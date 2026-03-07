@@ -12,29 +12,26 @@ const firebaseConfig = {
 };
 
 /**
- * Firebase is a browser-only SDK. We guard initialization with a typeof window
- * check so that SSR pre-rendering never calls initializeApp() (which would
- * throw auth/invalid-api-key because NEXT_PUBLIC_ vars aren't injected at
- * build-time for server-side rendering).
+ * Initialize Firebase once — works in both browser and Node.js (server actions).
+ * NEXT_PUBLIC_* vars are available in both contexts on Vercel.
  *
- * Auth state is initialized in AuthProvider via useEffect, which only runs
- * client-side, so the `null!` assertions below are safe in practice.
+ * - `app` and `db` (Firestore) are safe server-side (used by server actions).
+ * - `auth` is only instantiated in the browser because it relies on
+ *   localStorage persistence. Client components use it via AuthProvider;
+ *   server actions must never call auth directly.
  */
-const isBrowser = typeof window !== 'undefined';
+const _app: FirebaseApp =
+  getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 
-let _app: FirebaseApp;
+const _db: Firestore = getFirestore(_app);
+
+// Auth persistence (localStorage) is browser-only — instantiate lazily
 let _auth: Auth;
-let _db: Firestore;
-
-if (isBrowser) {
-  _app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+if (typeof window !== 'undefined') {
   _auth = getAuth(_app);
-  _db = getFirestore(_app);
 }
 
-// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-export const app = _app!;
+export const app = _app;
+export const db = _db;
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 export const auth = _auth!;
-// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-export const db = _db!;
