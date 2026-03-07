@@ -123,3 +123,61 @@ export interface VocabImageResult {
   imageUrl: string;
   imageAlt: string;
 }
+
+// ─── Curriculum & Lesson Engine ───────────────────────────────────────────────
+
+export interface LessonDefinition {
+  id: string;
+  language: SupportedLanguage;
+  level: ProficiencyLevel;
+  grammarFocus: string;
+}
+
+// ─── Exercise Data Types ──────────────────────────────────────────────────────
+
+export interface ContextChoiceData {
+  sentence: string;      // "Je ___ un café." (blank represented as ___)
+  blankWord: string;     // the correct answer
+  options: string[];     // 4 options including the correct one
+  translation: string;   // Portuguese translation of the full sentence
+}
+
+export interface SentenceBuilderData {
+  words: string[];        // shuffled word list
+  correctOrder: string[]; // correct arrangement
+  translation: string;    // Portuguese translation
+}
+
+export interface ReverseTranslationData {
+  portuguese_sentence: string;
+  target_translation: string;
+  acceptable_variants: string[];
+  hint?: string;
+}
+
+export interface DictationData {
+  text: string;        // text to play via TTS
+  translation: string; // Portuguese hint
+}
+
+export interface ErrorCorrectionData {
+  sentence_with_error: string;
+  error_word: string;
+  correct_word: string;
+  explanation: string; // in Portuguese
+}
+
+export interface ConjugationDrillData {
+  verb: string;
+  tense: string;
+  conjugations: Array<{ pronoun: string; form: string; blank: boolean }>;
+  tip?: string;
+}
+
+export type Exercise =
+  | { type: 'context-choice';         data: ContextChoiceData }
+  | { type: 'sentence-builder';       data: SentenceBuilderData }
+  | { type: 'reverse-translation';    data: ReverseTranslationData }
+  | { type: 'audio-dictation';        data: DictationData }
+  | { type: 'error-correction';       data: ErrorCorrectionData }
+  | { type: 'verb-conjugation-drill'; data: ConjugationDrillData }

@@ -1,0 +1,535 @@
+'use client';
+
+import { useEffect, useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
+import { Loader2, Trophy } from 'lucide-react';
+
+import { useAuthStore } from '@/store/authStore';
+import { useLessonStore } from '@/store/lessonStore';
+import { getNextLesson } from '@/lib/curriculum';
+
+import { generateHook } from '@/app/actions/generateHook';
+import { generateGrammarBridge } from '@/app/actions/generateGrammarBridge';
+import { getVocabImage } from '@/app/actions/getVocabImage';
+import { generatePracticeExercises } from '@/app/actions/generatePracticeExercises';
+import { translateWord } from '@/app/actions/translateWord';
+import { upsertVocabularyItem, logLesson } from '@/services/firestore';
+
+import { LessonProgressHeader } from '@/components/lesson/LessonProgressHeader';
+import { ClickableSentence } from '@/components/lesson/ClickableSentence';
+import { TranslationTooltip } from '@/components/lesson/TranslationTooltip';
+import { GrammarBridgeCard } from '@/components/lesson/GrammarBridgeCard';
+import { VisualVocabCard } from '@/components/lesson/VisualVocabCard';
+import { CheckButton } from '@/components/lesson/CheckButton';
+import { ContextChoiceExercise } from '@/components/lesson/ContextChoiceExercise';
+import { SentenceBuilder } from '@/components/lesson/SentenceBuilder';
+import { ReverseTranslationInput } from '@/components/lesson/ReverseTranslationInput';
+import { DictationInput } from '@/components/lesson/DictationInput';
+import { ErrorCorrectionExercise } from '@/components/lesson/ErrorCorrectionExercise';
+import { VerbConjugationDrill } from '@/components/lesson/VerbConjugationDrill';
+
+import type { LessonStage } from '@/types';
+import type { WordClickPayload } from '@/components/lesson/ClickableWord';
+
+// ── Map LessonPhase → LessonStage for progress header ────────────────────────
+
+function phaseToStage(phase: string): LessonStage {
+  switch (phase) {
+    case 'hook':       return 'hook';
+    case 'grammar':    return 'grammar';
+    case 'vocabulary': return 'vocabulary';
+    case 'practice':   return 'practice';
+    case 'complete':   return 'review';
+    default:           return 'hook';
+  }
+}
+
+// ── Tooltip state shape ───────────────────────────────────────────────────────
+
+interface TooltipState {
+  isOpen: boolean;
+  word: string;
+  isLoading: boolean;
+  translation?: string;
+  explanation?: string;
+  example?: string;
+}
+
+const CLOSED_TOOLTIP: TooltipState = { isOpen: false, word: '', isLoading: false };
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+export default function LessonPage() {
+  const router = useRouter();
+  const { user, profile } = useAuthStore();
+  const store = useLessonStore();
+
+  // Per-exercise answer state
+  const [exerciseAnswer, setExerciseAnswer] = useState<boolean | null>(null);
+  const [tooltip, setTooltip] = useState<TooltipState>(CLOSED_TOOLTIP);
+
+  // ── Redirect if not authenticated ────────────────────────────────────────
+
+  useEffect(() => {
+    if (!user || !profile) {
+      router.replace('/login');
+    }
+  }, [user, profile, router]);
+
+  // ── Lesson bootstrap ─────────────────────────────────────────────────────
+
+  useEffect(() => {
+    if (!profile || store.phase !== 'idle') return;
+
+    const lesson = getNextLesson(profile.currentTargetLanguage);
+    store.init(lesson, profile.interests ?? []);
+
+    // Start generating the hook immediately
+    (async () => {
+      store.setIsLoading(true);
+      const hook = await generateHook({
+        language: lesson.language,
+        level: lesson.level,
+        interests: profile.interests ?? [],
+        grammarFocus: lesson.grammarFocus,
+      });
+      if (hook) {
+        store.setHook(hook);
+        store.setPhase('hook');
+      } else {
+        // Fallback: go straight to practice if hook fails
+        store.setPhase('complete');
+      }
+    })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile]);
+
+  // ── Stage advance handlers ────────────────────────────────────────────────
+
+  async function advanceFromHook() {
+    if (!store.lesson || !store.hook || store.isLoading) return;
+    store.setIsLoading(true);
+
+    const bridge = await generateGrammarBridge({
+      dialogue: store.hook.dialogue,
+      grammarFocus: store.hook.grammarFocus,
+      language: store.lesson.language,
+    });
+    if (bridge) store.setGrammarBridge(bridge);
+    else store.setIsLoading(false);
+    store.setPhase('grammar');
+  }
+
+  async function advanceFromGrammar() {
+    if (!store.lesson || !store.hook || store.isLoading) return;
+    store.setIsLoading(true);
+
+    // Fetch vocab images in parallel
+    const words = store.hook.newVocabulary;
+    await Promise.all(
+      words.map(async (word) => {
+        const result = await getVocabImage(word, store.hook!.dialogue, store.lesson!.language);
+        store.setVocabImage(word, result);
+      }),
+    );
+
+    store.setIsLoading(false);
+    store.setPhase('vocabulary');
+  }
+
+  async function advanceFromVocabulary() {
+    if (!store.lesson || !store.hook || store.isLoading) return;
+    store.setIsLoading(true);
+
+    // Generate 2 AI exercises
+    const aiExercises = await generatePracticeExercises({
+      dialogue: store.hook.dialogue,
+      newVocabulary: store.hook.newVocabulary,
+      language: store.lesson.language,
+      level: store.lesson.level,
+    });
+
+    // Build SentenceBuilder client-side from dialogue words
+    const words = store.hook.dialogue
+      .replace(/\n/g, ' ')
+      .split(/\s+/)
+      .filter((w) => w.length > 0)
+      .slice(0, 8); // keep it manageable
+
+    const sentenceExercise = {
+      type: 'sentence-builder' as const,
+      data: {
+        words: [...words].sort(() => Math.random() - 0.5),
+        correctOrder: words,
+        translation: '', // No PT translation needed here
+      },
+    };
+
+    const allExercises = [...(aiExercises ?? []), sentenceExercise];
+    store.setExercises(allExercises);
+    store.setPhase('practice');
+  }
+
+  async function finishLesson() {
+    if (!user || !store.lesson || !store.hook) return;
+    const total = store.exercises.length;
+    const score = total > 0 ? Math.round((store.correctCount / total) * 100) : 0;
+
+    // Fire-and-forget — don't block the UI
+    logLesson({
+      uid: user.uid,
+      lessonId: store.lesson.id,
+      language: store.lesson.language,
+      score,
+    }).catch(console.error);
+
+    store.hook.newVocabulary.forEach((word) => {
+      // For vocabulary items we need a translation; use word itself as placeholder
+      // (in practice, we already fetched the translation via TranslationTooltip earlier)
+      upsertVocabularyItem(user.uid, word, word, store.lesson!.language).catch(console.error);
+    });
+
+    store.setPhase('complete');
+  }
+
+  // ── Exercise check / continue ─────────────────────────────────────────────
+
+  function handleAnswer(correct: boolean) {
+    setExerciseAnswer(correct);
+    if (correct) store.recordCorrect();
+  }
+
+  function handleCheck() {
+    // CheckButton in 'idle' state — nothing to do here; exercises call onAnswer directly
+  }
+
+  function handleContinue() {
+    setExerciseAnswer(null);
+    const isLast = store.exerciseIndex >= store.exercises.length - 1;
+    if (isLast) {
+      finishLesson();
+    } else {
+      store.nextExercise();
+    }
+  }
+
+  // ── Click-to-translate ────────────────────────────────────────────────────
+
+  const handleWordClick = useCallback(
+    async ({ word }: WordClickPayload) => {
+      if (!store.lesson) return;
+      setTooltip({ isOpen: true, word, isLoading: true });
+      const result = await translateWord(word, store.hook?.dialogue ?? '', store.lesson.language);
+      setTooltip({
+        isOpen: true,
+        word,
+        isLoading: false,
+        translation: result?.translation,
+        explanation: result?.explanation,
+        example: result?.example,
+      });
+    },
+    [store.lesson, store.hook],
+  );
+
+  // ── Derived state ─────────────────────────────────────────────────────────
+
+  const phase = store.phase;
+  const currentExercise = store.exercises[store.exerciseIndex];
+
+  const checkState = (() => {
+    if (exerciseAnswer === null) return 'disabled' as const;
+    return exerciseAnswer ? 'correct' as const : 'incorrect' as const;
+  })();
+
+  // For exercises that require manual Verificar (like ReverseTranslation / Dictation)
+  // those components call onAnswer internally; CheckButton state is driven by exerciseAnswer
+
+  // ── Loading screen ────────────────────────────────────────────────────────
+
+  if (phase === 'idle' || phase === 'loading') {
+    return (
+      <div
+        className="flex min-h-dvh flex-col items-center justify-center gap-4"
+        style={{ backgroundColor: 'var(--color-bg)' }}
+      >
+        <Loader2 size={36} className="animate-spin" style={{ color: 'var(--color-primary)' }} />
+        <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+          Gerando sua lição…
+        </p>
+      </div>
+    );
+  }
+
+  // ── Complete screen ───────────────────────────────────────────────────────
+
+  if (phase === 'complete') {
+    const total = store.exercises.length;
+    const correct = store.correctCount;
+    const pct = total > 0 ? Math.round((correct / total) * 100) : 100;
+
+    return (
+      <div
+        className="flex min-h-dvh flex-col items-center justify-center gap-6 px-5 py-12"
+        style={{ backgroundColor: 'var(--color-bg)' }}
+      >
+        <div
+          className="flex h-20 w-20 items-center justify-center rounded-full"
+          style={{ backgroundColor: 'var(--color-primary-light)' }}
+        >
+          <Trophy size={40} style={{ color: 'var(--color-primary)' }} />
+        </div>
+
+        <div className="text-center">
+          <h1 className="font-display text-3xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
+            Lição concluída!
+          </h1>
+          <p className="mt-2 text-lg font-semibold" style={{ color: 'var(--color-primary)' }}>
+            {pct}% de acerto
+          </p>
+          <p className="mt-1 text-sm" style={{ color: 'var(--color-text-muted)' }}>
+            {correct} de {total} exercícios corretos
+          </p>
+        </div>
+
+        {store.hook && store.hook.newVocabulary.length > 0 && (
+          <div
+            className="w-full max-w-sm rounded-2xl p-4"
+            style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
+          >
+            <p className="mb-3 text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--color-text-muted)' }}>
+              Palavras aprendidas
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {store.hook.newVocabulary.map((w) => (
+                <span
+                  key={w}
+                  className="rounded-lg px-3 py-1 text-sm font-medium"
+                  style={{ backgroundColor: 'var(--color-vocab-bg)', color: 'var(--color-vocab)' }}
+                >
+                  {w}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <button
+          type="button"
+          onClick={() => { store.reset(); router.replace('/'); }}
+          className="rounded-2xl px-8 py-4 text-base font-semibold transition-all active:scale-95"
+          style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-text-inverse)' }}
+        >
+          Voltar ao início
+        </button>
+      </div>
+    );
+  }
+
+  // ── Main lesson layout ────────────────────────────────────────────────────
+
+  return (
+    <div style={{ backgroundColor: 'var(--color-bg)', minHeight: '100dvh' }}>
+      <LessonProgressHeader
+        currentStage={phaseToStage(phase)}
+        onExit={() => { store.reset(); router.replace('/'); }}
+      />
+
+      <main className="mx-auto max-w-[640px] px-5 pt-6 pb-48">
+
+        {/* ── Hook phase ── */}
+        {phase === 'hook' && store.hook && (
+          <div className="flex flex-col gap-5 animate-slide-up">
+            <div>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--color-text-muted)' }}>
+                Diálogo
+              </p>
+              {store.hook.dialogue.split('\n').map((line, i) => (
+                <ClickableSentence
+                  key={i}
+                  text={line}
+                  newVocabulary={store.hook!.newVocabulary}
+                  onWordClick={handleWordClick}
+                  className="text-lg"
+                />
+              ))}
+            </div>
+            <p className="text-xs" style={{ color: 'var(--color-text-muted)', fontStyle: 'italic' }}>
+              Toque nas palavras para ver a tradução
+            </p>
+          </div>
+        )}
+
+        {/* ── Grammar phase ── */}
+        {phase === 'grammar' && store.grammarBridge && store.lesson && (
+          <div className="animate-slide-up">
+            <GrammarBridgeCard
+              rule={store.grammarBridge.rule}
+              targetExample={store.grammarBridge.targetExample}
+              portugueseComparison={store.grammarBridge.portugueseComparison}
+              language={store.lesson.language}
+            />
+          </div>
+        )}
+
+        {/* ── Vocabulary phase ── */}
+        {phase === 'vocabulary' && store.hook && store.lesson && (
+          <div className="flex flex-col gap-4 animate-slide-up">
+            <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--color-text-muted)' }}>
+              Novo vocabulário
+            </p>
+            {store.isLoading && store.hook.newVocabulary.length === 0 && (
+              <div className="flex items-center gap-3">
+                <Loader2 size={18} className="animate-spin" style={{ color: 'var(--color-primary)' }} />
+                <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Carregando imagens…</span>
+              </div>
+            )}
+            {store.hook.newVocabulary.map((word) => {
+              const img = store.vocabImages[word];
+              return (
+                <VisualVocabCard
+                  key={word}
+                  word={word}
+                  translation={word} // placeholder; real translation is in tooltip
+                  language={store.lesson!.language}
+                  imageUrl={img?.imageUrl}
+                  imageAlt={img?.imageAlt}
+                />
+              );
+            })}
+          </div>
+        )}
+
+        {/* ── Practice phase ── */}
+        {phase === 'practice' && currentExercise && store.lesson && (
+          <div className="animate-slide-up">
+            <div className="mb-4 flex items-center justify-between">
+              <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--color-text-muted)' }}>
+                Exercício {store.exerciseIndex + 1} / {store.exercises.length}
+              </p>
+              <div className="flex gap-1">
+                {store.exercises.map((_, i) => (
+                  <div
+                    key={i}
+                    className="h-1.5 w-6 rounded-full"
+                    style={{
+                      backgroundColor: i < store.exerciseIndex
+                        ? 'var(--color-success)'
+                        : i === store.exerciseIndex
+                          ? 'var(--color-primary)'
+                          : 'var(--color-border)',
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {currentExercise.type === 'context-choice' && (
+              <ContextChoiceExercise
+                data={currentExercise.data}
+                onAnswer={handleAnswer}
+                answered={exerciseAnswer !== null}
+              />
+            )}
+            {currentExercise.type === 'sentence-builder' && (
+              <SentenceBuilder
+                data={currentExercise.data}
+                onAnswer={handleAnswer}
+                answered={exerciseAnswer !== null}
+              />
+            )}
+            {currentExercise.type === 'reverse-translation' && (
+              <ReverseTranslationInput
+                data={currentExercise.data}
+                onAnswer={handleAnswer}
+                answered={exerciseAnswer !== null}
+              />
+            )}
+            {currentExercise.type === 'audio-dictation' && (
+              <DictationInput
+                data={currentExercise.data}
+                language={store.lesson.language}
+                onAnswer={handleAnswer}
+                answered={exerciseAnswer !== null}
+              />
+            )}
+            {currentExercise.type === 'error-correction' && (
+              <ErrorCorrectionExercise
+                data={currentExercise.data}
+                onAnswer={handleAnswer}
+                answered={exerciseAnswer !== null}
+              />
+            )}
+            {currentExercise.type === 'verb-conjugation-drill' && (
+              <VerbConjugationDrill
+                data={currentExercise.data}
+                onAnswer={handleAnswer}
+                answered={exerciseAnswer !== null}
+              />
+            )}
+          </div>
+        )}
+      </main>
+
+      {/* ── Bottom CTA bar (non-practice phases) ── */}
+      {phase !== 'practice' && (
+        <div
+          className="fixed bottom-0 left-0 right-0 z-20 mx-auto max-w-[640px] px-5 pb-6 pt-3"
+          style={{ backgroundColor: 'var(--color-bg)' }}
+        >
+          <button
+            type="button"
+            disabled={store.isLoading}
+            onClick={
+              phase === 'hook'
+                ? advanceFromHook
+                : phase === 'grammar'
+                  ? advanceFromGrammar
+                  : advanceFromVocabulary
+            }
+            className="flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-4 text-base font-semibold transition-all active:scale-[0.98] disabled:cursor-not-allowed"
+            style={{
+              backgroundColor: store.isLoading ? 'var(--color-surface-raised)' : 'var(--color-primary)',
+              color: store.isLoading ? 'var(--color-text-muted)' : 'var(--color-text-inverse)',
+              boxShadow: store.isLoading ? 'none' : '0 4px 16px rgba(29, 94, 212, 0.3)',
+            }}
+          >
+            {store.isLoading ? (
+              <>
+                <Loader2 size={20} className="animate-spin" />
+                Carregando…
+              </>
+            ) : phase === 'vocabulary' ? (
+              'Praticar'
+            ) : (
+              'Continuar'
+            )}
+          </button>
+        </div>
+      )}
+
+      {/* ── CheckButton (practice phase) ── */}
+      {phase === 'practice' && (
+        <CheckButton
+          state={checkState}
+          onCheck={handleCheck}
+          onContinue={handleContinue}
+        />
+      )}
+
+      {/* ── Translation tooltip ── */}
+      {store.lesson && (
+        <TranslationTooltip
+          word={tooltip.word}
+          language={store.lesson.language}
+          translation={tooltip.translation}
+          explanation={tooltip.explanation}
+          example={tooltip.example}
+          isOpen={tooltip.isOpen}
+          isLoading={tooltip.isLoading}
+          onClose={() => setTooltip(CLOSED_TOOLTIP)}
+        />
+      )}
+    </div>
+  );
+}

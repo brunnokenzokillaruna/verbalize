@@ -45,18 +45,22 @@ This document outlines the step-by-step implementation plan for the Verbalize ap
 - [x] Wired `translateWord` into `/preview` page (real Gemini call on word click).
 - [x] Set up Text-to-Speech (TTS) — browser native SpeechSynthesis via `useAudio` hook (done in Phase 3).
 
-## Phase 5: Lesson Engine
-- [ ] Build the Lesson State Machine (Hook -> Grammar -> Vocab -> Practice -> Review).
-- [ ] Implement Exercise Types:
-  - Context Choice (`ContextChoiceExercise`)
-  - Sentence Builder (`SentenceBuilder`)
-  - Image Match (`ImageMatchGrid`)
-  - Audio Dictation (`DictationInput`) — user listens and types what they hear
-  - Speak & Repeat (`SpeechRecorder`) — browser SpeechRecognition API
-  - Error Correction (`ErrorCorrectionExercise`) — tap incorrect word, type fix
-  - Reverse Translation (`ReverseTranslationInput`) — PT → target language
-  - Verb Conjugation Drill (`VerbConjugationDrill`) — fill blank table cells
-- [ ] Implement Spaced Repetition (SRS) logic (calculate `nextReview` dates).
+## Phase 5: Lesson Engine ✅
+- [x] `types/index.ts` — Extended with `LessonDefinition`, `Exercise` discriminated union, and 6 exercise data types.
+- [x] `lib/curriculum.ts` — 10 French + 10 English lesson definitions (A1–A2), `getNextLesson()`.
+- [x] `lib/srs.ts` — Simplified SM-2 spaced repetition: 6 levels, intervals [1, 3, 7, 14, 30, 90] days.
+- [x] `store/lessonStore.ts` — Zustand lesson state machine (`idle → loading → hook → grammar → vocabulary → practice → complete`).
+- [x] `app/actions/generatePracticeExercises.ts` — Gemini generates 2 exercises (context-choice + reverse-translation) in one call.
+- [x] 5 exercise components (SpeechRecorder deferred to Phase 7):
+  - `ContextChoiceExercise` — sentence-with-blank + 4 tappable option pills.
+  - `SentenceBuilder` — click-to-order word bank + answer area (no DnD library).
+  - `ReverseTranslationInput` — PT source card + free-text textarea + collapsible hint.
+  - `DictationInput` — AudioPlayerButton + transcription input + collapsible translation hint.
+  - `ErrorCorrectionExercise` — highlighted error word + correction input.
+  - `VerbConjugationDrill` — pronoun/conjugation table with blank `<input>` cells.
+- [x] `services/firestore.ts` — Added `upsertVocabularyItem` (SM-2 create/update) + `logLesson`.
+- [x] `app/(app)/lesson/page.tsx` — Full lesson orchestrator: lazy stage loading, exercise loop, CheckButton integration, Firestore saves on complete.
+- [x] `app/(app)/page.tsx` — Dashboard "Iniciar Lição" button navigates to `/lesson`.
 
 ## Phase 6: Vocabulary & Analytics
 - [ ] Build the "Verb Explorer" screen with searchable conjugation tables.

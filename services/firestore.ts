@@ -10,9 +10,11 @@ import {
   addDoc,
   serverTimestamp,
   type DocumentData,
+  Timestamp,
 } from 'firebase/firestore';
 import { db } from './firebase';
-import type { UserDocument, UserVocabularyDocument, ImageCacheDocument } from '@/types';
+import type { UserDocument, UserVocabularyDocument, ImageCacheDocument, SupportedLanguage } from '@/types';
+import { calculateNextReview } from '@/lib/srs';
 
 // ─── Users ────────────────────────────────────────────────────────────────────
 
@@ -56,6 +58,71 @@ export async function addVocabularyItem(
 ): Promise<string> {
   const ref = await addDoc(collection(db, 'user_vocabulary'), data);
   return ref.id;
+}
+
+// ─── Vocabulary (upsert with SRS) ─────────────────────────────────────────────
+
+/**
+ * Creates a new vocabulary item if the word doesn't exist yet for this user+language.
+ * If it already exists, updates the SRS level and nextReview date.
+ * `correct` defaults to true (first encounter = learned).
+ */
+export async function upsertVocabularyItem(
+  uid: string,
+  word: string,
+  translation: string,
+  language: SupportedLanguage,
+): Promise<void> {
+  const q = query(
+    collection(db, 'user_vocabulary'),
+    where('uid', '==', uid),
+    where('language', '==', language),
+    where('word', '==', word),
+  );
+  const snap = await getDocs(q);
+
+  if (snap.empty) {
+    // First encounter — create at srsLevel 0
+    const { newLevel, nextReview } = calculateNextReview(0, true);
+    await addDoc(collection(db, 'user_vocabulary'), {
+      uid,
+      language,
+      word,
+      translation,
+      srsLevel: newLevel,
+      mistakeCount: 0,
+      firstSeen: serverTimestamp(),
+      lastReview: serverTimestamp(),
+      nextReview: Timestamp.fromDate(nextReview),
+    });
+  } else {
+    // Already exists — advance SRS level
+    const docRef = snap.docs[0].ref;
+    const existing = snap.docs[0].data() as UserVocabularyDocument;
+    const { newLevel, nextReview } = calculateNextReview(existing.srsLevel, true);
+    await updateDoc(docRef, {
+      srsLevel: newLevel,
+      lastReview: serverTimestamp(),
+      nextReview: Timestamp.fromDate(nextReview),
+    });
+  }
+}
+
+// ─── Lesson Log ───────────────────────────────────────────────────────────────
+
+/**
+ * Records a completed lesson in the `lesson_logs` collection.
+ */
+export async function logLesson(data: {
+  uid: string;
+  lessonId: string;
+  language: SupportedLanguage;
+  score: number;
+}): Promise<void> {
+  await addDoc(collection(db, 'lesson_logs'), {
+    ...data,
+    completedAt: serverTimestamp(),
+  });
 }
 
 // ─── Image Cache ──────────────────────────────────────────────────────────────

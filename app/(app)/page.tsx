@@ -102,31 +102,36 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Coming soon — Lesson CTA */}
-      <div
-        className="flex flex-col items-center justify-center rounded-3xl p-10 text-center animate-slide-up delay-225"
+      {/* Lesson CTA */}
+      <button
+        type="button"
+        onClick={() => router.push('/lesson')}
+        className="w-full rounded-3xl p-6 text-left transition-all active:scale-[0.98] animate-slide-up delay-225"
         style={{
-          backgroundColor: 'var(--color-primary-light)',
-          border: '2px dashed var(--color-primary)',
+          backgroundColor: 'var(--color-primary)',
+          boxShadow: '0 8px 32px rgba(29, 94, 212, 0.3)',
         }}
       >
-        <BookOpen size={40} style={{ color: 'var(--color-primary)' }} className="mb-4" />
-        <h2
-          className="font-display text-xl font-semibold"
-          style={{ color: 'var(--color-primary)' }}
-        >
-          Lições em breve
-        </h2>
-        <p className="mt-2 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-          O motor de lições está sendo construído. Em breve você começará sua jornada em {lang.name}!
-        </p>
-        <div
-          className="mt-4 flex items-center gap-1 text-sm font-medium"
-          style={{ color: 'var(--color-primary)' }}
-        >
-          Fase 3 a caminho <ChevronRight size={14} />
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div
+              className="flex h-12 w-12 items-center justify-center rounded-xl"
+              style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}
+            >
+              <BookOpen size={24} style={{ color: 'white' }} />
+            </div>
+            <div>
+              <p className="font-display text-xl font-bold" style={{ color: 'white' }}>
+                Iniciar Lição
+              </p>
+              <p className="text-sm" style={{ color: 'rgba(255,255,255,0.75)' }}>
+                {lang.flag} {lang.name} · Aprenda algo novo
+              </p>
+            </div>
+          </div>
+          <ChevronRight size={22} style={{ color: 'rgba(255,255,255,0.75)' }} />
         </div>
-      </div>
+      </button>
 
       <p
         className="mt-6 text-center text-xs animate-slide-up delay-300"
