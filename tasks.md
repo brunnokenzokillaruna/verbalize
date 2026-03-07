@@ -9,12 +9,19 @@ This document outlines the step-by-step implementation plan for the Verbalize ap
 - [x] Create basic folder structure (`components`, `features`, `lib`, `services`, `hooks`, `store`, `types`, `utils`).
 - [x] Define Tailwind v4 configuration (CSS variables, fonts via `next/font`, dark mode class).
 
-## Phase 2: Authentication & Onboarding
-- [ ] Implement Firebase Authentication (Email/Password & Google Sign-In).
-- [ ] Build Onboarding Flow:
-  - Collect user name, profession, interests.
-  - Select target language (French or English).
-- [ ] Save user profile data to Firestore `users` collection.
+## Phase 2: Authentication & Onboarding ✅
+- [x] Implement Firebase Authentication (Email/Password & Google Sign-In).
+- [x] Build Onboarding Flow (4 steps):
+  - Step 1: Name
+  - Step 2: Profession + language goal
+  - Step 3: Interests (multi-select grid)
+  - Step 4: Target language selection (French or English)
+- [x] Save user profile data to Firestore `users` collection.
+- [x] Zustand auth store + `AuthProvider` (syncs Firebase auth state globally).
+- [x] Route guards: `(app)/layout.tsx` redirects unauthenticated/non-onboarded users.
+- [x] Reusable UI components: `Button`, `Input`.
+- [x] `lib/env.ts` — server-side env validation with security documentation.
+- [x] Editorial split-layout login/signup pages (desktop) with floating word texture.
 
 ## Phase 3: Core UI Components
 - [ ] Build `ClickableWord` and `TranslationTooltip` components.

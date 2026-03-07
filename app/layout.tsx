@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Fraunces, DM_Sans } from 'next/font/google';
+import { AuthProvider } from '@/components/AuthProvider';
 import './globals.css';
 
 const fraunces = Fraunces({
@@ -19,7 +20,7 @@ const dmSans = DM_Sans({
 export const metadata: Metadata = {
   title: 'Verbalize',
   description:
-    'Learn French and English through micro-stories, grammar bridges, and spaced repetition — designed for Brazilian Portuguese speakers.',
+    'Aprenda francês e inglês através de micro-histórias, pontes gramaticais e revisão espaçada — feito para falantes de português brasileiro.',
 };
 
 export default function RootLayout({
@@ -29,7 +30,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" className={`${fraunces.variable} ${dmSans.variable}`}>
-      <body style={{ fontFamily: 'var(--font-body)' }}>{children}</body>
+      <body>
+        <AuthProvider>{children}</AuthProvider>
+      </body>
     </html>
   );
 }
