@@ -1,0 +1,178 @@
+@import 'tailwindcss';
+
+/* ─── Design Tokens ─────────────────────────────────────────────────────────── */
+
+@theme {
+  /* Fonts */
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+
+  /* Brand */
+  --color-brand-primary: var(--color-primary);
+  --color-brand-primary-light: var(--color-primary-light);
+  --color-brand-primary-dark: var(--color-primary-dark);
+
+  /* Pedagogical */
+  --color-vocab: var(--color-vocab-base);
+  --color-vocab-bg: var(--color-vocab-bg-base);
+  --color-bridge: var(--color-bridge-base);
+  --color-bridge-bg: var(--color-bridge-bg-base);
+
+  /* Feedback */
+  --color-success: var(--color-success-base);
+  --color-success-bg: var(--color-success-bg-base);
+  --color-error: var(--color-error-base);
+  --color-error-bg: var(--color-error-bg-base);
+}
+
+/* ─── CSS Variables: Light Mode ──────────────────────────────────────────────── */
+
+:root {
+  /* Backgrounds */
+  --color-bg: #fafaf7;
+  --color-surface: #ffffff;
+  --color-surface-raised: #f4f3ef;
+
+  /* Brand */
+  --color-primary: #1d5ed4;
+  --color-primary-light: #ebf3ff;
+  --color-primary-dark: #1648a8;
+
+  /* Pedagogical */
+  --color-vocab-base: #d97706;
+  --color-vocab-bg-base: #fef3c7;
+  --color-bridge-base: #6b7280;
+  --color-bridge-bg-base: #f3f4f6;
+
+  /* Feedback */
+  --color-success-base: #059669;
+  --color-success-bg-base: #d1fae5;
+  --color-error-base: #dc2626;
+  --color-error-bg-base: #fee2e2;
+
+  /* Text */
+  --color-text-primary: #1c1917;
+  --color-text-secondary: #57534e;
+  --color-text-muted: #a8a29e;
+  --color-text-inverse: #ffffff;
+
+  /* Border */
+  --color-border: #e7e5e0;
+  --color-border-strong: #c7c4be;
+}
+
+/* ─── CSS Variables: Dark Mode ───────────────────────────────────────────────── */
+
+.dark {
+  --color-bg: #111827;
+  --color-surface: #1f2937;
+  --color-surface-raised: #374151;
+
+  --color-primary: #3b82f6;
+  --color-primary-light: #1e3a5f;
+  --color-primary-dark: #60a5fa;
+
+  --color-vocab-base: #fbbf24;
+  --color-vocab-bg-base: #3d2e00;
+  --color-bridge-base: #9ca3af;
+  --color-bridge-bg-base: #1f2937;
+
+  --color-success-base: #10b981;
+  --color-success-bg-base: #064e3b;
+  --color-error-base: #f87171;
+  --color-error-bg-base: #450a0a;
+
+  --color-text-primary: #f9fafb;
+  --color-text-secondary: #d1d5db;
+  --color-text-muted: #6b7280;
+  --color-text-inverse: #111827;
+
+  --color-border: #374151;
+  --color-border-strong: #4b5563;
+}
+
+/* ─── Base Styles ────────────────────────────────────────────────────────────── */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  min-height: 100dvh;
+  background-color: var(--color-bg);
+}
+
+/* ─── Typography Utilities ───────────────────────────────────────────────────── */
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-body {
+  font-family: var(--font-body);
+}
+
+.lesson-text {
+  font-size: 18px;
+  line-height: 1.7;
+}
+
+.bridge-text {
+  font-size: 14px;
+  color: var(--color-bridge-base);
+  font-style: italic;
+}
+
+/* ─── Keyframe Animations ────────────────────────────────────────────────────── */
+
+@keyframes tooltip-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes correct-bounce {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.12); }
+  70% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+@keyframes stage-enter {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+.animate-tooltip { animation: tooltip-enter 150ms ease forwards; }
+.animate-correct { animation: correct-bounce 400ms cubic-bezier(0.34, 1.56, 0.64, 1); }
+.animate-stage { animation: stage-enter 200ms ease forwards; }
+.animate-shake { animation: shake 350ms ease; }
