@@ -23,10 +23,17 @@ This document outlines the step-by-step implementation plan for the Verbalize ap
 - [x] `lib/env.ts` — server-side env validation with security documentation.
 - [x] Editorial split-layout login/signup pages (desktop) with floating word texture.
 
-## Phase 3: Core UI Components
-- [ ] Build `ClickableWord` and `TranslationTooltip` components.
-- [ ] Build `LessonProgressHeader` and sticky bottom `CheckButton`.
-- [ ] Build `GrammarBridgeCard` and `VisualVocabCard`.
+## Phase 3: Core UI Components ✅
+- [x] `hooks/useAudio.ts` — browser SpeechSynthesis hook (speak/stop/toggle, rate 0.85).
+- [x] `AudioPlayerButton` — circular play button with pulsing ring animation (sm/md/lg sizes).
+- [x] `ClickableWord` — amber vocab highlight, ripple on click, fires `onWordClick` payload.
+- [x] `ClickableSentence` — tokenizes text into clickable words + non-clickable punctuation.
+- [x] `TranslationTooltip` — bottom sheet (slides up), backdrop blur, skeleton loading, body scroll lock.
+- [x] `LessonProgressHeader` — 5-segment pill progress bar with exit button + stage label.
+- [x] `CheckButton` — idle/disabled/correct/incorrect states, result feedback banner, answer reveal.
+- [x] `GrammarBridgeCard` — left-border accent, target/Portuguese comparison rows.
+- [x] `VisualVocabCard` — image-first with gradient overlay, placeholder emoji, audio button.
+- [x] `app/(app)/preview/page.tsx` — living component showcase with interactive demo data.
 
 ## Phase 4: AI & External API Integration
 - [ ] Integrate Gemini API.
@@ -34,7 +41,7 @@ This document outlines the step-by-step implementation plan for the Verbalize ap
   - Write server actions to generate Grammar Bridges.
 - [ ] Integrate Pexels API.
   - Create the caching logic (check Firestore `image_cache` -> fetch Pexels -> save to Firestore).
-- [ ] Set up Text-to-Speech (TTS) for audio pronunciation (Browser native SpeechSynthesis or free tier cloud TTS).
+- [x] Set up Text-to-Speech (TTS) — browser native SpeechSynthesis via `useAudio` hook (done in Phase 3).
 
 ## Phase 5: Lesson Engine
 - [ ] Build the Lesson State Machine (Hook -> Grammar -> Vocab -> Practice -> Review).
