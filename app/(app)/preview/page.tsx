@@ -11,6 +11,7 @@ import { AudioPlayerButton } from '@/components/lesson/AudioPlayerButton';
 import type { WordClickPayload } from '@/components/lesson/ClickableWord';
 import type { CheckButtonState } from '@/components/lesson/CheckButton';
 import type { LessonStage, SupportedLanguage } from '@/types';
+import { translateWord } from '@/app/actions/translateWord';
 
 // ─── Sample data ────────────────────────────────────────────────────────────
 
@@ -70,28 +71,17 @@ export default function PreviewPage() {
   const [stageIndex, setStageIndex] = useState(1);
   const currentStage = STAGES_ORDER[stageIndex];
 
-  function handleWordClick({ word }: WordClickPayload) {
+  async function handleWordClick({ word }: WordClickPayload) {
     setTooltip({ isOpen: true, word, isLoading: true });
-    // Simulate async translation
-    setTimeout(() => {
-      const data: Record<string, { translation: string; explanation?: string; example?: string }> = {
-        voudrais: {
-          translation: 'gostaria',
-          explanation: '"Voudrais" é o condicional de "vouloir" (querer). Usado para pedidos educados — igual a "gostaria" em português.',
-          example: 'Je voudrais visiter Paris.',
-        },
-        café: {
-          translation: 'café / coffee',
-          example: "Un café, s'il vous plaît!",
-        },
-        plaît: {
-          translation: 'agrada (de "plaire")',
-          explanation: '"S\'il vous plaît" = "se lhe agrada" → Por favor. Expressão fixa de cortesia.',
-        },
-      };
-      const entry = data[word.toLowerCase()] ?? { translation: '(sem tradução de demo)' };
-      setTooltip({ isOpen: true, word, isLoading: false, ...entry });
-    }, 800);
+    const result = await translateWord(word, HOOK_SENTENCE, 'fr');
+    setTooltip({
+      isOpen: true,
+      word,
+      isLoading: false,
+      translation: result?.translation,
+      explanation: result?.explanation,
+      example: result?.example,
+    });
   }
 
   function handleCheck() {

@@ -35,12 +35,14 @@ This document outlines the step-by-step implementation plan for the Verbalize ap
 - [x] `VisualVocabCard` — image-first with gradient overlay, placeholder emoji, audio button.
 - [x] `app/(app)/preview/page.tsx` — living component showcase with interactive demo data.
 
-## Phase 4: AI & External API Integration
-- [ ] Integrate Gemini API.
-  - Write server actions to generate the "Hook" stories based on the curriculum.
-  - Write server actions to generate Grammar Bridges.
-- [ ] Integrate Pexels API.
-  - Create the caching logic (check Firestore `image_cache` -> fetch Pexels -> save to Firestore).
+## Phase 4: AI & External API Integration ✅
+- [x] `services/gemini.ts` — `callGemini` + `callGeminiJSON` REST client (no SDK, native fetch, `gemini-2.0-flash-lite`).
+- [x] `services/pexels.ts` — `searchPexels` with edge revalidation (1h cache).
+- [x] `app/actions/translateWord.ts` — Gemini Prompt #5; powers click-to-translate bottom sheet.
+- [x] `app/actions/generateHook.ts` — Gemini Prompt #1; generates personalized dialogue + vocabulary list.
+- [x] `app/actions/generateGrammarBridge.ts` — Gemini Prompt #2; outputs `GrammarBridgeCard` props directly.
+- [x] `app/actions/getVocabImage.ts` — Firestore cache → Gemini keyword → Pexels → save cache pipeline.
+- [x] Wired `translateWord` into `/preview` page (real Gemini call on word click).
 - [x] Set up Text-to-Speech (TTS) — browser native SpeechSynthesis via `useAudio` hook (done in Phase 3).
 
 ## Phase 5: Lesson Engine

@@ -98,3 +98,28 @@ export type ExerciseType =
   | 'error-correction'
   | 'reverse-translation'
   | 'verb-conjugation-drill';
+
+// ─── Server Action Result Types ───────────────────────────────────────────────
+
+export interface TranslateWordResult {
+  translation: string;
+  explanation: string;
+  example: string;
+}
+
+export interface HookResult {
+  dialogue: string;
+  newVocabulary: string[];
+  grammarFocus: string;
+}
+
+export interface GrammarBridgeResult {
+  rule: string;
+  targetExample: string;
+  portugueseComparison: string;
+}
+
+export interface VocabImageResult {
+  imageUrl: string;
+  imageAlt: string;
+}
