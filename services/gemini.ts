@@ -1,7 +1,7 @@
 import { getGeminiKey } from '@/lib/env';
 
-// Free-tier Gemini model (2.5 Flash-Lite — fastest & cheapest in the 2.5 family)
-const GEMINI_MODEL = 'gemini-2.5-flash-lite';
+// Latest free-tier Gemini model as specified in CLAUDE.md
+const GEMINI_MODEL = 'gemini-3.1-flash-lite-preview';
 
 interface GeminiResponse {
   candidates?: Array<{

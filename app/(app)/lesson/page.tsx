@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Loader2, Trophy } from 'lucide-react';
+import { Loader2, Trophy, Volume2, VolumeX } from 'lucide-react';
 
 import { useAuthStore } from '@/store/authStore';
 import { useLessonStore } from '@/store/lessonStore';
@@ -68,6 +68,35 @@ export default function LessonPage() {
   const [exerciseAnswer, setExerciseAnswer] = useState<boolean | null>(null);
   const [tooltip, setTooltip] = useState<TooltipState>(CLOSED_TOOLTIP);
   const [hookError, setHookError] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  // ── Audio (Web Speech API) ────────────────────────────────────────────────
+
+  const langCode = store.lesson?.language === 'fr' ? 'fr-FR' : 'en-US';
+
+  const playDialogue = useCallback(() => {
+    if (!store.hook) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(
+      store.hook.dialogue.replace(/\n/g, ' '),
+    );
+    utterance.lang = langCode;
+    utterance.rate = 0.88;
+    utterance.onstart = () => setIsPlaying(true);
+    utterance.onend = () => setIsPlaying(false);
+    utterance.onerror = () => setIsPlaying(false);
+    window.speechSynthesis.speak(utterance);
+  }, [store.hook, langCode]);
+
+  // Auto-play when hook phase is entered; cancel on phase change
+  useEffect(() => {
+    if (store.phase === 'hook') {
+      const t = setTimeout(playDialogue, 400);
+      return () => { clearTimeout(t); window.speechSynthesis.cancel(); };
+    }
+    window.speechSynthesis.cancel();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [store.phase]);
 
   // ── Redirect if not authenticated ────────────────────────────────────────
 
@@ -407,9 +436,23 @@ export default function LessonPage() {
         {phase === 'hook' && store.hook && (
           <div className="flex flex-col gap-5 animate-slide-up">
             <div>
-              <p className="mb-2 text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--color-text-muted)' }}>
-                Diálogo
-              </p>
+              <div className="mb-2 flex items-center justify-between">
+                <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--color-text-muted)' }}>
+                  Diálogo
+                </p>
+                <button
+                  type="button"
+                  onClick={isPlaying ? () => { window.speechSynthesis.cancel(); setIsPlaying(false); } : playDialogue}
+                  aria-label={isPlaying ? 'Parar áudio' : 'Ouvir diálogo'}
+                  className="flex h-8 w-8 items-center justify-center rounded-full transition-all active:scale-90"
+                  style={{
+                    backgroundColor: isPlaying ? 'var(--color-primary)' : 'var(--color-surface-raised)',
+                    color: isPlaying ? 'var(--color-text-inverse)' : 'var(--color-text-muted)',
+                  }}
+                >
+                  {isPlaying ? <VolumeX size={15} /> : <Volume2 size={15} />}
+                </button>
+              </div>
               {store.hook.dialogue.split('\n').map((line, i) => (
                 <ClickableSentence
                   key={i}
