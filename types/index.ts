@@ -121,6 +121,7 @@ export interface GrammarBridgeResult {
   rule: string;
   targetExample: string;
   portugueseComparison: string;
+  additionalExamples?: Array<{ target: string; portuguese: string }>;
 }
 
 export interface VocabImageResult {

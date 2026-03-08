@@ -276,23 +276,33 @@ export default function LessonPage() {
       level: store.lesson.level,
     });
 
-    // Build SentenceBuilder client-side from dialogue words
-    const words = store.hook.dialogue
-      .replace(/\n/g, ' ')
-      .split(/\s+/)
-      .filter((w) => w.length > 0)
-      .slice(0, 8); // keep it manageable
+    // Build SentenceBuilder exercises client-side from real dialogue sentences.
+    // Extract spoken text (strip "Name: " prefix), keep lines with 3–10 words, pick 2.
+    const dialogueSentences = store.hook.dialogue
+      .split('\n')
+      .filter((l) => l.trim().length > 0)
+      .map((line) => {
+        const m = line.match(/^[^:]+:\s*(.+)/);
+        return m ? m[1].trim() : line.trim();
+      })
+      .filter((text) => {
+        const wc = text.split(/\s+/).length;
+        return wc >= 3 && wc <= 10;
+      });
 
-    const sentenceExercise = {
-      type: 'sentence-builder' as const,
-      data: {
-        words: [...words].sort(() => Math.random() - 0.5),
-        correctOrder: words,
-        translation: '', // No PT translation needed here
-      },
-    };
+    const sentenceExercises = dialogueSentences.slice(0, 2).map((text) => {
+      const words = text.split(/\s+/).filter(Boolean);
+      return {
+        type: 'sentence-builder' as const,
+        data: {
+          words: [...words].sort(() => Math.random() - 0.5),
+          correctOrder: words,
+          translation: '',
+        },
+      };
+    });
 
-    const allExercises = [...(aiExercises ?? []), sentenceExercise];
+    const allExercises = [...(aiExercises ?? []), ...sentenceExercises];
     store.setExercises(allExercises);
     store.setPhase('practice');
   }
@@ -586,6 +596,7 @@ export default function LessonPage() {
               targetExample={store.grammarBridge.targetExample}
               portugueseComparison={store.grammarBridge.portugueseComparison}
               language={store.lesson.language}
+              additionalExamples={store.grammarBridge.additionalExamples}
             />
           </div>
         )}

@@ -24,10 +24,20 @@ export async function generateHook(params: GenerateHookParams): Promise<HookResu
 
   // Always pair one female name (nameA / voice A) with one male name (nameB / voice B)
   const femaleNames = language === 'fr'
-    ? ['Marie', 'Sophie', 'Camille', 'Léa']
+    ? ['Marie', 'Sophie', 'Camille', 'Lea',
+      'Emma', 'Chloe', 'Manon', 'Ines', 'Sarah',
+      'Jade', 'Louise', 'Alice', 'Lina', 'Julia',
+      'Eva', 'Clara', 'Lucie', 'Romane',
+      'Agathe', 'Jeanne', 'Margaux', 'Noemie',
+      'Elise', 'Anais']
     : ['Emma', 'Sarah', 'Olivia', 'Chloe'];
   const maleNames = language === 'fr'
-    ? ['Lucas', 'Thomas', 'Julien', 'Antoine']
+    ? ['Lucas', 'Thomas', 'Julien', 'Antoine',
+      'Louis', 'Hugo', 'Arthur', 'Nathan',
+      'Gabriel', 'Raphael', 'Leo', 'Enzo',
+      'Paul', 'Jules', 'Adam', 'Victor',
+      'Noah', 'Ethan', 'Mathis', 'Maxime',
+      'Alexandre', 'Clement', 'Baptiste', 'Romain']
     : ['Jake', 'Michael', 'Daniel', 'Ryan'];
   const nameA = femaleNames[Math.floor(Math.random() * femaleNames.length)];
   const nameB = maleNames[Math.floor(Math.random() * maleNames.length)];
@@ -39,13 +49,14 @@ export async function generateHook(params: GenerateHookParams): Promise<HookResu
   try {
     const systemPrompt = `You are an expert language teacher creating content for Brazilian Portuguese speakers learning ${LANG_LABEL[language]}. Respond with ONLY valid JSON, no markdown, no explanation.`;
 
-    const prompt = `Write a short 2-person dialogue in ${LANG_LABEL[language]} between ${nameA} and ${nameB}.
+    const prompt = `Write a rich 2-person dialogue in ${LANG_LABEL[language]} between ${nameA} and ${nameB}.
 
 Requirements:
 - ${level} level vocabulary and grammar
 - Topic: ${topic}
 - Naturally uses this grammar: ${grammarFocus}
-- 2 to 4 lines total, alternating speakers
+- 6 to 8 lines total, alternating speakers, forming a natural flowing conversation
+- Include natural conversational turns (questions, answers, reactions, follow-ups)
 - Every line MUST begin with the speaker name and a colon
 
 Example of the required format (replace with real content in ${LANG_LABEL[language]}):
@@ -54,8 +65,8 @@ ${nameB}: Je m'appelle ${nameB}. Et toi ?
 
 Output this JSON:
 {
-  "dialogue": "${nameA}: <first line>\\n${nameB}: <second line>",
-  "newVocabulary": ["word1", "word2", "word3"],
+  "dialogue": "${nameA}: <first line>\\n${nameB}: <second line>\\n${nameA}: <third line>\\n${nameB}: <fourth line>\\n...",
+  "newVocabulary": ["word1", "word2", "word3", "word4", "word5", "word6"],
   "grammarFocus": "one sentence describing the grammar used"
 }`;
 
