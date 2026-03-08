@@ -1,0 +1,46 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Users ─────────────────────────────────────────────────────────────────
+    // Only the authenticated user can read or write their own profile document.
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // ── User Vocabulary ───────────────────────────────────────────────────────
+    // A user may only access vocabulary items that belong to them.
+    match /user_vocabulary/{docId} {
+      allow read, delete: if request.auth != null
+        && resource.data.uid == request.auth.uid;
+      allow create, update: if request.auth != null
+        && request.resource.data.uid == request.auth.uid;
+    }
+
+    // ── Lesson Logs ───────────────────────────────────────────────────────────
+    // Users can read their own lesson history and create new entries.
+    // Update/delete not permitted (immutable log).
+    match /lesson_logs/{docId} {
+      allow read: if request.auth != null
+        && resource.data.uid == request.auth.uid;
+      allow create: if request.auth != null
+        && request.resource.data.uid == request.auth.uid;
+    }
+
+    // ── Image Cache ───────────────────────────────────────────────────────────
+    // Public cache for Pexels images, keyed by vocabulary word.
+    // Written by Next.js server actions which run without a Firebase Auth token
+    // (client SDK is used server-side without a user session), so rules must
+    // allow unauthenticated access. Data is non-sensitive (image URLs only).
+    match /image_cache/{wordId} {
+      allow read, write: if true;
+    }
+
+    // ── Verb Conjugation Cache ────────────────────────────────────────────────
+    // Public cache for Gemini-generated verb conjugations.
+    // Same reasoning as image_cache: server actions write without auth.
+    match /verbs/{verbId} {
+      allow read, write: if true;
+    }
+  }
+}

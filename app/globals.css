@@ -3,6 +3,7 @@
 /* ─── Light Mode Tokens ──────────────────────────────────────────────────────── */
 
 :root {
+  color-scheme: light;
   --color-bg:            #fafaf7;
   --color-surface:       #ffffff;
   --color-surface-raised:#f4f3ef;
@@ -33,6 +34,7 @@
 /* ─── Dark Mode Tokens ───────────────────────────────────────────────────────── */
 
 .dark {
+  color-scheme: dark;
   --color-bg:            #111827;
   --color-surface:       #1f2937;
   --color-surface-raised:#374151;

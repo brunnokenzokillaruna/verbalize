@@ -1,7 +1,8 @@
 'use client';
 
-import { LogOut, BookOpen, Flame, ChevronRight } from 'lucide-react';
+import { LogOut, BookOpen, Flame, ChevronRight, Sun, Moon } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
+import { useTheme } from '@/components/ThemeProvider';
 import { logOut } from '@/services/auth';
 import { useRouter } from 'next/navigation';
 
@@ -12,6 +13,7 @@ const LANG_LABEL: Record<string, { name: string; flag: string }> = {
 
 export default function DashboardPage() {
   const { profile, reset } = useAuthStore();
+  const { theme, toggleTheme } = useTheme();
   const router = useRouter();
 
   async function handleLogout() {
@@ -42,14 +44,26 @@ export default function DashboardPage() {
             Olá, {profile.name} 👋
           </p>
         </div>
-        <button
-          onClick={handleLogout}
-          className="flex h-10 w-10 items-center justify-center rounded-full transition-opacity hover:opacity-70 active:scale-95"
-          style={{ backgroundColor: 'var(--color-surface-raised)' }}
-          aria-label="Sair"
-        >
-          <LogOut size={18} style={{ color: 'var(--color-text-muted)' }} />
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={toggleTheme}
+            className="flex h-10 w-10 items-center justify-center rounded-full transition-opacity hover:opacity-70 active:scale-95"
+            style={{ backgroundColor: 'var(--color-surface-raised)' }}
+            aria-label="Alternar tema"
+          >
+            {theme === 'dark'
+              ? <Sun size={18} style={{ color: 'var(--color-text-muted)' }} />
+              : <Moon size={18} style={{ color: 'var(--color-text-muted)' }} />}
+          </button>
+          <button
+            onClick={handleLogout}
+            className="flex h-10 w-10 items-center justify-center rounded-full transition-opacity hover:opacity-70 active:scale-95"
+            style={{ backgroundColor: 'var(--color-surface-raised)' }}
+            aria-label="Sair"
+          >
+            <LogOut size={18} style={{ color: 'var(--color-text-muted)' }} />
+          </button>
+        </div>
       </header>
 
       {/* Streak card */}

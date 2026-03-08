@@ -71,8 +71,19 @@ This document outlines the step-by-step implementation plan for the Verbalize ap
 - [x] `app/(app)/verbs/page.tsx` — Verb Explorer: search input, quick-start chips, Gemini-powered conjugation table with collapsible tenses, per-form audio, example sentences.
 - [x] Dashboard — `pb-24` bottom padding for nav clearance.
 
-## Phase 7: Polish & Deployment
-- [ ] Ensure mobile responsiveness across all device sizes.
-- [ ] Implement Dark Mode support.
-- [ ] Deploy to Vercel (connect GitHub repository, set environment variables).
-- [ ] Test Firebase security rules (ensure users can only read/write their own data).
+## Phase 7: Polish & Deployment ✅
+- [x] **Dark Mode** — `components/ThemeProvider.tsx`: detects `prefers-color-scheme` on first load, persists manual override to `localStorage`, applies/removes `.dark` on `<html>`. Sun/Moon toggle in dashboard header.
+- [x] `app/layout.tsx` — Wraps app with `ThemeProvider`; adds `suppressHydrationWarning` + `<meta name="color-scheme" content="light dark" />`.
+- [x] `app/globals.css` — `color-scheme: light/dark` added to `:root` and `.dark` blocks (native UI elements now respect theme).
+- [x] **Mobile responsiveness** — Codebase was already mobile-first; `color-scheme` CSS property ensures inputs/scrollbars render correctly in dark mode.
+- [x] **Firebase Security Rules** — `firestore.rules`: users/user_vocabulary/lesson_logs locked to authenticated owner; image_cache/verbs open (server actions write without auth token).
+- [x] `firebase.json` + `firestore.indexes.json` created for CLI deployment.
+- [x] **Vercel** — Already deployed (connected in Phase 4/5). Push to `main` triggers auto-deploy.
+
+### Deploy Firebase rules
+```bash
+npm install -g firebase-tools   # if not installed
+firebase login
+firebase use --add              # select your Firebase project
+firebase deploy --only firestore:rules
+```
