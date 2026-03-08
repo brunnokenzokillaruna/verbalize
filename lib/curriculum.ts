@@ -42,13 +42,32 @@ const LESSON_MAP: Record<SupportedLanguage, LessonDefinition[]> = {
   en: ENGLISH_LESSONS,
 };
 
+/** All lessons for a given language, in curriculum order. */
+export function getLessonsForLanguage(language: SupportedLanguage): LessonDefinition[] {
+  return LESSON_MAP[language];
+}
+
 /**
- * Returns the next lesson for the given language.
- * Phase 5: always returns lesson[0]. Phase 6 will track user progress.
+ * Returns the lesson the user should study next.
+ * `currentLessonId` is the ID stored in `profile.lessonProgress[language]`.
+ * Falls back to the first lesson if no progress is recorded.
  */
-export function getNextLesson(language: SupportedLanguage): LessonDefinition {
+export function getNextLesson(language: SupportedLanguage, currentLessonId?: string): LessonDefinition {
   const lessons = LESSON_MAP[language];
-  return lessons[0];
+  if (!currentLessonId) return lessons[0];
+  const lesson = lessons.find((l) => l.id === currentLessonId);
+  return lesson ?? lessons[0];
+}
+
+/**
+ * Returns the ID of the lesson that comes after `completedLessonId`.
+ * Returns null if the completed lesson is the last one in the curriculum.
+ */
+export function getNextLessonId(language: SupportedLanguage, completedLessonId: string): string | null {
+  const lessons = LESSON_MAP[language];
+  const idx = lessons.findIndex((l) => l.id === completedLessonId);
+  if (idx === -1 || idx >= lessons.length - 1) return null;
+  return lessons[idx + 1].id;
 }
 
 export function getLessonById(id: string): LessonDefinition | undefined {

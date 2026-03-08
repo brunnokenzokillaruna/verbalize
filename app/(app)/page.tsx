@@ -1,10 +1,11 @@
 'use client';
 
-import { LogOut, BookOpen, Flame, ChevronRight, Sun, Moon } from 'lucide-react';
+import { LogOut, BookOpen, Flame, ChevronRight, Sun, Moon, Check, Lock } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useTheme } from '@/components/ThemeProvider';
 import { logOut } from '@/services/auth';
 import { useRouter } from 'next/navigation';
+import { getLessonsForLanguage } from '@/lib/curriculum';
 
 const LANG_LABEL: Record<string, { name: string; flag: string }> = {
   fr: { name: 'Francês', flag: '🇫🇷' },
@@ -25,6 +26,13 @@ export default function DashboardPage() {
   if (!profile) return null;
 
   const lang = LANG_LABEL[profile.currentTargetLanguage];
+  const allLessons = getLessonsForLanguage(profile.currentTargetLanguage);
+
+  // Determine which lesson is the user's current frontier
+  const frontierLessonId = profile.lessonProgress?.[profile.currentTargetLanguage];
+  const frontierIndex = frontierLessonId
+    ? allLessons.findIndex((l) => l.id === frontierLessonId)
+    : 0;
 
   return (
     <div
@@ -116,7 +124,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Lesson CTA */}
+      {/* Next lesson CTA */}
       <button
         type="button"
         onClick={() => router.push('/lesson')}
@@ -136,10 +144,10 @@ export default function DashboardPage() {
             </div>
             <div>
               <p className="font-display text-xl font-bold" style={{ color: 'white' }}>
-                Iniciar Lição
+                {!frontierLessonId ? 'Iniciar Lição 1' : `Continuar · Lição ${frontierIndex + 1}`}
               </p>
               <p className="text-sm" style={{ color: 'rgba(255,255,255,0.75)' }}>
-                {lang.flag} {lang.name} · Aprenda algo novo
+                {lang.flag} {lang.name} · {allLessons[frontierIndex]?.grammarFocus.split(' — ')[0]}
               </p>
             </div>
           </div>
@@ -148,11 +156,90 @@ export default function DashboardPage() {
       </button>
 
       <p
-        className="mt-6 text-center text-xs animate-slide-up delay-300"
+        className="mt-4 text-center text-xs animate-slide-up delay-300"
         style={{ color: 'var(--color-text-muted)' }}
       >
         {profile.totalLessonsCompleted} lição{profile.totalLessonsCompleted !== 1 ? 'ões' : ''} concluída{profile.totalLessonsCompleted !== 1 ? 's' : ''}
       </p>
+
+      {/* Lesson list */}
+      <div className="mt-8 animate-slide-up">
+        <p
+          className="mb-3 text-xs font-semibold uppercase tracking-widest"
+          style={{ color: 'var(--color-text-muted)' }}
+        >
+          Todas as lições
+        </p>
+        <div className="flex flex-col gap-2">
+          {allLessons.map((lesson, i) => {
+            const isCompleted = i < frontierIndex;
+            const isCurrent = i === frontierIndex;
+            const isLocked = i > frontierIndex;
+            const title = lesson.grammarFocus.split(' — ')[0];
+
+            return (
+              <button
+                key={lesson.id}
+                type="button"
+                disabled={isLocked}
+                onClick={() => router.push(`/lesson?id=${lesson.id}`)}
+                className="flex items-center gap-3 rounded-2xl p-4 text-left transition-all active:scale-[0.98] disabled:cursor-not-allowed"
+                style={{
+                  backgroundColor: isCurrent
+                    ? 'var(--color-primary-light)'
+                    : 'var(--color-surface)',
+                  border: `1px solid ${isCurrent ? 'var(--color-primary)' : 'var(--color-border)'}`,
+                  opacity: isLocked ? 0.45 : 1,
+                }}
+              >
+                {/* Status badge */}
+                <div
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold"
+                  style={{
+                    backgroundColor: isCompleted
+                      ? 'var(--color-success-bg, #dcfce7)'
+                      : isCurrent
+                        ? 'var(--color-primary)'
+                        : 'var(--color-surface-raised)',
+                    color: isCompleted
+                      ? 'var(--color-success, #16a34a)'
+                      : isCurrent
+                        ? 'white'
+                        : 'var(--color-text-muted)',
+                  }}
+                >
+                  {isCompleted ? <Check size={13} strokeWidth={2.5} /> : i + 1}
+                </div>
+
+                {/* Lesson info */}
+                <div className="flex-1 min-w-0">
+                  <p
+                    className="text-sm font-medium truncate"
+                    style={{
+                      color: isLocked ? 'var(--color-text-muted)' : 'var(--color-text-primary)',
+                    }}
+                  >
+                    {title}
+                  </p>
+                  <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-muted)' }}>
+                    {lesson.level}
+                    {isCurrent && (
+                      <span style={{ color: 'var(--color-primary)', fontWeight: 600 }}>
+                        {' '}· Próxima
+                      </span>
+                    )}
+                  </p>
+                </div>
+
+                {/* Right icon */}
+                {isLocked
+                  ? <Lock size={13} style={{ color: 'var(--color-text-muted)', flexShrink: 0 }} />
+                  : <ChevronRight size={14} style={{ color: 'var(--color-text-muted)', flexShrink: 0 }} />}
+              </button>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }

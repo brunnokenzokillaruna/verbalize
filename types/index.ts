@@ -19,6 +19,9 @@ export interface UserDocument {
   currentStreak: number;
   totalLessonsCompleted: number;
   lastLessonDate?: Timestamp; // date-only (midnight UTC) of the last completed lesson
+
+  // Per-language lesson progress: maps language → ID of the next lesson to study
+  lessonProgress?: Partial<Record<SupportedLanguage, string>>;
 }
 
 // ─── Vocabulary & SRS ─────────────────────────────────────────────────────────

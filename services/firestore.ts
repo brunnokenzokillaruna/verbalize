@@ -15,6 +15,7 @@ import {
 import { db } from './firebase';
 import type { UserDocument, UserVocabularyDocument, ImageCacheDocument, VerbDocument, SupportedLanguage } from '@/types';
 import { calculateNextReview } from '@/lib/srs';
+import { getNextLessonId } from '@/lib/curriculum';
 
 // ─── Users ────────────────────────────────────────────────────────────────────
 
@@ -129,12 +130,16 @@ export async function logLesson(data: {
  * Updates the user's lesson stats after completing a lesson:
  * - Increments totalLessonsCompleted
  * - Calculates the new streak based on lastLessonDate
- * - Persists both to Firestore and returns the updated fields.
+ * - Advances lessonProgress[language] to the next lesson (only when the
+ *   completed lesson is the user's current frontier, not a replay)
+ * - Persists all changes to Firestore and returns the updated fields.
  */
 export async function updateLessonStats(
   uid: string,
   profile: UserDocument,
-): Promise<Pick<UserDocument, 'totalLessonsCompleted' | 'currentStreak' | 'lastLessonDate'>> {
+  completedLessonId: string,
+  language: SupportedLanguage,
+): Promise<Pick<UserDocument, 'totalLessonsCompleted' | 'currentStreak' | 'lastLessonDate' | 'lessonProgress'>> {
   const now = new Date();
   // Normalise to midnight local time so we compare calendar days, not exact times
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -154,10 +159,22 @@ export async function updateLessonStats(
     diffDays === 1 ? profile.currentStreak + 1 :
     1;
 
+  // Advance lesson progress only when the user completes their current frontier lesson
+  const currentProgress = profile.lessonProgress ?? {};
+  const frontierLessonId = currentProgress[language]; // undefined = user hasn't started yet
+  const isAtFrontier = completedLessonId === frontierLessonId || !frontierLessonId;
+  const newLessonProgress: Partial<Record<SupportedLanguage, string>> = { ...currentProgress };
+  if (isAtFrontier) {
+    const nextId = getNextLessonId(language, completedLessonId);
+    // If nextId is null we're at the last lesson — keep frontier pointing to the same lesson
+    newLessonProgress[language] = nextId ?? completedLessonId;
+  }
+
   const updates = {
     totalLessonsCompleted: profile.totalLessonsCompleted + 1,
     currentStreak: newStreak,
     lastLessonDate: Timestamp.fromDate(todayStart),
+    lessonProgress: newLessonProgress,
   };
 
   await updateUser(uid, updates);

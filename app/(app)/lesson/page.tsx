@@ -1,12 +1,12 @@
 'use client';
 
 import { useEffect, useState, useCallback, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Loader2, Trophy, Volume2, VolumeX } from 'lucide-react';
 
 import { useAuthStore } from '@/store/authStore';
 import { useLessonStore } from '@/store/lessonStore';
-import { getNextLesson } from '@/lib/curriculum';
+import { getNextLesson, getLessonById } from '@/lib/curriculum';
 
 import { generateHook } from '@/app/actions/generateHook';
 import { synthesizeDialogue } from '@/app/actions/synthesizeSpeech';
@@ -62,6 +62,8 @@ const CLOSED_TOOLTIP: TooltipState = { isOpen: false, word: '', isLoading: false
 
 export default function LessonPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const requestedLessonId = searchParams.get('id') ?? undefined;
   const { user, profile, setProfile } = useAuthStore();
   const store = useLessonStore();
 
@@ -191,7 +193,11 @@ export default function LessonPage() {
     if (store.phase !== 'idle') return;
 
     setHookError(false);
-    const lesson = getNextLesson(profile.currentTargetLanguage);
+    const language = profile.currentTargetLanguage;
+    // If a specific lesson was requested (replay), use it; otherwise use progress
+    const lesson =
+      (requestedLessonId ? getLessonById(requestedLessonId) : undefined) ??
+      getNextLesson(language, profile.lessonProgress?.[language]);
     store.init(lesson, profile.interests ?? []);
 
     (async () => {
@@ -304,9 +310,9 @@ export default function LessonPage() {
       score,
     }).catch(console.error);
 
-    // Update totalLessonsCompleted + streak on the user doc and refresh local profile
-    if (profile) {
-      updateLessonStats(user.uid, profile)
+    // Update totalLessonsCompleted + streak + lesson progress, then refresh local profile
+    if (profile && store.lesson) {
+      updateLessonStats(user.uid, profile, store.lesson.id, store.lesson.language)
         .then((updates) => setProfile({ ...profile, ...updates }))
         .catch(console.error);
     }
