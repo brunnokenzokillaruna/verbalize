@@ -9,7 +9,7 @@ import { useLessonStore } from '@/store/lessonStore';
 import { getNextLesson } from '@/lib/curriculum';
 
 import { generateHook } from '@/app/actions/generateHook';
-import { synthesizeSpeech } from '@/app/actions/synthesizeSpeech';
+import { synthesizeDialogue } from '@/app/actions/synthesizeSpeech';
 import { generateGrammarBridge } from '@/app/actions/generateGrammarBridge';
 import { getVocabImage } from '@/app/actions/getVocabImage';
 import { generatePracticeExercises } from '@/app/actions/generatePracticeExercises';
@@ -71,65 +71,82 @@ export default function LessonPage() {
   const [hookError, setHookError] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  // ── Audio (Google Cloud TTS) ──────────────────────────────────────────────
+  // ── Audio (Google Cloud TTS — two-voice dialogue) ────────────────────────
 
   const [isLoadingAudio, setIsLoadingAudio] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const cachedAudioRef = useRef<string | null>(null);
+  const audioQueueRef = useRef<string[]>([]);
+  const cachedChunksRef = useRef<string[] | null>(null);
 
   function stopAudio() {
     audioRef.current?.pause();
     audioRef.current = null;
+    audioQueueRef.current = [];
     setIsPlaying(false);
   }
 
-  function startAudio(base64: string) {
-    audioRef.current?.pause();
-    const audio = new Audio(`data:audio/mp3;base64,${base64}`);
+  function playQueue(queue: string[]) {
+    if (queue.length === 0) { setIsPlaying(false); return; }
+    const [first, ...rest] = queue;
+    audioQueueRef.current = rest;
+    const audio = new Audio(`data:audio/mp3;base64,${first}`);
     audioRef.current = audio;
     audio.onplay = () => setIsPlaying(true);
-    audio.onended = () => { setIsPlaying(false); audioRef.current = null; };
-    audio.onerror = () => { setIsPlaying(false); audioRef.current = null; };
-    audio.play().catch(() => { setIsPlaying(false); audioRef.current = null; });
+    audio.onended = () => {
+      audioRef.current = null;
+      if (audioQueueRef.current.length > 0) {
+        playQueue(audioQueueRef.current);
+      } else {
+        setIsPlaying(false);
+      }
+    };
+    audio.onerror = () => { stopAudio(); };
+    audio.play().catch(() => { stopAudio(); });
   }
 
-  async function fetchAndPlay(text: string) {
-    if (!store.lesson || isLoadingAudio) return;
-    setIsLoadingAudio(true);
-    const base64 = await synthesizeSpeech(text, store.lesson.language);
-    setIsLoadingAudio(false);
-    if (!base64) return;
-    cachedAudioRef.current = base64;
-    startAudio(base64);
+  function startAudio(chunks: string[]) {
+    audioRef.current?.pause();
+    audioRef.current = null;
+    playQueue(chunks);
   }
 
   function handleAudioButton() {
     if (isPlaying) { stopAudio(); return; }
     if (!store.hook) return;
-    const text = store.hook.dialogue.replace(/\n/g, ' ');
-    if (cachedAudioRef.current) { startAudio(cachedAudioRef.current); return; }
-    fetchAndPlay(text);
+    if (cachedChunksRef.current) { startAudio(cachedChunksRef.current); return; }
+    if (!store.lesson || isLoadingAudio) return;
+    const lines = store.hook.dialogue.split('\n').filter((l) => l.trim().length > 0);
+    const language = store.lesson.language;
+    (async () => {
+      setIsLoadingAudio(true);
+      try {
+        const chunks = await synthesizeDialogue(lines, language);
+        if (chunks.length > 0) { cachedChunksRef.current = chunks; startAudio(chunks); }
+      } finally {
+        setIsLoadingAudio(false);
+      }
+    })();
   }
 
   // Auto-fetch + play when entering hook phase
   useEffect(() => {
     if (store.phase !== 'hook') {
       stopAudio();
-      cachedAudioRef.current = null;
+      cachedChunksRef.current = null;
       return;
     }
     if (!store.hook || !store.lesson) return;
-    const text = store.hook.dialogue.replace(/\n/g, ' ');
+    const lines = store.hook.dialogue.split('\n').filter((l) => l.trim().length > 0);
     const language = store.lesson.language;
     let cancelled = false;
 
     (async () => {
       setIsLoadingAudio(true);
       try {
-        const base64 = await synthesizeSpeech(text, language);
-        if (!cancelled && base64) {
-          cachedAudioRef.current = base64;
-          startAudio(base64);
+        const chunks = await synthesizeDialogue(lines, language);
+        if (!cancelled && chunks.length > 0) {
+          cachedChunksRef.current = chunks;
+          startAudio(chunks);
         }
       } catch (err) {
         console.error('[LessonPage] TTS error:', err);
