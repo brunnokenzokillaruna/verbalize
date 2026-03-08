@@ -25,14 +25,23 @@ export async function generateHook(params: GenerateHookParams): Promise<HookResu
   try {
     const systemPrompt = `You are an expert language teacher creating content for Brazilian Portuguese speakers learning ${LANG_LABEL[language]}. Respond with ONLY valid JSON, no markdown, no explanation.`;
 
-    const prompt = `Write a short, natural dialogue or micro-story (2–4 sentences maximum).
+    const frenchNames = ['Marie', 'Lucas', 'Sophie', 'Thomas', 'Camille', 'Julien', 'Léa', 'Antoine'];
+    const englishNames = ['Emma', 'Jake', 'Sarah', 'Michael', 'Olivia', 'Daniel', 'Chloe', 'Ryan'];
+    const namePool = language === 'fr' ? frenchNames : englishNames;
+    const shuffle = (arr: string[]) => [...arr].sort(() => Math.random() - 0.5);
+    const [nameA, nameB] = shuffle(namePool);
+
+    const prompt = `Write a short, natural 2-person dialogue (2–4 lines total, alternating between exactly 2 speakers).
 
 Target language: ${LANG_LABEL[language]}
 User level: ${level}
 Topics of interest: ${interests.join(', ')}
 Target grammar: ${grammarFocus}
+Speaker 1 name: ${nameA}
+Speaker 2 name: ${nameB}
 
 Rules:
+- Each line must start with the speaker's name followed by a colon, e.g. "${nameA}: ..." then "${nameB}: ...".
 - Use simple vocabulary suited for ${level} level.
 - Emphasize the target grammar naturally within the dialogue.
 - Make it conversational and engaging.
@@ -40,7 +49,7 @@ Rules:
 
 Output JSON in exactly this format:
 {
-  "dialogue": "The full dialogue text (use \\n for line breaks between speakers)",
+  "dialogue": "${nameA}: [first line]\\n${nameB}: [second line]\\n${nameA}: [optional third line]",
   "newVocabulary": ["key", "vocabulary", "words", "to", "highlight"],
   "grammarFocus": "Brief description of the grammar pattern used"
 }`;

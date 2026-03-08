@@ -8,21 +8,29 @@ type VoiceConfig = { languageCode: string; name: string };
 
 // Single voice per language (used for word-click audio)
 const VOICES: Record<SupportedLanguage, VoiceConfig> = {
-  fr: { languageCode: 'fr-FR', name: 'fr-FR-Neural2-A' },
-  en: { languageCode: 'en-US', name: 'en-US-Neural2-C' },
+  fr: { languageCode: 'fr-FR', name: 'fr-FR-Neural2-F' }, // female (confirmed)
+  en: { languageCode: 'en-US', name: 'en-US-Neural2-C' }, // female (confirmed)
 };
 
-// Two voices per language for dialogue (alternating speaker A / speaker B)
+// Two clearly distinct voices per language for dialogue
+// fr-FR-Neural2-F (female) and fr-FR-Neural2-G (male) are confirmed in Google's docs
+// en-US-Neural2-C (female) and en-US-Neural2-D (male) are confirmed in Google's docs
 const DIALOGUE_VOICES: Record<SupportedLanguage, [VoiceConfig, VoiceConfig]> = {
   fr: [
-    { languageCode: 'fr-FR', name: 'fr-FR-Neural2-A' }, // female
-    { languageCode: 'fr-FR', name: 'fr-FR-Neural2-B' }, // male
+    { languageCode: 'fr-FR', name: 'fr-FR-Neural2-F' }, // female
+    { languageCode: 'fr-FR', name: 'fr-FR-Neural2-G' }, // male
   ],
   en: [
     { languageCode: 'en-US', name: 'en-US-Neural2-C' }, // female
     { languageCode: 'en-US', name: 'en-US-Neural2-D' }, // male
   ],
 };
+
+// Strips "SpeakerName: " prefix from a dialogue line before sending to TTS
+// so the voice doesn't read out the character's name.
+function stripSpeakerPrefix(line: string): string {
+  return line.replace(/^[^:]+:\s*/, '').trim();
+}
 
 async function callTTS(
   text: string,
@@ -83,7 +91,7 @@ export async function synthesizeDialogue(
   const nonEmpty = lines.filter((l) => l.trim().length > 0);
 
   const results = await Promise.all(
-    nonEmpty.map((line, i) => callTTS(line, pair[i % 2], apiKey)),
+    nonEmpty.map((line, i) => callTTS(stripSpeakerPrefix(line), pair[i % 2], apiKey)),
   );
 
   return results.filter((r): r is string => r !== null);

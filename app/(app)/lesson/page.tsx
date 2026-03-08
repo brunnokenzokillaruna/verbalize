@@ -519,15 +519,30 @@ export default function LessonPage() {
                       : <Volume2 size={15} />}
                 </button>
               </div>
-              {store.hook.dialogue.split('\n').map((line, i) => (
-                <ClickableSentence
-                  key={i}
-                  text={line}
-                  newVocabulary={store.hook!.newVocabulary}
-                  onWordClick={handleWordClick}
-                  className="text-lg"
-                />
-              ))}
+              {store.hook.dialogue.split('\n').filter((l) => l.trim()).map((line, i) => {
+                const match = line.match(/^([^:]+):\s*(.+)/);
+                const speakerName = match?.[1]?.trim();
+                const text = match?.[2]?.trim() ?? line;
+                const isEven = i % 2 === 0;
+                return (
+                  <div key={i} className="mb-4">
+                    {speakerName && (
+                      <p
+                        className="mb-1 text-xs font-bold uppercase tracking-wide"
+                        style={{ color: isEven ? 'var(--color-primary)' : 'var(--color-accent, #e05c2a)' }}
+                      >
+                        {speakerName}
+                      </p>
+                    )}
+                    <ClickableSentence
+                      text={text}
+                      newVocabulary={store.hook!.newVocabulary}
+                      onWordClick={handleWordClick}
+                      className="text-lg"
+                    />
+                  </div>
+                );
+              })}
             </div>
             <p className="text-xs" style={{ color: 'var(--color-text-muted)', fontStyle: 'italic' }}>
               Toque nas palavras para ver a tradução
