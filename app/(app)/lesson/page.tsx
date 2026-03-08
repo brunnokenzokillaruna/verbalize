@@ -327,6 +327,9 @@ export default function LessonPage() {
   }
 
   async function finishLesson() {
+    // Always transition to the complete screen first — never block on data ops
+    store.setPhase('complete');
+
     if (!user || !store.lesson || !store.hook) return;
     const total = store.exercises.length;
     const score = total > 0 ? Math.round((store.correctCount / total) * 100) : 0;
@@ -350,9 +353,6 @@ export default function LessonPage() {
       const translation = store.vocabTranslations[word] ?? word;
       upsertVocabularyItem(user.uid, word, translation, store.lesson!.language).catch(console.error);
     });
-
-    // Transition to the complete screen — it handles the final navigation
-    store.setPhase('complete');
   }
 
   function handleRetry() {
