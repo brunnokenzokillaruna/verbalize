@@ -12,19 +12,21 @@ const LANG_LABEL: Record<SupportedLanguage, string> = {
 
 /**
  * Returns an image URL for a vocabulary word.
- * Flow: Firestore cache → Gemini keyword → Pexels → save cache
+ * Flow: Firestore cache → Gemini keyword → Pexels (pages 1-3) → save cache
+ * Pass `excludeUrls` to avoid returning an image already used by another word.
  * Returns null if any step fails (UI shows placeholder).
  */
 export async function getVocabImage(
   word: string,
   sentence: string,
   language: SupportedLanguage,
+  excludeUrls: string[] = [],
 ): Promise<VocabImageResult | null> {
   try {
     // ── 1. Check Firestore cache ──────────────────────────────────────────────
     const cacheKey = `${word}_${language}`;
     const cached = await getCachedImage(cacheKey);
-    if (cached) {
+    if (cached && !excludeUrls.includes(cached.imageUrl)) {
       return { imageUrl: cached.imageUrl, imageAlt: cached.photographer };
     }
 
@@ -38,20 +40,29 @@ Rules:
 - Output ONLY the search query string in English (e.g., "coffee cup isolated white background").
 - No explanation, no punctuation, just the keyword string.`;
 
-    const keyword = await callGemini(keywordPrompt);
+    const keyword = (await callGemini(keywordPrompt)).trim();
 
-    // ── 3. Fetch from Pexels ──────────────────────────────────────────────────
-    const photo = await searchPexels(keyword.trim());
-    if (!photo) return null;
+    // ── 3. Fetch from Pexels, trying pages 1-3 to avoid duplicate images ─────
+    for (let page = 1; page <= 3; page++) {
+      const photo = await searchPexels(keyword, page);
+      if (!photo) break; // no more results for this keyword
 
-    // ── 4. Save to Firestore cache ────────────────────────────────────────────
-    await saveImageCache(cacheKey, {
-      language,
-      imageUrl: photo.imageUrl,
-      photographer: photo.photographer,
-    });
+      if (!excludeUrls.includes(photo.imageUrl)) {
+        // ── 4. Save page-1 result to Firestore cache ────────────────────────
+        if (page === 1) {
+          await saveImageCache(cacheKey, {
+            language,
+            imageUrl: photo.imageUrl,
+            photographer: photo.photographer,
+          });
+        }
+        return { imageUrl: photo.imageUrl, imageAlt: photo.photographer };
+      }
+    }
 
-    return { imageUrl: photo.imageUrl, imageAlt: photo.photographer };
+    // Fallback: return the cached entry even if it's a duplicate
+    if (cached) return { imageUrl: cached.imageUrl, imageAlt: cached.photographer };
+    return null;
   } catch (err) {
     console.error('[getVocabImage] Error:', err);
     return null;

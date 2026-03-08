@@ -183,13 +183,6 @@ export default function LessonPage() {
   useEffect(() => {
     if (!profile) return;
 
-    // If arriving at the lesson page after a completed (or abandoned) lesson,
-    // reset the store so a fresh lesson can start.
-    if (store.phase === 'complete') {
-      store.reset();
-      return; // re-renders with phase='idle', effect fires again
-    }
-
     if (store.phase !== 'idle') return;
 
     setHookError(false);
@@ -245,20 +238,46 @@ export default function LessonPage() {
     if (!store.lesson || !store.hook || store.isLoading) return;
     store.setIsLoading(true);
 
-    // Fetch vocab images AND PT-BR translations in parallel
     const words = store.hook.newVocabulary;
-    await Promise.all(
-      words.map(async (word) => {
-        const [imageResult, translationResult] = await Promise.all([
-          getVocabImage(word, store.hook!.dialogue, store.lesson!.language),
-          translateWord(word, store.hook!.dialogue, store.lesson!.language),
-        ]);
-        store.setVocabImage(word, imageResult);
-        if (translationResult?.translation) {
-          store.setVocabTranslation(word, translationResult.translation);
-        }
-      }),
-    );
+    const dialogue = store.hook.dialogue;
+    const language = store.lesson.language;
+
+    // Fetch translations and first-pass images in parallel
+    const [translationResults, imageResults] = await Promise.all([
+      Promise.all(words.map((word) => translateWord(word, dialogue, language))),
+      Promise.all(words.map((word) => getVocabImage(word, dialogue, language))),
+    ]);
+
+    translationResults.forEach((result, i) => {
+      if (result?.translation) store.setVocabTranslation(words[i], result.translation);
+    });
+
+    // Detect duplicate image URLs and re-fetch with excludeUrls
+    const usedUrls: string[] = [];
+    const refetchWords: string[] = [];
+
+    imageResults.forEach((result, i) => {
+      if (result?.imageUrl && usedUrls.includes(result.imageUrl)) {
+        refetchWords.push(words[i]);
+        store.setVocabImage(words[i], null); // placeholder until re-fetched
+      } else {
+        store.setVocabImage(words[i], result);
+        if (result?.imageUrl) usedUrls.push(result.imageUrl);
+      }
+    });
+
+    // Re-fetch only the duplicate words, passing already-used URLs
+    if (refetchWords.length > 0) {
+      await Promise.all(
+        refetchWords.map(async (word) => {
+          const result = await getVocabImage(word, dialogue, language, [...usedUrls]);
+          store.setVocabImage(word, result);
+          if (result?.imageUrl && !usedUrls.includes(result.imageUrl)) {
+            usedUrls.push(result.imageUrl);
+          }
+        }),
+      );
+    }
 
     store.setIsLoading(false);
     store.setPhase('vocabulary');
@@ -332,8 +351,8 @@ export default function LessonPage() {
       upsertVocabularyItem(user.uid, word, translation, store.lesson!.language).catch(console.error);
     });
 
-    store.reset();
-    router.replace('/');
+    // Transition to the complete screen — it handles the final navigation
+    store.setPhase('complete');
   }
 
   function handleRetry() {
@@ -389,6 +408,17 @@ export default function LessonPage() {
   const checkState = (() => {
     if (exerciseAnswer === null) return 'disabled' as const;
     return exerciseAnswer ? 'correct' as const : 'incorrect' as const;
+  })();
+
+  // Correct answer shown in CheckButton banner when wrong
+  // (reverse-translation, audio-dictation, and sentence-builder already show it inline)
+  const correctAnswerForBanner: string | undefined = (() => {
+    if (!currentExercise || exerciseAnswer !== false) return undefined;
+    switch (currentExercise.type) {
+      case 'context-choice':   return currentExercise.data.blankWord;
+      case 'error-correction': return currentExercise.data.correct_word;
+      default:                 return undefined;
+    }
   })();
 
   // For exercises that require manual Verificar (like ReverseTranslation / Dictation)
@@ -742,6 +772,7 @@ export default function LessonPage() {
       {phase === 'practice' && (
         <CheckButton
           state={checkState}
+          correctAnswer={correctAnswerForBanner}
           onCheck={handleCheck}
           onContinue={handleContinue}
         />

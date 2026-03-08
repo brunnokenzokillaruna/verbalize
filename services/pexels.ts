@@ -21,11 +21,13 @@ interface PexelsResponse {
  */
 export async function searchPexels(
   keyword: string,
+  page = 1,
 ): Promise<{ imageUrl: string; photographer: string } | null> {
   const apiKey = getPexelsKey();
   const params = new URLSearchParams({
     query: keyword,
     per_page: '1',
+    page: String(page),
     orientation: 'landscape',
   });
 
