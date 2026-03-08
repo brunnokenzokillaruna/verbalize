@@ -67,6 +67,7 @@ export default function LessonPage() {
   // Per-exercise answer state
   const [exerciseAnswer, setExerciseAnswer] = useState<boolean | null>(null);
   const [tooltip, setTooltip] = useState<TooltipState>(CLOSED_TOOLTIP);
+  const [hookError, setHookError] = useState(false);
 
   // ── Redirect if not authenticated ────────────────────────────────────────
 
@@ -79,12 +80,21 @@ export default function LessonPage() {
   // ── Lesson bootstrap ─────────────────────────────────────────────────────
 
   useEffect(() => {
-    if (!profile || store.phase !== 'idle') return;
+    if (!profile) return;
 
+    // If arriving at the lesson page after a completed (or abandoned) lesson,
+    // reset the store so a fresh lesson can start.
+    if (store.phase === 'complete') {
+      store.reset();
+      return; // re-renders with phase='idle', effect fires again
+    }
+
+    if (store.phase !== 'idle') return;
+
+    setHookError(false);
     const lesson = getNextLesson(profile.currentTargetLanguage);
     store.init(lesson, profile.interests ?? []);
 
-    // Start generating the hook immediately
     (async () => {
       store.setIsLoading(true);
       const hook = await generateHook({
@@ -97,12 +107,13 @@ export default function LessonPage() {
         store.setHook(hook);
         store.setPhase('hook');
       } else {
-        // Fallback: go straight to practice if hook fails
-        store.setPhase('complete');
+        // Show a retry screen instead of jumping to the complete screen
+        store.setIsLoading(false);
+        setHookError(true);
       }
     })();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profile]);
+  }, [profile, store.phase]);
 
   // ── Stage advance handlers ────────────────────────────────────────────────
 
@@ -192,6 +203,11 @@ export default function LessonPage() {
     store.setPhase('complete');
   }
 
+  function handleRetry() {
+    setHookError(false);
+    store.reset(); // resets phase to 'idle' → bootstrap effect re-runs
+  }
+
   // ── Exercise check / continue ─────────────────────────────────────────────
 
   function handleAnswer(correct: boolean) {
@@ -257,6 +273,51 @@ export default function LessonPage() {
         <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
           Gerando sua lição…
         </p>
+      </div>
+    );
+  }
+
+  // ── Error screen ─────────────────────────────────────────────────────────
+
+  if (hookError) {
+    return (
+      <div
+        className="flex min-h-dvh flex-col items-center justify-center gap-5 px-6 py-12 text-center"
+        style={{ backgroundColor: 'var(--color-bg)' }}
+      >
+        <div
+          className="flex h-16 w-16 items-center justify-center rounded-full text-3xl"
+          style={{ backgroundColor: 'var(--color-error-bg)' }}
+        >
+          ⚠️
+        </div>
+        <div>
+          <h2
+            className="font-display text-xl font-semibold"
+            style={{ color: 'var(--color-text-primary)' }}
+          >
+            Erro ao gerar lição
+          </h2>
+          <p className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--color-text-muted)' }}>
+            Não foi possível conectar ao servidor de IA.{'\n'}Verifique sua conexão e tente novamente.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={handleRetry}
+          className="rounded-2xl px-8 py-4 text-base font-semibold transition-all active:scale-95"
+          style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-text-inverse)' }}
+        >
+          Tentar novamente
+        </button>
+        <button
+          type="button"
+          onClick={() => { store.reset(); router.replace('/'); }}
+          className="text-sm transition-opacity hover:opacity-70"
+          style={{ color: 'var(--color-text-muted)' }}
+        >
+          Voltar ao início
+        </button>
       </div>
     );
   }
