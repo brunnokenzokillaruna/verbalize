@@ -240,35 +240,30 @@ export default function LessonPage() {
 
   async function advanceFromGrammar() {
     if (!store.lesson || !store.hook || store.isLoading) return;
-    store.setIsLoading(true);
 
     const words = store.hook.newVocabulary;
     const dialogue = store.hook.dialogue;
     const language = store.lesson.language;
 
-    // Start image fetches immediately in the background — each updates the store as it arrives
+    // Transition immediately — vocab cards show with word as fallback while data loads
+    store.setPhase('vocabulary');
+
+    // Translations: fire-and-forget, each updates the store as it arrives
+    words.forEach(async (word) => {
+      const result = await translateWord(word, dialogue, language);
+      if (result?.translation) store.setVocabTranslation(word, result.translation);
+    });
+
+    // Images: each updates the store as it arrives; collect results for duplicate detection
     const imagePromises = words.map(async (word) => {
       const result = await getVocabImage(word, dialogue, language);
       store.setVocabImage(word, result);
       return { word, result };
     });
 
-    // Wait only for translations (no Pexels/cache lookup — much faster)
-    const translationResults = await Promise.all(
-      words.map((word) => translateWord(word, dialogue, language)),
-    );
-
-    translationResults.forEach((result, i) => {
-      if (result?.translation) store.setVocabTranslation(words[i], result.translation);
-    });
-
-    // Transition to vocabulary immediately — images continue loading in background
-    store.setIsLoading(false);
-    store.setPhase('vocabulary');
-
-    // Wait for all images, then fix any duplicates
     const imageResults = await Promise.all(imagePromises);
 
+    // Fix any duplicate image URLs by re-fetching affected words
     const usedUrls: string[] = [];
     const refetchWords: string[] = [];
 
