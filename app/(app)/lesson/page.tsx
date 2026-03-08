@@ -82,30 +82,13 @@ export default function LessonPage() {
 
   function stopAudio() {
     playSessionRef.current++;        // invalidate any in-flight callbacks
-    audioRef.current?.pause();
-    audioRef.current = null;
-    setIsPlaying(false);
-  }
-
-  // Plays chunk at `index` from `chunks`, then advances to the next chunk.
-  // `session` must match `playSessionRef.current` or the call is ignored.
-  function playChunk(chunks: string[], index: number, session: number) {
-    if (session !== playSessionRef.current) return; // cancelled
-    if (index >= chunks.length) { setIsPlaying(false); return; }
-
-    const audio = new Audio(`data:audio/mp3;base64,${chunks[index]}`);
-    audioRef.current = audio;
-    audio.onended = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.onended = null;
+      audioRef.current.onerror = null;
       audioRef.current = null;
-      // 300 ms pause between speakers for natural dialogue feel
-      setTimeout(() => playChunk(chunks, index + 1, session), 300);
-    };
-    audio.onerror = () => {
-      if (session === playSessionRef.current) { audioRef.current = null; setIsPlaying(false); }
-    };
-    audio.play().catch(() => {
-      if (session === playSessionRef.current) { audioRef.current = null; setIsPlaying(false); }
-    });
+    }
+    setIsPlaying(false);
   }
 
   function startAudio(chunks: string[]) {
@@ -113,7 +96,27 @@ export default function LessonPage() {
     if (chunks.length === 0) return;
     const session = playSessionRef.current;
     setIsPlaying(true);
-    playChunk(chunks, 0, session);
+
+    // Reuse ONE Audio element for the entire sequence so the browser's
+    // autoplay-activation context carries over from chunk to chunk.
+    const audio = new Audio();
+    audioRef.current = audio;
+
+    function playIndex(i: number) {
+      if (session !== playSessionRef.current) return; // cancelled
+      if (i >= chunks.length) { setIsPlaying(false); return; }
+
+      audio.onended = () => setTimeout(() => playIndex(i + 1), 300);
+      audio.onerror = () => {
+        if (session === playSessionRef.current) setIsPlaying(false);
+      };
+      audio.src = `data:audio/mp3;base64,${chunks[i]}`;
+      audio.play().catch(() => {
+        if (session === playSessionRef.current) setIsPlaying(false);
+      });
+    }
+
+    playIndex(0);
   }
 
   function handleAudioButton() {

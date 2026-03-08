@@ -53,16 +53,15 @@ Output this JSON:
     const result = await callGeminiJSON<HookResult>(prompt, systemPrompt);
     if (!result) return null;
 
-    // Post-process: ensure every line has "Name: " prefix.
-    // Gemini sometimes ignores format instructions; this guarantees the UI
-    // can always parse speaker names.
+    // Post-process: ensure EVERY line has "Name: " prefix.
+    // Gemini sometimes labels only the first line; check each line individually.
     const lines = result.dialogue.split('\n').filter((l) => l.trim().length > 0);
-    const alreadyLabelled = lines.length > 0 && /^[^:\n]{1,25}:/.test(lines[0]);
-    if (!alreadyLabelled) {
-      result.dialogue = lines
-        .map((line, i) => `${i % 2 === 0 ? nameA : nameB}: ${line}`)
-        .join('\n');
-    }
+    result.dialogue = lines
+      .map((line, i) => {
+        if (/^[^:\n]{1,25}:/.test(line)) return line; // already labelled
+        return `${i % 2 === 0 ? nameA : nameB}: ${line}`;
+      })
+      .join('\n');
 
     return result;
   } catch (err) {
