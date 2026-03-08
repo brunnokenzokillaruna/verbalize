@@ -97,17 +97,22 @@ export default function LessonPage() {
 
     (async () => {
       store.setIsLoading(true);
-      const hook = await generateHook({
-        language: lesson.language,
-        level: lesson.level,
-        interests: profile.interests ?? [],
-        grammarFocus: lesson.grammarFocus,
-      });
-      if (hook) {
-        store.setHook(hook);
-        store.setPhase('hook');
-      } else {
-        // Show a retry screen instead of jumping to the complete screen
+      try {
+        const hook = await generateHook({
+          language: lesson.language,
+          level: lesson.level,
+          interests: profile.interests ?? [],
+          grammarFocus: lesson.grammarFocus,
+        });
+        if (hook) {
+          store.setHook(hook);
+          store.setPhase('hook');
+        } else {
+          store.setIsLoading(false);
+          setHookError(true);
+        }
+      } catch (err) {
+        console.error('[LessonPage] generateHook threw:', err);
         store.setIsLoading(false);
         setHookError(true);
       }
@@ -261,23 +266,7 @@ export default function LessonPage() {
   // For exercises that require manual Verificar (like ReverseTranslation / Dictation)
   // those components call onAnswer internally; CheckButton state is driven by exerciseAnswer
 
-  // ── Loading screen ────────────────────────────────────────────────────────
-
-  if (phase === 'idle' || phase === 'loading') {
-    return (
-      <div
-        className="flex min-h-dvh flex-col items-center justify-center gap-4"
-        style={{ backgroundColor: 'var(--color-bg)' }}
-      >
-        <Loader2 size={36} className="animate-spin" style={{ color: 'var(--color-primary)' }} />
-        <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
-          Gerando sua lição…
-        </p>
-      </div>
-    );
-  }
-
-  // ── Error screen ─────────────────────────────────────────────────────────
+  // ── Error screen (must come before loading screen) ───────────────────────
 
   if (hookError) {
     return (
@@ -318,6 +307,22 @@ export default function LessonPage() {
         >
           Voltar ao início
         </button>
+      </div>
+    );
+  }
+
+  // ── Loading screen ────────────────────────────────────────────────────────
+
+  if (phase === 'idle' || phase === 'loading') {
+    return (
+      <div
+        className="flex min-h-dvh flex-col items-center justify-center gap-4"
+        style={{ backgroundColor: 'var(--color-bg)' }}
+      >
+        <Loader2 size={36} className="animate-spin" style={{ color: 'var(--color-primary)' }} />
+        <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+          Gerando sua lição…
+        </p>
       </div>
     );
   }
