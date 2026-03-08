@@ -246,31 +246,41 @@ export default function LessonPage() {
     const dialogue = store.hook.dialogue;
     const language = store.lesson.language;
 
-    // Fetch translations and first-pass images in parallel
-    const [translationResults, imageResults] = await Promise.all([
-      Promise.all(words.map((word) => translateWord(word, dialogue, language))),
-      Promise.all(words.map((word) => getVocabImage(word, dialogue, language))),
-    ]);
+    // Start image fetches immediately in the background — each updates the store as it arrives
+    const imagePromises = words.map(async (word) => {
+      const result = await getVocabImage(word, dialogue, language);
+      store.setVocabImage(word, result);
+      return { word, result };
+    });
+
+    // Wait only for translations (no Pexels/cache lookup — much faster)
+    const translationResults = await Promise.all(
+      words.map((word) => translateWord(word, dialogue, language)),
+    );
 
     translationResults.forEach((result, i) => {
       if (result?.translation) store.setVocabTranslation(words[i], result.translation);
     });
 
-    // Detect duplicate image URLs and re-fetch with excludeUrls
+    // Transition to vocabulary immediately — images continue loading in background
+    store.setIsLoading(false);
+    store.setPhase('vocabulary');
+
+    // Wait for all images, then fix any duplicates
+    const imageResults = await Promise.all(imagePromises);
+
     const usedUrls: string[] = [];
     const refetchWords: string[] = [];
 
-    imageResults.forEach((result, i) => {
+    imageResults.forEach(({ word, result }) => {
       if (result?.imageUrl && usedUrls.includes(result.imageUrl)) {
-        refetchWords.push(words[i]);
-        store.setVocabImage(words[i], null); // placeholder until re-fetched
-      } else {
-        store.setVocabImage(words[i], result);
-        if (result?.imageUrl) usedUrls.push(result.imageUrl);
+        refetchWords.push(word);
+        store.setVocabImage(word, null);
+      } else if (result?.imageUrl) {
+        usedUrls.push(result.imageUrl);
       }
     });
 
-    // Re-fetch only the duplicate words, passing already-used URLs
     if (refetchWords.length > 0) {
       await Promise.all(
         refetchWords.map(async (word) => {
@@ -282,9 +292,6 @@ export default function LessonPage() {
         }),
       );
     }
-
-    store.setIsLoading(false);
-    store.setPhase('vocabulary');
   }
 
   async function advanceFromVocabulary() {
