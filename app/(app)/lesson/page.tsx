@@ -239,12 +239,18 @@ export default function LessonPage() {
     if (!store.lesson || !store.hook || store.isLoading) return;
     store.setIsLoading(true);
 
-    // Fetch vocab images in parallel
+    // Fetch vocab images AND PT-BR translations in parallel
     const words = store.hook.newVocabulary;
     await Promise.all(
       words.map(async (word) => {
-        const result = await getVocabImage(word, store.hook!.dialogue, store.lesson!.language);
-        store.setVocabImage(word, result);
+        const [imageResult, translationResult] = await Promise.all([
+          getVocabImage(word, store.hook!.dialogue, store.lesson!.language),
+          translateWord(word, store.hook!.dialogue, store.lesson!.language),
+        ]);
+        store.setVocabImage(word, imageResult);
+        if (translationResult?.translation) {
+          store.setVocabTranslation(word, translationResult.translation);
+        }
       }),
     );
 
@@ -306,12 +312,12 @@ export default function LessonPage() {
     }
 
     store.hook.newVocabulary.forEach((word) => {
-      // For vocabulary items we need a translation; use word itself as placeholder
-      // (in practice, we already fetched the translation via TranslationTooltip earlier)
-      upsertVocabularyItem(user.uid, word, word, store.lesson!.language).catch(console.error);
+      const translation = store.vocabTranslations[word] ?? word;
+      upsertVocabularyItem(user.uid, word, translation, store.lesson!.language).catch(console.error);
     });
 
-    store.setPhase('complete');
+    store.reset();
+    router.replace('/');
   }
 
   function handleRetry() {
@@ -592,11 +598,12 @@ export default function LessonPage() {
             )}
             {store.hook.newVocabulary.map((word) => {
               const img = store.vocabImages[word];
+              const translation = store.vocabTranslations[word] ?? word;
               return (
                 <VisualVocabCard
                   key={word}
                   word={word}
-                  translation={word} // placeholder; real translation is in tooltip
+                  translation={translation}
                   language={store.lesson!.language}
                   imageUrl={img?.imageUrl}
                   imageAlt={img?.imageAlt}

@@ -26,6 +26,7 @@ interface LessonState {
   hook: HookResult | null;
   grammarBridge: GrammarBridgeResult | null;
   vocabImages: Record<string, VocabImageResult | null>; // keyed by word
+  vocabTranslations: Record<string, string>; // keyed by word → PT-BR translation
 
   // Exercises
   exercises: Exercise[];
@@ -44,6 +45,7 @@ interface LessonState {
   setHook: (hook: HookResult) => void;
   setGrammarBridge: (bridge: GrammarBridgeResult) => void;
   setVocabImage: (word: string, image: VocabImageResult | null) => void;
+  setVocabTranslation: (word: string, translation: string) => void;
   setExercises: (exercises: Exercise[]) => void;
   setIsLoading: (loading: boolean) => void;
 
@@ -68,6 +70,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
   hook: null,
   grammarBridge: null,
   vocabImages: {},
+  vocabTranslations: {},
   exercises: [],
   exerciseIndex: 0,
   correctCount: 0,
@@ -83,6 +86,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       hook: null,
       grammarBridge: null,
       vocabImages: {},
+      vocabTranslations: {},
       exercises: [],
       exerciseIndex: 0,
       correctCount: 0,
@@ -99,6 +103,11 @@ export const useLessonStore = create<LessonState>((set, get) => ({
   setVocabImage: (word, image) =>
     set((state) => ({
       vocabImages: { ...state.vocabImages, [word]: image },
+    })),
+
+  setVocabTranslation: (word, translation) =>
+    set((state) => ({
+      vocabTranslations: { ...state.vocabTranslations, [word]: translation },
     })),
 
   setExercises: (exercises) => set({ exercises, isLoading: false }),
@@ -124,6 +133,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       hook: null,
       grammarBridge: null,
       vocabImages: {},
+      vocabTranslations: {},
       exercises: [],
       exerciseIndex: 0,
       correctCount: 0,
