@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader2, Trophy, Volume2, VolumeX } from 'lucide-react';
 
@@ -73,6 +73,15 @@ export default function LessonPage() {
   // ── Audio (Web Speech API) ────────────────────────────────────────────────
 
   const langCode = store.lesson?.language === 'fr' ? 'fr-FR' : 'en-US';
+  const voicesRef = useRef<SpeechSynthesisVoice[]>([]);
+
+  // Voices load asynchronously; cache them once ready
+  useEffect(() => {
+    const load = () => { voicesRef.current = window.speechSynthesis.getVoices(); };
+    load();
+    window.speechSynthesis.addEventListener('voiceschanged', load);
+    return () => window.speechSynthesis.removeEventListener('voiceschanged', load);
+  }, []);
 
   const playDialogue = useCallback(() => {
     if (!store.hook) return;
@@ -82,6 +91,17 @@ export default function LessonPage() {
     );
     utterance.lang = langCode;
     utterance.rate = 0.88;
+
+    // Pick the highest-quality available voice for this language.
+    // Priority: Google Neural > Microsoft Neural > Siri > any enhanced/natural > first match.
+    const langPrefix = langCode.split('-')[0]; // 'fr' or 'en'
+    const candidates = voicesRef.current.filter(v => v.lang.startsWith(langPrefix));
+    const preferred = candidates.find(v =>
+      ['Google', 'Microsoft', 'Siri', 'Neural', 'Natural', 'Enhanced', 'Premium']
+        .some(kw => v.name.includes(kw))
+    ) ?? candidates[0];
+    if (preferred) utterance.voice = preferred;
+
     utterance.onstart = () => setIsPlaying(true);
     utterance.onend = () => setIsPlaying(false);
     utterance.onerror = () => setIsPlaying(false);
