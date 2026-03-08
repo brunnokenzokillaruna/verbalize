@@ -125,6 +125,45 @@ export async function logLesson(data: {
   });
 }
 
+/**
+ * Updates the user's lesson stats after completing a lesson:
+ * - Increments totalLessonsCompleted
+ * - Calculates the new streak based on lastLessonDate
+ * - Persists both to Firestore and returns the updated fields.
+ */
+export async function updateLessonStats(
+  uid: string,
+  profile: UserDocument,
+): Promise<Pick<UserDocument, 'totalLessonsCompleted' | 'currentStreak' | 'lastLessonDate'>> {
+  const now = new Date();
+  // Normalise to midnight local time so we compare calendar days, not exact times
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  const lastDate = profile.lastLessonDate?.toDate();
+  const lastDayStart = lastDate
+    ? new Date(lastDate.getFullYear(), lastDate.getMonth(), lastDate.getDate())
+    : null;
+
+  const diffDays = lastDayStart
+    ? Math.round((todayStart.getTime() - lastDayStart.getTime()) / 86_400_000)
+    : Infinity;
+
+  // diffDays === 0 → already counted today; === 1 → consecutive; > 1 → streak broken
+  const newStreak =
+    diffDays === 0 ? profile.currentStreak :
+    diffDays === 1 ? profile.currentStreak + 1 :
+    1;
+
+  const updates = {
+    totalLessonsCompleted: profile.totalLessonsCompleted + 1,
+    currentStreak: newStreak,
+    lastLessonDate: Timestamp.fromDate(todayStart),
+  };
+
+  await updateUser(uid, updates);
+  return updates;
+}
+
 // ─── Vocabulary (full list + translation patch) ───────────────────────────────
 
 /**

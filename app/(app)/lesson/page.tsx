@@ -14,7 +14,7 @@ import { generateGrammarBridge } from '@/app/actions/generateGrammarBridge';
 import { getVocabImage } from '@/app/actions/getVocabImage';
 import { generatePracticeExercises } from '@/app/actions/generatePracticeExercises';
 import { translateWord } from '@/app/actions/translateWord';
-import { upsertVocabularyItem, logLesson } from '@/services/firestore';
+import { upsertVocabularyItem, logLesson, updateLessonStats } from '@/services/firestore';
 
 import { LessonProgressHeader } from '@/components/lesson/LessonProgressHeader';
 import { ClickableSentence } from '@/components/lesson/ClickableSentence';
@@ -62,7 +62,7 @@ const CLOSED_TOOLTIP: TooltipState = { isOpen: false, word: '', isLoading: false
 
 export default function LessonPage() {
   const router = useRouter();
-  const { user, profile } = useAuthStore();
+  const { user, profile, setProfile } = useAuthStore();
   const store = useLessonStore();
 
   // Per-exercise answer state
@@ -297,6 +297,13 @@ export default function LessonPage() {
       language: store.lesson.language,
       score,
     }).catch(console.error);
+
+    // Update totalLessonsCompleted + streak on the user doc and refresh local profile
+    if (profile) {
+      updateLessonStats(user.uid, profile)
+        .then((updates) => setProfile({ ...profile, ...updates }))
+        .catch(console.error);
+    }
 
     store.hook.newVocabulary.forEach((word) => {
       // For vocabulary items we need a translation; use word itself as placeholder

@@ -18,6 +18,7 @@ export interface UserDocument {
   // High-level stats
   currentStreak: number;
   totalLessonsCompleted: number;
+  lastLessonDate?: Timestamp; // date-only (midnight UTC) of the last completed lesson
 }
 
 // ─── Vocabulary & SRS ─────────────────────────────────────────────────────────

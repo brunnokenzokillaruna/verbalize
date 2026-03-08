@@ -22,10 +22,19 @@ interface GenerateHookParams {
 export async function generateHook(params: GenerateHookParams): Promise<HookResult | null> {
   const { language, level, interests, grammarFocus } = params;
 
-  const frenchNames = ['Marie', 'Lucas', 'Sophie', 'Thomas', 'Camille', 'Julien', 'Léa', 'Antoine'];
-  const englishNames = ['Emma', 'Jake', 'Sarah', 'Michael', 'Olivia', 'Daniel', 'Chloe', 'Ryan'];
-  const namePool = language === 'fr' ? frenchNames : englishNames;
-  const [nameA, nameB] = [...namePool].sort(() => Math.random() - 0.5);
+  // Always pair one female name (nameA / voice A) with one male name (nameB / voice B)
+  const femaleNames = language === 'fr'
+    ? ['Marie', 'Sophie', 'Camille', 'Léa']
+    : ['Emma', 'Sarah', 'Olivia', 'Chloe'];
+  const maleNames = language === 'fr'
+    ? ['Lucas', 'Thomas', 'Julien', 'Antoine']
+    : ['Jake', 'Michael', 'Daniel', 'Ryan'];
+  const nameA = femaleNames[Math.floor(Math.random() * femaleNames.length)];
+  const nameB = maleNames[Math.floor(Math.random() * maleNames.length)];
+
+  // Pick ONE random interest per lesson so every dialogue has a fresh theme
+  const topicPool = interests.length > 0 ? interests : ['daily life'];
+  const topic = topicPool[Math.floor(Math.random() * topicPool.length)];
 
   try {
     const systemPrompt = `You are an expert language teacher creating content for Brazilian Portuguese speakers learning ${LANG_LABEL[language]}. Respond with ONLY valid JSON, no markdown, no explanation.`;
@@ -34,7 +43,7 @@ export async function generateHook(params: GenerateHookParams): Promise<HookResu
 
 Requirements:
 - ${level} level vocabulary and grammar
-- Topic: ${interests.join(', ')}
+- Topic: ${topic}
 - Naturally uses this grammar: ${grammarFocus}
 - 2 to 4 lines total, alternating speakers
 - Every line MUST begin with the speaker name and a colon
