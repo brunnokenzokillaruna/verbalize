@@ -327,9 +327,6 @@ export default function LessonPage() {
   }
 
   async function finishLesson() {
-    // Always transition to the complete screen first — never block on data ops
-    store.setPhase('complete');
-
     if (!user || !store.lesson || !store.hook) return;
     const total = store.exercises.length;
     const score = total > 0 ? Math.round((store.correctCount / total) * 100) : 0;
@@ -372,11 +369,15 @@ export default function LessonPage() {
   }
 
   function handleContinue() {
-    setExerciseAnswer(null);
     const isLast = store.exerciseIndex >= store.exercises.length - 1;
     if (isLast) {
+      // Transition phase BEFORE resetting answer state so there is no intermediate
+      // render where answered=false could unfreeze the last exercise component.
+      store.setPhase('complete');
+      setExerciseAnswer(null);
       finishLesson();
     } else {
+      setExerciseAnswer(null);
       store.nextExercise();
     }
   }
@@ -662,7 +663,7 @@ export default function LessonPage() {
 
         {/* ── Practice phase ── */}
         {phase === 'practice' && currentExercise && store.lesson && (
-          <div className="animate-slide-up">
+          <div key={store.exerciseIndex} className="animate-slide-up">
             <div className="mb-4 flex items-center justify-between">
               <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--color-text-muted)' }}>
                 Exercício {store.exerciseIndex + 1} / {store.exercises.length}
