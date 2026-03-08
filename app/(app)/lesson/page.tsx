@@ -125,11 +125,17 @@ export default function LessonPage() {
 
     (async () => {
       setIsLoadingAudio(true);
-      const base64 = await synthesizeSpeech(text, language);
-      setIsLoadingAudio(false);
-      if (cancelled || !base64) return;
-      cachedAudioRef.current = base64;
-      startAudio(base64);
+      try {
+        const base64 = await synthesizeSpeech(text, language);
+        if (!cancelled && base64) {
+          cachedAudioRef.current = base64;
+          startAudio(base64);
+        }
+      } catch (err) {
+        console.error('[LessonPage] TTS error:', err);
+      } finally {
+        if (!cancelled) setIsLoadingAudio(false);
+      }
     })();
 
     return () => { cancelled = true; stopAudio(); };

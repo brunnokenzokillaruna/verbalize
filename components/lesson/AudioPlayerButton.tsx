@@ -1,6 +1,6 @@
 'use client';
 
-import { Volume2, Square } from 'lucide-react';
+import { Volume2, Square, Loader2 } from 'lucide-react';
 import { useAudio } from '@/hooks/useAudio';
 import type { SupportedLanguage } from '@/types';
 
@@ -8,8 +8,6 @@ interface AudioPlayerButtonProps {
   text: string;
   language: SupportedLanguage;
   size?: 'sm' | 'md' | 'lg';
-  /** If true, plays immediately on mount */
-  autoPlay?: boolean;
 }
 
 const SIZE = {
@@ -23,22 +21,22 @@ export function AudioPlayerButton({
   language,
   size = 'md',
 }: AudioPlayerButtonProps) {
-  const { toggle, isPlaying } = useAudio();
+  const { toggle, isPlaying, isLoading } = useAudio();
   const s = SIZE[size];
+  const busy = isPlaying || isLoading;
 
   return (
     <button
       type="button"
       onClick={() => toggle(text, language)}
+      disabled={isLoading}
       aria-label={isPlaying ? 'Parar áudio' : 'Ouvir pronúncia'}
-      className="relative flex items-center justify-center rounded-full transition-transform duration-150 active:scale-90"
+      className="relative flex items-center justify-center rounded-full transition-transform duration-150 active:scale-90 disabled:cursor-not-allowed"
       style={{
         width: s.btn,
         height: s.btn,
-        backgroundColor: isPlaying
-          ? 'var(--color-primary)'
-          : 'var(--color-primary-light)',
-        color: isPlaying ? 'var(--color-text-inverse)' : 'var(--color-primary)',
+        backgroundColor: busy ? 'var(--color-primary)' : 'var(--color-primary-light)',
+        color: busy ? 'var(--color-text-inverse)' : 'var(--color-primary)',
       }}
     >
       {/* Pulsing ring while playing */}
@@ -55,7 +53,11 @@ export function AudioPlayerButton({
         />
       )}
 
-      {isPlaying ? <Square size={s.icon} fill="currentColor" /> : <Volume2 size={s.icon} />}
+      {isLoading
+        ? <Loader2 size={s.icon} className="animate-spin" />
+        : isPlaying
+          ? <Square size={s.icon} fill="currentColor" />
+          : <Volume2 size={s.icon} />}
     </button>
   );
 }
