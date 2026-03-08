@@ -75,39 +75,45 @@ export default function LessonPage() {
 
   const [isLoadingAudio, setIsLoadingAudio] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const audioQueueRef = useRef<string[]>([]);
   const cachedChunksRef = useRef<string[] | null>(null);
+  // Monotonically-increasing session ID prevents stale onended callbacks
+  // from a previous play session from triggering the next chunk.
+  const playSessionRef = useRef(0);
 
   function stopAudio() {
+    playSessionRef.current++;        // invalidate any in-flight callbacks
     audioRef.current?.pause();
     audioRef.current = null;
-    audioQueueRef.current = [];
     setIsPlaying(false);
   }
 
-  function playQueue(queue: string[]) {
-    if (queue.length === 0) { setIsPlaying(false); return; }
-    const [first, ...rest] = queue;
-    audioQueueRef.current = rest;
-    const audio = new Audio(`data:audio/mp3;base64,${first}`);
+  // Plays chunk at `index` from `chunks`, then advances to the next chunk.
+  // `session` must match `playSessionRef.current` or the call is ignored.
+  function playChunk(chunks: string[], index: number, session: number) {
+    if (session !== playSessionRef.current) return; // cancelled
+    if (index >= chunks.length) { setIsPlaying(false); return; }
+
+    const audio = new Audio(`data:audio/mp3;base64,${chunks[index]}`);
     audioRef.current = audio;
-    audio.onplay = () => setIsPlaying(true);
     audio.onended = () => {
       audioRef.current = null;
-      if (audioQueueRef.current.length > 0) {
-        playQueue(audioQueueRef.current);
-      } else {
-        setIsPlaying(false);
-      }
+      // 300 ms pause between speakers for natural dialogue feel
+      setTimeout(() => playChunk(chunks, index + 1, session), 300);
     };
-    audio.onerror = () => { stopAudio(); };
-    audio.play().catch(() => { stopAudio(); });
+    audio.onerror = () => {
+      if (session === playSessionRef.current) { audioRef.current = null; setIsPlaying(false); }
+    };
+    audio.play().catch(() => {
+      if (session === playSessionRef.current) { audioRef.current = null; setIsPlaying(false); }
+    });
   }
 
   function startAudio(chunks: string[]) {
-    audioRef.current?.pause();
-    audioRef.current = null;
-    playQueue(chunks);
+    stopAudio();                          // increments playSessionRef.current
+    if (chunks.length === 0) return;
+    const session = playSessionRef.current;
+    setIsPlaying(true);
+    playChunk(chunks, 0, session);
   }
 
   function handleAudioButton() {

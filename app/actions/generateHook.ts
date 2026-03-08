@@ -22,39 +22,49 @@ interface GenerateHookParams {
 export async function generateHook(params: GenerateHookParams): Promise<HookResult | null> {
   const { language, level, interests, grammarFocus } = params;
 
+  const frenchNames = ['Marie', 'Lucas', 'Sophie', 'Thomas', 'Camille', 'Julien', 'Léa', 'Antoine'];
+  const englishNames = ['Emma', 'Jake', 'Sarah', 'Michael', 'Olivia', 'Daniel', 'Chloe', 'Ryan'];
+  const namePool = language === 'fr' ? frenchNames : englishNames;
+  const [nameA, nameB] = [...namePool].sort(() => Math.random() - 0.5);
+
   try {
     const systemPrompt = `You are an expert language teacher creating content for Brazilian Portuguese speakers learning ${LANG_LABEL[language]}. Respond with ONLY valid JSON, no markdown, no explanation.`;
 
-    const frenchNames = ['Marie', 'Lucas', 'Sophie', 'Thomas', 'Camille', 'Julien', 'Léa', 'Antoine'];
-    const englishNames = ['Emma', 'Jake', 'Sarah', 'Michael', 'Olivia', 'Daniel', 'Chloe', 'Ryan'];
-    const namePool = language === 'fr' ? frenchNames : englishNames;
-    const shuffle = (arr: string[]) => [...arr].sort(() => Math.random() - 0.5);
-    const [nameA, nameB] = shuffle(namePool);
+    const prompt = `Write a short 2-person dialogue in ${LANG_LABEL[language]} between ${nameA} and ${nameB}.
 
-    const prompt = `Write a short, natural 2-person dialogue (2–4 lines total, alternating between exactly 2 speakers).
+Requirements:
+- ${level} level vocabulary and grammar
+- Topic: ${interests.join(', ')}
+- Naturally uses this grammar: ${grammarFocus}
+- 2 to 4 lines total, alternating speakers
+- Every line MUST begin with the speaker name and a colon
 
-Target language: ${LANG_LABEL[language]}
-User level: ${level}
-Topics of interest: ${interests.join(', ')}
-Target grammar: ${grammarFocus}
-Speaker 1 name: ${nameA}
-Speaker 2 name: ${nameB}
+Example of the required format (replace with real content in ${LANG_LABEL[language]}):
+${nameA}: Bonjour, comment tu t'appelles ?
+${nameB}: Je m'appelle ${nameB}. Et toi ?
 
-Rules:
-- Each line must start with the speaker's name followed by a colon, e.g. "${nameA}: ..." then "${nameB}: ...".
-- Use simple vocabulary suited for ${level} level.
-- Emphasize the target grammar naturally within the dialogue.
-- Make it conversational and engaging.
-- Write entirely in ${LANG_LABEL[language]}.
-
-Output JSON in exactly this format:
+Output this JSON:
 {
-  "dialogue": "${nameA}: [first line]\\n${nameB}: [second line]\\n${nameA}: [optional third line]",
-  "newVocabulary": ["key", "vocabulary", "words", "to", "highlight"],
-  "grammarFocus": "Brief description of the grammar pattern used"
+  "dialogue": "${nameA}: <first line>\\n${nameB}: <second line>",
+  "newVocabulary": ["word1", "word2", "word3"],
+  "grammarFocus": "one sentence describing the grammar used"
 }`;
 
-    return await callGeminiJSON<HookResult>(prompt, systemPrompt);
+    const result = await callGeminiJSON<HookResult>(prompt, systemPrompt);
+    if (!result) return null;
+
+    // Post-process: ensure every line has "Name: " prefix.
+    // Gemini sometimes ignores format instructions; this guarantees the UI
+    // can always parse speaker names.
+    const lines = result.dialogue.split('\n').filter((l) => l.trim().length > 0);
+    const alreadyLabelled = lines.length > 0 && /^[^:\n]{1,25}:/.test(lines[0]);
+    if (!alreadyLabelled) {
+      result.dialogue = lines
+        .map((line, i) => `${i % 2 === 0 ? nameA : nameB}: ${line}`)
+        .join('\n');
+    }
+
+    return result;
   } catch (err) {
     console.error('[generateHook] Error:', err);
     return null;
