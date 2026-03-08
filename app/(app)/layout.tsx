@@ -2,7 +2,13 @@
 export const dynamic = 'force-dynamic';
 
 import { AuthGuard } from '@/components/AuthGuard';
+import { BottomNav } from '@/components/ui/BottomNav';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  return <AuthGuard>{children}</AuthGuard>;
+  return (
+    <AuthGuard>
+      {children}
+      <BottomNav />
+    </AuthGuard>
+  );
 }

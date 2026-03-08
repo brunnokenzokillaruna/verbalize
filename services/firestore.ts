@@ -13,7 +13,7 @@ import {
   Timestamp,
 } from 'firebase/firestore';
 import { db } from './firebase';
-import type { UserDocument, UserVocabularyDocument, ImageCacheDocument, SupportedLanguage } from '@/types';
+import type { UserDocument, UserVocabularyDocument, ImageCacheDocument, VerbDocument, SupportedLanguage } from '@/types';
 import { calculateNextReview } from '@/lib/srs';
 
 // ─── Users ────────────────────────────────────────────────────────────────────
@@ -123,6 +123,69 @@ export async function logLesson(data: {
     ...data,
     completedAt: serverTimestamp(),
   });
+}
+
+// ─── Vocabulary (full list + translation patch) ───────────────────────────────
+
+/**
+ * Returns all vocabulary items for a user+language (not filtered by due date).
+ */
+export async function getUserVocabulary(
+  uid: string,
+  language: SupportedLanguage,
+): Promise<UserVocabularyDocument[]> {
+  const q = query(
+    collection(db, 'user_vocabulary'),
+    where('uid', '==', uid),
+    where('language', '==', language),
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() } as UserVocabularyDocument));
+}
+
+/**
+ * Patches the translation field of an existing vocabulary item.
+ * Used to lazily enrich placeholder translations on the vocabulary page.
+ */
+export async function updateVocabTranslation(
+  uid: string,
+  word: string,
+  language: SupportedLanguage,
+  translation: string,
+): Promise<void> {
+  const q = query(
+    collection(db, 'user_vocabulary'),
+    where('uid', '==', uid),
+    where('language', '==', language),
+    where('word', '==', word),
+  );
+  const snap = await getDocs(q);
+  if (!snap.empty) {
+    await updateDoc(snap.docs[0].ref, { translation });
+  }
+}
+
+// ─── Verb Cache ───────────────────────────────────────────────────────────────
+
+/**
+ * Returns a cached VerbDocument from Firestore, or null if not yet cached.
+ * Document ID format: `{infinitive}_{language}` (e.g., "être_fr").
+ */
+export async function getCachedVerb(
+  infinitive: string,
+  language: SupportedLanguage,
+): Promise<VerbDocument | null> {
+  const id = `${infinitive.toLowerCase()}_${language}`;
+  const snap = await getDoc(doc(db, 'verbs', id));
+  return snap.exists() ? (snap.data() as VerbDocument) : null;
+}
+
+/**
+ * Saves a generated VerbDocument to the Firestore verbs cache.
+ */
+export async function saveVerbCache(data: VerbDocument): Promise<void> {
+  const id = `${data.infinitive.toLowerCase()}_${data.language}`;
+  await setDoc(doc(db, 'verbs', id), data);
 }
 
 // ─── Image Cache ──────────────────────────────────────────────────────────────

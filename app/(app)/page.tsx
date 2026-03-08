@@ -26,7 +26,7 @@ export default function DashboardPage() {
 
   return (
     <div
-      className="min-h-dvh px-5 py-8 max-w-lg mx-auto"
+      className="min-h-dvh px-5 py-8 pb-24 max-w-lg mx-auto"
       style={{ backgroundColor: 'var(--color-bg)' }}
     >
       {/* Header */}

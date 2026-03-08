@@ -62,12 +62,14 @@ This document outlines the step-by-step implementation plan for the Verbalize ap
 - [x] `app/(app)/lesson/page.tsx` — Full lesson orchestrator: lazy stage loading, exercise loop, CheckButton integration, Firestore saves on complete.
 - [x] `app/(app)/page.tsx` — Dashboard "Iniciar Lição" button navigates to `/lesson`.
 
-## Phase 6: Vocabulary & Analytics
-- [ ] Build the "Verb Explorer" screen with searchable conjugation tables.
-- [ ] Build the User Dashboard:
-  - Display daily streak.
-  - Show learned vocabulary list.
-  - Show progress through the curriculum modules.
+## Phase 6: Vocabulary & Analytics ✅
+- [x] `services/firestore.ts` — Added `getUserVocabulary`, `updateVocabTranslation`, `getCachedVerb`, `saveVerbCache`.
+- [x] `app/actions/getVerbConjugation.ts` — Gemini on-demand verb conjugation with Firestore caching (`verbs/{infinitive}_{language}`).
+- [x] `components/ui/BottomNav.tsx` — Fixed bottom nav (Home / Vocabulário / Verbos); auto-hides on `/lesson`.
+- [x] `app/(app)/layout.tsx` — BottomNav added to all app routes.
+- [x] `app/(app)/vocabulary/page.tsx` — Full vocabulary list: due-today vs learned sections, SRS level badges, lazy Gemini translation enrichment for placeholder words, audio buttons.
+- [x] `app/(app)/verbs/page.tsx` — Verb Explorer: search input, quick-start chips, Gemini-powered conjugation table with collapsible tenses, per-form audio, example sentences.
+- [x] Dashboard — `pb-24` bottom padding for nav clearance.
 
 ## Phase 7: Polish & Deployment
 - [ ] Ensure mobile responsiveness across all device sizes.
