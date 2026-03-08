@@ -487,6 +487,12 @@ export default function LessonPage() {
     );
   }
 
+  // ── Navigating away — render nothing to avoid loading screen flash ────────
+
+  if (exitingRef.current) {
+    return <div style={{ backgroundColor: 'var(--color-bg)', minHeight: '100dvh' }} />;
+  }
+
   // ── Loading screen ────────────────────────────────────────────────────────
 
   if (phase === 'idle' || phase === 'loading') {
