@@ -76,6 +76,10 @@ export default function LessonPage() {
   // ── Audio (Google Cloud TTS — two-voice dialogue) ────────────────────────
 
   const [isLoadingAudio, setIsLoadingAudio] = useState(false);
+  // Set to true once the user deliberately navigates away so the bootstrap
+  // effect doesn't start generating a new lesson after store.reset().
+  const exitingRef = useRef(false);
+
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const cachedChunksRef = useRef<string[] | null>(null);
   // Monotonically-increasing session ID prevents stale onended callbacks
@@ -182,7 +186,7 @@ export default function LessonPage() {
 
   useEffect(() => {
     if (!profile) return;
-
+    if (exitingRef.current) return;
     if (store.phase !== 'idle') return;
 
     setHookError(false);
@@ -352,6 +356,12 @@ export default function LessonPage() {
     });
   }
 
+  function exitLesson() {
+    exitingRef.current = true;
+    store.reset();
+    router.replace('/');
+  }
+
   function handleRetry() {
     setHookError(false);
     store.reset(); // resets phase to 'idle' → bootstrap effect re-runs
@@ -460,7 +470,7 @@ export default function LessonPage() {
         </button>
         <button
           type="button"
-          onClick={() => { store.reset(); router.replace('/'); }}
+          onClick={() => exitLesson()}
           className="text-sm transition-opacity hover:opacity-70"
           style={{ color: 'var(--color-text-muted)' }}
         >
@@ -541,7 +551,7 @@ export default function LessonPage() {
 
         <button
           type="button"
-          onClick={() => { store.reset(); router.replace('/'); }}
+          onClick={() => exitLesson()}
           className="rounded-2xl px-8 py-4 text-base font-semibold transition-all active:scale-95"
           style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-text-inverse)' }}
         >
@@ -557,7 +567,7 @@ export default function LessonPage() {
     <div style={{ backgroundColor: 'var(--color-bg)', minHeight: '100dvh' }}>
       <LessonProgressHeader
         currentStage={phaseToStage(phase)}
-        onExit={() => { store.reset(); router.replace('/'); }}
+        onExit={exitLesson}
       />
 
       <main className="mx-auto max-w-[640px] px-5 pt-6 pb-48">
