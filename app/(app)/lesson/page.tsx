@@ -9,6 +9,7 @@ import { useLessonStore } from '@/store/lessonStore';
 import { getNextLesson } from '@/lib/curriculum';
 
 import { generateHook } from '@/app/actions/generateHook';
+import { synthesizeSpeech } from '@/app/actions/synthesizeSpeech';
 import { generateGrammarBridge } from '@/app/actions/generateGrammarBridge';
 import { getVocabImage } from '@/app/actions/getVocabImage';
 import { generatePracticeExercises } from '@/app/actions/generatePracticeExercises';
@@ -70,51 +71,68 @@ export default function LessonPage() {
   const [hookError, setHookError] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  // ── Audio (Web Speech API) ────────────────────────────────────────────────
+  // ── Audio (Google Cloud TTS) ──────────────────────────────────────────────
 
-  const langCode = store.lesson?.language === 'fr' ? 'fr-FR' : 'en-US';
-  const voicesRef = useRef<SpeechSynthesisVoice[]>([]);
+  const [isLoadingAudio, setIsLoadingAudio] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const cachedAudioRef = useRef<string | null>(null);
 
-  // Voices load asynchronously; cache them once ready
-  useEffect(() => {
-    const load = () => { voicesRef.current = window.speechSynthesis.getVoices(); };
-    load();
-    window.speechSynthesis.addEventListener('voiceschanged', load);
-    return () => window.speechSynthesis.removeEventListener('voiceschanged', load);
-  }, []);
+  function stopAudio() {
+    audioRef.current?.pause();
+    audioRef.current = null;
+    setIsPlaying(false);
+  }
 
-  const playDialogue = useCallback(() => {
+  function startAudio(base64: string) {
+    audioRef.current?.pause();
+    const audio = new Audio(`data:audio/mp3;base64,${base64}`);
+    audioRef.current = audio;
+    audio.onplay = () => setIsPlaying(true);
+    audio.onended = () => { setIsPlaying(false); audioRef.current = null; };
+    audio.onerror = () => { setIsPlaying(false); audioRef.current = null; };
+    audio.play().catch(() => { setIsPlaying(false); audioRef.current = null; });
+  }
+
+  async function fetchAndPlay(text: string) {
+    if (!store.lesson || isLoadingAudio) return;
+    setIsLoadingAudio(true);
+    const base64 = await synthesizeSpeech(text, store.lesson.language);
+    setIsLoadingAudio(false);
+    if (!base64) return;
+    cachedAudioRef.current = base64;
+    startAudio(base64);
+  }
+
+  function handleAudioButton() {
+    if (isPlaying) { stopAudio(); return; }
     if (!store.hook) return;
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(
-      store.hook.dialogue.replace(/\n/g, ' '),
-    );
-    utterance.lang = langCode;
-    utterance.rate = 0.88;
+    const text = store.hook.dialogue.replace(/\n/g, ' ');
+    if (cachedAudioRef.current) { startAudio(cachedAudioRef.current); return; }
+    fetchAndPlay(text);
+  }
 
-    // Pick the highest-quality available voice for this language.
-    // Priority: Google Neural > Microsoft Neural > Siri > any enhanced/natural > first match.
-    const langPrefix = langCode.split('-')[0]; // 'fr' or 'en'
-    const candidates = voicesRef.current.filter(v => v.lang.startsWith(langPrefix));
-    const preferred = candidates.find(v =>
-      ['Google', 'Microsoft', 'Siri', 'Neural', 'Natural', 'Enhanced', 'Premium']
-        .some(kw => v.name.includes(kw))
-    ) ?? candidates[0];
-    if (preferred) utterance.voice = preferred;
-
-    utterance.onstart = () => setIsPlaying(true);
-    utterance.onend = () => setIsPlaying(false);
-    utterance.onerror = () => setIsPlaying(false);
-    window.speechSynthesis.speak(utterance);
-  }, [store.hook, langCode]);
-
-  // Auto-play when hook phase is entered; cancel on phase change
+  // Auto-fetch + play when entering hook phase
   useEffect(() => {
-    if (store.phase === 'hook') {
-      const t = setTimeout(playDialogue, 400);
-      return () => { clearTimeout(t); window.speechSynthesis.cancel(); };
+    if (store.phase !== 'hook') {
+      stopAudio();
+      cachedAudioRef.current = null;
+      return;
     }
-    window.speechSynthesis.cancel();
+    if (!store.hook || !store.lesson) return;
+    const text = store.hook.dialogue.replace(/\n/g, ' ');
+    const language = store.lesson.language;
+    let cancelled = false;
+
+    (async () => {
+      setIsLoadingAudio(true);
+      const base64 = await synthesizeSpeech(text, language);
+      setIsLoadingAudio(false);
+      if (cancelled || !base64) return;
+      cachedAudioRef.current = base64;
+      startAudio(base64);
+    })();
+
+    return () => { cancelled = true; stopAudio(); };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [store.phase]);
 
@@ -462,15 +480,20 @@ export default function LessonPage() {
                 </p>
                 <button
                   type="button"
-                  onClick={isPlaying ? () => { window.speechSynthesis.cancel(); setIsPlaying(false); } : playDialogue}
+                  onClick={handleAudioButton}
+                  disabled={isLoadingAudio}
                   aria-label={isPlaying ? 'Parar áudio' : 'Ouvir diálogo'}
-                  className="flex h-8 w-8 items-center justify-center rounded-full transition-all active:scale-90"
+                  className="flex h-8 w-8 items-center justify-center rounded-full transition-all active:scale-90 disabled:cursor-not-allowed"
                   style={{
                     backgroundColor: isPlaying ? 'var(--color-primary)' : 'var(--color-surface-raised)',
                     color: isPlaying ? 'var(--color-text-inverse)' : 'var(--color-text-muted)',
                   }}
                 >
-                  {isPlaying ? <VolumeX size={15} /> : <Volume2 size={15} />}
+                  {isLoadingAudio
+                    ? <Loader2 size={15} className="animate-spin" />
+                    : isPlaying
+                      ? <VolumeX size={15} />
+                      : <Volume2 size={15} />}
                 </button>
               </div>
               {store.hook.dialogue.split('\n').map((line, i) => (
