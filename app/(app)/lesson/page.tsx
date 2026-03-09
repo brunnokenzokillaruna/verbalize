@@ -29,7 +29,7 @@ import { DictationInput } from '@/components/lesson/DictationInput';
 import { ErrorCorrectionExercise } from '@/components/lesson/ErrorCorrectionExercise';
 import { VerbConjugationDrill } from '@/components/lesson/VerbConjugationDrill';
 
-import type { LessonStage } from '@/types';
+import type { LessonStage, GrammarBridgeResult, Exercise } from '@/types';
 import type { WordClickPayload } from '@/components/lesson/ClickableWord';
 
 // ── Map LessonPhase → LessonStage for progress header ────────────────────────
@@ -85,6 +85,11 @@ export default function LessonPage() {
   // Monotonically-increasing session ID prevents stale onended callbacks
   // from a previous play session from triggering the next chunk.
   const playSessionRef = useRef(0);
+
+  // Prefetch promises — start fetching the next screen's data while the user
+  // is still reading/listening on the current screen.
+  const grammarBridgePrefetchRef = useRef<Promise<GrammarBridgeResult | null> | null>(null);
+  const exercisesPrefetchRef = useRef<Promise<Exercise[] | null> | null>(null);
 
   function stopAudio() {
     playSessionRef.current++;        // invalidate any in-flight callbacks
@@ -222,87 +227,85 @@ export default function LessonPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile, store.phase]);
 
-  // ── Stage advance handlers ────────────────────────────────────────────────
+  // ── Prefetch: start next-screen data while user reads/listens ────────────
 
-  async function advanceFromHook() {
-    if (!store.lesson || !store.hook || store.isLoading) return;
-    store.setIsLoading(true);
-
-    const bridge = await generateGrammarBridge({
+  // 1. Hook phase active → prefetch grammar bridge
+  useEffect(() => {
+    if (store.phase !== 'hook' || !store.hook || !store.lesson) return;
+    grammarBridgePrefetchRef.current = generateGrammarBridge({
       dialogue: store.hook.dialogue,
       grammarFocus: store.hook.grammarFocus,
       language: store.lesson.language,
     });
-    if (bridge) store.setGrammarBridge(bridge);
-    else store.setIsLoading(false);
-    store.setPhase('grammar');
-  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [store.phase]);
 
-  async function advanceFromGrammar() {
-    if (!store.lesson || !store.hook || store.isLoading) return;
-
+  // 2. Grammar phase active → prefetch vocab translations + images
+  useEffect(() => {
+    if (store.phase !== 'grammar' || !store.hook || !store.lesson) return;
     const words = store.hook.newVocabulary;
     const dialogue = store.hook.dialogue;
     const language = store.lesson.language;
 
-    // Transition immediately — vocab cards show with word as fallback while data loads
-    store.setPhase('vocabulary');
-
-    // Translations: fire-and-forget, each updates the store as it arrives
+    // Translations — fire-and-forget per word
     words.forEach(async (word) => {
       const result = await translateWord(word, dialogue, language);
       if (result?.translation) store.setVocabTranslation(word, result.translation);
     });
 
-    // Images: each updates the store as it arrives; collect results for duplicate detection
-    const imagePromises = words.map(async (word) => {
-      const result = await getVocabImage(word, dialogue, language);
-      store.setVocabImage(word, result);
-      return { word, result };
-    });
+    // Images — each updates the store as it arrives, then fix duplicates
+    (async () => {
+      const imagePromises = words.map(async (word) => {
+        const result = await getVocabImage(word, dialogue, language);
+        store.setVocabImage(word, result);
+        return { word, result };
+      });
+      const imageResults = await Promise.all(imagePromises);
 
-    const imageResults = await Promise.all(imagePromises);
+      const usedUrls: string[] = [];
+      const refetchWords: string[] = [];
+      imageResults.forEach(({ word, result }) => {
+        if (result?.imageUrl && usedUrls.includes(result.imageUrl)) {
+          refetchWords.push(word);
+          store.setVocabImage(word, null);
+        } else if (result?.imageUrl) {
+          usedUrls.push(result.imageUrl);
+        }
+      });
 
-    // Fix any duplicate image URLs by re-fetching affected words
-    const usedUrls: string[] = [];
-    const refetchWords: string[] = [];
-
-    imageResults.forEach(({ word, result }) => {
-      if (result?.imageUrl && usedUrls.includes(result.imageUrl)) {
-        refetchWords.push(word);
-        store.setVocabImage(word, null);
-      } else if (result?.imageUrl) {
-        usedUrls.push(result.imageUrl);
+      if (refetchWords.length > 0) {
+        await Promise.all(
+          refetchWords.map(async (word) => {
+            const result = await getVocabImage(word, dialogue, language, [...usedUrls]);
+            store.setVocabImage(word, result);
+            if (result?.imageUrl && !usedUrls.includes(result.imageUrl)) {
+              usedUrls.push(result.imageUrl);
+            }
+          }),
+        );
       }
-    });
+    })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [store.phase]);
 
-    if (refetchWords.length > 0) {
-      await Promise.all(
-        refetchWords.map(async (word) => {
-          const result = await getVocabImage(word, dialogue, language, [...usedUrls]);
-          store.setVocabImage(word, result);
-          if (result?.imageUrl && !usedUrls.includes(result.imageUrl)) {
-            usedUrls.push(result.imageUrl);
-          }
-        }),
-      );
-    }
-  }
+  // 3. Vocabulary phase active → prefetch practice exercises
+  useEffect(() => {
+    if (store.phase !== 'vocabulary' || !store.hook || !store.lesson) return;
+    exercisesPrefetchRef.current = buildAndFetchExercises();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [store.phase]);
 
-  async function advanceFromVocabulary() {
-    if (!store.lesson || !store.hook || store.isLoading) return;
-    store.setIsLoading(true);
+  // ── Stage advance handlers ────────────────────────────────────────────────
 
-    // Generate 2 AI exercises
+  /** Shared exercise builder — used by prefetch effect and advanceFromVocabulary fallback. */
+  async function buildAndFetchExercises(): Promise<Exercise[] | null> {
+    if (!store.hook || !store.lesson) return null;
     const aiExercises = await generatePracticeExercises({
       dialogue: store.hook.dialogue,
       newVocabulary: store.hook.newVocabulary,
       language: store.lesson.language,
       level: store.lesson.level,
     });
-
-    // Build SentenceBuilder exercises client-side from real dialogue sentences.
-    // Extract spoken text (strip "Name: " prefix), keep lines with 3–10 words, pick 2.
     const dialogueSentences = store.hook.dialogue
       .split('\n')
       .filter((l) => l.trim().length > 0)
@@ -314,21 +317,51 @@ export default function LessonPage() {
         const wc = text.split(/\s+/).length;
         return wc >= 3 && wc <= 10;
       });
-
     const sentenceExercises = dialogueSentences.slice(0, 2).map((text) => {
       const words = text.split(/\s+/).filter(Boolean);
       return {
         type: 'sentence-builder' as const,
-        data: {
-          words: [...words].sort(() => Math.random() - 0.5),
-          correctOrder: words,
-          translation: '',
-        },
+        data: { words: [...words].sort(() => Math.random() - 0.5), correctOrder: words, translation: '' },
       };
     });
+    return [...(aiExercises ?? []), ...sentenceExercises];
+  }
 
-    const allExercises = [...(aiExercises ?? []), ...sentenceExercises];
-    store.setExercises(allExercises);
+  async function advanceFromHook() {
+    if (!store.lesson || !store.hook || store.isLoading) return;
+    store.setIsLoading(true);
+
+    // Use the prefetched promise (likely already resolved) or fall back to fetching now
+    const bridge = await (
+      grammarBridgePrefetchRef.current ??
+      generateGrammarBridge({
+        dialogue: store.hook.dialogue,
+        grammarFocus: store.hook.grammarFocus,
+        language: store.lesson.language,
+      })
+    );
+    grammarBridgePrefetchRef.current = null;
+    if (bridge) store.setGrammarBridge(bridge);
+    else store.setIsLoading(false);
+    store.setPhase('grammar');
+  }
+
+  function advanceFromGrammar() {
+    if (!store.lesson || !store.hook) return;
+    // Vocab translations + images are already being fetched by the grammar-phase
+    // prefetch effect — just transition immediately.
+    store.setPhase('vocabulary');
+  }
+
+  async function advanceFromVocabulary() {
+    if (!store.lesson || !store.hook || store.isLoading) return;
+    store.setIsLoading(true);
+
+    // Use the prefetched promise (likely already resolved) or fall back to building now
+    const allExercises = await (exercisesPrefetchRef.current ?? buildAndFetchExercises());
+    exercisesPrefetchRef.current = null;
+
+    store.setExercises(allExercises ?? []);
     store.setPhase('practice');
   }
 
