@@ -24,7 +24,6 @@ export default function DashboardPage() {
   const router = useRouter();
 
   // ── Derive initial selected level from user's frontier ─────────────────────
-  // getLessonsForLanguage is a static lookup — safe to call before hooks.
   const allLessonsComputed = profile ? getLessonsForLanguage(profile.currentTargetLanguage) : [];
   const frontierLessonId = profile?.lessonProgress?.[profile.currentTargetLanguage ?? 'fr'];
   const frontierIndexComputed = frontierLessonId
@@ -64,12 +63,10 @@ export default function DashboardPage() {
   const lang = LANG_LABEL[profile.currentTargetLanguage];
   const allLessons = getLessonsForLanguage(profile.currentTargetLanguage);
 
-  // Current frontier (next lesson to study)
   const frontierIndex = frontierLessonId
     ? allLessons.findIndex((l) => l.id === frontierLessonId)
     : 0;
 
-  // Set of levels that have at least one lesson in the curriculum
   const levelsWithLessons = new Set(allLessons.map((l) => l.level));
 
   function handleSelectLevel(level: ProficiencyLevel) {
@@ -77,7 +74,6 @@ export default function DashboardPage() {
     setPage(0);
   }
 
-  // Lessons for the selected level + pagination
   const levelLessons = allLessons.filter((l) => l.level === selectedLevel);
   const totalPages = Math.max(1, Math.ceil(levelLessons.length / LESSONS_PER_PAGE));
   const safePage = Math.min(page, totalPages - 1);
@@ -88,19 +84,23 @@ export default function DashboardPage() {
 
   return (
     <div
-      className="min-h-dvh px-5 py-8 pb-24 max-w-lg mx-auto"
+      className="min-h-dvh px-5 py-8 pb-24 md:pb-10 max-w-lg mx-auto md:max-w-2xl lg:max-w-4xl"
       style={{ backgroundColor: 'var(--color-bg)' }}
     >
       {/* ── Header ── */}
       <header className="flex items-center justify-between mb-8 animate-slide-up">
         <div>
+          {/* Hide logo on desktop — it lives in the sidebar */}
           <h1
-            className="font-display text-3xl font-bold"
+            className="font-display text-3xl font-bold md:hidden"
             style={{ color: 'var(--color-primary)' }}
           >
             Verbalize
           </h1>
-          <p className="mt-0.5 text-sm" style={{ color: 'var(--color-text-muted)' }}>
+          <p
+            className="mt-0.5 text-sm md:text-xl md:font-semibold md:mt-0"
+            style={{ color: 'var(--color-text-muted)' }}
+          >
             Olá, {profile.name} 👋
           </p>
         </div>
@@ -126,63 +126,67 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      {/* ── Streak card ── */}
-      <div
-        className="mb-4 flex items-center gap-4 rounded-2xl p-5 animate-slide-up delay-75"
-        style={{
-          backgroundColor: 'var(--color-surface)',
-          border: '1px solid var(--color-border)',
-        }}
-      >
-        <div
-          className="flex h-12 w-12 items-center justify-center rounded-xl text-2xl"
-          style={{ backgroundColor: 'var(--color-vocab-bg)' }}
-        >
-          <Flame size={24} style={{ color: 'var(--color-vocab)' }} />
-        </div>
-        <div>
-          <p className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
-            {profile.currentStreak}{' '}
-            <span className="text-base font-normal" style={{ color: 'var(--color-text-muted)' }}>
-              {profile.currentStreak === 1 ? 'dia' : 'dias'}
-            </span>
-          </p>
-          <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-            Sequência atual
-          </p>
-        </div>
-      </div>
+      {/* ── Stats row: Streak + Language side-by-side on md+ ── */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
 
-      {/* ── Current language ── */}
-      <div
-        className="mb-4 flex items-center justify-between rounded-2xl p-5 animate-slide-up delay-150"
-        style={{
-          backgroundColor: 'var(--color-surface)',
-          border: '1px solid var(--color-border)',
-        }}
-      >
-        <div className="flex items-center gap-3">
-          <span className="text-2xl" role="img" aria-label={lang.name}>
-            {lang.flag}
-          </span>
+        {/* Streak card */}
+        <div
+          className="flex items-center gap-4 rounded-2xl p-5 animate-slide-up delay-75"
+          style={{
+            backgroundColor: 'var(--color-surface)',
+            border: '1px solid var(--color-border)',
+          }}
+        >
+          <div
+            className="flex h-12 w-12 items-center justify-center rounded-xl text-2xl"
+            style={{ backgroundColor: 'var(--color-vocab-bg)' }}
+          >
+            <Flame size={24} style={{ color: 'var(--color-vocab)' }} />
+          </div>
           <div>
-            <p className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>
-              {lang.name}
+            <p className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
+              {profile.currentStreak}{' '}
+              <span className="text-base font-normal" style={{ color: 'var(--color-text-muted)' }}>
+                {profile.currentStreak === 1 ? 'dia' : 'dias'}
+              </span>
             </p>
             <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-              Idioma atual
+              Sequência atual
             </p>
           </div>
         </div>
-        <button
-          type="button"
-          onClick={() => setShowLangSheet(true)}
-          className="flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-sm font-semibold transition-all active:scale-95"
-          style={{ backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)' }}
+
+        {/* Current language card */}
+        <div
+          className="flex items-center justify-between rounded-2xl p-5 animate-slide-up delay-150"
+          style={{
+            backgroundColor: 'var(--color-surface)',
+            border: '1px solid var(--color-border)',
+          }}
         >
-          <ArrowLeftRight size={13} />
-          Trocar
-        </button>
+          <div className="flex items-center gap-3">
+            <span className="text-2xl" role="img" aria-label={lang.name}>
+              {lang.flag}
+            </span>
+            <div>
+              <p className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+                {lang.name}
+              </p>
+              <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+                Idioma atual
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowLangSheet(true)}
+            className="flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-sm font-semibold transition-all active:scale-95"
+            style={{ backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)' }}
+          >
+            <ArrowLeftRight size={13} />
+            Trocar
+          </button>
+        </div>
       </div>
 
       {/* ── Next lesson CTA ── */}
@@ -233,7 +237,10 @@ export default function DashboardPage() {
         </p>
 
         {/* Level selector chips */}
-        <div className="flex gap-2 overflow-x-auto pb-2 mb-4" style={{ scrollbarWidth: 'none' }}>
+        <div
+          className="flex gap-2 overflow-x-auto pb-2 mb-4 lg:flex-wrap lg:overflow-visible lg:pb-0"
+          style={{ scrollbarWidth: 'none' }}
+        >
           {ALL_LEVELS.map((level) => {
             const hasLessons = levelsWithLessons.has(level);
             const isSelected = selectedLevel === level;
@@ -292,8 +299,8 @@ export default function DashboardPage() {
           </div>
         ) : (
           <>
-            {/* Lesson list */}
-            <div className="flex flex-col gap-2">
+            {/* Lesson list — 1 col on mobile/tablet, 2 cols on lg+ */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
               {visibleLessons.map((lesson) => {
                 const i = allLessons.findIndex((l) => l.id === lesson.id);
                 const isCompleted = i < frontierIndex;
@@ -407,19 +414,20 @@ export default function DashboardPage() {
           </>
         )}
       </div>
+
       {/* ── Language switcher bottom sheet ── */}
       {showLangSheet && (
         <div
-          className="fixed inset-0 z-50 flex items-end"
+          className="fixed inset-0 z-50 flex items-end md:items-center md:justify-center"
           style={{ backgroundColor: 'rgba(0,0,0,0.45)' }}
           onClick={(e) => { if (e.target === e.currentTarget) setShowLangSheet(false); }}
         >
           <div
-            className="w-full max-w-lg mx-auto rounded-t-3xl px-6 pb-10 pt-6 flex flex-col gap-5"
+            className="w-full max-w-lg mx-auto rounded-t-3xl px-6 pb-10 pt-6 flex flex-col gap-5 md:rounded-3xl md:max-w-sm md:pb-6"
             style={{ backgroundColor: 'var(--color-surface)' }}
           >
             <div
-              className="mx-auto h-1 w-10 rounded-full"
+              className="mx-auto h-1 w-10 rounded-full md:hidden"
               style={{ backgroundColor: 'var(--color-border-strong)' }}
             />
             <h2
