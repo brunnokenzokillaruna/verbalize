@@ -11,8 +11,13 @@ const NAV_ITEMS = [
   { href: '/profile',    label: 'Perfil',       Icon: User       },
 ] as const;
 
+// Hide on lesson page — focused experience, no nav distractions
+const HIDDEN_ON = ['/lesson'];
+
 export function SidebarNav() {
   const pathname = usePathname();
+
+  if (HIDDEN_ON.some((p) => pathname.startsWith(p))) return null;
 
   return (
     <aside

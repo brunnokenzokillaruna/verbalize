@@ -28,7 +28,7 @@ export function LessonProgressHeader({ currentStage, onExit }: LessonProgressHea
         borderBottom: '1px solid var(--color-border)',
       }}
     >
-      <div className="flex items-center gap-3">
+      <div className="mx-auto max-w-lg md:max-w-2xl lg:max-w-4xl flex items-center gap-3">
         {/* Exit button */}
         <button
           type="button"

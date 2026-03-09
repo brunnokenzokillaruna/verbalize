@@ -658,7 +658,7 @@ export default function LessonPage() {
         onExit={exitLesson}
       />
 
-      <main className="mx-auto max-w-[640px] px-5 pt-6 pb-48">
+      <main className="mx-auto max-w-lg md:max-w-2xl lg:max-w-4xl px-5 pt-6 pb-48">
 
         {/* ── Hook phase ── */}
         {phase === 'hook' && store.hook && (
@@ -742,20 +742,22 @@ export default function LessonPage() {
                 <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Carregando imagens…</span>
               </div>
             )}
-            {store.hook.newVocabulary.map((word) => {
-              const img = store.vocabImages[word];
-              const translation = store.vocabTranslations[word] ?? word;
-              return (
-                <VisualVocabCard
-                  key={word}
-                  word={word}
-                  translation={translation}
-                  language={store.lesson!.language}
-                  imageUrl={img?.imageUrl}
-                  imageAlt={img?.imageAlt}
-                />
-              );
-            })}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {store.hook.newVocabulary.map((word) => {
+                const img = store.vocabImages[word];
+                const translation = store.vocabTranslations[word] ?? word;
+                return (
+                  <VisualVocabCard
+                    key={word}
+                    word={word}
+                    translation={translation}
+                    language={store.lesson!.language}
+                    imageUrl={img?.imageUrl}
+                    imageAlt={img?.imageAlt}
+                  />
+                );
+              })}
+            </div>
           </div>
         )}
 
@@ -848,7 +850,7 @@ export default function LessonPage() {
       {/* ── Bottom CTA bar (non-practice phases) ── */}
       {phase !== 'practice' && (
         <div
-          className="fixed bottom-0 left-0 right-0 z-20 mx-auto max-w-[640px] px-5 pb-6 pt-3"
+          className="fixed bottom-0 left-0 right-0 z-20 mx-auto max-w-lg md:max-w-2xl lg:max-w-4xl px-5 pb-6 pt-3"
           style={{ backgroundColor: 'var(--color-bg)' }}
         >
           <button

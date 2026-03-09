@@ -33,10 +33,7 @@ export function CheckButton({
   }
 
   return (
-    <div
-      className="fixed bottom-0 left-0 right-0 z-20"
-      style={{ maxWidth: '640px', margin: '0 auto' }}
-    >
+    <div className="fixed bottom-0 left-0 right-0 z-20 mx-auto max-w-lg md:max-w-2xl lg:max-w-4xl">
       {/* Result feedback banner */}
       <div
         style={{
