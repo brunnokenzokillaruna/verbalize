@@ -5,6 +5,7 @@ import {
   GoogleAuthProvider,
   signOut,
   onAuthStateChanged,
+  deleteUser,
   type User,
 } from 'firebase/auth';
 import { auth } from './firebase';
@@ -25,6 +26,10 @@ export async function signInWithGoogle() {
 
 export async function logOut() {
   return signOut(auth);
+}
+
+export async function deleteAccount(user: User) {
+  return deleteUser(user);
 }
 
 export function onAuthChange(callback: (user: User | null) => void) {

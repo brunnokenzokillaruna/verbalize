@@ -2,12 +2,13 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, BookOpen, BookMarked } from 'lucide-react';
+import { Home, BookOpen, BookMarked, User } from 'lucide-react';
 
 const NAV_ITEMS = [
   { href: '/',           label: 'Início',      Icon: Home       },
   { href: '/vocabulary', label: 'Vocabulário',  Icon: BookOpen   },
   { href: '/verbs',      label: 'Verbos',       Icon: BookMarked },
+  { href: '/profile',    label: 'Perfil',       Icon: User       },
 ] as const;
 
 // Pages where the bottom nav should be hidden

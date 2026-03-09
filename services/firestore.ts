@@ -3,6 +3,7 @@ import {
   getDoc,
   setDoc,
   updateDoc,
+  deleteDoc,
   collection,
   query,
   where,
@@ -35,6 +36,16 @@ export async function createUser(uid: string, data: Omit<UserDocument, 'uid' | '
 
 export async function updateUser(uid: string, data: Partial<UserDocument>) {
   await updateDoc(doc(db, 'users', uid), data as DocumentData);
+}
+
+export async function deleteUserData(uid: string): Promise<void> {
+  await deleteDoc(doc(db, 'users', uid));
+
+  const vocabSnap = await getDocs(query(collection(db, 'user_vocabulary'), where('uid', '==', uid)));
+  await Promise.all(vocabSnap.docs.map((d) => deleteDoc(d.ref)));
+
+  const logsSnap = await getDocs(query(collection(db, 'lesson_logs'), where('uid', '==', uid)));
+  await Promise.all(logsSnap.docs.map((d) => deleteDoc(d.ref)));
 }
 
 // ─── Vocabulary ───────────────────────────────────────────────────────────────
