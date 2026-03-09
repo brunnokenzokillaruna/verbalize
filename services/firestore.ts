@@ -14,7 +14,7 @@ import {
   Timestamp,
 } from 'firebase/firestore';
 import { db } from './firebase';
-import type { UserDocument, UserVocabularyDocument, ImageCacheDocument, VerbDocument, SupportedLanguage } from '@/types';
+import type { UserDocument, UserVocabularyDocument, ImageCacheDocument, VerbDocument, LessonMistakeDocument, SupportedLanguage, ProficiencyLevel } from '@/types';
 import { calculateNextReview } from '@/lib/srs';
 import { getNextLessonId } from '@/lib/curriculum';
 
@@ -293,4 +293,57 @@ export async function approveImageCache(word: string): Promise<void> {
 
 export async function updateImageCacheTranslation(word: string, translation: string): Promise<void> {
   await updateDoc(doc(db, 'image_cache', word), { translation });
+}
+
+// ─── Lesson Mistakes ──────────────────────────────────────────────────────────
+
+/**
+ * Upserts a lesson mistake keyed by uid + language + sanitised grammarFocus.
+ * One document per grammar topic per user per language — deduplicates naturally.
+ */
+export async function saveLessonMistake(
+  uid: string,
+  language: SupportedLanguage,
+  grammarFocus: string,
+  mistakeContext: string,
+  lessonId: string,
+  level: ProficiencyLevel,
+): Promise<void> {
+  const safeKey = grammarFocus.toLowerCase().replace(/[^a-z0-9]+/g, '_').slice(0, 40);
+  const docId = `${uid.slice(0, 20)}_${language}_${safeKey}`;
+  await setDoc(doc(db, 'lesson_mistakes', docId), {
+    uid,
+    language,
+    grammarFocus,
+    mistakeContext,
+    lessonId,
+    level,
+    createdAt: serverTimestamp(),
+  });
+}
+
+/**
+ * Returns the oldest pending mistake for a user+language (limit 1).
+ * Falls back to JS-side filtering to avoid requiring a composite index.
+ */
+export async function getOldestMistake(
+  uid: string,
+  language: SupportedLanguage,
+): Promise<LessonMistakeDocument | null> {
+  const snap = await getDocs(query(collection(db, 'lesson_mistakes'), where('uid', '==', uid)));
+  const all = snap.docs
+    .map((d) => ({ id: d.id, ...d.data() } as LessonMistakeDocument))
+    .filter((m) => m.language === language);
+  if (all.length === 0) return null;
+  // Sort by createdAt ascending (oldest first)
+  all.sort((a, b) => {
+    const ta = (a.createdAt as unknown as Timestamp)?.toMillis?.() ?? 0;
+    const tb = (b.createdAt as unknown as Timestamp)?.toMillis?.() ?? 0;
+    return ta - tb;
+  });
+  return all[0];
+}
+
+export async function deleteLessonMistake(docId: string): Promise<void> {
+  await deleteDoc(doc(db, 'lesson_mistakes', docId));
 }

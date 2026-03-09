@@ -56,6 +56,19 @@ export interface ImageCacheDocument {
   translation?: string;  // pt-BR translation, cached for admin display
 }
 
+// ─── Lesson Mistakes ──────────────────────────────────────────────────────────
+
+export interface LessonMistakeDocument {
+  id?: string;             // Firestore doc ID
+  uid: string;
+  language: SupportedLanguage;
+  grammarFocus: string;    // e.g. "Present tense of être"
+  mistakeContext: string;  // description of what went wrong, used as AI context
+  lessonId: string;
+  level: ProficiencyLevel;
+  createdAt: Timestamp;
+}
+
 // ─── Lesson Log ───────────────────────────────────────────────────────────────
 
 export interface LessonLogDocument {

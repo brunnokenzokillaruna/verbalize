@@ -5,6 +5,7 @@ import type {
   GrammarBridgeResult,
   VocabImageResult,
   Exercise,
+  LessonMistakeDocument,
 } from '@/types';
 
 export type LessonPhase =
@@ -14,6 +15,7 @@ export type LessonPhase =
   | 'grammar'
   | 'vocabulary'
   | 'practice'
+  | 'review'     // mistake review — after practice, before complete
   | 'complete';
 
 interface LessonState {
@@ -28,10 +30,16 @@ interface LessonState {
   vocabImages: Record<string, VocabImageResult | null>; // keyed by word
   vocabTranslations: Record<string, string>; // keyed by word → PT-BR translation
 
-  // Exercises
+  // Practice exercises
   exercises: Exercise[];
   exerciseIndex: number;
   correctCount: number;
+
+  // Mistake review
+  reviewMistake: LessonMistakeDocument | null;
+  reviewExercises: Exercise[];
+  reviewIndex: number;
+  reviewCorrectCount: number;
 
   // Loading state
   isLoading: boolean;
@@ -49,14 +57,23 @@ interface LessonState {
   setExercises: (exercises: Exercise[]) => void;
   setIsLoading: (loading: boolean) => void;
 
-  /** Record a correct answer for the current exercise. */
+  /** Record a correct answer for the current practice exercise. */
   recordCorrect: () => void;
 
   /**
-   * Advance to the next exercise.
-   * Transitions to 'complete' when all exercises are done.
+   * Advance to the next practice exercise.
+   * Does NOT auto-transition to complete — the page controls that.
    */
   nextExercise: () => void;
+
+  /** Set the mistake to review and its generated exercises. */
+  setReview: (mistake: LessonMistakeDocument, exercises: Exercise[]) => void;
+
+  /** Record a correct answer for the current review exercise. */
+  recordReviewCorrect: () => void;
+
+  /** Advance to the next review exercise. */
+  nextReviewExercise: () => void;
 
   /** Full reset — call when leaving the lesson. */
   reset: () => void;
@@ -74,6 +91,10 @@ export const useLessonStore = create<LessonState>((set, get) => ({
   exercises: [],
   exerciseIndex: 0,
   correctCount: 0,
+  reviewMistake: null,
+  reviewExercises: [],
+  reviewIndex: 0,
+  reviewCorrectCount: 0,
   isLoading: false,
 
   // ── Actions ────────────────────────────────────────────────────────────────
@@ -90,6 +111,10 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       exercises: [],
       exerciseIndex: 0,
       correctCount: 0,
+      reviewMistake: null,
+      reviewExercises: [],
+      reviewIndex: 0,
+      reviewCorrectCount: 0,
       isLoading: true,
     }),
 
@@ -116,13 +141,24 @@ export const useLessonStore = create<LessonState>((set, get) => ({
     set((state) => ({ correctCount: state.correctCount + 1 })),
 
   nextExercise: () => {
-    const { exerciseIndex, exercises } = get();
-    const next = exerciseIndex + 1;
-    if (next >= exercises.length) {
-      set({ phase: 'complete' });
-    } else {
-      set({ exerciseIndex: next });
-    }
+    const { exerciseIndex } = get();
+    set({ exerciseIndex: exerciseIndex + 1 });
+  },
+
+  setReview: (mistake, exercises) =>
+    set({
+      reviewMistake: mistake,
+      reviewExercises: exercises,
+      reviewIndex: 0,
+      reviewCorrectCount: 0,
+    }),
+
+  recordReviewCorrect: () =>
+    set((state) => ({ reviewCorrectCount: state.reviewCorrectCount + 1 })),
+
+  nextReviewExercise: () => {
+    const { reviewIndex } = get();
+    set({ reviewIndex: reviewIndex + 1 });
   },
 
   reset: () =>
@@ -137,6 +173,10 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       exercises: [],
       exerciseIndex: 0,
       correctCount: 0,
+      reviewMistake: null,
+      reviewExercises: [],
+      reviewIndex: 0,
+      reviewCorrectCount: 0,
       isLoading: false,
     }),
 }));

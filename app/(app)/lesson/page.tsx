@@ -13,9 +13,17 @@ import { synthesizeDialogue } from '@/app/actions/synthesizeSpeech';
 import { generateGrammarBridge } from '@/app/actions/generateGrammarBridge';
 import { getVocabImage } from '@/app/actions/getVocabImage';
 import { generatePracticeExercises } from '@/app/actions/generatePracticeExercises';
+import { generateMistakeReview } from '@/app/actions/generateMistakeReview';
 import { translateWord } from '@/app/actions/translateWord';
 import { getVerbConjugation } from '@/app/actions/getVerbConjugation';
-import { upsertVocabularyItem, logLesson, updateLessonStats } from '@/services/firestore';
+import {
+  upsertVocabularyItem,
+  logLesson,
+  updateLessonStats,
+  saveLessonMistake,
+  getOldestMistake,
+  deleteLessonMistake,
+} from '@/services/firestore';
 
 import { LessonProgressHeader } from '@/components/lesson/LessonProgressHeader';
 import { ClickableSentence } from '@/components/lesson/ClickableSentence';
@@ -35,6 +43,28 @@ import { ImageMatchExercise } from '@/components/lesson/ImageMatchExercise';
 import type { LessonStage, GrammarBridgeResult, Exercise } from '@/types';
 import type { WordClickPayload } from '@/components/lesson/ClickableWord';
 
+/** Builds a short description of an exercise + wrong answer for the AI review prompt. */
+function buildMistakeContext(exercise: Exercise): string {
+  switch (exercise.type) {
+    case 'context-choice':
+      return `Fill-in-the-blank: "${exercise.data.sentence}" — correct answer: "${exercise.data.blankWord}"`;
+    case 'error-correction':
+      return `Error correction: "${exercise.data.sentence_with_error}" — error: "${exercise.data.error_word}", correct: "${exercise.data.correct_word}"`;
+    case 'reverse-translation':
+      return `Reverse translation: "${exercise.data.portuguese_sentence}" → "${exercise.data.target_translation}"`;
+    case 'audio-dictation':
+      return `Audio dictation: "${exercise.data.text}"`;
+    case 'speak-repeat':
+      return `Speak & repeat: "${exercise.data.text}"`;
+    case 'sentence-builder':
+      return `Sentence builder: correct order "${exercise.data.correctOrder.join(' ')}"`;
+    case 'image-match':
+      return `Image match: correct word "${exercise.data.word}"`;
+    case 'verb-conjugation-drill':
+      return `Verb conjugation: "${exercise.data.verb}" in ${exercise.data.tense}`;
+  }
+}
+
 // ── Map LessonPhase → LessonStage for progress header ────────────────────────
 
 function phaseToStage(phase: string): LessonStage {
@@ -43,6 +73,7 @@ function phaseToStage(phase: string): LessonStage {
     case 'grammar':    return 'grammar';
     case 'vocabulary': return 'vocabulary';
     case 'practice':   return 'practice';
+    case 'review':     return 'review';
     case 'complete':   return 'review';
     default:           return 'hook';
   }
@@ -453,25 +484,84 @@ export default function LessonPage() {
 
   function handleAnswer(correct: boolean) {
     setExerciseAnswer(correct);
-    if (correct) store.recordCorrect();
+    if (correct) {
+      store.recordCorrect();
+    } else if (store.lesson) {
+      // Record this mistake to Firestore (fire-and-forget, deduplicates by grammarFocus)
+      const exercise = store.exercises[store.exerciseIndex];
+      if (exercise) {
+        saveLessonMistake(
+          user!.uid,
+          store.lesson.language,
+          store.lesson.grammarFocus,
+          buildMistakeContext(exercise),
+          store.lesson.id,
+          store.lesson.level,
+        ).catch(console.error);
+      }
+    }
   }
 
   function handleCheck() {
     // CheckButton in 'idle' state — nothing to do here; exercises call onAnswer directly
   }
 
-  function handleContinue() {
+  function handleReviewAnswer(correct: boolean) {
+    setExerciseAnswer(correct);
+    if (correct) store.recordReviewCorrect();
+  }
+
+  async function handleContinue() {
     const isLast = store.exerciseIndex >= store.exercises.length - 1;
-    if (isLast) {
-      // Transition phase BEFORE resetting answer state so there is no intermediate
-      // render where answered=false could unfreeze the last exercise component.
-      store.setPhase('complete');
-      setExerciseAnswer(null);
-      finishLesson();
-    } else {
+    if (!isLast) {
       setExerciseAnswer(null);
       store.nextExercise();
+      return;
     }
+
+    // Last practice exercise — finish lesson stats, then check for a mistake to review
+    store.setPhase('complete'); // optimistic: overridden below if review is needed
+    setExerciseAnswer(null);
+    finishLesson();
+
+    if (!user || !store.lesson) return;
+    try {
+      store.setIsLoading(true);
+      const mistake = await getOldestMistake(user.uid, store.lesson.language);
+      if (mistake) {
+        const exercises = await generateMistakeReview({
+          grammarFocus: mistake.grammarFocus,
+          mistakeContext: mistake.mistakeContext,
+          language: store.lesson.language,
+          level: store.lesson.level,
+        });
+        if (exercises) {
+          store.setReview(mistake, exercises);
+          store.setPhase('review');
+          return;
+        }
+      }
+    } catch (err) {
+      console.error('[LessonPage] mistake review error:', err);
+    } finally {
+      store.setIsLoading(false);
+    }
+  }
+
+  async function handleReviewContinue() {
+    const isLastReview = store.reviewIndex >= store.reviewExercises.length - 1;
+    if (!isLastReview) {
+      setExerciseAnswer(null);
+      store.nextReviewExercise();
+      return;
+    }
+
+    // Last review exercise — if all 3 correct, delete the mistake
+    setExerciseAnswer(null);
+    if (store.reviewMistake?.id && store.reviewCorrectCount + (exerciseAnswer === true ? 1 : 0) >= store.reviewExercises.length) {
+      deleteLessonMistake(store.reviewMistake.id).catch(console.error);
+    }
+    store.setPhase('complete');
   }
 
   // ── Click-to-translate ────────────────────────────────────────────────────
@@ -497,6 +587,8 @@ export default function LessonPage() {
 
   const phase = store.phase;
   const currentExercise = store.exercises[store.exerciseIndex];
+  const currentReviewExercise = store.reviewExercises[store.reviewIndex];
+  const activeExercise = phase === 'review' ? currentReviewExercise : currentExercise;
 
   const checkState = (() => {
     if (exerciseAnswer === null) return 'disabled' as const;
@@ -506,10 +598,10 @@ export default function LessonPage() {
   // Correct answer shown in CheckButton banner when wrong
   // (reverse-translation, audio-dictation, and sentence-builder already show it inline)
   const correctAnswerForBanner: string | undefined = (() => {
-    if (!currentExercise || exerciseAnswer !== false) return undefined;
-    switch (currentExercise.type) {
-      case 'context-choice':   return currentExercise.data.blankWord;
-      case 'error-correction': return currentExercise.data.correct_word;
+    if (!activeExercise || exerciseAnswer !== false) return undefined;
+    switch (activeExercise.type) {
+      case 'context-choice':   return activeExercise.data.blankWord;
+      case 'error-correction': return activeExercise.data.correct_word;
       default:                 return undefined;
     }
   })();
@@ -845,10 +937,64 @@ export default function LessonPage() {
             )}
           </div>
         )}
+
+        {/* ── Review phase ── */}
+        {phase === 'review' && currentReviewExercise && store.lesson && (
+          <div key={`review-${store.reviewIndex}`} className="animate-slide-up">
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--color-error)' }}>
+                  Revisão de erros
+                </p>
+                <p className="mt-0.5 text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                  {store.reviewMistake?.grammarFocus}
+                </p>
+              </div>
+              <div className="flex gap-1">
+                {store.reviewExercises.map((_, i) => (
+                  <div
+                    key={i}
+                    className="h-1.5 w-6 rounded-full"
+                    style={{
+                      backgroundColor:
+                        i < store.reviewIndex
+                          ? 'var(--color-success)'
+                          : i === store.reviewIndex
+                            ? 'var(--color-error)'
+                            : 'var(--color-border)',
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {currentReviewExercise.type === 'context-choice' && (
+              <ContextChoiceExercise
+                data={currentReviewExercise.data}
+                onAnswer={handleReviewAnswer}
+                answered={exerciseAnswer !== null}
+              />
+            )}
+            {currentReviewExercise.type === 'error-correction' && (
+              <ErrorCorrectionExercise
+                data={currentReviewExercise.data}
+                onAnswer={handleReviewAnswer}
+                answered={exerciseAnswer !== null}
+              />
+            )}
+            {currentReviewExercise.type === 'reverse-translation' && (
+              <ReverseTranslationInput
+                data={currentReviewExercise.data}
+                onAnswer={handleReviewAnswer}
+                answered={exerciseAnswer !== null}
+              />
+            )}
+          </div>
+        )}
       </main>
 
-      {/* ── Bottom CTA bar (non-practice phases) ── */}
-      {phase !== 'practice' && (
+      {/* ── Bottom CTA bar (non-practice, non-review phases) ── */}
+      {phase !== 'practice' && phase !== 'review' && (
         <div
           className="fixed bottom-0 left-0 right-0 z-20 mx-auto max-w-lg md:max-w-2xl lg:max-w-4xl px-5 pb-6 pt-3"
           style={{ backgroundColor: 'var(--color-bg)' }}
@@ -884,13 +1030,13 @@ export default function LessonPage() {
         </div>
       )}
 
-      {/* ── CheckButton (practice phase) ── */}
-      {phase === 'practice' && (
+      {/* ── CheckButton (practice + review phases) ── */}
+      {(phase === 'practice' || phase === 'review') && (
         <CheckButton
           state={checkState}
           correctAnswer={correctAnswerForBanner}
           onCheck={handleCheck}
-          onContinue={handleContinue}
+          onContinue={phase === 'review' ? handleReviewContinue : handleContinue}
         />
       )}
 
