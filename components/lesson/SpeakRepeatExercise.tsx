@@ -35,7 +35,6 @@ export function SpeakRepeatExercise({
   onAnswer,
   answered,
 }: SpeakRepeatExerciseProps) {
-  // Detect after mount to avoid SSR/hydration mismatch
   const [hasSpeechAPI, setHasSpeechAPI] = useState(false);
   const [recording, setRecording] = useState(false);
   const [transcript, setTranscript] = useState('');
@@ -54,41 +53,47 @@ export function SpeakRepeatExercise({
   function startRecording() {
     if (recording || answered) return;
     setRecordError('');
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const w = window as any;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const SR: new () => any = w.SpeechRecognition || w.webkitSpeechRecognition;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const rec: any = new SR();
-    rec.lang = langCode;
-    rec.continuous = false;
-    rec.interimResults = false;
-    let resultReceived = false;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    rec.onresult = (e: any) => {
-      resultReceived = true;
-      const result: string = e.results[0][0].transcript;
-      setTranscript(result);
-      onAnswer(similarity(data.text, result) >= 0.6);
-    };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    rec.onerror = (e: any) => {
-      setRecording(false);
-      if (e.error === 'not-allowed') {
-        setRecordError('Permissão de microfone negada. Use os botões abaixo.');
-      } else {
-        setRecordError('Não foi possível gravar. Use os botões abaixo.');
-      }
-    };
-    rec.onend = () => {
-      setRecording(false);
-      if (!resultReceived) {
-        setRecordError('Nenhuma fala detectada. Tente novamente ou use os botões abaixo.');
-      }
-    };
-    recogRef.current = rec;
-    rec.start();
-    setRecording(true);
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const w = window as any;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const SR: new () => any = w.SpeechRecognition || w.webkitSpeechRecognition;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const rec: any = new SR();
+      rec.lang = langCode;
+      rec.continuous = false;
+      rec.interimResults = false;
+      let resultReceived = false;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      rec.onresult = (e: any) => {
+        resultReceived = true;
+        const result: string = e.results[0][0].transcript;
+        setTranscript(result);
+        onAnswer(similarity(data.text, result) >= 0.6);
+      };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      rec.onerror = (e: any) => {
+        setRecording(false);
+        if (e.error === 'not-allowed') {
+          setRecordError('Permissão de microfone negada.');
+        } else if (e.error === 'network') {
+          setRecordError('Serviço de voz bloqueado (extensão do navegador?).');
+        } else {
+          setRecordError('Gravação falhou. Use os botões abaixo.');
+        }
+      };
+      rec.onend = () => {
+        setRecording(false);
+        if (!resultReceived) {
+          setRecordError('Nenhuma fala detectada. Tente novamente.');
+        }
+      };
+      recogRef.current = rec;
+      rec.start();
+      setRecording(true);
+    } catch {
+      setRecordError('Gravação não disponível neste navegador.');
+    }
   }
 
   const isCorrect = transcript ? similarity(data.text, transcript) >= 0.6 : null;
@@ -112,7 +117,7 @@ export function SpeakRepeatExercise({
         </p>
       </div>
 
-      {/* Controls row */}
+      {/* Audio + optional Record button */}
       <div className="flex flex-wrap items-center gap-3">
         <AudioPlayerButton text={data.text} language={language} size="sm" />
 
@@ -132,56 +137,58 @@ export function SpeakRepeatExercise({
             {recording ? 'Gravando…' : 'Gravar'}
           </button>
         )}
-
-        {/* Skip button — always visible while unanswered */}
-        {!answered && (
-          <button
-            type="button"
-            onClick={() => onAnswer(true)}
-            className="flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-medium transition-all active:scale-95"
-            style={{
-              backgroundColor: 'var(--color-surface)',
-              border: '1px solid var(--color-border)',
-              color: 'var(--color-text-muted)',
-            }}
-          >
-            <SkipForward size={14} />
-            Pular
-          </button>
-        )}
       </div>
 
-      {/* Self-assess fallback (when API unavailable or errored) */}
-      {!answered && (recordError || !hasSpeechAPI) && (
-        <div className="flex flex-col gap-2">
-          {recordError && (
-            <p className="text-xs rounded-xl px-3 py-2" style={{ backgroundColor: 'var(--color-error-bg)', color: 'var(--color-error)' }}>
-              {recordError}
-            </p>
-          )}
-          <div className="flex items-center gap-2">
-            <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Você disse corretamente?</p>
+      {/* Record error */}
+      {recordError && (
+        <p
+          className="text-xs rounded-xl px-3 py-2"
+          style={{ backgroundColor: 'var(--color-error-bg)', color: 'var(--color-error)' }}
+        >
+          {recordError}
+        </p>
+      )}
+
+      {/* Primary self-assess — always visible while unanswered */}
+      {!answered && (
+        <div
+          className="flex flex-col gap-3 rounded-2xl p-4"
+          style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
+        >
+          <p className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>
+            Você conseguiu repetir corretamente?
+          </p>
+          <div className="flex gap-3">
             <button
               type="button"
               onClick={() => onAnswer(true)}
-              className="rounded-xl px-3 py-1.5 text-xs font-semibold"
-              style={{ backgroundColor: 'var(--color-success-bg)', color: 'var(--color-success)' }}
+              className="flex-1 rounded-xl py-2.5 text-sm font-semibold transition-all active:scale-95"
+              style={{ backgroundColor: 'var(--color-success-bg)', color: 'var(--color-success)', border: '1px solid var(--color-success)' }}
             >
-              Sim
+              Sim ✓
             </button>
             <button
               type="button"
               onClick={() => onAnswer(false)}
-              className="rounded-xl px-3 py-1.5 text-xs font-semibold"
-              style={{ backgroundColor: 'var(--color-error-bg)', color: 'var(--color-error)' }}
+              className="flex-1 rounded-xl py-2.5 text-sm font-semibold transition-all active:scale-95"
+              style={{ backgroundColor: 'var(--color-error-bg)', color: 'var(--color-error)', border: '1px solid var(--color-error)' }}
             >
-              Não
+              Não ✗
+            </button>
+            <button
+              type="button"
+              onClick={() => onAnswer(true)}
+              className="flex items-center gap-1.5 rounded-xl px-3 py-2.5 text-sm font-medium transition-all active:scale-95"
+              style={{ backgroundColor: 'var(--color-surface-raised)', color: 'var(--color-text-muted)', border: '1px solid var(--color-border)' }}
+            >
+              <SkipForward size={13} />
+              Pular
             </button>
           </div>
         </div>
       )}
 
-      {/* Transcript + result */}
+      {/* Transcript result (when Speech API was used) */}
       {answered && transcript && (
         <div
           className="flex items-start gap-3 rounded-2xl p-4"
