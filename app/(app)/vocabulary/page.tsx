@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { Loader2, BookOpen } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { getUserVocabulary, updateVocabTranslation } from '@/services/firestore';
@@ -229,43 +230,64 @@ function VocabCard({
 
   return (
     <div
-      className="flex items-center gap-4 rounded-2xl p-4"
+      className="flex items-center rounded-2xl overflow-hidden"
       style={{
         backgroundColor: 'var(--color-surface)',
         border: `1px solid ${urgent ? 'var(--color-error)' : 'var(--color-border)'}`,
       }}
     >
-      {/* Word + translation */}
-      <div className="flex-1 min-w-0">
-        <p
-          className="font-display text-xl font-semibold leading-tight"
-          style={{ color: 'var(--color-vocab)' }}
-        >
-          {item.word}
-        </p>
-        <p
-          className="mt-0.5 text-sm truncate"
-          style={{
-            color: isPlaceholder ? 'var(--color-text-muted)' : 'var(--color-text-secondary)',
-            fontStyle: isPlaceholder ? 'italic' : 'normal',
-          }}
-        >
-          {isPlaceholder ? 'traduzindo…' : item.translation}
-        </p>
-        <p className="mt-1 text-xs" style={{ color: 'var(--color-text-muted)' }}>
-          {formatNextReview(item.nextReview as Parameters<typeof formatNextReview>[0])}
-        </p>
+      {/* Image thumbnail */}
+      <div
+        className="relative h-[72px] w-[72px] shrink-0"
+        style={{ backgroundColor: 'var(--color-surface-raised)' }}
+      >
+        {item.imageUrl ? (
+          <Image
+            src={item.imageUrl}
+            alt={item.word}
+            fill
+            className="object-cover"
+            sizes="72px"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center">
+            <span className="text-2xl opacity-25">📖</span>
+          </div>
+        )}
       </div>
 
-      {/* SRS badge + audio */}
-      <div className="flex flex-col items-end gap-2 shrink-0">
-        <span
-          className="rounded-lg px-2 py-0.5 text-xs font-semibold"
-          style={{ backgroundColor: srsColor.bg, color: srsColor.text }}
-        >
-          {SRS_LABELS[level]}
-        </span>
-        <AudioPlayerButton text={item.word} language={language} size="sm" />
+      {/* Content: word/translation + SRS badge/audio */}
+      <div className="flex flex-1 items-center gap-4 px-4 py-3 min-w-0">
+        <div className="flex-1 min-w-0">
+          <p
+            className="font-display text-xl font-semibold leading-tight"
+            style={{ color: 'var(--color-vocab)' }}
+          >
+            {item.word}
+          </p>
+          <p
+            className="mt-0.5 text-sm truncate"
+            style={{
+              color: isPlaceholder ? 'var(--color-text-muted)' : 'var(--color-text-secondary)',
+              fontStyle: isPlaceholder ? 'italic' : 'normal',
+            }}
+          >
+            {isPlaceholder ? 'traduzindo…' : item.translation}
+          </p>
+          <p className="mt-1 text-xs" style={{ color: 'var(--color-text-muted)' }}>
+            {formatNextReview(item.nextReview as Parameters<typeof formatNextReview>[0])}
+          </p>
+        </div>
+
+        <div className="flex flex-col items-end gap-2 shrink-0">
+          <span
+            className="rounded-lg px-2 py-0.5 text-xs font-semibold"
+            style={{ backgroundColor: srsColor.bg, color: srsColor.text }}
+          >
+            {SRS_LABELS[level]}
+          </span>
+          <AudioPlayerButton text={item.word} language={language} size="sm" />
+        </div>
       </div>
     </div>
   );

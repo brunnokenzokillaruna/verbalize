@@ -66,9 +66,15 @@ ${nameB}: Je m'appelle ${nameB}. Et toi ?
 Output this JSON:
 {
   "dialogue": "${nameA}: <first line>\\n${nameB}: <second line>\\n${nameA}: <third line>\\n${nameB}: <fourth line>\\n...",
-  "newVocabulary": ["word1", "word2", "word3", "word4", "word5", "word6"],
+  "newVocabulary": ["verb_infinitive", "noun1", "noun2", "noun3", "noun4"],
+  "verbWord": "verb_infinitive",
   "grammarFocus": "one sentence describing the grammar used"
-}`;
+}
+
+Rules for newVocabulary:
+- Exactly 5 words: the FIRST word must be 1 verb in its infinitive form, then exactly 4 nouns
+- verbWord MUST equal newVocabulary[0]
+- All 5 words must appear naturally in the dialogue`;
 
     const result = await callGeminiJSON<HookResult>(prompt, systemPrompt);
     if (!result) return null;

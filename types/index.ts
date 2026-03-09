@@ -33,6 +33,8 @@ export interface UserVocabularyDocument {
 
   word: string;
   translation: string;
+  imageUrl?: string;
+  wordType?: 'verb' | 'noun';
 
   // SRS Data
   firstSeen: Timestamp;
@@ -115,6 +117,7 @@ export interface HookResult {
   dialogue: string;
   newVocabulary: string[];
   grammarFocus: string;
+  verbWord: string;
 }
 
 export interface GrammarBridgeResult {

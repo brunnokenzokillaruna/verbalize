@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, Loader2, BookMarked, ChevronDown, ChevronUp } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { getVerbConjugation } from '@/app/actions/getVerbConjugation';
+import { getUserVocabulary } from '@/services/firestore';
 import { AudioPlayerButton } from '@/components/lesson/AudioPlayerButton';
 import type { VerbDocument, SupportedLanguage } from '@/types';
 
@@ -36,8 +37,17 @@ export default function VerbsPage() {
   const [verb, setVerb] = useState<VerbDocument | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [openTenses, setOpenTenses] = useState<Set<string>>(new Set(['present']));
+  const [learnedVerbs, setLearnedVerbs] = useState<string[]>([]);
 
   const language = (profile?.currentTargetLanguage ?? 'fr') as SupportedLanguage;
+
+  useEffect(() => {
+    if (!profile?.uid) return;
+    getUserVocabulary(profile.uid, language).then((items) => {
+      setLearnedVerbs(items.filter((i) => i.wordType === 'verb').map((i) => i.word));
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile?.uid, language]);
 
   async function handleSearch(infinitive: string) {
     const clean = infinitive.trim();
@@ -132,7 +142,34 @@ export default function VerbsPage() {
 
         {/* Quick-start chips */}
         {!verb && !loading && (
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-5">
+            {/* Learned verbs section */}
+            {learnedVerbs.length > 0 && (
+              <div className="flex flex-col gap-3">
+                <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--color-text-muted)' }}>
+                  Verbos aprendidos
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {learnedVerbs.map((v) => (
+                    <button
+                      key={v}
+                      type="button"
+                      onClick={() => handleSearch(v)}
+                      className="rounded-xl px-4 py-2 text-sm font-medium transition-all active:scale-95"
+                      style={{
+                        backgroundColor: 'var(--color-primary-light)',
+                        border: '1px solid var(--color-primary)',
+                        color: 'var(--color-primary)',
+                      }}
+                    >
+                      {v}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="flex flex-col gap-3">
             <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--color-text-muted)' }}>
               Verbos comuns
             </p>
@@ -152,6 +189,7 @@ export default function VerbsPage() {
                   {v}
                 </button>
               ))}
+            </div>
             </div>
 
             {/* Empty illustration */}

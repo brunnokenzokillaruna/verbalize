@@ -14,6 +14,7 @@ import { generateGrammarBridge } from '@/app/actions/generateGrammarBridge';
 import { getVocabImage } from '@/app/actions/getVocabImage';
 import { generatePracticeExercises } from '@/app/actions/generatePracticeExercises';
 import { translateWord } from '@/app/actions/translateWord';
+import { getVerbConjugation } from '@/app/actions/getVerbConjugation';
 import { upsertVocabularyItem, logLesson, updateLessonStats } from '@/services/firestore';
 
 import { LessonProgressHeader } from '@/components/lesson/LessonProgressHeader';
@@ -385,10 +386,18 @@ export default function LessonPage() {
         .catch(console.error);
     }
 
+    const language = store.lesson.language;
     store.hook.newVocabulary.forEach((word) => {
       const translation = store.vocabTranslations[word] ?? word;
-      upsertVocabularyItem(user.uid, word, translation, store.lesson!.language).catch(console.error);
+      const imageUrl = store.vocabImages[word]?.imageUrl;
+      const wordType: 'verb' | 'noun' = word === store.hook!.verbWord ? 'verb' : 'noun';
+      upsertVocabularyItem(user.uid, word, translation, language, imageUrl, wordType).catch(console.error);
     });
+
+    // Pre-cache verb conjugation so the Verbs page loads it instantly
+    if (store.hook.verbWord) {
+      getVerbConjugation(store.hook.verbWord, language).catch(console.error);
+    }
   }
 
   function exitLesson() {

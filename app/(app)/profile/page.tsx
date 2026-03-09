@@ -89,7 +89,18 @@ export default function ProfilePage() {
   const { user, profile, setProfile, reset } = useAuthStore();
 
   const [name, setName] = useState(profile?.name ?? '');
-  const [profession, setProfession] = useState(profile?.profession ?? '');
+
+  // Profession: split between pill selection and free-text for 'Outro'
+  const STANDARD_PROFESSIONS = PROFESSIONS.slice(0, -1); // all except 'Outro'
+  const initialProfessionPill = STANDARD_PROFESSIONS.includes(profile?.profession ?? '')
+    ? (profile?.profession ?? '')
+    : profile?.profession ? 'Outro' : '';
+  const [professionPill, setProfessionPill] = useState(initialProfessionPill);
+  const [customProfession, setCustomProfession] = useState(
+    initialProfessionPill === 'Outro' ? (profile?.profession ?? '') : '',
+  );
+  const profession = professionPill === 'Outro' ? customProfession.trim() : professionPill;
+
   const [goal, setGoal] = useState(profile?.languageGoals ?? '');
   const [interests, setInterests] = useState<string[]>(profile?.interests ?? []);
   const [language, setLanguage] = useState<SupportedLanguage>(
@@ -241,11 +252,22 @@ export default function ProfilePage() {
                 <SelectPill
                   key={p}
                   label={p}
-                  selected={profession === p}
-                  onClick={() => setProfession(p)}
+                  selected={professionPill === p}
+                  onClick={() => {
+                    setProfessionPill(p);
+                    if (p !== 'Outro') setCustomProfession('');
+                  }}
                 />
               ))}
             </div>
+            {professionPill === 'Outro' && (
+              <Input
+                label="Qual é a sua profissão?"
+                type="text"
+                value={customProfession}
+                onChange={(e) => setCustomProfession(e.target.value)}
+              />
+            )}
           </div>
 
           <div className="flex flex-col gap-3">

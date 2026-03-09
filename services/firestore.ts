@@ -84,6 +84,8 @@ export async function upsertVocabularyItem(
   word: string,
   translation: string,
   language: SupportedLanguage,
+  imageUrl?: string,
+  wordType?: 'verb' | 'noun',
 ): Promise<void> {
   const q = query(
     collection(db, 'user_vocabulary'),
@@ -101,6 +103,8 @@ export async function upsertVocabularyItem(
       language,
       word,
       translation,
+      ...(imageUrl && { imageUrl }),
+      ...(wordType && { wordType }),
       srsLevel: newLevel,
       mistakeCount: 0,
       firstSeen: serverTimestamp(),
