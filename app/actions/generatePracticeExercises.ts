@@ -17,11 +17,10 @@ interface GeneratePracticeParams {
 }
 
 /**
- * Generates 5 practice exercises via Gemini:
- *   context-choice, error-correction, reverse-translation,
- *   audio-dictation, speak-repeat.
- * Three more are built client-side: sentence-builder, image-match,
- * and verb-conjugation-drill (on the Verbs page, not here).
+ * Generates 8 practice exercises via Gemini:
+ *   2× context-choice, 2× error-correction, 2× reverse-translation,
+ *   1× audio-dictation, 1× speak-repeat.
+ * Two more are built client-side: sentence-builder + image-match → 10 total.
  * Returns null on any error.
  */
 export async function generatePracticeExercises(
@@ -38,7 +37,7 @@ export async function generatePracticeExercises(
 
 Key vocabulary words: ${newVocabulary.join(', ')}
 
-Generate exactly 5 exercises as a JSON array:
+Generate exactly 8 exercises as a JSON array in this order:
 
 Exercise 1 — type "context-choice":
 - Take ONE sentence from the dialogue that contains a key vocabulary word
@@ -69,7 +68,16 @@ Exercise 5 — type "speak-repeat":
 - "text" is that sentence in ${LANG_LABEL[language]}
 - "translation" is the Brazilian Portuguese translation
 
-Output format (exactly this structure):
+Exercise 6 — type "context-choice" (second one, different sentence and word from Exercise 1):
+- Same rules as Exercise 1 but use a different sentence and vocabulary word
+
+Exercise 7 — type "error-correction" (second one, different sentence from Exercise 2):
+- Same rules as Exercise 2 but write a completely different sentence with a different error
+
+Exercise 8 — type "reverse-translation" (second one, different sentence from Exercise 3):
+- Same rules as Exercise 3 but use a different Brazilian Portuguese sentence
+
+Output format (exactly this structure, 8 items):
 [
   {
     "type": "context-choice",
@@ -111,12 +119,39 @@ Output format (exactly this structure):
       "text": "A sentence from the dialogue",
       "translation": "Portuguese translation"
     }
+  },
+  {
+    "type": "context-choice",
+    "data": {
+      "sentence": "different sentence with ___",
+      "blankWord": "correct word",
+      "options": ["correct", "wrong1", "wrong2", "wrong3"],
+      "translation": "Portuguese translation"
+    }
+  },
+  {
+    "type": "error-correction",
+    "data": {
+      "sentence_with_error": "different sentence with one error",
+      "error_word": "wrong word",
+      "correct_word": "correct word",
+      "explanation": "Explicação em português"
+    }
+  },
+  {
+    "type": "reverse-translation",
+    "data": {
+      "portuguese_sentence": "Outra frase em português.",
+      "target_translation": "Target language sentence.",
+      "acceptable_variants": [],
+      "hint": "Dica gramatical opcional"
+    }
   }
 ]`;
 
     const exercises = await callGeminiJSON<Exercise[]>(prompt, systemPrompt);
 
-    if (!Array.isArray(exercises) || exercises.length < 4) {
+    if (!Array.isArray(exercises) || exercises.length < 7) {
       console.error('[generatePracticeExercises] Unexpected response shape');
       return null;
     }
