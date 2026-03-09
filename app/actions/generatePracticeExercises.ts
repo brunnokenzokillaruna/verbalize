@@ -17,22 +17,18 @@ interface GeneratePracticeParams {
 }
 
 /**
- * Generates 6 practice exercises via Gemini:
+ * Generates 5 practice exercises via Gemini:
  *   context-choice, error-correction, reverse-translation,
- *   audio-dictation, verb-conjugation-drill, speak-repeat.
- * Two more exercises are constructed client-side (sentence-builder, image-match).
+ *   audio-dictation, speak-repeat.
+ * Three more are built client-side: sentence-builder, image-match,
+ * and verb-conjugation-drill (on the Verbs page, not here).
  * Returns null on any error.
  */
 export async function generatePracticeExercises(
   params: GeneratePracticeParams,
 ): Promise<Exercise[] | null> {
-  const { dialogue, newVocabulary, verbWord, language, level } = params;
+  const { dialogue, newVocabulary, language, level } = params;
   const isEarly = level === 'A1' || level === 'A2';
-
-  // Pronouns for conjugation drill
-  const pronouns = language === 'fr'
-    ? ['je', 'tu', 'il/elle', 'nous', 'vous', 'ils/elles']
-    : ['I', 'you', 'he/she', 'we', 'you (pl.)', 'they'];
 
   try {
     const systemPrompt = `You are a language exercise generator for Brazilian Portuguese speakers learning ${LANG_LABEL[language]}. Respond with ONLY a valid JSON array, no markdown, no explanation.`;
@@ -41,9 +37,8 @@ export async function generatePracticeExercises(
 "${dialogue}"
 
 Key vocabulary words: ${newVocabulary.join(', ')}
-Verb to conjugate: ${verbWord}
 
-Generate exactly 6 exercises as a JSON array:
+Generate exactly 5 exercises as a JSON array:
 
 Exercise 1 — type "context-choice":
 - Take ONE sentence from the dialogue that contains a key vocabulary word
@@ -69,16 +64,7 @@ Exercise 4 — type "audio-dictation":
 - "text" is a sentence taken directly from the dialogue (in ${LANG_LABEL[language]}, without the speaker name prefix)
 - "translation" is the Brazilian Portuguese translation of that sentence
 
-Exercise 5 — type "verb-conjugation-drill":
-- Conjugate the verb "${verbWord}" in the present tense
-- "verb" is "${verbWord}"
-- "tense" is the tense label in ${LANG_LABEL[language]} (e.g. "présent" or "present simple")
-- "conjugations" is an array of ALL 6 pronoun forms using these exact pronouns: ${pronouns.join(', ')}
-  Each item: { "pronoun": "...", "form": "conjugated form", "blank": true/false }
-  Mark exactly 3 forms as blank: true (choose varied persons, not consecutive)
-- "tip" is an optional short memory tip in Brazilian Portuguese (or omit the field)
-
-Exercise 6 — type "speak-repeat":
+Exercise 5 — type "speak-repeat":
 - Pick ONE sentence from the dialogue (without the speaker name prefix)
 - "text" is that sentence in ${LANG_LABEL[language]}
 - "translation" is the Brazilian Portuguese translation
@@ -120,22 +106,6 @@ Output format (exactly this structure):
     }
   },
   {
-    "type": "verb-conjugation-drill",
-    "data": {
-      "verb": "${verbWord}",
-      "tense": "présent",
-      "conjugations": [
-        { "pronoun": "${pronouns[0]}", "form": "...", "blank": false },
-        { "pronoun": "${pronouns[1]}", "form": "...", "blank": true },
-        { "pronoun": "${pronouns[2]}", "form": "...", "blank": false },
-        { "pronoun": "${pronouns[3]}", "form": "...", "blank": true },
-        { "pronoun": "${pronouns[4]}", "form": "...", "blank": false },
-        { "pronoun": "${pronouns[5]}", "form": "...", "blank": true }
-      ],
-      "tip": "Dica opcional"
-    }
-  },
-  {
     "type": "speak-repeat",
     "data": {
       "text": "A sentence from the dialogue",
@@ -146,7 +116,7 @@ Output format (exactly this structure):
 
     const exercises = await callGeminiJSON<Exercise[]>(prompt, systemPrompt);
 
-    if (!Array.isArray(exercises) || exercises.length < 5) {
+    if (!Array.isArray(exercises) || exercises.length < 4) {
       console.error('[generatePracticeExercises] Unexpected response shape');
       return null;
     }
