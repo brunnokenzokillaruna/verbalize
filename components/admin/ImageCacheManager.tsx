@@ -73,7 +73,7 @@ export function ImageCacheManager() {
     setReplacing(true);
     setLoadingAlts(true);
     try {
-      const alts = await fetchPexelsAlternatives(current.word, current.imageUrl);
+      const alts = await fetchPexelsAlternatives(current.word, current.imageUrl, current.translation);
       setAlternatives(alts);
     } finally {
       setLoadingAlts(false);
@@ -152,7 +152,14 @@ export function ImageCacheManager() {
             className="absolute bottom-0 left-0 right-0 px-4 py-3"
             style={{ background: 'linear-gradient(transparent, rgba(0,0,0,0.72))' }}
           >
-            <p className="font-display text-lg font-bold text-white">{wordDisplay}</p>
+            <p className="font-display text-lg font-bold text-white">
+              {wordDisplay}
+              {current.translation && (
+                <span className="ml-2 text-sm font-normal text-white/75">
+                  — {current.translation}
+                </span>
+              )}
+            </p>
             <p className="text-xs text-white/70">📷 {current.photographer}</p>
           </div>
         </div>

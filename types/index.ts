@@ -52,7 +52,8 @@ export interface ImageCacheDocument {
   imageUrl: string;
   photographer: string;
   createdAt: Timestamp;
-  approved?: boolean; // true = excluded from admin review queue
+  approved?: boolean;    // true = excluded from admin review queue
+  translation?: string;  // pt-BR translation, cached for admin display
 }
 
 // ─── Lesson Log ───────────────────────────────────────────────────────────────

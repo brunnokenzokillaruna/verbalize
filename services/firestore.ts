@@ -290,3 +290,7 @@ export async function updateImageCache(
 export async function approveImageCache(word: string): Promise<void> {
   await updateDoc(doc(db, 'image_cache', word), { approved: true });
 }
+
+export async function updateImageCacheTranslation(word: string, translation: string): Promise<void> {
+  await updateDoc(doc(db, 'image_cache', word), { translation });
+}
