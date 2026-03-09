@@ -182,6 +182,19 @@ export interface ConjugationDrillData {
   tip?: string;
 }
 
+export interface SpeakRepeatData {
+  text: string;        // sentence to say aloud (in target language)
+  translation: string; // Portuguese hint
+}
+
+export interface ImageMatchData {
+  imageUrl: string;
+  imageAlt: string;
+  word: string;      // correct answer
+  options: string[]; // 4 shuffled options (includes correct)
+  translation: string;
+}
+
 export type Exercise =
   | { type: 'context-choice';         data: ContextChoiceData }
   | { type: 'sentence-builder';       data: SentenceBuilderData }
@@ -189,3 +202,5 @@ export type Exercise =
   | { type: 'audio-dictation';        data: DictationData }
   | { type: 'error-correction';       data: ErrorCorrectionData }
   | { type: 'verb-conjugation-drill'; data: ConjugationDrillData }
+  | { type: 'speak-repeat';           data: SpeakRepeatData }
+  | { type: 'image-match';            data: ImageMatchData }

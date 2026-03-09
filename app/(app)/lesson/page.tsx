@@ -29,6 +29,8 @@ import { ReverseTranslationInput } from '@/components/lesson/ReverseTranslationI
 import { DictationInput } from '@/components/lesson/DictationInput';
 import { ErrorCorrectionExercise } from '@/components/lesson/ErrorCorrectionExercise';
 import { VerbConjugationDrill } from '@/components/lesson/VerbConjugationDrill';
+import { SpeakRepeatExercise } from '@/components/lesson/SpeakRepeatExercise';
+import { ImageMatchExercise } from '@/components/lesson/ImageMatchExercise';
 
 import type { LessonStage, GrammarBridgeResult, Exercise } from '@/types';
 import type { WordClickPayload } from '@/components/lesson/ClickableWord';
@@ -304,9 +306,12 @@ export default function LessonPage() {
     const aiExercises = await generatePracticeExercises({
       dialogue: store.hook.dialogue,
       newVocabulary: store.hook.newVocabulary,
+      verbWord: store.hook.verbWord,
       language: store.lesson.language,
       level: store.lesson.level,
     });
+
+    // 1 sentence-builder from first suitable dialogue line
     const dialogueSentences = store.hook.dialogue
       .split('\n')
       .filter((l) => l.trim().length > 0)
@@ -318,14 +323,39 @@ export default function LessonPage() {
         const wc = text.split(/\s+/).length;
         return wc >= 3 && wc <= 10;
       });
-    const sentenceExercises = dialogueSentences.slice(0, 2).map((text) => {
-      const words = text.split(/\s+/).filter(Boolean);
-      return {
-        type: 'sentence-builder' as const,
+    const clientExercises: Exercise[] = [];
+    if (dialogueSentences[0]) {
+      const words = dialogueSentences[0].split(/\s+/).filter(Boolean);
+      clientExercises.push({
+        type: 'sentence-builder',
         data: { words: [...words].sort(() => Math.random() - 0.5), correctOrder: words, translation: '' },
-      };
-    });
-    return [...(aiExercises ?? []), ...sentenceExercises];
+      });
+    }
+
+    // 1 image-match using the first vocabulary word that has an image
+    const vocabWithImage = store.hook.newVocabulary.find(
+      (w) => store.vocabImages[w]?.imageUrl,
+    );
+    if (vocabWithImage) {
+      const imgData = store.vocabImages[vocabWithImage]!;
+      const distractors = store.hook.newVocabulary
+        .filter((w) => w !== vocabWithImage)
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 3);
+      const options = [...distractors, vocabWithImage].sort(() => Math.random() - 0.5);
+      clientExercises.push({
+        type: 'image-match',
+        data: {
+          imageUrl: imgData.imageUrl,
+          imageAlt: imgData.imageAlt ?? vocabWithImage,
+          word: vocabWithImage,
+          options,
+          translation: store.vocabTranslations[vocabWithImage] ?? vocabWithImage,
+        },
+      });
+    }
+
+    return [...(aiExercises ?? []), ...clientExercises];
   }
 
   async function advanceFromHook() {
@@ -783,6 +813,21 @@ export default function LessonPage() {
             )}
             {currentExercise.type === 'verb-conjugation-drill' && (
               <VerbConjugationDrill
+                data={currentExercise.data}
+                onAnswer={handleAnswer}
+                answered={exerciseAnswer !== null}
+              />
+            )}
+            {currentExercise.type === 'speak-repeat' && (
+              <SpeakRepeatExercise
+                data={currentExercise.data}
+                language={store.lesson.language}
+                onAnswer={handleAnswer}
+                answered={exerciseAnswer !== null}
+              />
+            )}
+            {currentExercise.type === 'image-match' && (
+              <ImageMatchExercise
                 data={currentExercise.data}
                 onAnswer={handleAnswer}
                 answered={exerciseAnswer !== null}
