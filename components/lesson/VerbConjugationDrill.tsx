@@ -20,7 +20,7 @@ export function VerbConjugationDrill({ data, onAnswer, answered }: VerbConjugati
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const allFilled = inputs.every((v) => v.trim() !== '');
-  const allCorrect = blanks.every((c, i) => normalize(inputs[i]) === normalize(c.form));
+
   // Each blank can be: 'correct', 'accent-warning', or 'wrong'
   const cellStatuses = blanks.map((c, i) => {
     const exact = normalize(inputs[i]) === normalize(c.form);

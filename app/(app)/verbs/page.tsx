@@ -46,7 +46,6 @@ export default function VerbsPage() {
     getUserVocabulary(profile.uid, language).then((items) => {
       setLearnedVerbs(items.filter((i) => i.wordType === 'verb').map((i) => i.word));
     });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile?.uid, language]);
 
   async function handleSearch(infinitive: string) {
