@@ -81,7 +81,7 @@ export default function VerbsPage() {
 
   return (
     <div
-      className="min-h-dvh pb-24"
+      className="min-h-dvh pb-24 md:pb-10"
       style={{ backgroundColor: 'var(--color-bg)' }}
     >
       {/* Header */}
@@ -89,7 +89,7 @@ export default function VerbsPage() {
         className="sticky top-0 z-10 px-5 pt-8 pb-4"
         style={{ backgroundColor: 'var(--color-bg)', borderBottom: '1px solid var(--color-border)' }}
       >
-        <div className="mx-auto max-w-[640px]">
+        <div className="mx-auto max-w-lg md:max-w-2xl lg:max-w-4xl">
           <h1
             className="font-display text-2xl font-bold"
             style={{ color: 'var(--color-text-primary)' }}
@@ -102,7 +102,7 @@ export default function VerbsPage() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-[640px] px-5 pt-5 flex flex-col gap-5">
+      <main className="mx-auto max-w-lg md:max-w-2xl lg:max-w-4xl px-5 pt-5 flex flex-col gap-5">
 
         {/* Search form */}
         <form
@@ -230,7 +230,7 @@ export default function VerbsPage() {
         {/* Verb result */}
         {verb && !loading && (
           <div className="flex flex-col gap-4 animate-slide-up">
-            {/* Verb header */}
+            {/* Verb header — full width */}
             <div
               className="flex items-center justify-between rounded-2xl p-5"
               style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
@@ -251,100 +251,106 @@ export default function VerbsPage() {
               </div>
             </div>
 
-            {/* Conjugation tenses */}
-            {TENSE_ORDER.filter((t) => verb.conjugations?.[t as keyof typeof verb.conjugations])
-              .map((tense) => {
-                const forms = verb.conjugations[tense as keyof typeof verb.conjugations];
-                const isOpen = openTenses.has(tense);
-                return (
-                  <div
-                    key={tense}
-                    className="overflow-hidden rounded-2xl"
-                    style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
-                  >
-                    {/* Tense header */}
-                    <button
-                      type="button"
-                      onClick={() => toggleTense(tense)}
-                      className="flex w-full items-center justify-between px-5 py-4 transition-opacity hover:opacity-70"
-                    >
-                      <span className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>
-                        {TENSE_LABELS[tense] ?? tense}
-                      </span>
-                      {isOpen
-                        ? <ChevronUp size={18} style={{ color: 'var(--color-text-muted)' }} />
-                        : <ChevronDown size={18} style={{ color: 'var(--color-text-muted)' }} />}
-                    </button>
+            {/* Tenses + Examples: stacked on mobile, side-by-side on lg+ */}
+            <div className="flex flex-col gap-4 lg:grid lg:grid-cols-2 lg:items-start lg:gap-6">
 
-                    {/* Conjugation rows */}
-                    {isOpen && forms && (
-                      <div style={{ borderTop: '1px solid var(--color-border)' }}>
-                        {Object.entries(forms).map(([pronoun, form], i) => (
-                          <div
-                            key={pronoun}
-                            className="flex items-center justify-between px-5 py-3"
-                            style={{
-                              borderTop: i > 0 ? '1px solid var(--color-border)' : 'none',
-                              backgroundColor: i % 2 === 0 ? 'transparent' : 'var(--color-surface-raised)',
-                            }}
-                          >
-                            <span
-                              className="text-sm font-medium w-24"
-                              style={{ color: 'var(--color-text-muted)' }}
-                            >
-                              {pronoun}
-                            </span>
-                            <span
-                              className="flex-1 text-base font-semibold"
-                              style={{ color: 'var(--color-text-primary)' }}
-                            >
-                              {form}
-                            </span>
-                            <AudioPlayerButton
-                              text={`${pronoun} ${form}`}
-                              language={language}
-                              size="sm"
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-
-            {/* Example sentences */}
-            {verb.exampleSentences?.length > 0 && (
-              <div
-                className="rounded-2xl p-5"
-                style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
-              >
-                <p
-                  className="mb-4 text-xs font-semibold uppercase tracking-widest"
-                  style={{ color: 'var(--color-text-muted)' }}
-                >
-                  Exemplos
-                </p>
-                <div className="flex flex-col gap-4">
-                  {verb.exampleSentences.slice(0, 3).map((ex, i) => (
-                    <div key={i} className="flex items-start gap-3">
-                      <div className="flex-1">
-                        <p className="text-base font-medium" style={{ color: 'var(--color-text-primary)' }}>
-                          {ex.target}
-                        </p>
-                        <p
-                          className="mt-0.5 text-sm"
-                          style={{ color: 'var(--color-text-secondary)', fontStyle: 'italic' }}
+              {/* Conjugation tenses */}
+              <div className="flex flex-col gap-4">
+                {TENSE_ORDER.filter((t) => verb.conjugations?.[t as keyof typeof verb.conjugations])
+                  .map((tense) => {
+                    const forms = verb.conjugations[tense as keyof typeof verb.conjugations];
+                    const isOpen = openTenses.has(tense);
+                    return (
+                      <div
+                        key={tense}
+                        className="overflow-hidden rounded-2xl"
+                        style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
+                      >
+                        {/* Tense header */}
+                        <button
+                          type="button"
+                          onClick={() => toggleTense(tense)}
+                          className="flex w-full items-center justify-between px-5 py-4 transition-opacity hover:opacity-70"
                         >
-                          {ex.portuguese}
-                        </p>
+                          <span className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+                            {TENSE_LABELS[tense] ?? tense}
+                          </span>
+                          {isOpen
+                            ? <ChevronUp size={18} style={{ color: 'var(--color-text-muted)' }} />
+                            : <ChevronDown size={18} style={{ color: 'var(--color-text-muted)' }} />}
+                        </button>
+
+                        {/* Conjugation rows */}
+                        {isOpen && forms && (
+                          <div style={{ borderTop: '1px solid var(--color-border)' }}>
+                            {Object.entries(forms).map(([pronoun, form], i) => (
+                              <div
+                                key={pronoun}
+                                className="flex items-center justify-between px-5 py-3"
+                                style={{
+                                  borderTop: i > 0 ? '1px solid var(--color-border)' : 'none',
+                                  backgroundColor: i % 2 === 0 ? 'transparent' : 'var(--color-surface-raised)',
+                                }}
+                              >
+                                <span
+                                  className="text-sm font-medium w-24"
+                                  style={{ color: 'var(--color-text-muted)' }}
+                                >
+                                  {pronoun}
+                                </span>
+                                <span
+                                  className="flex-1 text-base font-semibold"
+                                  style={{ color: 'var(--color-text-primary)' }}
+                                >
+                                  {form}
+                                </span>
+                                <AudioPlayerButton
+                                  text={`${pronoun} ${form}`}
+                                  language={language}
+                                  size="sm"
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
-                      <AudioPlayerButton text={ex.target} language={language} size="sm" />
-                    </div>
-                  ))}
-                </div>
+                    );
+                  })}
               </div>
-            )}
+
+              {/* Example sentences */}
+              {verb.exampleSentences?.length > 0 && (
+                <div
+                  className="rounded-2xl p-5"
+                  style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
+                >
+                  <p
+                    className="mb-4 text-xs font-semibold uppercase tracking-widest"
+                    style={{ color: 'var(--color-text-muted)' }}
+                  >
+                    Exemplos
+                  </p>
+                  <div className="flex flex-col gap-4">
+                    {verb.exampleSentences.slice(0, 3).map((ex, i) => (
+                      <div key={i} className="flex items-start gap-3">
+                        <div className="flex-1">
+                          <p className="text-base font-medium" style={{ color: 'var(--color-text-primary)' }}>
+                            {ex.target}
+                          </p>
+                          <p
+                            className="mt-0.5 text-sm"
+                            style={{ color: 'var(--color-text-secondary)', fontStyle: 'italic' }}
+                          >
+                            {ex.portuguese}
+                          </p>
+                        </div>
+                        <AudioPlayerButton text={ex.target} language={language} size="sm" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </main>

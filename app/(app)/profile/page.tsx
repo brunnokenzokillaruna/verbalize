@@ -185,30 +185,32 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-dvh pb-28" style={{ backgroundColor: 'var(--color-bg)' }}>
+    <div className="min-h-dvh pb-28 md:pb-10" style={{ backgroundColor: 'var(--color-bg)' }}>
       {/* ── Header ── */}
       <header
-        className="sticky top-0 z-10 flex items-center gap-3 px-4 py-4 max-w-lg mx-auto"
+        className="sticky top-0 z-10 px-4 py-4"
         style={{ backgroundColor: 'var(--color-bg)', borderBottom: '1px solid var(--color-border)' }}
       >
-        <button
-          type="button"
-          onClick={() => router.back()}
-          className="flex h-9 w-9 items-center justify-center rounded-full transition-opacity active:opacity-60"
-          style={{ color: 'var(--color-text-secondary)' }}
-          aria-label="Voltar"
-        >
-          <ChevronLeft size={22} />
-        </button>
-        <h1
-          className="font-display text-xl font-semibold flex-1"
-          style={{ color: 'var(--color-text-primary)' }}
-        >
-          Perfil
-        </h1>
+        <div className="max-w-lg md:max-w-2xl mx-auto flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="md:hidden flex h-9 w-9 items-center justify-center rounded-full transition-opacity active:opacity-60"
+            style={{ color: 'var(--color-text-secondary)' }}
+            aria-label="Voltar"
+          >
+            <ChevronLeft size={22} />
+          </button>
+          <h1
+            className="font-display text-xl font-semibold flex-1"
+            style={{ color: 'var(--color-text-primary)' }}
+          >
+            Perfil
+          </h1>
+        </div>
       </header>
 
-      <main className="px-5 py-6 max-w-lg mx-auto flex flex-col gap-8">
+      <main className="px-5 py-6 max-w-lg md:max-w-2xl mx-auto flex flex-col gap-8">
 
         {/* ── Avatar + email ── */}
         <div className="flex items-center gap-4">
@@ -290,7 +292,7 @@ export default function ProfilePage() {
         {/* ── Interesses ── */}
         <section className="flex flex-col gap-4">
           <SectionLabel>Interesses</SectionLabel>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {INTERESTS.map(({ label, emoji }) => {
               const selected = interests.includes(label);
               return (
@@ -322,7 +324,7 @@ export default function ProfilePage() {
         {/* ── Idioma ── */}
         <section className="flex flex-col gap-4">
           <SectionLabel>Idioma em aprendizado</SectionLabel>
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col md:flex-row gap-3">
             {(
               [
                 { lang: 'fr', flag: '🇫🇷', title: 'Francês' },
@@ -398,9 +400,10 @@ export default function ProfilePage() {
 
       {/* ── Sticky save button ── */}
       <div
-        className="fixed bottom-16 left-0 right-0 z-10 mx-auto max-w-[640px] px-5 pb-3 pt-2"
+        className="fixed bottom-16 md:bottom-0 left-0 md:left-56 right-0 z-10 px-5 pb-3 pt-2"
         style={{ backgroundColor: 'var(--color-bg)', borderTop: '1px solid var(--color-border)' }}
       >
+        <div className="max-w-lg md:max-w-2xl mx-auto">
         <Button
           variant="primary"
           size="lg"
@@ -418,21 +421,22 @@ export default function ProfilePage() {
             'Salvar alterações'
           )}
         </Button>
+        </div>
       </div>
 
       {/* ── Delete confirmation bottom sheet ── */}
       {showDeleteSheet && (
         <div
-          className="fixed inset-0 z-50 flex items-end"
+          className="fixed inset-0 z-50 flex items-end md:items-center md:justify-center"
           style={{ backgroundColor: 'rgba(0,0,0,0.45)' }}
           onClick={(e) => { if (e.target === e.currentTarget) setShowDeleteSheet(false); }}
         >
           <div
-            className="w-full max-w-lg mx-auto rounded-t-3xl px-6 pb-10 pt-6 flex flex-col gap-5"
+            className="w-full max-w-lg mx-auto rounded-t-3xl px-6 pb-10 pt-6 flex flex-col gap-5 md:rounded-3xl md:max-w-sm md:pb-6"
             style={{ backgroundColor: 'var(--color-surface)' }}
           >
             <div
-              className="mx-auto h-1 w-10 rounded-full"
+              className="mx-auto h-1 w-10 rounded-full md:hidden"
               style={{ backgroundColor: 'var(--color-border-strong)' }}
             />
             <div

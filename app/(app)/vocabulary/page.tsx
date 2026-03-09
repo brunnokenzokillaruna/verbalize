@@ -141,7 +141,7 @@ export default function VocabularyPage() {
 
   return (
     <div
-      className="min-h-dvh pb-24"
+      className="min-h-dvh pb-24 md:pb-10"
       style={{ backgroundColor: 'var(--color-bg)' }}
     >
       {/* Header */}
@@ -149,7 +149,7 @@ export default function VocabularyPage() {
         className="sticky top-0 z-10 px-5 pt-8 pb-4"
         style={{ backgroundColor: 'var(--color-bg)', borderBottom: '1px solid var(--color-border)' }}
       >
-        <div className="mx-auto max-w-[640px]">
+        <div className="mx-auto max-w-lg md:max-w-2xl lg:max-w-4xl">
           <div className="flex items-end justify-between">
             <div>
               <h1
@@ -174,7 +174,7 @@ export default function VocabularyPage() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-[640px] px-5 pt-5 flex flex-col gap-6">
+      <main className="mx-auto max-w-lg md:max-w-2xl lg:max-w-4xl px-5 pt-5 flex flex-col gap-6">
         {/* Due today section */}
         {dueToday.length > 0 && (
           <section>
@@ -184,7 +184,7 @@ export default function VocabularyPage() {
             >
               Para revisar hoje ({dueToday.length})
             </p>
-            <div className="flex flex-col gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {dueToday.map((item) => (
                 <VocabCard key={item.word} item={item} language={language} urgent />
               ))}
@@ -201,7 +201,7 @@ export default function VocabularyPage() {
             >
               Aprendido ({learned.length})
             </p>
-            <div className="flex flex-col gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {learned.map((item) => (
                 <VocabCard key={item.word} item={item} language={language} />
               ))}
