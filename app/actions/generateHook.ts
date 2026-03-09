@@ -42,20 +42,41 @@ export async function generateHook(params: GenerateHookParams): Promise<HookResu
   const nameA = femaleNames[Math.floor(Math.random() * femaleNames.length)];
   const nameB = maleNames[Math.floor(Math.random() * maleNames.length)];
 
-  // Pick ONE random interest per lesson so every dialogue has a fresh theme
-  const topicPool = interests.length > 0 ? interests : ['daily life'];
-  const topic = topicPool[Math.floor(Math.random() * topicPool.length)];
+  // Pick ONE topic per lesson using weighted selection:
+  // user's interests appear 3× (higher probability) alongside a general pool (1× each)
+  const generalTopics = [
+    'daily life', 'food & restaurants', 'travel', 'work & career', 'shopping',
+    'health & medicine', 'sports & fitness', 'technology', 'nature & environment',
+    'art & culture', 'family & relationships', 'education', 'music', 'movies & TV',
+    'weather', 'transportation', 'home & living', 'hobbies', 'news & current events',
+    'celebrations & holidays', 'history', 'science', 'psychology', 'philosophy', 'politics & government',
+    'finance & investing', 'personal development', 'mental health', 'design & creativity',
+    'gardening', 'architecture', 'internet & social media', 'customer service', 'leadership & management',
+    'productivity & organization', 'time management', 'language learning', 'culture & traditions',
+  ];
+  const weightedPool = [
+    ...generalTopics,
+    ...interests.flatMap((i) => [i, i, i]), // user interests at 3× weight
+  ];
+  const topic = weightedPool[Math.floor(Math.random() * weightedPool.length)];
+
+  const dialogueLines: Record<ProficiencyLevel, number> = {
+    A1: 4, A2: 4,
+    B1: 6, B2: 6,
+    C1: 8, C2: 8,
+  };
+  const lineCount = dialogueLines[level];
 
   try {
     const systemPrompt = `You are an expert language teacher creating content for Brazilian Portuguese speakers learning ${LANG_LABEL[language]}. Respond with ONLY valid JSON, no markdown, no explanation.`;
 
-    const prompt = `Write a rich 2-person dialogue in ${LANG_LABEL[language]} between ${nameA} and ${nameB}.
+    const prompt = `Write a 2-person dialogue in ${LANG_LABEL[language]} between ${nameA} and ${nameB}.
 
 Requirements:
 - ${level} level vocabulary and grammar
 - Topic: ${topic}
 - Naturally uses this grammar: ${grammarFocus}
-- 6 to 8 lines total, alternating speakers, forming a natural flowing conversation
+- Exactly ${lineCount} lines total, alternating speakers, forming a natural flowing conversation
 - Include natural conversational turns (questions, answers, reactions, follow-ups)
 - Every line MUST begin with the speaker name and a colon
 
@@ -63,9 +84,9 @@ Example of the required format (replace with real content in ${LANG_LABEL[langua
 ${nameA}: Bonjour, comment tu t'appelles ?
 ${nameB}: Je m'appelle ${nameB}. Et toi ?
 
-Output this JSON:
+Output this JSON (dialogue must have exactly ${lineCount} lines):
 {
-  "dialogue": "${nameA}: <first line>\\n${nameB}: <second line>\\n${nameA}: <third line>\\n${nameB}: <fourth line>\\n...",
+  "dialogue": "${nameA}: <first line>\\n${nameB}: <second line>\\n...",
   "newVocabulary": ["verb_infinitive", "noun1", "noun2", "noun3", "noun4"],
   "verbWord": "verb_infinitive",
   "grammarFocus": "one sentence describing the grammar used"
