@@ -18,82 +18,70 @@ function parseKey(cacheKey: string): { word: string; lang: string } {
   return m ? { word: m[1], lang: m[2] } : { word: cacheKey, lang: '' };
 }
 
-/**
- * Translates a batch of items (max ~20) via a single Gemini call.
- * Sends input as JSON so the model returns keys exactly as given.
- */
-async function batchTranslate(
-  items: Array<{ key: string; word: string; lang: string }>,
-): Promise<Record<string, string>> {
-  const inputJson = JSON.stringify(
-    items.map(({ key, word, lang }) => ({
-      key,
-      word,
-      language: lang === 'fr' ? 'French' : 'English',
-    })),
-  );
-
-  const prompt = `Translate each word to Portuguese (pt-BR).
-Return ONLY a valid JSON object mapping each "key" to its Portuguese translation.
-
-Input: ${inputJson}
-
-Expected output format: {"aimer_fr": "amar", "manger_fr": "comer"}
-Output ONLY the JSON object, nothing else.`;
-
-  return callGeminiJSON<Record<string, string>>(prompt);
-}
-
 // ── Actions ───────────────────────────────────────────────────────────────────
 
 /**
  * Fetches all image_cache entries sorted alphabetically.
- * For entries missing a pt-BR translation, generates them in batches of 20
- * via Gemini and persists the results back to Firestore.
+ * Does NOT block on translations — returns immediately so images load fast.
  */
 export async function fetchAllImageCache(): Promise<ImageCacheDocument[]> {
-  const entries = await getAllImageCache();
-  entries.sort((a, b) => a.word.localeCompare(b.word));
+  try {
+    const entries = await getAllImageCache();
+    entries.sort((a, b) => a.word.localeCompare(b.word));
+    return entries;
+  } catch (err) {
+    console.error('[adminImages] fetchAllImageCache failed:', err);
+    return [];
+  }
+}
 
-  const missing = entries.filter((e) => !e.translation);
+/**
+ * Translates a batch of cache keys that are missing pt-BR translations.
+ * Called separately after images are loaded so it never blocks the UI.
+ * Returns a map of cacheKey → translation.
+ */
+export async function translateMissingEntries(
+  cacheKeys: string[],
+): Promise<Record<string, string>> {
+  if (cacheKeys.length === 0) return {};
 
-  if (missing.length > 0) {
-    const BATCH_SIZE = 20;
-    for (let i = 0; i < missing.length; i += BATCH_SIZE) {
-      const batch = missing.slice(i, i + BATCH_SIZE);
-      try {
-        const items = batch.map((e) => {
-          const { word, lang } = parseKey(e.word);
-          return { key: e.word, word, lang };
-        });
-        const translations = await batchTranslate(items);
+  const items = cacheKeys.map((key) => {
+    const { word, lang } = parseKey(key);
+    return { key, word, language: lang === 'fr' ? 'French' : 'English' };
+  });
 
-        await Promise.all(
-          batch.map(async (e) => {
-            const t = translations[e.word];
-            if (t) {
-              e.translation = t;
-              await updateImageCacheTranslation(e.word, t).catch((err) => {
-                console.error('[adminImages] failed to persist translation for', e.word, err);
-              });
-            } else {
-              console.warn('[adminImages] no translation returned for key:', e.word, '| got keys:', Object.keys(translations));
-            }
-          }),
+  const inputJson = JSON.stringify(items);
+  const prompt = `Translate each word to Portuguese (pt-BR).
+Input is a JSON array where each item has a "key", "word", and "language".
+Return ONLY a valid JSON object mapping each "key" to its Portuguese translation.
+
+Input: ${inputJson}
+
+Example output: {"aimer_fr": "amar", "manger_fr": "comer"}
+Output ONLY the JSON object, nothing else.`;
+
+  try {
+    const translations = await callGeminiJSON<Record<string, string>>(prompt);
+
+    // Persist to Firestore in the background (fire-and-forget per entry)
+    for (const [key, t] of Object.entries(translations)) {
+      if (t) {
+        updateImageCacheTranslation(key, t).catch((err) =>
+          console.error('[adminImages] failed to save translation for', key, err),
         );
-      } catch (err) {
-        console.error('[adminImages] batchTranslate failed for batch starting at', i, err);
       }
     }
-  }
 
-  return entries;
+    return translations;
+  } catch (err) {
+    console.error('[adminImages] translateMissingEntries failed:', err);
+    return {};
+  }
 }
 
 /**
  * Searches Pexels for up to 6 alternative images for a given cache key.
- * Uses Gemini to generate a relevant English image search keyword from the
- * word + its Portuguese translation, so results are topically accurate.
+ * Uses Gemini to generate a relevant English image search keyword.
  */
 export async function fetchPexelsAlternatives(
   cacheKey: string,
@@ -113,16 +101,16 @@ export async function fetchPexelsAlternatives(
         )
       ).trim();
     } catch (err) {
-      console.error('[adminImages] translation fallback failed:', err);
+      console.error('[adminImages] on-demand translation failed:', err);
     }
   }
 
-  // ── Step 2: generate a precise Pexels search keyword ─────────────────────
   const meaningHint = resolvedTranslation
     ? ` (meaning "${resolvedTranslation}" in Portuguese)`
     : '';
 
-  let keyword = resolvedTranslation ?? word; // better fallback than raw foreign word
+  // ── Step 2: generate a precise Pexels search keyword ─────────────────────
+  let keyword = resolvedTranslation ?? word;
   try {
     keyword = (
       await callGemini(
@@ -137,7 +125,7 @@ Rules:
       )
     ).trim();
   } catch (err) {
-    console.error('[adminImages] keyword generation failed, using fallback:', resolvedTranslation ?? word, err);
+    console.error('[adminImages] keyword generation failed, fallback:', resolvedTranslation ?? word, err);
   }
 
   // ── Step 3: collect up to 6 Pexels results ────────────────────────────────

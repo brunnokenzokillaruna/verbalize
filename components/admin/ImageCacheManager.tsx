@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { ChevronLeft, ChevronRight, RefreshCw, X, Check } from 'lucide-react';
 import {
   fetchAllImageCache,
+  translateMissingEntries,
   fetchPexelsAlternatives,
   replaceImageCacheEntry,
   approveImageCacheEntry,
@@ -25,7 +26,35 @@ export function ImageCacheManager() {
 
   useEffect(() => {
     fetchAllImageCache()
-      .then((all) => setEntries(all.filter((e) => !e.approved)))
+      .then((all) => {
+        const unapproved = all.filter((e) => !e.approved);
+        setEntries(unapproved);
+
+        // Translate missing entries in a separate, non-blocking step
+        const missingKeys = unapproved
+          .filter((e) => !e.translation)
+          .map((e) => e.word);
+
+        if (missingKeys.length > 0) {
+          // Process in chunks of 20 in parallel to stay within Gemini limits
+          const CHUNK = 20;
+          const chunks: string[][] = [];
+          for (let i = 0; i < missingKeys.length; i += CHUNK) {
+            chunks.push(missingKeys.slice(i, i + CHUNK));
+          }
+          Promise.all(chunks.map((chunk) => translateMissingEntries(chunk)))
+            .then((results) => {
+              const merged = Object.assign({}, ...results) as Record<string, string>;
+              setEntries((prev) =>
+                prev.map((e) =>
+                  merged[e.word] ? { ...e, translation: merged[e.word] } : e,
+                ),
+              );
+            })
+            .catch(() => {}); // translations are non-critical
+        }
+      })
+      .catch(() => {}) // graceful failure — entries stays []
       .finally(() => setLoading(false));
   }, []);
 
