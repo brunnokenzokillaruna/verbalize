@@ -273,3 +273,20 @@ export async function saveImageCache(word: string, data: Omit<ImageCacheDocument
     createdAt: serverTimestamp(),
   });
 }
+
+export async function getAllImageCache(): Promise<ImageCacheDocument[]> {
+  const snap = await getDocs(collection(db, 'image_cache'));
+  return snap.docs.map((d) => d.data() as ImageCacheDocument);
+}
+
+export async function updateImageCache(
+  word: string,
+  imageUrl: string,
+  photographer: string,
+): Promise<void> {
+  await updateDoc(doc(db, 'image_cache', word), { imageUrl, photographer });
+}
+
+export async function approveImageCache(word: string): Promise<void> {
+  await updateDoc(doc(db, 'image_cache', word), { approved: true });
+}

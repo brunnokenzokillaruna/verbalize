@@ -52,6 +52,7 @@ export interface ImageCacheDocument {
   imageUrl: string;
   photographer: string;
   createdAt: Timestamp;
+  approved?: boolean; // true = excluded from admin review queue
 }
 
 // ─── Lesson Log ───────────────────────────────────────────────────────────────

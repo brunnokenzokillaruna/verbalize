@@ -8,7 +8,10 @@ import { updateUser, deleteUserData } from '@/services/firestore';
 import { logOut, deleteAccount } from '@/services/auth';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { ImageCacheManager } from '@/components/admin/ImageCacheManager';
 import type { SupportedLanguage } from '@/types';
+
+const ADMIN_EMAIL = 'brunnokenzokillaruna@gmail.com';
 
 // ─── Data (mirrors onboarding) ────────────────────────────────────────────────
 
@@ -365,6 +368,14 @@ export default function ProfilePage() {
             })}
           </div>
         </section>
+
+        {/* ── Admin: Image Cache ── */}
+        {profile.email === ADMIN_EMAIL && (
+          <section className="flex flex-col gap-4">
+            <SectionLabel>Gerenciar imagens de vocabulário</SectionLabel>
+            <ImageCacheManager />
+          </section>
+        )}
 
         {/* ── Conta ── */}
         <section className="flex flex-col gap-3">
