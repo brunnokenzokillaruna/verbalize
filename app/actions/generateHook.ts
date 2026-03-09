@@ -87,6 +87,7 @@ ${nameB}: Je m'appelle ${nameB}. Et toi ?
 Output this JSON (dialogue must have exactly ${lineCount} lines):
 {
   "dialogue": "${nameA}: <first line>\\n${nameB}: <second line>\\n...",
+  "dialogueTranslations": ["<pt-BR translation of line 1>", "<pt-BR translation of line 2>", ...],
   "newVocabulary": ["verb_infinitive", "noun1", "noun2", "noun3", "noun4"],
   "verbWord": "verb_infinitive",
   "grammarFocus": "one sentence describing the grammar used"
@@ -95,7 +96,11 @@ Output this JSON (dialogue must have exactly ${lineCount} lines):
 Rules for newVocabulary:
 - Exactly 5 words: the FIRST word must be 1 verb in its infinitive form, then exactly 4 nouns
 - verbWord MUST equal newVocabulary[0]
-- All 5 words must appear naturally in the dialogue`;
+- All 5 words must appear naturally in the dialogue
+
+Rules for dialogueTranslations:
+- Exactly ${lineCount} strings, one natural Brazilian Portuguese translation per dialogue line
+- Do NOT include the speaker name prefix — translate only the spoken text`;
 
     const result = await callGeminiJSON<HookResult>(prompt, systemPrompt);
     if (!result) return null;

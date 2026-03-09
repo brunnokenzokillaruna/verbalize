@@ -347,3 +347,21 @@ export async function getOldestMistake(
 export async function deleteLessonMistake(docId: string): Promise<void> {
   await deleteDoc(doc(db, 'lesson_mistakes', docId));
 }
+
+/**
+ * Returns all pending mistakes for a user, optionally filtered by language.
+ */
+export async function getUserMistakes(
+  uid: string,
+  language?: SupportedLanguage,
+): Promise<LessonMistakeDocument[]> {
+  const snap = await getDocs(query(collection(db, 'lesson_mistakes'), where('uid', '==', uid)));
+  const all = snap.docs.map((d) => ({ id: d.id, ...d.data() } as LessonMistakeDocument));
+  const filtered = language ? all.filter((m) => m.language === language) : all;
+  filtered.sort((a, b) => {
+    const ta = (a.createdAt as unknown as Timestamp)?.toMillis?.() ?? 0;
+    const tb = (b.createdAt as unknown as Timestamp)?.toMillis?.() ?? 0;
+    return tb - ta; // newest first for display
+  });
+  return filtered;
+}

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import type { ErrorCorrectionData } from '@/types';
+import { isAccentOnlyDiff } from '@/utils/accent';
 
 interface ErrorCorrectionExerciseProps {
   data: ErrorCorrectionData;
@@ -9,15 +10,21 @@ interface ErrorCorrectionExerciseProps {
   answered: boolean;
 }
 
+type AnswerStatus = 'idle' | 'correct' | 'accent-warning' | 'wrong';
+
 export function ErrorCorrectionExercise({ data, onAnswer, answered }: ErrorCorrectionExerciseProps) {
   const [input, setInput] = useState(data.error_word);
+  const [answerStatus, setAnswerStatus] = useState<AnswerStatus>('idle');
 
   const isCorrect =
     input.trim().toLowerCase() === data.correct_word.trim().toLowerCase();
+  const isAccentWarning = !isCorrect && isAccentOnlyDiff(input, data.correct_word);
 
   function handleSubmit() {
     if (answered) return;
-    onAnswer(isCorrect);
+    const status: AnswerStatus = isCorrect ? 'correct' : isAccentWarning ? 'accent-warning' : 'wrong';
+    setAnswerStatus(status);
+    onAnswer(status !== 'wrong');
   }
 
   // Split sentence around the error word to highlight it
@@ -80,11 +87,13 @@ export function ErrorCorrectionExercise({ data, onAnswer, answered }: ErrorCorre
           style={{
             backgroundColor: 'var(--color-surface)',
             border: `2px solid ${
-              answered
-                ? isCorrect
+              !answered
+                ? 'var(--color-border)'
+                : answerStatus === 'correct'
                   ? 'var(--color-success)'
-                  : 'var(--color-error)'
-                : 'var(--color-border)'
+                  : answerStatus === 'accent-warning'
+                    ? '#d97706'
+                    : 'var(--color-error)'
             }`,
             color: 'var(--color-text-primary)',
             caretColor: 'var(--color-primary)',
@@ -94,6 +103,17 @@ export function ErrorCorrectionExercise({ data, onAnswer, answered }: ErrorCorre
           onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
         />
       </div>
+
+      {/* Accent warning */}
+      {answered && answerStatus === 'accent-warning' && (
+        <div
+          className="rounded-xl px-4 py-3 text-sm"
+          style={{ backgroundColor: '#fef3c7', color: '#92400e' }}
+        >
+          Quase! Verifique os acentos:{' '}
+          <span className="font-semibold">{data.correct_word}</span>
+        </div>
+      )}
 
       {/* Explanation on answer */}
       {answered && (

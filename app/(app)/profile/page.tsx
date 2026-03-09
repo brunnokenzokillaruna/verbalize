@@ -1,15 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronLeft, LogOut, Trash2, Check } from 'lucide-react';
+import { ChevronLeft, LogOut, Trash2, Check, AlertCircle, Loader2 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
-import { updateUser, deleteUserData } from '@/services/firestore';
+import { updateUser, deleteUserData, getUserMistakes, deleteLessonMistake } from '@/services/firestore';
 import { logOut, deleteAccount } from '@/services/auth';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { ImageCacheManager } from '@/components/admin/ImageCacheManager';
-import type { SupportedLanguage } from '@/types';
+import type { SupportedLanguage, LessonMistakeDocument } from '@/types';
 
 const ADMIN_EMAIL = 'brunnokenzokillaruna@gmail.com';
 
@@ -116,6 +116,20 @@ export default function ProfilePage() {
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState('');
 
+  // Mistakes state
+  const [mistakes, setMistakes] = useState<LessonMistakeDocument[]>([]);
+  const [mistakesLoading, setMistakesLoading] = useState(true);
+  const [removingMistakeId, setRemovingMistakeId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+    setMistakesLoading(true);
+    getUserMistakes(user.uid).then((list) => {
+      setMistakes(list);
+      setMistakesLoading(false);
+    }).catch(() => setMistakesLoading(false));
+  }, [user]);
+
   if (!profile || !user) return null;
 
   const isDirty =
@@ -163,6 +177,16 @@ export default function ProfilePage() {
     await logOut();
     reset();
     router.replace('/login');
+  }
+
+  async function handleRemoveMistake(id: string) {
+    setRemovingMistakeId(id);
+    try {
+      await deleteLessonMistake(id);
+      setMistakes((prev) => prev.filter((m) => m.id !== id));
+    } finally {
+      setRemovingMistakeId(null);
+    }
   }
 
   async function handleDeleteAccount() {
@@ -367,6 +391,111 @@ export default function ProfilePage() {
               );
             })}
           </div>
+        </section>
+
+        {/* ── Erros pendentes ── */}
+        <section className="flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <SectionLabel>Erros para revisar</SectionLabel>
+            {mistakes.length > 0 && (
+              <span
+                className="rounded-full px-2.5 py-0.5 text-xs font-semibold"
+                style={{ backgroundColor: 'var(--color-error-bg)', color: 'var(--color-error)' }}
+              >
+                {mistakes.length}
+              </span>
+            )}
+          </div>
+
+          {mistakesLoading ? (
+            <div className="flex items-center gap-2 py-2">
+              <Loader2 size={16} className="animate-spin" style={{ color: 'var(--color-text-muted)' }} />
+              <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Carregando…</span>
+            </div>
+          ) : mistakes.length === 0 ? (
+            <div
+              className="flex items-center gap-3 rounded-2xl px-4 py-4"
+              style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
+            >
+              <Check size={18} style={{ color: 'var(--color-success)' }} />
+              <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+                Nenhum erro pendente. Continue assim!
+              </p>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2">
+              {/* Group by language */}
+              {(['fr', 'en'] as const).map((lang) => {
+                const langMistakes = mistakes.filter((m) => m.language === lang);
+                if (langMistakes.length === 0) return null;
+                const langLabel = lang === 'fr' ? '🇫🇷 Francês' : '🇬🇧 Inglês';
+                return (
+                  <div key={lang}>
+                    <p
+                      className="mb-2 text-xs font-semibold uppercase tracking-widest"
+                      style={{ color: 'var(--color-text-muted)' }}
+                    >
+                      {langLabel}
+                    </p>
+                    {langMistakes.map((m) => (
+                      <div
+                        key={m.id}
+                        className="mb-2 flex items-start gap-3 rounded-2xl px-4 py-3.5"
+                        style={{
+                          backgroundColor: 'var(--color-surface)',
+                          border: '1px solid var(--color-border)',
+                        }}
+                      >
+                        <AlertCircle
+                          size={16}
+                          className="mt-0.5 shrink-0"
+                          style={{ color: 'var(--color-error)' }}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p
+                            className="text-sm font-semibold leading-snug"
+                            style={{ color: 'var(--color-text-primary)' }}
+                          >
+                            {m.grammarFocus}
+                          </p>
+                          <p
+                            className="mt-0.5 text-xs leading-snug line-clamp-2"
+                            style={{ color: 'var(--color-text-muted)' }}
+                          >
+                            {m.mistakeContext}
+                          </p>
+                          <p
+                            className="mt-1 text-xs"
+                            style={{ color: 'var(--color-text-muted)', opacity: 0.7 }}
+                          >
+                            Nível {m.level}
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          disabled={removingMistakeId === m.id}
+                          onClick={() => m.id && handleRemoveMistake(m.id)}
+                          aria-label="Marcar como revisado"
+                          className="shrink-0 flex h-7 w-7 items-center justify-center rounded-full transition-all active:scale-90 disabled:opacity-50"
+                          style={{
+                            backgroundColor: 'var(--color-surface-raised)',
+                            color: 'var(--color-text-muted)',
+                          }}
+                        >
+                          {removingMistakeId === m.id
+                            ? <Loader2 size={13} className="animate-spin" />
+                            : <Check size={13} strokeWidth={2.5} />}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })}
+              <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                Os erros são removidos automaticamente após você acertar os exercícios de revisão durante as lições.
+              </p>
+            </div>
+          )}
         </section>
 
         {/* ── Admin: Image Cache ── */}

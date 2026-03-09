@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { AudioPlayerButton } from './AudioPlayerButton';
 import type { DictationData, SupportedLanguage } from '@/types';
+import { isAccentOnlyDiff } from '@/utils/accent';
 
 interface DictationInputProps {
   data: DictationData;
@@ -20,15 +21,21 @@ function normalize(s: string): string {
     .replace(/\s+/g, ' ');
 }
 
+type AnswerStatus = 'idle' | 'correct' | 'accent-warning' | 'wrong';
+
 export function DictationInput({ data, language, onAnswer, answered }: DictationInputProps) {
   const [input, setInput] = useState('');
   const [hintOpen, setHintOpen] = useState(false);
+  const [answerStatus, setAnswerStatus] = useState<AnswerStatus>('idle');
 
   const isCorrect = normalize(input) === normalize(data.text);
+  const isAccentWarning = !isCorrect && isAccentOnlyDiff(input, data.text);
 
   function handleSubmit() {
     if (input.trim() === '' || answered) return;
-    onAnswer(isCorrect);
+    const status: AnswerStatus = isCorrect ? 'correct' : isAccentWarning ? 'accent-warning' : 'wrong';
+    setAnswerStatus(status);
+    onAnswer(status !== 'wrong');
   }
 
   return (
@@ -61,11 +68,13 @@ export function DictationInput({ data, language, onAnswer, answered }: Dictation
         style={{
           backgroundColor: 'var(--color-surface)',
           border: `2px solid ${
-            answered
-              ? isCorrect
+            !answered
+              ? 'var(--color-border)'
+              : answerStatus === 'correct'
                 ? 'var(--color-success)'
-                : 'var(--color-error)'
-              : 'var(--color-border)'
+                : answerStatus === 'accent-warning'
+                  ? '#d97706'
+                  : 'var(--color-error)'
           }`,
           color: 'var(--color-text-primary)',
           caretColor: 'var(--color-primary)',
@@ -80,8 +89,19 @@ export function DictationInput({ data, language, onAnswer, answered }: Dictation
         }}
       />
 
+      {/* Accent warning */}
+      {answered && answerStatus === 'accent-warning' && (
+        <div
+          className="rounded-xl px-4 py-3 text-sm"
+          style={{ backgroundColor: '#fef3c7', color: '#92400e' }}
+        >
+          Quase! Verifique os acentos:{' '}
+          <span className="font-semibold">{data.text}</span>
+        </div>
+      )}
+
       {/* Show correct text on wrong */}
-      {answered && !isCorrect && (
+      {answered && answerStatus === 'wrong' && (
         <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
           Texto correto:{' '}
           <span className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>

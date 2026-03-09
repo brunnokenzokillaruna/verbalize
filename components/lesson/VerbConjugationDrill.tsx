@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react';
 import type { ConjugationDrillData } from '@/types';
+import { isAccentOnlyDiff } from '@/utils/accent';
 
 interface VerbConjugationDrillProps {
   data: ConjugationDrillData;
@@ -20,6 +21,15 @@ export function VerbConjugationDrill({ data, onAnswer, answered }: VerbConjugati
 
   const allFilled = inputs.every((v) => v.trim() !== '');
   const allCorrect = blanks.every((c, i) => normalize(inputs[i]) === normalize(c.form));
+  // Each blank can be: 'correct', 'accent-warning', or 'wrong'
+  const cellStatuses = blanks.map((c, i) => {
+    const exact = normalize(inputs[i]) === normalize(c.form);
+    if (exact) return 'correct';
+    if (isAccentOnlyDiff(inputs[i], c.form)) return 'accent-warning';
+    return 'wrong';
+  });
+  const hasAccentWarning = cellStatuses.includes('accent-warning');
+  const allAcceptable = cellStatuses.every((s) => s !== 'wrong');
 
   function handleChange(index: number, value: string) {
     const next = [...inputs];
@@ -29,7 +39,7 @@ export function VerbConjugationDrill({ data, onAnswer, answered }: VerbConjugati
 
   function handleSubmit() {
     if (!allFilled || answered) return;
-    onAnswer(allCorrect);
+    onAnswer(allAcceptable);
   }
 
   // Map to track blank index per row
@@ -59,7 +69,7 @@ export function VerbConjugationDrill({ data, onAnswer, answered }: VerbConjugati
           const isBlank = row.blank;
           const currentBlankIndex = isBlank ? blankIndex++ : -1;
           const userInput = isBlank ? inputs[currentBlankIndex] : '';
-          const isCorrectCell = isBlank && normalize(userInput) === normalize(row.form);
+          const cellStatus = isBlank ? cellStatuses[currentBlankIndex] : 'correct';
 
           return (
             <div
@@ -92,21 +102,27 @@ export function VerbConjugationDrill({ data, onAnswer, answered }: VerbConjugati
                     className="w-full rounded-xl px-3 py-1.5 text-base outline-none transition-all"
                     style={{
                       backgroundColor: answered
-                        ? isCorrectCell
+                        ? cellStatus === 'correct'
                           ? 'var(--color-success-bg)'
-                          : 'var(--color-error-bg)'
+                          : cellStatus === 'accent-warning'
+                            ? '#fef3c7'
+                            : 'var(--color-error-bg)'
                         : 'var(--color-surface-raised)',
                       border: `2px solid ${
                         answered
-                          ? isCorrectCell
+                          ? cellStatus === 'correct'
                             ? 'var(--color-success)'
-                            : 'var(--color-error)'
+                            : cellStatus === 'accent-warning'
+                              ? '#d97706'
+                              : 'var(--color-error)'
                           : 'var(--color-border)'
                       }`,
                       color: answered
-                        ? isCorrectCell
+                        ? cellStatus === 'correct'
                           ? 'var(--color-success)'
-                          : 'var(--color-error)'
+                          : cellStatus === 'accent-warning'
+                            ? '#92400e'
+                            : 'var(--color-error)'
                         : 'var(--color-text-primary)',
                     }}
                     onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
@@ -116,9 +132,9 @@ export function VerbConjugationDrill({ data, onAnswer, answered }: VerbConjugati
                     {row.form}
                   </p>
                 )}
-                {/* Show correct form when wrong */}
-                {answered && isBlank && !isCorrectCell && (
-                  <p className="mt-1 text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                {/* Show correct form when wrong or accent-warning */}
+                {answered && isBlank && cellStatus !== 'correct' && (
+                  <p className="mt-1 text-xs" style={{ color: cellStatus === 'accent-warning' ? '#92400e' : 'var(--color-text-muted)' }}>
                     → {row.form}
                   </p>
                 )}
@@ -127,6 +143,16 @@ export function VerbConjugationDrill({ data, onAnswer, answered }: VerbConjugati
           );
         })}
       </div>
+
+      {/* Accent warning banner */}
+      {answered && hasAccentWarning && (
+        <div
+          className="rounded-xl px-4 py-3 text-sm"
+          style={{ backgroundColor: '#fef3c7', color: '#92400e' }}
+        >
+          Quase! Verifique os acentos nas formas indicadas acima.
+        </div>
+      )}
 
       {/* Memory tip */}
       {data.tip && (

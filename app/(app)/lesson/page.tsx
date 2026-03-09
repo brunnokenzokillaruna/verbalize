@@ -106,6 +106,7 @@ export default function LessonPage() {
   const [tooltip, setTooltip] = useState<TooltipState>(CLOSED_TOOLTIP);
   const [hookError, setHookError] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [showDialogueTranslation, setShowDialogueTranslation] = useState(false);
 
   // ── Audio (Google Cloud TTS — two-voice dialogue) ────────────────────────
 
@@ -760,29 +761,46 @@ export default function LessonPage() {
                 <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--color-text-muted)' }}>
                   Diálogo
                 </p>
-                <button
-                  type="button"
-                  onClick={handleAudioButton}
-                  disabled={isLoadingAudio}
-                  aria-label={isPlaying ? 'Parar áudio' : 'Ouvir diálogo'}
-                  className="flex h-8 w-8 items-center justify-center rounded-full transition-all active:scale-90 disabled:cursor-not-allowed"
-                  style={{
-                    backgroundColor: isPlaying ? 'var(--color-primary)' : 'var(--color-surface-raised)',
-                    color: isPlaying ? 'var(--color-text-inverse)' : 'var(--color-text-muted)',
-                  }}
-                >
-                  {isLoadingAudio
-                    ? <Loader2 size={15} className="animate-spin" />
-                    : isPlaying
-                      ? <VolumeX size={15} />
-                      : <Volume2 size={15} />}
-                </button>
+                <div className="flex items-center gap-2">
+                  {store.hook.dialogueTranslations && store.hook.dialogueTranslations.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setShowDialogueTranslation((v) => !v)}
+                      className="rounded-full px-3 py-1 text-xs font-medium transition-all active:scale-90"
+                      style={{
+                        backgroundColor: showDialogueTranslation ? 'var(--color-bridge-bg)' : 'var(--color-surface-raised)',
+                        color: showDialogueTranslation ? 'var(--color-bridge)' : 'var(--color-text-muted)',
+                        border: `1px solid ${showDialogueTranslation ? 'var(--color-bridge)' : 'var(--color-border)'}`,
+                      }}
+                    >
+                      PT
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={handleAudioButton}
+                    disabled={isLoadingAudio}
+                    aria-label={isPlaying ? 'Parar áudio' : 'Ouvir diálogo'}
+                    className="flex h-8 w-8 items-center justify-center rounded-full transition-all active:scale-90 disabled:cursor-not-allowed"
+                    style={{
+                      backgroundColor: isPlaying ? 'var(--color-primary)' : 'var(--color-surface-raised)',
+                      color: isPlaying ? 'var(--color-text-inverse)' : 'var(--color-text-muted)',
+                    }}
+                  >
+                    {isLoadingAudio
+                      ? <Loader2 size={15} className="animate-spin" />
+                      : isPlaying
+                        ? <VolumeX size={15} />
+                        : <Volume2 size={15} />}
+                  </button>
+                </div>
               </div>
               {store.hook.dialogue.split('\n').filter((l) => l.trim()).map((line, i) => {
                 const match = line.match(/^([^:]+):\s*(.+)/);
                 const speakerName = match?.[1]?.trim();
                 const text = match?.[2]?.trim() ?? line;
                 const isEven = i % 2 === 0;
+                const ptTranslation = store.hook!.dialogueTranslations?.[i];
                 return (
                   <div key={i} className="mb-4">
                     {speakerName && (
@@ -799,6 +817,14 @@ export default function LessonPage() {
                       onWordClick={handleWordClick}
                       className="text-lg"
                     />
+                    {showDialogueTranslation && ptTranslation && (
+                      <p
+                        className="mt-1 text-sm italic"
+                        style={{ color: 'var(--color-bridge)' }}
+                      >
+                        {ptTranslation}
+                      </p>
+                    )}
                   </div>
                 );
               })}

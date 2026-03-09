@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import type { ReverseTranslationData } from '@/types';
+import { isAccentOnlyDiff } from '@/utils/accent';
 
 interface ReverseTranslationInputProps {
   data: ReverseTranslationData;
@@ -18,18 +19,28 @@ function normalize(s: string): string {
     .replace(/\s+/g, ' ');
 }
 
+type AnswerStatus = 'idle' | 'correct' | 'accent-warning' | 'wrong';
+
 export function ReverseTranslationInput({ data, onAnswer, answered }: ReverseTranslationInputProps) {
   const [input, setInput] = useState('');
   const [hintOpen, setHintOpen] = useState(false);
+  const [answerStatus, setAnswerStatus] = useState<AnswerStatus>('idle');
 
   const userNorm = normalize(input);
   const isCorrect =
     userNorm === normalize(data.target_translation) ||
     data.acceptable_variants.some((v) => userNorm === normalize(v));
 
+  const isAccentWarning =
+    !isCorrect &&
+    (isAccentOnlyDiff(input, data.target_translation) ||
+      data.acceptable_variants.some((v) => isAccentOnlyDiff(input, v)));
+
   function handleSubmit() {
     if (input.trim() === '' || answered) return;
-    onAnswer(isCorrect);
+    const status: AnswerStatus = isCorrect ? 'correct' : isAccentWarning ? 'accent-warning' : 'wrong';
+    setAnswerStatus(status);
+    onAnswer(status !== 'wrong');
   }
 
   return (
@@ -62,11 +73,13 @@ export function ReverseTranslationInput({ data, onAnswer, answered }: ReverseTra
         style={{
           backgroundColor: 'var(--color-surface)',
           border: `2px solid ${
-            answered
-              ? isCorrect
+            !answered
+              ? 'var(--color-border)'
+              : answerStatus === 'correct'
                 ? 'var(--color-success)'
-                : 'var(--color-error)'
-              : 'var(--color-border)'
+                : answerStatus === 'accent-warning'
+                  ? '#d97706'
+                  : 'var(--color-error)'
           }`,
           color: 'var(--color-text-primary)',
           caretColor: 'var(--color-primary)',
@@ -87,8 +100,19 @@ export function ReverseTranslationInput({ data, onAnswer, answered }: ReverseTra
         }}
       />
 
+      {/* Accent warning */}
+      {answered && answerStatus === 'accent-warning' && (
+        <div
+          className="rounded-xl px-4 py-3 text-sm"
+          style={{ backgroundColor: '#fef3c7', color: '#92400e' }}
+        >
+          Quase! Verifique os acentos:{' '}
+          <span className="font-semibold">{data.target_translation}</span>
+        </div>
+      )}
+
       {/* Show correct answer on wrong */}
-      {answered && !isCorrect && (
+      {answered && answerStatus === 'wrong' && (
         <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
           Resposta certa:{' '}
           <span className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>

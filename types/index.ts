@@ -130,6 +130,7 @@ export interface TranslateWordResult {
 
 export interface HookResult {
   dialogue: string;
+  dialogueTranslations?: string[]; // pt-BR translations, one per dialogue line
   newVocabulary: string[];
   grammarFocus: string;
   verbWord: string;
