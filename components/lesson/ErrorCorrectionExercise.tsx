@@ -24,7 +24,7 @@ export function ErrorCorrectionExercise({ data, onAnswer, answered }: ErrorCorre
     if (answered) return;
     const status: AnswerStatus = isCorrect ? 'correct' : isAccentWarning ? 'accent-warning' : 'wrong';
     setAnswerStatus(status);
-    onAnswer(status !== 'wrong');
+    onAnswer(status === 'correct');
   }
 
   // Split sentence around the error word to highlight it

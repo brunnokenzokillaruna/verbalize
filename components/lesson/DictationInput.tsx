@@ -35,7 +35,7 @@ export function DictationInput({ data, language, onAnswer, answered }: Dictation
     if (input.trim() === '' || answered) return;
     const status: AnswerStatus = isCorrect ? 'correct' : isAccentWarning ? 'accent-warning' : 'wrong';
     setAnswerStatus(status);
-    onAnswer(status !== 'wrong');
+    onAnswer(status === 'correct');
   }
 
   return (

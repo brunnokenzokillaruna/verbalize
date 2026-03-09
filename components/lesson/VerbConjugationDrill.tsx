@@ -29,7 +29,7 @@ export function VerbConjugationDrill({ data, onAnswer, answered }: VerbConjugati
     return 'wrong';
   });
   const hasAccentWarning = cellStatuses.includes('accent-warning');
-  const allAcceptable = cellStatuses.every((s) => s !== 'wrong');
+
 
   function handleChange(index: number, value: string) {
     const next = [...inputs];
@@ -39,7 +39,7 @@ export function VerbConjugationDrill({ data, onAnswer, answered }: VerbConjugati
 
   function handleSubmit() {
     if (!allFilled || answered) return;
-    onAnswer(allAcceptable);
+    onAnswer(cellStatuses.every((s) => s === 'correct'));
   }
 
   // Map to track blank index per row
