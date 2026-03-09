@@ -291,27 +291,36 @@ export default function LessonPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [store.phase]);
 
-  // 3. Vocabulary phase active → prefetch practice exercises
+  // 3. Vocabulary phase active → prefetch AI practice exercises only
   useEffect(() => {
     if (store.phase !== 'vocabulary' || !store.hook || !store.lesson) return;
-    exercisesPrefetchRef.current = buildAndFetchExercises();
+    exercisesPrefetchRef.current = fetchAiExercises();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [store.phase]);
 
   // ── Stage advance handlers ────────────────────────────────────────────────
 
-  /** Shared exercise builder — used by prefetch effect and advanceFromVocabulary fallback. */
-  async function buildAndFetchExercises(): Promise<Exercise[] | null> {
+  /** Fetches only the AI-generated exercises (Gemini). Used for prefetch. */
+  async function fetchAiExercises(): Promise<Exercise[] | null> {
     if (!store.hook || !store.lesson) return null;
-    const aiExercises = await generatePracticeExercises({
+    return generatePracticeExercises({
       dialogue: store.hook.dialogue,
       newVocabulary: store.hook.newVocabulary,
       verbWord: store.hook.verbWord,
       language: store.lesson.language,
       level: store.lesson.level,
     });
+  }
 
-    // 1 sentence-builder from first suitable dialogue line
+  /**
+   * Builds client-side exercises (sentence-builder + image-match) synchronously
+   * from current store state. Called at transition time so vocabImages is populated.
+   */
+  function buildClientExercises(): Exercise[] {
+    if (!store.hook) return [];
+    const exercises: Exercise[] = [];
+
+    // sentence-builder: first suitable dialogue line
     const dialogueSentences = store.hook.dialogue
       .split('\n')
       .filter((l) => l.trim().length > 0)
@@ -323,16 +332,15 @@ export default function LessonPage() {
         const wc = text.split(/\s+/).length;
         return wc >= 3 && wc <= 10;
       });
-    const clientExercises: Exercise[] = [];
     if (dialogueSentences[0]) {
       const words = dialogueSentences[0].split(/\s+/).filter(Boolean);
-      clientExercises.push({
+      exercises.push({
         type: 'sentence-builder',
         data: { words: [...words].sort(() => Math.random() - 0.5), correctOrder: words, translation: '' },
       });
     }
 
-    // 1 image-match using the first vocabulary word that has an image
+    // image-match: first vocab word with an image (vocabImages is populated by now)
     const vocabWithImage = store.hook.newVocabulary.find(
       (w) => store.vocabImages[w]?.imageUrl,
     );
@@ -342,20 +350,19 @@ export default function LessonPage() {
         .filter((w) => w !== vocabWithImage)
         .sort(() => Math.random() - 0.5)
         .slice(0, 3);
-      const options = [...distractors, vocabWithImage].sort(() => Math.random() - 0.5);
-      clientExercises.push({
+      exercises.push({
         type: 'image-match',
         data: {
           imageUrl: imgData.imageUrl,
           imageAlt: imgData.imageAlt ?? vocabWithImage,
           word: vocabWithImage,
-          options,
+          options: [...distractors, vocabWithImage].sort(() => Math.random() - 0.5),
           translation: store.vocabTranslations[vocabWithImage] ?? vocabWithImage,
         },
       });
     }
 
-    return [...(aiExercises ?? []), ...clientExercises];
+    return exercises;
   }
 
   async function advanceFromHook() {
@@ -388,11 +395,12 @@ export default function LessonPage() {
     if (!store.lesson || !store.hook || store.isLoading) return;
     store.setIsLoading(true);
 
-    // Use the prefetched promise (likely already resolved) or fall back to building now
-    const allExercises = await (exercisesPrefetchRef.current ?? buildAndFetchExercises());
+    // AI exercises prefetched; client-side exercises built NOW so vocabImages is populated
+    const aiExercises = await (exercisesPrefetchRef.current ?? fetchAiExercises());
     exercisesPrefetchRef.current = null;
+    const clientExercises = buildClientExercises();
 
-    store.setExercises(allExercises ?? []);
+    store.setExercises([...(aiExercises ?? []), ...clientExercises]);
     store.setPhase('practice');
   }
 

@@ -63,8 +63,10 @@ export function SpeakRepeatExercise({
     rec.lang = langCode;
     rec.continuous = false;
     rec.interimResults = false;
+    let resultReceived = false;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     rec.onresult = (e: any) => {
+      resultReceived = true;
       const result: string = e.results[0][0].transcript;
       setTranscript(result);
       onAnswer(similarity(data.text, result) >= 0.6);
@@ -78,7 +80,12 @@ export function SpeakRepeatExercise({
         setRecordError('Não foi possível gravar. Use os botões abaixo.');
       }
     };
-    rec.onend = () => setRecording(false);
+    rec.onend = () => {
+      setRecording(false);
+      if (!resultReceived) {
+        setRecordError('Nenhuma fala detectada. Tente novamente ou use os botões abaixo.');
+      }
+    };
     recogRef.current = rec;
     rec.start();
     setRecording(true);
