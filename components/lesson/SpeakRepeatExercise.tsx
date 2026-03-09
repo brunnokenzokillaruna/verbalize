@@ -69,7 +69,7 @@ export function SpeakRepeatExercise({
         resultReceived = true;
         const result: string = e.results[0][0].transcript;
         setTranscript(result);
-        onAnswer(similarity(data.text, result) >= 0.6);
+        onAnswer(similarity(data.text, result) >= 0.85);
       };
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       rec.onerror = (e: any) => {
@@ -96,7 +96,7 @@ export function SpeakRepeatExercise({
     }
   }
 
-  const isCorrect = transcript ? similarity(data.text, transcript) >= 0.6 : null;
+  const isCorrect = transcript ? similarity(data.text, transcript) >= 0.85 : null;
 
   return (
     <div className="flex flex-col gap-5">
