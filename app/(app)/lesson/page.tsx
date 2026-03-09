@@ -106,7 +106,7 @@ export default function LessonPage() {
   const [tooltip, setTooltip] = useState<TooltipState>(CLOSED_TOOLTIP);
   const [hookError, setHookError] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [showDialogueTranslation, setShowDialogueTranslation] = useState(false);
+  const [showDialogueTranslation, setShowDialogueTranslation] = useState(true);
 
   // ── Audio (Google Cloud TTS — two-voice dialogue) ────────────────────────
 
@@ -817,7 +817,7 @@ export default function LessonPage() {
                       onWordClick={handleWordClick}
                       className="text-lg"
                     />
-                    {showDialogueTranslation && ptTranslation && (
+                    {showDialogueTranslation && ptTranslation?.trim() && (
                       <p
                         className="mt-1 text-sm italic"
                         style={{ color: 'var(--color-bridge)' }}
