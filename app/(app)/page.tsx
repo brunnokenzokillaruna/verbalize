@@ -1,13 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { LogOut, BookOpen, Flame, ChevronRight, ChevronLeft, Sun, Moon, Check, Lock } from 'lucide-react';
+import { LogOut, BookOpen, Flame, ChevronRight, ChevronLeft, Sun, Moon, Check, Lock, ArrowLeftRight } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useTheme } from '@/components/ThemeProvider';
 import { logOut } from '@/services/auth';
+import { updateUser } from '@/services/firestore';
 import { useRouter } from 'next/navigation';
 import { getLessonsForLanguage } from '@/lib/curriculum';
-import type { ProficiencyLevel } from '@/types';
+import type { ProficiencyLevel, SupportedLanguage } from '@/types';
 
 const LANG_LABEL: Record<string, { name: string; flag: string }> = {
   fr: { name: 'Francês', flag: '🇫🇷' },
@@ -18,7 +19,7 @@ const ALL_LEVELS: ProficiencyLevel[] = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
 const LESSONS_PER_PAGE = 5;
 
 export default function DashboardPage() {
-  const { profile, reset } = useAuthStore();
+  const { profile, user, setProfile, reset } = useAuthStore();
   const { theme, toggleTheme } = useTheme();
   const router = useRouter();
 
@@ -34,11 +35,28 @@ export default function DashboardPage() {
 
   const [selectedLevel, setSelectedLevel] = useState<ProficiencyLevel>(initialLevel);
   const [page, setPage] = useState(0);
+  const [showLangSheet, setShowLangSheet] = useState(false);
+  const [switchingLang, setSwitchingLang] = useState(false);
 
   async function handleLogout() {
     await logOut();
     reset();
     router.replace('/login');
+  }
+
+  async function handleSwitchLanguage(lang: SupportedLanguage) {
+    if (!user || !profile || lang === profile.currentTargetLanguage || switchingLang) return;
+    setSwitchingLang(true);
+    await updateUser(user.uid, { currentTargetLanguage: lang });
+    const newProfile = { ...profile, currentTargetLanguage: lang };
+    setProfile(newProfile);
+    const newLessons = getLessonsForLanguage(lang);
+    const newFrontier = newProfile.lessonProgress?.[lang];
+    const newFrontierIndex = newFrontier ? newLessons.findIndex((l) => l.id === newFrontier) : 0;
+    setSelectedLevel((newLessons[newFrontierIndex]?.level as ProficiencyLevel) ?? 'A1');
+    setPage(0);
+    setSwitchingLang(false);
+    setShowLangSheet(false);
   }
 
   if (!profile) return null;
@@ -156,6 +174,15 @@ export default function DashboardPage() {
             </p>
           </div>
         </div>
+        <button
+          type="button"
+          onClick={() => setShowLangSheet(true)}
+          className="flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-sm font-semibold transition-all active:scale-95"
+          style={{ backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)' }}
+        >
+          <ArrowLeftRight size={13} />
+          Trocar
+        </button>
       </div>
 
       {/* ── Next lesson CTA ── */}
@@ -380,6 +407,77 @@ export default function DashboardPage() {
           </>
         )}
       </div>
+      {/* ── Language switcher bottom sheet ── */}
+      {showLangSheet && (
+        <div
+          className="fixed inset-0 z-50 flex items-end"
+          style={{ backgroundColor: 'rgba(0,0,0,0.45)' }}
+          onClick={(e) => { if (e.target === e.currentTarget) setShowLangSheet(false); }}
+        >
+          <div
+            className="w-full max-w-lg mx-auto rounded-t-3xl px-6 pb-10 pt-6 flex flex-col gap-5"
+            style={{ backgroundColor: 'var(--color-surface)' }}
+          >
+            <div
+              className="mx-auto h-1 w-10 rounded-full"
+              style={{ backgroundColor: 'var(--color-border-strong)' }}
+            />
+            <h2
+              className="font-display text-xl font-semibold"
+              style={{ color: 'var(--color-text-primary)' }}
+            >
+              Trocar idioma
+            </h2>
+            <div className="flex flex-col gap-3">
+              {(
+                [
+                  { lang: 'fr', flag: '🇫🇷', name: 'Francês' },
+                  { lang: 'en', flag: '🇬🇧', name: 'Inglês' },
+                ] as const
+              ).map(({ lang: l, flag, name }) => {
+                const isCurrent = profile.currentTargetLanguage === l;
+                return (
+                  <button
+                    key={l}
+                    type="button"
+                    disabled={switchingLang}
+                    onClick={() => handleSwitchLanguage(l)}
+                    className="flex items-center gap-4 rounded-2xl border-2 p-4 text-left transition-all active:scale-95 disabled:opacity-60"
+                    style={{
+                      backgroundColor: isCurrent ? 'var(--color-primary-light)' : 'var(--color-surface-raised)',
+                      borderColor: isCurrent ? 'var(--color-primary)' : 'var(--color-border)',
+                    }}
+                  >
+                    <span className="text-3xl">{flag}</span>
+                    <span
+                      className="flex-1 font-semibold"
+                      style={{ color: isCurrent ? 'var(--color-primary)' : 'var(--color-text-primary)' }}
+                    >
+                      {name}
+                    </span>
+                    {isCurrent && (
+                      <span
+                        className="flex h-6 w-6 items-center justify-center rounded-full"
+                        style={{ backgroundColor: 'var(--color-primary)' }}
+                      >
+                        <Check size={14} color="white" strokeWidth={3} />
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowLangSheet(false)}
+              className="text-center text-sm font-medium py-2"
+              style={{ color: 'var(--color-text-secondary)' }}
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
