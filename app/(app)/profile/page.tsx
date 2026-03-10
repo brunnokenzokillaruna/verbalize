@@ -212,7 +212,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-dvh pb-40 md:pb-10" style={{ backgroundColor: 'var(--color-bg)' }}>
+    <div className="min-h-dvh pb-40 md:pb-24" style={{ backgroundColor: 'var(--color-bg)' }}>
       {/* ── Header ── */}
       <header
         className="sticky top-0 z-10 px-4 py-4"
