@@ -193,6 +193,25 @@ Rules:
     const result = await callGeminiJSON<HookResult>(superPrompt, systemPrompt, 4096);
     if (result?.dialogue && result?.newVocabulary?.length === 5) {
       result.dialogue = fixDialogueLabels(result.dialogue, nameA, nameB);
+
+      // Normalize: verbWord must be present at newVocabulary[0].
+      // Gemini sometimes returns a verbWord that is absent from the list
+      // (or puts it at a non-zero index), causing the verb to be saved as
+      // a noun or lost entirely. Fix it deterministically here.
+      if (result.verbWord) {
+        const idx = result.newVocabulary.indexOf(result.verbWord);
+        if (idx === -1) {
+          // verbWord not in list — insert at front, drop the last noun
+          result.newVocabulary = [result.verbWord, ...result.newVocabulary.slice(0, 4)];
+        } else if (idx !== 0) {
+          // verbWord is in the list but not first — move it to front
+          result.newVocabulary = [
+            result.verbWord,
+            ...result.newVocabulary.filter((w) => w !== result.verbWord),
+          ];
+        }
+      }
+
       return result;
     }
   } catch (err) {
@@ -228,6 +247,20 @@ Rules for dialogueTranslations: ${lineCount} natural Brazilian Portuguese transl
     const fallback = await callGeminiJSON<HookResult>(simplePrompt, systemPrompt, 1024);
     if (!fallback) return null;
     fallback.dialogue = fixDialogueLabels(fallback.dialogue, nameA, nameB);
+
+    // Same normalization as super-hook: ensure verbWord is at newVocabulary[0]
+    if (fallback.verbWord && fallback.newVocabulary?.length) {
+      const idx = fallback.newVocabulary.indexOf(fallback.verbWord);
+      if (idx === -1) {
+        fallback.newVocabulary = [fallback.verbWord, ...fallback.newVocabulary.slice(0, 4)];
+      } else if (idx !== 0) {
+        fallback.newVocabulary = [
+          fallback.verbWord,
+          ...fallback.newVocabulary.filter((w) => w !== fallback.verbWord),
+        ];
+      }
+    }
+
     return fallback;
   } catch (err) {
     console.error('[generateHook] Simple hook fallback also failed:', err);
