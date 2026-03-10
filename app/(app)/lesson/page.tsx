@@ -419,10 +419,15 @@ export default function LessonPage() {
     );
     if (vocabWithImage) {
       const imgData = store.vocabImages[vocabWithImage]!;
-      const distractors = store.hook.newVocabulary
-        .filter((w) => w !== vocabWithImage)
-        .sort(() => Math.random() - 0.5)
-        .slice(0, 3);
+      // Use pre-computed visually distinct distractors from the super-hook;
+      // fall back to other lesson vocab words if the field is absent (old cache).
+      const precomputedDistractors = store.hook.imageMatchDistractors?.[vocabWithImage];
+      const distractors = precomputedDistractors && precomputedDistractors.length >= 3
+        ? precomputedDistractors.slice(0, 3)
+        : store.hook.newVocabulary
+            .filter((w) => w !== vocabWithImage)
+            .sort(() => Math.random() - 0.5)
+            .slice(0, 3);
       exercises.push({
         type: 'image-match',
         data: {

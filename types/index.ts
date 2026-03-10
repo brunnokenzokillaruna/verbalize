@@ -147,6 +147,7 @@ export interface HookResult {
   grammarBridge?: GrammarBridgeResult;
   imageKeywords?: Record<string, string>;            // word → Pexels search term
   vocabTranslations?: Record<string, TranslateWordResult>; // word → translation data
+  imageMatchDistractors?: Record<string, string[]>;  // word → 3 visually distinct distractors
 }
 
 export interface GrammarBridgeResult {

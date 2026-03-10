@@ -169,6 +169,13 @@ Output ONLY this JSON object (no extra text):
     "<vocab word 3>": { "translation": "pt-BR", "explanation": "tip in Portuguese ≤20 words", "example": "sentence in ${lang}" },
     "<vocab word 4>": { "translation": "pt-BR", "explanation": "tip in Portuguese ≤20 words", "example": "sentence in ${lang}" },
     "<vocab word 5>": { "translation": "pt-BR", "explanation": "tip in Portuguese ≤20 words", "example": "sentence in ${lang}" }
+  },
+  "imageMatchDistractors": {
+    "<vocab word 1>": ["distractor_a", "distractor_b", "distractor_c"],
+    "<vocab word 2>": ["distractor_a", "distractor_b", "distractor_c"],
+    "<vocab word 3>": ["distractor_a", "distractor_b", "distractor_c"],
+    "<vocab word 4>": ["distractor_a", "distractor_b", "distractor_c"],
+    "<vocab word 5>": ["distractor_a", "distractor_b", "distractor_c"]
   }
 }
 
@@ -178,7 +185,9 @@ Rules:
 - verbWord must equal newVocabulary[0]
 - dialogueTranslations: ${lineCount} strings, no speaker prefix, natural Brazilian Portuguese
 - imageKeywords keys must match the actual vocabulary words in newVocabulary
-- vocabTranslations keys must match the actual vocabulary words in newVocabulary`;
+- vocabTranslations keys must match the actual vocabulary words in newVocabulary
+- imageMatchDistractors keys must match the actual vocabulary words in newVocabulary
+- imageMatchDistractors: for each vocab word, provide 3 concrete nouns in ${lang} from a COMPLETELY different semantic category (e.g., if the word is "restaurant", distractors could be "avion", "chien", "montagne"). The distractors must be visually unambiguous and obviously wrong for that word's image. Do NOT use other words from newVocabulary as distractors.`;
 
   try {
     const result = await callGeminiJSON<HookResult>(superPrompt, systemPrompt, 4096);
