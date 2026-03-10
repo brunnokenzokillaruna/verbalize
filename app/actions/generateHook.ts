@@ -1,6 +1,6 @@
 'use server';
 
-import { callGemini, callGeminiJSON } from '@/services/gemini';
+import { callGeminiJSON } from '@/services/gemini';
 import type { SupportedLanguage, ProficiencyLevel, HookResult } from '@/types';
 
 const LANG_LABEL: Record<SupportedLanguage, string> = {
