@@ -363,6 +363,14 @@ export default function LessonPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [store.phase]);
 
+  // 3. Complete phase → prefetch home page so navigation is instant
+  useEffect(() => {
+    if (store.phase === 'complete') {
+      router.prefetch('/');
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [store.phase]);
+
   // ── Stage advance handlers ────────────────────────────────────────────────
 
   /** Fetches only the AI-generated exercises (Gemini). Used for prefetch. */
