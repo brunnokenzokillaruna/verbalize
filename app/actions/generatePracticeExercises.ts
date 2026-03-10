@@ -55,7 +55,8 @@ Exercise 1 — type "context-choice":
 - Take ONE sentence from the dialogue that contains a key vocabulary word
 - Replace that word with ___ in the "sentence" field
 - "blankWord" is the correct answer
-- "options" must have exactly 4 items: the correct word plus 3 plausible wrong options
+- "options" must have exactly 4 items: the correct word plus 3 distractors
+- CRITICAL: the 3 distractors must be CLEARLY WRONG in this specific sentence — they must not make logical or grammatical sense in the blank. Choose words from different semantic fields or grammatical categories so that ONLY the correct answer fits. Never use synonyms or words from the same category that could also make the sentence true.
 - "translation" is the Brazilian Portuguese translation of the full original sentence
 
 Exercise 2 — type "error-correction":
@@ -81,7 +82,7 @@ Exercise 5 — type "speak-repeat":
 - "translation" is the Brazilian Portuguese translation
 
 Exercise 6 — type "context-choice" (second one, different sentence and word from Exercise 1):
-- Same rules as Exercise 1 but use a different sentence and vocabulary word
+- Same rules as Exercise 1 (including the CRITICAL distractor rule) but use a different sentence and vocabulary word
 
 Exercise 7 — type "error-correction" (second one, different sentence from Exercise 2):
 - Same rules as Exercise 2 but write a completely different sentence with a different error

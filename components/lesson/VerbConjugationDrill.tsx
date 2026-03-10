@@ -39,7 +39,7 @@ export function VerbConjugationDrill({ data, onAnswer, answered }: VerbConjugati
 
   function handleSubmit() {
     if (!allFilled || answered) return;
-    onAnswer(cellStatuses.every((s) => s === 'correct'));
+    onAnswer(cellStatuses.every((s) => s === 'correct' || s === 'accent-warning'));
   }
 
   // Map to track blank index per row

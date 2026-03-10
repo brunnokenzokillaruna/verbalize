@@ -39,7 +39,8 @@ Exercise 1 — type "context-choice":
 - Create a sentence that tests this exact grammar point
 - Replace the key word with ___ in the "sentence" field
 - "blankWord" is the correct answer
-- "options" must have exactly 4 items: the correct word plus 3 plausible wrong options
+- "options" must have exactly 4 items: the correct word plus 3 distractors
+- CRITICAL: the 3 distractors must be CLEARLY WRONG in this specific sentence — they must not make logical or grammatical sense in the blank. Choose words from different semantic fields or grammatical categories so that ONLY the correct answer fits. Never use synonyms or words from the same category that could also make the sentence true.
 - "translation" is the Brazilian Portuguese translation of the full sentence
 
 Exercise 2 — type "error-correction":

@@ -40,7 +40,7 @@ export function ReverseTranslationInput({ data, onAnswer, answered }: ReverseTra
     if (input.trim() === '' || answered) return;
     const status: AnswerStatus = isCorrect ? 'correct' : isAccentWarning ? 'accent-warning' : 'wrong';
     setAnswerStatus(status);
-    onAnswer(status === 'correct');
+    onAnswer(status === 'correct' || status === 'accent-warning');
   }
 
   return (
