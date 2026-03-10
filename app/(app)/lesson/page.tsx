@@ -6,7 +6,7 @@ import { Loader2, Trophy, Volume2, VolumeX } from 'lucide-react';
 
 import { useAuthStore } from '@/store/authStore';
 import { useLessonStore } from '@/store/lessonStore';
-import { getNextLesson, getLessonById } from '@/lib/curriculum';
+import { getNextLesson, getNextLessonId, getLessonById } from '@/lib/curriculum';
 
 import { generateHook } from '@/app/actions/generateHook';
 import { synthesizeDialogue } from '@/app/actions/synthesizeSpeech';
@@ -16,6 +16,7 @@ import { generatePracticeExercises } from '@/app/actions/generatePracticeExercis
 import { generateMistakeReview } from '@/app/actions/generateMistakeReview';
 import { translateWord } from '@/app/actions/translateWord';
 import { getVerbConjugation } from '@/app/actions/getVerbConjugation';
+import { pregenerateNextLesson } from '@/app/actions/pregenerateNextLesson';
 import {
   upsertVocabularyItem,
   logLesson,
@@ -23,6 +24,8 @@ import {
   saveLessonMistake,
   getOldestMistake,
   deleteLessonMistake,
+  getPregeneratedLesson,
+  deletePregeneratedLesson,
 } from '@/services/firestore';
 
 import { LessonProgressHeader } from '@/components/lesson/LessonProgressHeader';
@@ -240,12 +243,24 @@ export default function LessonPage() {
     (async () => {
       store.setIsLoading(true);
       try {
-        const hook = await generateHook({
-          language: lesson.language,
-          level: lesson.level,
-          interests: profile.interests ?? [],
-          grammarFocus: lesson.grammarFocus,
-        });
+        // Check if we have a pre-generated lesson ready (from previous lesson completion)
+        let hook = user
+          ? await getPregeneratedLesson(user.uid, lesson.id).then((doc) => doc?.hook ?? null)
+          : null;
+
+        if (hook) {
+          // Consume the cache — delete it after reading so it won't be reused
+          if (user) deletePregeneratedLesson(user.uid, lesson.id).catch(console.error);
+        } else {
+          // No cache — generate normally (super-hook: dialogue + grammar bridge + keywords + translations)
+          hook = await generateHook({
+            language: lesson.language,
+            level: lesson.level,
+            interests: profile.interests ?? [],
+            grammarFocus: lesson.grammarFocus,
+          });
+        }
+
         if (hook) {
           store.setHook(hook);
           store.setPhase('hook');
@@ -264,34 +279,44 @@ export default function LessonPage() {
 
   // ── Prefetch: start next-screen data while user reads/listens ────────────
 
-  // 1. Hook phase active → prefetch grammar bridge
+  // 1. Hook phase active → resolve grammar bridge + start vocab images + translations early
   useEffect(() => {
     if (store.phase !== 'hook' || !store.hook || !store.lesson) return;
-    grammarBridgePrefetchRef.current = generateGrammarBridge({
-      dialogue: store.hook.dialogue,
-      grammarFocus: store.hook.grammarFocus,
-      language: store.lesson.language,
-    });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [store.phase]);
+    const { hook, lesson } = store;
 
-  // 2. Grammar phase active → prefetch vocab translations + images
-  useEffect(() => {
-    if (store.phase !== 'grammar' || !store.hook || !store.lesson) return;
-    const words = store.hook.newVocabulary;
-    const dialogue = store.hook.dialogue;
-    const language = store.lesson.language;
+    // Grammar bridge: use bundled data if available, otherwise fall back to a separate call
+    if (hook.grammarBridge) {
+      grammarBridgePrefetchRef.current = Promise.resolve(hook.grammarBridge);
+    } else {
+      grammarBridgePrefetchRef.current = generateGrammarBridge({
+        dialogue: hook.dialogue,
+        grammarFocus: hook.grammarFocus,
+        language: lesson.language,
+      });
+    }
 
-    // Translations — fire-and-forget per word
-    words.forEach(async (word) => {
-      const result = await translateWord(word, dialogue, language);
-      if (result?.translation) store.setVocabTranslation(word, result.translation);
-    });
+    // Translations: populate from bundled data immediately, or fire separate calls as fallback
+    const words = hook.newVocabulary;
+    const dialogue = hook.dialogue;
+    const language = lesson.language;
 
-    // Images — each updates the store as it arrives, then fix duplicates
+    if (hook.vocabTranslations) {
+      words.forEach((word) => {
+        const result = hook.vocabTranslations![word];
+        if (result?.translation) store.setVocabTranslation(word, result.translation);
+      });
+    } else {
+      words.forEach(async (word) => {
+        const result = await translateWord(word, dialogue, language);
+        if (result?.translation) store.setVocabTranslation(word, result.translation);
+      });
+    }
+
+    // Images: start Pexels fetches now using bundled keywords (or Gemini fallback per-word)
     (async () => {
       const imagePromises = words.map(async (word) => {
-        const result = await getVocabImage(word, dialogue, language);
+        const precomputedKeyword = hook.imageKeywords?.[word];
+        const result = await getVocabImage(word, dialogue, language, [], precomputedKeyword);
         store.setVocabImage(word, result);
         return { word, result };
       });
@@ -311,7 +336,8 @@ export default function LessonPage() {
       if (refetchWords.length > 0) {
         await Promise.all(
           refetchWords.map(async (word) => {
-            const result = await getVocabImage(word, dialogue, language, [...usedUrls]);
+            const precomputedKeyword = hook.imageKeywords?.[word];
+            const result = await getVocabImage(word, dialogue, language, [...usedUrls], precomputedKeyword);
             store.setVocabImage(word, result);
             if (result?.imageUrl && !usedUrls.includes(result.imageUrl)) {
               usedUrls.push(result.imageUrl);
@@ -323,9 +349,9 @@ export default function LessonPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [store.phase]);
 
-  // 3. Vocabulary phase active → prefetch AI practice exercises only
+  // 2. Grammar phase active → prefetch AI practice exercises (moved up from vocabulary phase)
   useEffect(() => {
-    if (store.phase !== 'vocabulary' || !store.hook || !store.lesson) return;
+    if (store.phase !== 'grammar' || !store.hook || !store.lesson) return;
     exercisesPrefetchRef.current = fetchAiExercises();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [store.phase]);
@@ -467,6 +493,15 @@ export default function LessonPage() {
     // Pre-cache verb conjugation so the Verbs page loads it instantly
     if (store.hook.verbWord) {
       getVerbConjugation(store.hook.verbWord, language).catch(console.error);
+    }
+
+    // Pre-generate the next lesson in the background so it starts instantly
+    const nextLessonId = getNextLessonId(language, store.lesson.id);
+    if (nextLessonId && user) {
+      const nextLesson = getLessonById(nextLessonId);
+      if (nextLesson) {
+        pregenerateNextLesson(user.uid, nextLesson, profile?.interests ?? []).catch(console.error);
+      }
     }
   }
 

@@ -18,9 +18,10 @@ interface GeminiResponse {
  *
  * @param prompt - The user prompt (required)
  * @param systemPrompt - Optional system-level instruction
+ * @param maxOutputTokens - Token budget (default 1024; tune per call to reduce latency)
  * @throws Error with a descriptive message on failure
  */
-export async function callGemini(prompt: string, systemPrompt?: string): Promise<string> {
+export async function callGemini(prompt: string, systemPrompt?: string, maxOutputTokens = 1024): Promise<string> {
   const apiKey = getGeminiKey();
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
 
@@ -28,7 +29,7 @@ export async function callGemini(prompt: string, systemPrompt?: string): Promise
     contents: [{ role: 'user', parts: [{ text: prompt }] }],
     generationConfig: {
       temperature: 0.7,
-      maxOutputTokens: 1024,
+      maxOutputTokens,
     },
   };
 
@@ -60,8 +61,8 @@ export async function callGemini(prompt: string, systemPrompt?: string): Promise
  * Calls Gemini and parses the response as JSON.
  * The prompt should instruct Gemini to respond with ONLY valid JSON.
  */
-export async function callGeminiJSON<T>(prompt: string, systemPrompt?: string): Promise<T> {
-  const raw = await callGemini(prompt, systemPrompt);
+export async function callGeminiJSON<T>(prompt: string, systemPrompt?: string, maxOutputTokens = 1024): Promise<T> {
+  const raw = await callGemini(prompt, systemPrompt, maxOutputTokens);
 
   // Strip markdown code fences if Gemini wraps JSON in ```json ... ```
   const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim();

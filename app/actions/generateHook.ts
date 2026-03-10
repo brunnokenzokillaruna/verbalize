@@ -16,7 +16,9 @@ interface GenerateHookParams {
 }
 
 /**
- * Generates a short dialogue (Hook) for a lesson using Gemini (Prompt #1).
+ * Super-hook: generates dialogue, grammar bridge explanation, image keywords,
+ * and vocabulary translations in a single Gemini call, eliminating ~10 extra
+ * round-trips that the old approach required.
  * Returns null on any error.
  */
 export async function generateHook(params: GenerateHookParams): Promise<HookResult | null> {
@@ -90,7 +92,30 @@ Output this JSON (dialogue must have exactly ${lineCount} lines):
   "dialogueTranslations": ["<pt-BR translation of line 1>", "<pt-BR translation of line 2>", ...],
   "newVocabulary": ["verb_infinitive", "noun1", "noun2", "noun3", "noun4"],
   "verbWord": "verb_infinitive",
-  "grammarFocus": "one sentence describing the grammar used"
+  "grammarFocus": "one sentence describing the grammar used",
+  "grammarBridge": {
+    "rule": "Thorough explanation in Brazilian Portuguese (4-6 sentences, using the Portuguese Bridge Method comparing ${LANG_LABEL[language]} structure to Portuguese)",
+    "targetExample": "Main example sentence in ${LANG_LABEL[language]} from or inspired by the dialogue",
+    "portugueseComparison": "The Brazilian Portuguese equivalent of the main example",
+    "additionalExamples": [
+      { "target": "Second example in ${LANG_LABEL[language]}", "portuguese": "Its Brazilian Portuguese equivalent" },
+      { "target": "Third example in ${LANG_LABEL[language]}", "portuguese": "Its Brazilian Portuguese equivalent" }
+    ]
+  },
+  "imageKeywords": {
+    "verb_infinitive": "concise English Pexels search term (single object or action, neutral background)",
+    "noun1": "concise English Pexels search term",
+    "noun2": "concise English Pexels search term",
+    "noun3": "concise English Pexels search term",
+    "noun4": "concise English Pexels search term"
+  },
+  "vocabTranslations": {
+    "verb_infinitive": { "translation": "pt-BR translation", "explanation": "one usage tip in Portuguese (max 20 words)", "example": "new example sentence in ${LANG_LABEL[language]} only" },
+    "noun1": { "translation": "pt-BR translation", "explanation": "one usage tip in Portuguese (max 20 words)", "example": "new example sentence in ${LANG_LABEL[language]} only" },
+    "noun2": { "translation": "pt-BR translation", "explanation": "one usage tip in Portuguese (max 20 words)", "example": "new example sentence in ${LANG_LABEL[language]} only" },
+    "noun3": { "translation": "pt-BR translation", "explanation": "one usage tip in Portuguese (max 20 words)", "example": "new example sentence in ${LANG_LABEL[language]} only" },
+    "noun4": { "translation": "pt-BR translation", "explanation": "one usage tip in Portuguese (max 20 words)", "example": "new example sentence in ${LANG_LABEL[language]} only" }
+  }
 }
 
 Rules for newVocabulary:
@@ -100,13 +125,21 @@ Rules for newVocabulary:
 
 Rules for dialogueTranslations:
 - Exactly ${lineCount} strings, one natural Brazilian Portuguese translation per dialogue line
-- Do NOT include the speaker name prefix — translate only the spoken text`;
+- Do NOT include the speaker name prefix — translate only the spoken text
 
-    const result = await callGeminiJSON<HookResult>(prompt, systemPrompt);
+Rules for imageKeywords:
+- Keys must exactly match the 5 words in newVocabulary
+- Each value is a short English phrase for Pexels image search (e.g. "coffee cup white background")
+
+Rules for vocabTranslations:
+- Keys must exactly match the 5 words in newVocabulary
+- explanation: max 20 words in Brazilian Portuguese
+- example: a new sentence in ${LANG_LABEL[language]} only (no Portuguese)`;
+
+    const result = await callGeminiJSON<HookResult>(prompt, systemPrompt, 2048);
     if (!result) return null;
 
     // Post-process: ensure EVERY line has "Name: " prefix.
-    // Gemini sometimes labels only the first line; check each line individually.
     const lines = result.dialogue.split('\n').filter((l) => l.trim().length > 0);
     result.dialogue = lines
       .map((line, i) => {

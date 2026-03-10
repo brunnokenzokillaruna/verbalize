@@ -102,6 +102,15 @@ export interface VerbDocument {
   }>;
 }
 
+// ─── Pre-generated Lesson Cache ───────────────────────────────────────────────
+
+export interface PregeneratedLessonDocument {
+  uid: string;
+  lessonId: string;
+  hook: HookResult;
+  createdAt: Timestamp;
+}
+
 // ─── Lesson ───────────────────────────────────────────────────────────────────
 
 export type LessonStage = 'hook' | 'grammar' | 'vocabulary' | 'practice' | 'review';
@@ -134,6 +143,10 @@ export interface HookResult {
   newVocabulary: string[];
   grammarFocus: string;
   verbWord: string;
+  // Bundled from super-hook (eliminates separate Gemini round-trips)
+  grammarBridge?: GrammarBridgeResult;
+  imageKeywords?: Record<string, string>;            // word → Pexels search term
+  vocabTranslations?: Record<string, TranslateWordResult>; // word → translation data
 }
 
 export interface GrammarBridgeResult {

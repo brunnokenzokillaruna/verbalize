@@ -12,8 +12,9 @@ const LANG_LABEL: Record<SupportedLanguage, string> = {
 
 /**
  * Returns an image URL for a vocabulary word.
- * Flow: Firestore cache → Gemini keyword → Pexels (pages 1-3) → save cache
+ * Flow: Firestore cache → keyword (pre-computed or Gemini) → Pexels (pages 1-3) → save cache
  * Pass `excludeUrls` to avoid returning an image already used by another word.
+ * Pass `precomputedKeyword` (from the super-hook) to skip the Gemini keyword call entirely.
  * Returns null if any step fails (UI shows placeholder).
  */
 export async function getVocabImage(
@@ -21,6 +22,7 @@ export async function getVocabImage(
   sentence: string,
   language: SupportedLanguage,
   excludeUrls: string[] = [],
+  precomputedKeyword?: string,
 ): Promise<VocabImageResult | null> {
   try {
     // ── 1. Check Firestore cache ──────────────────────────────────────────────
@@ -30,8 +32,12 @@ export async function getVocabImage(
       return { imageUrl: cached.imageUrl, imageAlt: cached.photographer };
     }
 
-    // ── 2. Generate image search keyword via Gemini (Prompt #3) ──────────────
-    const keywordPrompt = `Generate a highly precise search keyword string to query Pexels for the ${LANG_LABEL[language]} word "${word}" in this sentence context: "${sentence}".
+    // ── 2. Use pre-computed keyword or call Gemini as fallback ────────────────
+    let keyword: string;
+    if (precomputedKeyword) {
+      keyword = precomputedKeyword.trim();
+    } else {
+      const keywordPrompt = `Generate a highly precise search keyword string to query Pexels for the ${LANG_LABEL[language]} word "${word}" in this sentence context: "${sentence}".
 
 Rules:
 - Focus on a single object or action.
@@ -40,7 +46,8 @@ Rules:
 - Output ONLY the search query string in English (e.g., "coffee cup isolated white background").
 - No explanation, no punctuation, just the keyword string.`;
 
-    const keyword = (await callGemini(keywordPrompt)).trim();
+      keyword = (await callGemini(keywordPrompt, undefined, 100)).trim();
+    }
 
     // ── 3. Fetch from Pexels, trying pages 1-3 to avoid duplicate images ─────
     for (let page = 1; page <= 3; page++) {

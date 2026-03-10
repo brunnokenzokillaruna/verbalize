@@ -14,7 +14,7 @@ import {
   Timestamp,
 } from 'firebase/firestore';
 import { db } from './firebase';
-import type { UserDocument, UserVocabularyDocument, ImageCacheDocument, VerbDocument, LessonMistakeDocument, SupportedLanguage, ProficiencyLevel } from '@/types';
+import type { UserDocument, UserVocabularyDocument, ImageCacheDocument, VerbDocument, LessonMistakeDocument, PregeneratedLessonDocument, SupportedLanguage, ProficiencyLevel } from '@/types';
 import { calculateNextReview } from '@/lib/srs';
 import { getNextLessonId } from '@/lib/curriculum';
 
@@ -364,4 +364,47 @@ export async function getUserMistakes(
     return tb - ta; // newest first for display
   });
   return filtered;
+}
+
+// ─── Pre-generated Lesson Cache ───────────────────────────────────────────────
+
+/** Document ID: `{uid}_{lessonId}` */
+function pregeneratedDocId(uid: string, lessonId: string) {
+  return `${uid}_${lessonId}`;
+}
+
+/**
+ * Stores a pre-generated hook in the `lesson_pregen` collection so the next
+ * lesson can start instantly without waiting for an AI call.
+ */
+export async function savePregeneratedLesson(
+  uid: string,
+  lessonId: string,
+  hook: PregeneratedLessonDocument['hook'],
+): Promise<void> {
+  const id = pregeneratedDocId(uid, lessonId);
+  await setDoc(doc(db, 'lesson_pregen', id), {
+    uid,
+    lessonId,
+    hook,
+    createdAt: serverTimestamp(),
+  });
+}
+
+/**
+ * Returns a pre-generated lesson if one exists, or null.
+ */
+export async function getPregeneratedLesson(
+  uid: string,
+  lessonId: string,
+): Promise<PregeneratedLessonDocument | null> {
+  const snap = await getDoc(doc(db, 'lesson_pregen', pregeneratedDocId(uid, lessonId)));
+  return snap.exists() ? (snap.data() as PregeneratedLessonDocument) : null;
+}
+
+/**
+ * Deletes the pre-generated lesson entry after it has been consumed.
+ */
+export async function deletePregeneratedLesson(uid: string, lessonId: string): Promise<void> {
+  await deleteDoc(doc(db, 'lesson_pregen', pregeneratedDocId(uid, lessonId)));
 }

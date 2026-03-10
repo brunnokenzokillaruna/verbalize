@@ -36,7 +36,7 @@ Rules:
 - The example must be in ${LANG_LABEL[language]} only (no Portuguese).
 - Use simple vocabulary appropriate for beginners.`;
 
-    return await callGeminiJSON<TranslateWordResult>(prompt, systemPrompt);
+    return await callGeminiJSON<TranslateWordResult>(prompt, systemPrompt, 300);
   } catch (err) {
     console.error('[translateWord] Error:', err);
     return null;

@@ -50,7 +50,7 @@ Output JSON in exactly this format:
   ]
 }`;
 
-    return await callGeminiJSON<GrammarBridgeResult>(prompt, systemPrompt);
+    return await callGeminiJSON<GrammarBridgeResult>(prompt, systemPrompt, 900);
   } catch (err) {
     console.error('[generateGrammarBridge] Error:', err);
     return null;

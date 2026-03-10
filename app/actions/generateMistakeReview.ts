@@ -86,7 +86,7 @@ Output format (exactly this structure, 3 items):
   }
 ]`;
 
-    const exercises = await callGeminiJSON<Exercise[]>(prompt, systemPrompt);
+    const exercises = await callGeminiJSON<Exercise[]>(prompt, systemPrompt, 1200);
 
     if (!Array.isArray(exercises) || exercises.length < 3) {
       console.error('[generateMistakeReview] Unexpected response shape');
