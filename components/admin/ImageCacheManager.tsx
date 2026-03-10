@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { ChevronLeft, ChevronRight, RefreshCw, X, Check } from 'lucide-react';
+import { ChevronLeft, ChevronRight, RefreshCw, X, Check, Search } from 'lucide-react';
 import {
   fetchAllImageCache,
   translateMissingEntries,
   fetchPexelsAlternatives,
+  fetchPexelsFromCustomPrompt,
   replaceImageCacheEntry,
   approveImageCacheEntry,
 } from '@/app/actions/adminImages';
@@ -23,6 +24,9 @@ export function ImageCacheManager() {
   const [alternatives, setAlternatives] = useState<Array<{ imageUrl: string; photographer: string }>>([]);
   const [loadingAlts, setLoadingAlts] = useState(false);
   const [saving, setSaving] = useState<string | null>(null);
+  const [seenUrls, setSeenUrls] = useState<string[]>([]);
+  const [customPrompt, setCustomPrompt] = useState('');
+  const [loadingCustom, setLoadingCustom] = useState(false);
 
   useEffect(() => {
     fetchAllImageCache()
@@ -64,6 +68,8 @@ export function ImageCacheManager() {
   function closeReplace() {
     setReplacing(false);
     setAlternatives([]);
+    setSeenUrls([]);
+    setCustomPrompt('');
   }
 
   function removeCurrentAndAdvance() {
@@ -99,13 +105,28 @@ export function ImageCacheManager() {
 
   async function handleStartReplace() {
     if (!current) return;
+    const initialExcludes = [current.imageUrl];
+    setSeenUrls(initialExcludes);
     setReplacing(true);
     setLoadingAlts(true);
     try {
       const alts = await fetchPexelsAlternatives(current.word, current.imageUrl, current.translation);
       setAlternatives(alts);
+      setSeenUrls([...initialExcludes, ...alts.map((a) => a.imageUrl)]);
     } finally {
       setLoadingAlts(false);
+    }
+  }
+
+  async function handleCustomSearch() {
+    if (!customPrompt.trim() || loadingCustom) return;
+    setLoadingCustom(true);
+    try {
+      const alts = await fetchPexelsFromCustomPrompt(customPrompt.trim(), seenUrls);
+      setAlternatives(alts);
+      setSeenUrls((prev) => [...prev, ...alts.map((a) => a.imageUrl)]);
+    } finally {
+      setLoadingCustom(false);
     }
   }
 
@@ -324,6 +345,56 @@ export function ImageCacheManager() {
                   </div>
                 </button>
               ))}
+            </div>
+          )}
+
+          {/* ── Custom prompt search ── */}
+          {!loadingAlts && (
+            <div className="flex flex-col gap-2 pt-1">
+              <div
+                className="h-px w-full"
+                style={{ backgroundColor: 'var(--color-border)' }}
+              />
+              <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                Buscar com texto personalizado:
+              </p>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={customPrompt}
+                  onChange={(e) => setCustomPrompt(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') handleCustomSearch(); }}
+                  placeholder="ex: woman drinking coffee table"
+                  disabled={loadingCustom}
+                  className="flex-1 rounded-xl px-3 py-2 text-sm outline-none disabled:opacity-50"
+                  style={{
+                    backgroundColor: 'var(--color-surface)',
+                    border: '1px solid var(--color-border)',
+                    color: 'var(--color-text-primary)',
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={handleCustomSearch}
+                  disabled={!customPrompt.trim() || loadingCustom}
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border transition-all active:scale-95 disabled:opacity-40"
+                  style={{
+                    backgroundColor: 'var(--color-primary-light)',
+                    borderColor: 'var(--color-primary)',
+                    color: 'var(--color-primary)',
+                  }}
+                  aria-label="Buscar"
+                >
+                  {loadingCustom ? (
+                    <div
+                      className="h-4 w-4 rounded-full border-2 animate-spin"
+                      style={{ borderColor: 'rgba(0,0,0,0.15)', borderTopColor: 'var(--color-primary)' }}
+                    />
+                  ) : (
+                    <Search size={15} />
+                  )}
+                </button>
+              </div>
             </div>
           )}
         </div>

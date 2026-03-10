@@ -11,7 +11,7 @@ interface VerbConjugationDrillProps {
 }
 
 function normalize(s: string): string {
-  return s.trim().toLowerCase();
+  return s.toLowerCase().trim().replace(/[.,!?;:'"-]/g, '').replace(/\s+/g, ' ');
 }
 
 export function VerbConjugationDrill({ data, onAnswer, answered }: VerbConjugationDrillProps) {

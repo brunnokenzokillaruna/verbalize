@@ -152,3 +152,23 @@ export async function replaceImageCacheEntry(
 export async function approveImageCacheEntry(cacheKey: string): Promise<void> {
   await approveImageCache(cacheKey);
 }
+
+/**
+ * Searches Pexels using a user-supplied custom query string.
+ * Returns up to 6 results, skipping any URLs already seen.
+ */
+export async function fetchPexelsFromCustomPrompt(
+  query: string,
+  excludeUrls: string[] = [],
+): Promise<Array<{ imageUrl: string; photographer: string }>> {
+  if (!query.trim()) return [];
+  const results: Array<{ imageUrl: string; photographer: string }> = [];
+  for (let page = 1; page <= 10 && results.length < 6; page++) {
+    const photo = await searchPexels(query.trim(), page);
+    if (!photo) break;
+    if (!excludeUrls.includes(photo.imageUrl)) {
+      results.push(photo);
+    }
+  }
+  return results;
+}

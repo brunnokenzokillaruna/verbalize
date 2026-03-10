@@ -16,8 +16,10 @@ export function ErrorCorrectionExercise({ data, onAnswer, answered }: ErrorCorre
   const [input, setInput] = useState(data.error_word);
   const [answerStatus, setAnswerStatus] = useState<AnswerStatus>('idle');
 
-  const isCorrect =
-    input.trim().toLowerCase() === data.correct_word.trim().toLowerCase();
+  const normalize = (s: string) =>
+    s.toLowerCase().trim().replace(/[.,!?;:'"-]/g, '').replace(/\s+/g, ' ');
+
+  const isCorrect = normalize(input) === normalize(data.correct_word);
   const isAccentWarning = !isCorrect && isAccentOnlyDiff(input, data.correct_word);
 
   function handleSubmit() {
