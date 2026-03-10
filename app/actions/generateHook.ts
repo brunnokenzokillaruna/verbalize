@@ -52,6 +52,58 @@ const DIALOGUE_LINES: Record<ProficiencyLevel, number> = {
   A1: 4, A2: 4, B1: 6, B2: 6, C1: 8, C2: 8,
 };
 
+/**
+ * Concrete CEFR-level descriptors injected into the Gemini prompt so the
+ * model produces vocabulary and grammar that truly matches the learner's level.
+ */
+const LEVEL_DESCRIPTORS: Record<ProficiencyLevel, string> = {
+  A1: `
+STRICT A1 BEGINNER rules — the learner knows almost nothing yet:
+- Vocabulary: use ONLY the 300–500 most common everyday words (e.g. hello, eat, drink, house, water, go, have, be, name, like).  No complex or uncommon words at all.
+- Grammar: present tense of être/avoir (FR) or to be/to have (EN) and the most basic -ER verbs (FR) or simple present (EN). Affirmative sentences only or a single simple yes/no question. NO subordinate clauses, NO past, NO future.
+- Sentence length: max 8 words per line.
+- Topics: greetings, self-introduction, numbers, colors, family, food/drink, daily objects, simple actions.
+- Example dialogue line (French): "Marie: Bonjour ! J'ai un café."
+- Example dialogue line (English): "Emma: Hello! I have a cat."`,
+
+  A2: `
+A2 ELEMENTARY rules — the learner handles basic everyday situations:
+- Vocabulary: common everyday vocabulary (500–1 500 words). Simple nouns, verbs, adjectives that appear in daily life.  Avoid rare, abstract or technical words.
+- Grammar: present tense, passé composé with avoir (FR) / simple past (EN), futur proche (FR) / going to (EN), basic modals (pouvoir/vouloir FR; can/want EN). Simple connectors: et, mais, parce que / and, but, because. ONE simple subordinate clause at most.
+- Sentence length: 8–12 words per line.
+- Topics: shopping, café/restaurant, weather, transport, hobbies, professions, daily routines.
+- Example dialogue line (French): "Lucas: Hier, j'ai mangé une pizza avec mes amis."
+- Example dialogue line (English): "Jake: Yesterday I went to the market with my friend."`,
+
+  B1: `
+B1 INTERMEDIATE rules — the learner can handle familiar topics:
+- Vocabulary: intermediate vocabulary (1 500–3 000 words). Can use descriptive adjectives, common idiomatic expressions, and topic-specific words.
+- Grammar: all A1–A2 structures plus imparfait (FR) / past continuous (EN), futur simple (FR) / will-future (EN), conditionnel présent (FR) / would (EN), simple relative clauses (qui/que/where/who).
+- Sentence length: 10–16 words per line.
+- Topics: travel, work plans, opinions, health, environment, culture, learning.`,
+
+  B2: `
+B2 UPPER-INTERMEDIATE rules — the learner handles complex ideas:
+- Vocabulary: varied vocabulary (3 000–6 000 words). Abstract nouns, nuanced verbs, fixed expressions, and collocations are welcome.
+- Grammar: all B1 plus subjonctif présent (FR) / subjunctive (EN), plus-que-parfait (FR) / past perfect (EN), passive voice, complex conjunctions (bien que, alors que / although, whereas). Multiple subordinate clauses allowed.
+- Sentence length: natural length, typically 12–20 words per line.
+- Topics: society, technology, environment, business, cross-cultural issues.`,
+
+  C1: `
+C1 ADVANCED rules — the learner operates with sophistication:
+- Vocabulary: rich, precise vocabulary including formal register, idioms, and low-frequency words. Stylistic variation is expected.
+- Grammar: all B2 structures plus complex inversion, cleft sentences, advanced connectors (certes, en effet, or, d'autant plus que / nonetheless, albeit, henceforth). Participial clauses and gerunds freely used.
+- Sentence length: varied, can be long and complex. Native-like rhythm.
+- Topics: abstract debates, media analysis, professional contexts, philosophy, science.`,
+
+  C2: `
+C2 MASTERY rules — the learner approaches native-speaker fluency:
+- Vocabulary: fully native-level including argot, formal/literary registers, and cultural references. No restrictions.
+- Grammar: all tenses and moods including literary forms for recognition (passé simple, subjonctif imparfait FR). Stylistic choices freely made.
+- Sentence length: fully natural; mirrors authentic native speech or writing.
+- Topics: anything — literature, rhetoric, irony, understatement, humor.`,
+};
+
 function fixDialogueLabels(dialogue: string, nameA: string, nameB: string): string {
   const lines = dialogue.split('\n').filter((l) => l.trim().length > 0);
   return lines
@@ -72,6 +124,7 @@ export async function generateHook(params: GenerateHookParams): Promise<HookResu
   const topic = pickTopic(interests);
   const lineCount = DIALOGUE_LINES[level];
   const lang = LANG_LABEL[language];
+  const levelDesc = LEVEL_DESCRIPTORS[level];
 
   const systemPrompt = `You are an expert language teacher creating content for Brazilian Portuguese speakers learning ${lang}. Respond with ONLY valid JSON, no markdown, no explanation.`;
 
@@ -79,11 +132,13 @@ export async function generateHook(params: GenerateHookParams): Promise<HookResu
   const superPrompt = `Write a 2-person dialogue in ${lang} between ${nameA} and ${nameB}.
 
 Requirements:
-- ${level} level vocabulary and grammar
 - Topic: ${topic}
 - Naturally uses this grammar: ${grammarFocus}
 - Exactly ${lineCount} lines total, alternating speakers, forming a natural flowing conversation
 - Every line MUST begin with the speaker name and a colon
+
+LEVEL CONSTRAINTS (follow these strictly):
+${levelDesc}
 
 Output ONLY this JSON object (no extra text):
 {
@@ -140,11 +195,13 @@ Rules:
   const simplePrompt = `Write a 2-person dialogue in ${lang} between ${nameA} and ${nameB}.
 
 Requirements:
-- ${level} level vocabulary and grammar
 - Topic: ${topic}
 - Naturally uses this grammar: ${grammarFocus}
 - Exactly ${lineCount} lines total, alternating speakers
 - Every line MUST begin with the speaker name and a colon
+
+LEVEL CONSTRAINTS (follow these strictly):
+${levelDesc}
 
 Output this JSON (dialogue must have exactly ${lineCount} lines):
 {

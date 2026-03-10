@@ -8,6 +8,15 @@ const LANG_LABEL: Record<SupportedLanguage, string> = {
   en: 'English',
 };
 
+const LEVEL_EXERCISE_DESCRIPTORS: Record<ProficiencyLevel, string> = {
+  A1: 'A1 BEGINNER: use only the 300–500 most common everyday words. Sentences max 8 words. Simple present tense only. No subordinate clauses. Very short, clear sentences.',
+  A2: 'A2 ELEMENTARY: use everyday vocabulary (up to 1,500 words). Sentences 8–12 words. Present, simple past, futur proche / going to. Basic connectors (and, but, because).',
+  B1: 'B1 INTERMEDIATE: intermediate vocabulary (up to 3,000 words). Sentences 10–16 words. Can use past, future, conditional, simple relative clauses.',
+  B2: 'B2 UPPER-INTERMEDIATE: varied vocabulary (up to 6,000 words). Complex sentences allowed. Passive voice, subjunctive, complex conjunctions are fine.',
+  C1: 'C1 ADVANCED: rich and precise vocabulary. Idiomatic, formal register welcome. Long complex sentences with multiple subordinate clauses.',
+  C2: 'C2 MASTERY: fully native-level. Any register, tense, or structure. Stylistic sophistication expected.',
+};
+
 interface GeneratePracticeParams {
   dialogue: string;
   newVocabulary: string[];
@@ -28,6 +37,7 @@ export async function generatePracticeExercises(
 ): Promise<Exercise[] | null> {
   const { dialogue, newVocabulary, language, level } = params;
   const isEarly = level === 'A1' || level === 'A2';
+  const levelDesc = LEVEL_EXERCISE_DESCRIPTORS[level];
 
   try {
     const systemPrompt = `You are a language exercise generator for Brazilian Portuguese speakers learning ${LANG_LABEL[language]}. Respond with ONLY a valid JSON array, no markdown, no explanation.`;
@@ -36,6 +46,8 @@ export async function generatePracticeExercises(
 "${dialogue}"
 
 Key vocabulary words: ${newVocabulary.join(', ')}
+
+LEVEL CONSTRAINTS — all sentences you write must follow these rules: ${levelDesc}
 
 Generate exactly 8 exercises as a JSON array in this order:
 
