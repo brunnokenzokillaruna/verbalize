@@ -42,5 +42,15 @@ service cloud.firestore {
     match /verbs/{verbId} {
       allow read, write: if true;
     }
+
+    // ── Pre-generated Lesson Cache ────────────────────────────────────────────
+    // Written by server actions (no Firebase Auth token), read/deleted by the
+    // authenticated user who owns the doc. Treats write as unauthenticated
+    // (same pattern as image_cache / verbs) since server actions lack user auth.
+    match /lesson_pregen/{docId} {
+      allow read, delete: if request.auth != null
+        && resource.data.uid == request.auth.uid;
+      allow create: if true;
+    }
   }
 }

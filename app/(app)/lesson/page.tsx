@@ -243,15 +243,22 @@ export default function LessonPage() {
     (async () => {
       store.setIsLoading(true);
       try {
-        // Check if we have a pre-generated lesson ready (from previous lesson completion)
-        let hook = user
-          ? await getPregeneratedLesson(user.uid, lesson.id).then((doc) => doc?.hook ?? null)
-          : null;
+        // Check if we have a pre-generated lesson ready (from previous lesson completion).
+        // Wrapped in its own try/catch so a Firestore permission error never crashes the bootstrap.
+        let hook = null;
+        if (user) {
+          try {
+            const pregenDoc = await getPregeneratedLesson(user.uid, lesson.id);
+            if (pregenDoc?.hook) {
+              hook = pregenDoc.hook;
+              deletePregeneratedLesson(user.uid, lesson.id).catch(console.error);
+            }
+          } catch {
+            // Permission error or network issue — fall through to normal generation
+          }
+        }
 
-        if (hook) {
-          // Consume the cache — delete it after reading so it won't be reused
-          if (user) deletePregeneratedLesson(user.uid, lesson.id).catch(console.error);
-        } else {
+        if (!hook) {
           // No cache — generate normally (super-hook: dialogue + grammar bridge + keywords + translations)
           hook = await generateHook({
             language: lesson.language,
