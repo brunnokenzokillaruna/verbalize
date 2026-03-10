@@ -112,7 +112,7 @@ export async function upsertVocabularyItem(
       nextReview: Timestamp.fromDate(nextReview),
     });
   } else {
-    // Already exists — advance SRS level
+    // Already exists — advance SRS level and refresh imageUrl/translation if provided
     const docRef = snap.docs[0].ref;
     const existing = snap.docs[0].data() as UserVocabularyDocument;
     const { newLevel, nextReview } = calculateNextReview(existing.srsLevel, true);
@@ -120,6 +120,10 @@ export async function upsertVocabularyItem(
       srsLevel: newLevel,
       lastReview: serverTimestamp(),
       nextReview: Timestamp.fromDate(nextReview),
+      // Refresh imageUrl when provided (fixes stale/missing images)
+      ...(imageUrl && { imageUrl }),
+      // Refresh translation when it was a placeholder
+      ...(translation && translation !== word && { translation }),
     });
   }
 }

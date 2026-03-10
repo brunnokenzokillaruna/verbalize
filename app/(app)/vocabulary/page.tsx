@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Loader2, BookOpen } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
-import { getUserVocabulary, updateVocabTranslation } from '@/services/firestore';
+import { getUserVocabulary, updateVocabTranslation, getCachedImage } from '@/services/firestore';
 import { translateWord } from '@/app/actions/translateWord';
 import { AudioPlayerButton } from '@/components/lesson/AudioPlayerButton';
 import type { UserVocabularyDocument, SupportedLanguage } from '@/types';
@@ -52,7 +52,19 @@ export default function VocabularyPage() {
     (async () => {
       setLoading(true);
       const vocab = await getUserVocabulary(user.uid, language);
-      setItems(vocab);
+
+      // Batch-fetch latest image URLs from image_cache in parallel.
+      // image_cache is the source of truth (updated by admin / new fetches),
+      // so it overrides potentially stale URLs stored in user_vocabulary.
+      const cacheResults = await Promise.all(
+        vocab.map((v) => getCachedImage(`${v.word}_${language}`)),
+      );
+      const enriched = vocab.map((v, i) => ({
+        ...v,
+        imageUrl: cacheResults[i]?.imageUrl ?? v.imageUrl,
+      }));
+
+      setItems(enriched);
       setLoading(false);
 
       // Lazily enrich placeholder translations (word === translation)
