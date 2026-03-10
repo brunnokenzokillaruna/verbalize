@@ -21,13 +21,6 @@ const TENSE_LABELS: Record<string, string> = {
 
 const TENSE_ORDER = ['present', 'past', 'imperfect', 'future', 'conditional', 'subjunctive'];
 
-// ── Quick-start chips ─────────────────────────────────────────────────────────
-
-const QUICK_VERBS: Record<SupportedLanguage, string[]> = {
-  fr: ['être', 'avoir', 'aller', 'faire', 'vouloir'],
-  en: ['to be', 'to have', 'to go', 'to do', 'to want'],
-};
-
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export default function VerbsPage() {
@@ -167,29 +160,6 @@ export default function VerbsPage() {
                 </div>
               </div>
             )}
-
-            <div className="flex flex-col gap-3">
-            <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--color-text-muted)' }}>
-              Verbos comuns
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {QUICK_VERBS[language].map((v) => (
-                <button
-                  key={v}
-                  type="button"
-                  onClick={() => handleSearch(v)}
-                  className="rounded-xl px-4 py-2 text-sm font-medium transition-all active:scale-95"
-                  style={{
-                    backgroundColor: 'var(--color-surface)',
-                    border: '1px solid var(--color-border)',
-                    color: 'var(--color-text-primary)',
-                  }}
-                >
-                  {v}
-                </button>
-              ))}
-            </div>
-            </div>
 
             {/* Empty illustration */}
             <div className="mt-6 flex flex-col items-center gap-3 text-center">
