@@ -43,6 +43,15 @@ service cloud.firestore {
       allow read, write: if true;
     }
 
+    // ── Lesson Mistakes ───────────────────────────────────────────────────────
+    // Users can read, write, and delete their own mistake documents.
+    match /lesson_mistakes/{docId} {
+      allow read, delete: if request.auth != null
+        && resource.data.uid == request.auth.uid;
+      allow create, update: if request.auth != null
+        && request.resource.data.uid == request.auth.uid;
+    }
+
     // ── Pre-generated Lesson Cache ────────────────────────────────────────────
     // Written by server actions (no Firebase Auth token), read/deleted by the
     // authenticated user who owns the doc. Treats write as unauthenticated
