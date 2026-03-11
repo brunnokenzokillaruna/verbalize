@@ -84,8 +84,8 @@ export function CheckButton({
 
       {/* CTA button */}
       <div
-        className="px-5 pb-6 pt-3"
-        style={{ backgroundColor: 'var(--color-bg)' }}
+        className="px-5 pt-3"
+        style={{ backgroundColor: 'var(--color-bg)', paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}
       >
         <button
           type="button"

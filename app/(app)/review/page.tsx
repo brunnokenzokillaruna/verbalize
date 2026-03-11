@@ -295,8 +295,8 @@ function ReviewContent() {
     >
       {/* Header */}
       <div
-        className="flex items-center gap-3 px-5 pt-5 pb-3"
-        style={{ borderBottom: '1px solid var(--color-border)' }}
+        className="sticky top-0 z-10 flex items-center gap-3 px-5 pt-5 pb-3"
+        style={{ borderBottom: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)' }}
       >
         <button
           type="button"
@@ -339,7 +339,7 @@ function ReviewContent() {
       </div>
 
       {/* Exercise */}
-      <div className="flex-1 overflow-y-auto px-5 pb-48 pt-6 mx-auto w-full max-w-lg md:max-w-2xl lg:max-w-4xl">
+      <div className="px-5 pb-56 pt-6 mx-auto w-full max-w-lg md:max-w-2xl lg:max-w-4xl">
         {currentExercise && (
           <div key={currentIndex} className="animate-slide-up">
             <p className="mb-4 text-xs" style={{ color: 'var(--color-text-muted)' }}>
