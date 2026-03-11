@@ -12,7 +12,7 @@ const NAV_ITEMS = [
 ] as const;
 
 // Pages where the bottom nav should be hidden
-const HIDDEN_ON = ['/lesson'];
+const HIDDEN_ON = ['/lesson', '/review'];
 
 export function BottomNav() {
   const pathname = usePathname();
