@@ -53,7 +53,7 @@ Exercise 4 — type "context-choice":
 - "translation" is the Brazilian Portuguese translation of the full sentence
 
 Exercise 5 — type "reverse-translation":
-- "portuguese_sentence" is a DIFFERENT natural Brazilian Portuguese sentence (not the same as Exercise 3) that exercises this grammar point
+- "portuguese_sentence" MUST be written ENTIRELY in Brazilian Portuguese — do NOT include any ${LANG_LABEL[language]} words. Write a DIFFERENT sentence from Exercise 3 that exercises this grammar point
 - "target_translation" is the correct ${LANG_LABEL[language]} translation
 - "acceptable_variants" lists 1-2 alternative correct phrasings (or empty array)
 - "hint" is ${isEarly ? 'a brief grammar tip in Portuguese' : 'omitted (leave field out)'}` : '';
@@ -100,8 +100,8 @@ Exercise 2 — type "error-correction":
 - "explanation" is a brief explanation in Brazilian Portuguese of why it is wrong
 
 Exercise 3 — type "reverse-translation":
-- "portuguese_sentence" is a natural Brazilian Portuguese sentence that exercises this grammar point
-- "target_translation" is the correct ${LANG_LABEL[language]} translation
+- "portuguese_sentence" MUST be written ENTIRELY in Brazilian Portuguese — do NOT include any ${LANG_LABEL[language]} words. Express the meaning using only Portuguese words (e.g., use "Há" instead of "Il y a", "Existe" instead of "There is", etc.)
+- "target_translation" is the correct ${LANG_LABEL[language]} translation of that Portuguese sentence
 - "acceptable_variants" lists 1-2 alternative correct phrasings (or empty array)
 - "hint" is ${isEarly ? 'a brief grammar tip in Portuguese' : 'omitted (leave field out)'}${extraExercises}
 

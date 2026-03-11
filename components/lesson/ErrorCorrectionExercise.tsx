@@ -13,7 +13,7 @@ interface ErrorCorrectionExerciseProps {
 type AnswerStatus = 'idle' | 'correct' | 'accent-warning' | 'wrong';
 
 export function ErrorCorrectionExercise({ data, onAnswer, answered }: ErrorCorrectionExerciseProps) {
-  const [input, setInput] = useState(data.error_word);
+  const [input, setInput] = useState('');
   const [answerStatus, setAnswerStatus] = useState<AnswerStatus>('idle');
 
   const normalize = (s: string) =>
@@ -85,6 +85,7 @@ export function ErrorCorrectionExercise({ data, onAnswer, answered }: ErrorCorre
           value={input}
           onChange={(e) => setInput(e.target.value)}
           disabled={answered}
+          placeholder={`Substitua "${data.error_word}"…`}
           className="w-full rounded-2xl px-4 py-3 text-base outline-none transition-all"
           style={{
             backgroundColor: 'var(--color-surface)',
