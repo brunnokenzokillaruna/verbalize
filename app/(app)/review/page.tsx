@@ -4,7 +4,8 @@ import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Loader2, X, Trophy, RefreshCw } from 'lucide-react';
 
-import { getMistakeById, deleteLessonMistake } from '@/services/firestore';
+import { useAuthStore } from '@/store/authStore';
+import { getMistakeById, deleteLessonMistake, getUserVocabulary } from '@/services/firestore';
 import { generateMistakeReview } from '@/app/actions/generateMistakeReview';
 
 import { CheckButton } from '@/components/lesson/CheckButton';
@@ -21,6 +22,7 @@ type Phase = 'loading' | 'practice' | 'complete' | 'error';
 function ReviewContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const user = useAuthStore((s) => s.user);
 
   const mistakeId = searchParams.get('id') ?? '';
 
@@ -30,6 +32,7 @@ function ReviewContent() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
   const [exerciseAnswer, setExerciseAnswer] = useState<boolean | null>(null);
+  const [knownVocab, setKnownVocab] = useState<string[]>([]);
 
   // Load mistake + generate exercises
   useEffect(() => {
@@ -48,12 +51,18 @@ function ReviewContent() {
       if (cancelled) return;
       setMistake(doc);
 
+      // Fetch known vocabulary in parallel with nothing (sequential is fine — fast Firestore read)
+      const vocabItems = user ? await getUserVocabulary(user.uid, doc.language) : [];
+      const knownVocabulary = vocabItems.map((v) => v.word);
+      if (!cancelled) setKnownVocab(knownVocabulary);
+
       const exs = await generateMistakeReview({
         grammarFocus: doc.grammarFocus,
         mistakeContext: doc.mistakeContext,
         language: doc.language,
         level: doc.level,
         count: TOTAL,
+        knownVocabulary,
       });
 
       if (cancelled) return;
@@ -116,6 +125,7 @@ function ReviewContent() {
       language: mistake.language,
       level: mistake.level,
       count: TOTAL,
+      knownVocabulary: knownVocab,
     });
     if (!exs || exs.length < TOTAL) {
       setPhase('error');

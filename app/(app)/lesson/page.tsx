@@ -590,6 +590,7 @@ export default function LessonPage() {
           mistakeContext: mistake.mistakeContext,
           language: store.lesson.language,
           level: store.lesson.level,
+          knownVocabulary: store.hook?.newVocabulary,
         });
         if (exercises) {
           store.setReview(mistake, exercises);

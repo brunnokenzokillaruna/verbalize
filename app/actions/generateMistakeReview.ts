@@ -15,6 +15,12 @@ interface GenerateMistakeReviewParams {
   level: ProficiencyLevel;
   /** Number of exercises to generate. Defaults to 3 (lesson review). Use 5 for profile review. */
   count?: number;
+  /**
+   * Words the student already knows. When provided, the AI will prefer these
+   * words in exercise sentences so the student can focus on grammar, not vocabulary.
+   * Pass up to 30 words; extras are silently ignored.
+   */
+  knownVocabulary?: string[];
 }
 
 /**
@@ -26,9 +32,12 @@ interface GenerateMistakeReviewParams {
 export async function generateMistakeReview(
   params: GenerateMistakeReviewParams,
 ): Promise<Exercise[] | null> {
-  const { grammarFocus, mistakeContext, language, level, count = 3 } = params;
+  const { grammarFocus, mistakeContext, language, level, count = 3, knownVocabulary } = params;
   const isEarly = level === 'A1' || level === 'A2';
   const isFive = count >= 5;
+  const vocabHint = knownVocabulary && knownVocabulary.length > 0
+    ? `\nVocabulary the student already knows (prefer these words in your sentences): ${knownVocabulary.slice(0, 30).join(', ')}.`
+    : '';
 
   try {
     const systemPrompt = `You are a language exercise generator for Brazilian Portuguese speakers learning ${LANG_LABEL[language]}. Respond with ONLY a valid JSON array, no markdown, no explanation.`;
@@ -71,7 +80,7 @@ Exercise 5 — type "reverse-translation":
 
     const prompt = `A student learning ${LANG_LABEL[language]} at level ${level} made a mistake.
 Grammar topic: "${grammarFocus}"
-Mistake context: "${mistakeContext}"
+Mistake context: "${mistakeContext}"${vocabHint}
 
 Generate exactly ${isFive ? 5 : 3} exercises to help them correct this mistake and reinforce the grammar point.
 
