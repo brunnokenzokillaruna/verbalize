@@ -14,9 +14,9 @@ interface ReverseTranslationInputProps {
 function normalize(s: string): string {
   return s
     .toLowerCase()
-    .trim()
     .replace(/[.,!?;:'"-]/g, '')
-    .replace(/\s+/g, ' ');
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 type AnswerStatus = 'idle' | 'correct' | 'accent-warning' | 'wrong';

@@ -17,7 +17,7 @@ export function ErrorCorrectionExercise({ data, onAnswer, answered }: ErrorCorre
   const [answerStatus, setAnswerStatus] = useState<AnswerStatus>('idle');
 
   const normalize = (s: string) =>
-    s.toLowerCase().trim().replace(/[.,!?;:'"-]/g, '').replace(/\s+/g, ' ');
+    s.toLowerCase().replace(/[.,!?;:'"-]/g, '').replace(/\s+/g, ' ').trim();
 
   const isCorrect = normalize(input) === normalize(data.correct_word);
   const isAccentWarning = !isCorrect && isAccentOnlyDiff(input, data.correct_word);
