@@ -13,7 +13,7 @@ export function removeAccents(s: string): string {
  */
 export function isAccentOnlyDiff(userInput: string, correct: string): boolean {
   const clean = (s: string) =>
-    s.toLowerCase().trim().replace(/[.,!?;:'"-]/g, '').replace(/\s+/g, ' ');
+    s.toLowerCase().replace(/[.,!?;:'"-]/g, '').replace(/\s+/g, ' ').trim();
 
   const userClean = clean(userInput);
   const correctClean = clean(correct);
