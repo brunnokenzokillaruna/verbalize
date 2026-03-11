@@ -119,6 +119,7 @@ export default function ProfilePage() {
   // Mistakes state
   const [mistakes, setMistakes] = useState<LessonMistakeDocument[]>([]);
   const [mistakesLoading, setMistakesLoading] = useState(true);
+  const [mistakeIndex, setMistakeIndex] = useState(0);
 
   useEffect(() => {
     if (!user) return;
@@ -411,75 +412,82 @@ export default function ProfilePage() {
                 Nenhum erro pendente. Continue assim!
               </p>
             </div>
-          ) : (
-            <div className="flex flex-col gap-2">
-              {/* Group by language */}
-              {(['fr', 'en'] as const).map((lang) => {
-                const langMistakes = mistakes.filter((m) => m.language === lang);
-                if (langMistakes.length === 0) return null;
-                const langLabel = lang === 'fr' ? '🇫🇷 Francês' : '🇬🇧 Inglês';
-                return (
-                  <div key={lang}>
-                    <p
-                      className="mb-2 text-xs font-semibold uppercase tracking-widest"
-                      style={{ color: 'var(--color-text-muted)' }}
-                    >
-                      {langLabel}
-                    </p>
-                    {langMistakes.map((m) => (
-                      <div
-                        key={m.id}
-                        className="mb-2 flex items-start gap-3 rounded-2xl px-4 py-3.5 cursor-pointer transition-opacity active:opacity-70"
-                        role="button"
-                        tabIndex={0}
-                        onClick={() => m.id && router.push(`/review?id=${m.id}`)}
-                        onKeyDown={(e) => e.key === 'Enter' && m.id && router.push(`/review?id=${m.id}`)}
-                        style={{
-                          backgroundColor: 'var(--color-surface)',
-                          border: '1px solid var(--color-border)',
-                        }}
-                      >
-                        <AlertCircle
-                          size={16}
-                          className="mt-0.5 shrink-0"
-                          style={{ color: 'var(--color-error)' }}
-                        />
-                        <div className="flex-1 min-w-0">
-                          <p
-                            className="text-sm font-semibold leading-snug"
-                            style={{ color: 'var(--color-text-primary)' }}
-                          >
-                            {m.grammarFocus}
-                          </p>
-                          <p
-                            className="mt-0.5 text-xs leading-snug line-clamp-2"
-                            style={{ color: 'var(--color-text-muted)' }}
-                          >
-                            {m.mistakeContext}
-                          </p>
-                          <p
-                            className="mt-1 text-xs"
-                            style={{ color: 'var(--color-text-muted)', opacity: 0.7 }}
-                          >
-                            Nível {m.level}
-                          </p>
-                        </div>
-                        <div className="shrink-0 flex items-center gap-1">
-                          <span className="text-xs font-medium" style={{ color: 'var(--color-primary)' }}>
-                            Revisar
-                          </span>
-                          <ChevronRight size={14} style={{ color: 'var(--color-primary)' }} />
-                        </div>
+          ) : (() => {
+            const m = mistakes[Math.min(mistakeIndex, mistakes.length - 1)];
+            const safeIndex = Math.min(mistakeIndex, mistakes.length - 1);
+            return (
+              <div className="flex flex-col gap-3">
+                {/* Navigation row */}
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    disabled={safeIndex === 0}
+                    onClick={() => setMistakeIndex((i) => Math.max(0, i - 1))}
+                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-all active:scale-90 disabled:opacity-30"
+                    style={{ backgroundColor: 'var(--color-surface-raised)', color: 'var(--color-text-muted)' }}
+                    aria-label="Erro anterior"
+                  >
+                    <ChevronLeft size={16} />
+                  </button>
+
+                  {/* Card */}
+                  <div
+                    className="flex-1 flex items-start gap-3 rounded-2xl px-4 py-3.5 cursor-pointer transition-opacity active:opacity-70"
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => m.id && router.push(`/review?id=${m.id}`)}
+                    onKeyDown={(e) => e.key === 'Enter' && m.id && router.push(`/review?id=${m.id}`)}
+                    style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
+                  >
+                    <AlertCircle size={16} className="mt-0.5 shrink-0" style={{ color: 'var(--color-error)' }} />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5 mb-0.5">
+                        <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                          {m.language === 'fr' ? '🇫🇷' : '🇬🇧'}
+                        </span>
+                        <span className="text-xs" style={{ color: 'var(--color-text-muted)', opacity: 0.7 }}>
+                          Nível {m.level}
+                        </span>
                       </div>
-                    ))}
+                      <p className="text-sm font-semibold leading-snug" style={{ color: 'var(--color-text-primary)' }}>
+                        {m.grammarFocus}
+                      </p>
+                      <p className="mt-0.5 text-xs leading-snug line-clamp-2" style={{ color: 'var(--color-text-muted)' }}>
+                        {m.mistakeContext}
+                      </p>
+                    </div>
+                    <div className="shrink-0 flex items-center gap-1 ml-1">
+                      <span className="text-xs font-medium" style={{ color: 'var(--color-primary)' }}>Revisar</span>
+                      <ChevronRight size={14} style={{ color: 'var(--color-primary)' }} />
+                    </div>
                   </div>
-                );
-              })}
-              <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
-                Toque em um erro para iniciar uma revisão de 5 exercícios. Ao acertar 100%, o erro é removido automaticamente.
-              </p>
-            </div>
-          )}
+
+                  <button
+                    type="button"
+                    disabled={safeIndex >= mistakes.length - 1}
+                    onClick={() => setMistakeIndex((i) => Math.min(mistakes.length - 1, i + 1))}
+                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-all active:scale-90 disabled:opacity-30"
+                    style={{ backgroundColor: 'var(--color-surface-raised)', color: 'var(--color-text-muted)' }}
+                    aria-label="Próximo erro"
+                  >
+                    <ChevronRight size={16} />
+                  </button>
+                </div>
+
+                {/* Counter + hint */}
+                <div className="flex items-center justify-between px-1">
+                  <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                    Toque para revisar. Ao acertar 100%, o erro é removido.
+                  </p>
+                  {mistakes.length > 1 && (
+                    <span className="text-xs font-medium shrink-0 ml-2" style={{ color: 'var(--color-text-muted)' }}>
+                      {safeIndex + 1} / {mistakes.length}
+                    </span>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
         </section>
 
         {/* ── Admin: Image Cache ── */}
