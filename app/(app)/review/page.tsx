@@ -4,7 +4,6 @@ import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Loader2, X, Trophy, RefreshCw } from 'lucide-react';
 
-import { useAuthStore } from '@/store/authStore';
 import { getMistakeById, deleteLessonMistake } from '@/services/firestore';
 import { generateMistakeReview } from '@/app/actions/generateMistakeReview';
 
@@ -22,7 +21,6 @@ type Phase = 'loading' | 'practice' | 'complete' | 'error';
 function ReviewContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const user = useAuthStore((s) => s.user);
 
   const mistakeId = searchParams.get('id') ?? '';
 

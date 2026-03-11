@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, ChevronRight, LogOut, Trash2, Check, AlertCircle, Loader2 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
-import { updateUser, deleteUserData, getUserMistakes, deleteLessonMistake } from '@/services/firestore';
+import { updateUser, deleteUserData, getUserMistakes } from '@/services/firestore';
 import { logOut, deleteAccount } from '@/services/auth';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -119,7 +119,6 @@ export default function ProfilePage() {
   // Mistakes state
   const [mistakes, setMistakes] = useState<LessonMistakeDocument[]>([]);
   const [mistakesLoading, setMistakesLoading] = useState(true);
-  const [removingMistakeId, setRemovingMistakeId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -177,16 +176,6 @@ export default function ProfilePage() {
     await logOut();
     reset();
     router.replace('/login');
-  }
-
-  async function handleRemoveMistake(id: string) {
-    setRemovingMistakeId(id);
-    try {
-      await deleteLessonMistake(id);
-      setMistakes((prev) => prev.filter((m) => m.id !== id));
-    } finally {
-      setRemovingMistakeId(null);
-    }
   }
 
   async function handleDeleteAccount() {
