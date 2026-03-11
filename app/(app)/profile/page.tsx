@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChevronLeft, LogOut, Trash2, Check, AlertCircle, Loader2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, LogOut, Trash2, Check, AlertCircle, Loader2 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { updateUser, deleteUserData, getUserMistakes, deleteLessonMistake } from '@/services/firestore';
 import { logOut, deleteAccount } from '@/services/auth';
@@ -440,7 +440,11 @@ export default function ProfilePage() {
                     {langMistakes.map((m) => (
                       <div
                         key={m.id}
-                        className="mb-2 flex items-start gap-3 rounded-2xl px-4 py-3.5"
+                        className="mb-2 flex items-start gap-3 rounded-2xl px-4 py-3.5 cursor-pointer transition-opacity active:opacity-70"
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => m.id && router.push(`/review?id=${m.id}`)}
+                        onKeyDown={(e) => e.key === 'Enter' && m.id && router.push(`/review?id=${m.id}`)}
                         style={{
                           backgroundColor: 'var(--color-surface)',
                           border: '1px solid var(--color-border)',
@@ -471,28 +475,19 @@ export default function ProfilePage() {
                             Nível {m.level}
                           </p>
                         </div>
-                        <button
-                          type="button"
-                          disabled={removingMistakeId === m.id}
-                          onClick={() => m.id && handleRemoveMistake(m.id)}
-                          aria-label="Marcar como revisado"
-                          className="shrink-0 flex h-7 w-7 items-center justify-center rounded-full transition-all active:scale-90 disabled:opacity-50"
-                          style={{
-                            backgroundColor: 'var(--color-surface-raised)',
-                            color: 'var(--color-text-muted)',
-                          }}
-                        >
-                          {removingMistakeId === m.id
-                            ? <Loader2 size={13} className="animate-spin" />
-                            : <Check size={13} strokeWidth={2.5} />}
-                        </button>
+                        <div className="shrink-0 flex items-center gap-1">
+                          <span className="text-xs font-medium" style={{ color: 'var(--color-primary)' }}>
+                            Revisar
+                          </span>
+                          <ChevronRight size={14} style={{ color: 'var(--color-primary)' }} />
+                        </div>
                       </div>
                     ))}
                   </div>
                 );
               })}
               <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
-                Os erros são removidos automaticamente após você acertar os exercícios de revisão durante as lições.
+                Toque em um erro para iniciar uma revisão de 5 exercícios. Ao acertar 100%, o erro é removido automaticamente.
               </p>
             </div>
           )}

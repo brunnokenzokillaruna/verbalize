@@ -352,6 +352,12 @@ export async function deleteLessonMistake(docId: string): Promise<void> {
   await deleteDoc(doc(db, 'lesson_mistakes', docId));
 }
 
+export async function getMistakeById(docId: string): Promise<LessonMistakeDocument | null> {
+  const snap = await getDoc(doc(db, 'lesson_mistakes', docId));
+  if (!snap.exists()) return null;
+  return { id: snap.id, ...snap.data() } as LessonMistakeDocument;
+}
+
 /**
  * Returns all pending mistakes for a user, optionally filtered by language.
  */
