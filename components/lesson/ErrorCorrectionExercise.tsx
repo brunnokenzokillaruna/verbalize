@@ -133,7 +133,7 @@ export function ErrorCorrectionExercise({ data, onAnswer, answered }: ErrorCorre
           style={{ backgroundColor: 'var(--color-success-bg)', color: 'var(--color-success)' }}
         >
           Também correto! No diálogo foi usado{' '}
-          <span className="font-semibold">"{data.correct_word}"</span>.
+          <span className="font-semibold">&ldquo;{data.correct_word}&rdquo;</span>.
         </div>
       )}
 
