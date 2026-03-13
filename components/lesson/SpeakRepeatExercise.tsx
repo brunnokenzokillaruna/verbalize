@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Mic, MicOff, CheckCircle, XCircle, SkipForward } from 'lucide-react';
+import { Mic, MicOff, CheckCircle, XCircle, SkipForward, RefreshCw } from 'lucide-react';
 import { AudioPlayerButton } from './AudioPlayerButton';
 import type { SpeakRepeatData, SupportedLanguage } from '@/types';
 
@@ -29,6 +29,8 @@ function similarity(target: string, transcript: string): number {
   return matches / Math.max(tWords.length, 1);
 }
 
+type Phase = 'idle' | 'recording' | 'review' | 'answered';
+
 export function SpeakRepeatExercise({
   data,
   language,
@@ -36,7 +38,7 @@ export function SpeakRepeatExercise({
   answered,
 }: SpeakRepeatExerciseProps) {
   const [hasSpeechAPI, setHasSpeechAPI] = useState(false);
-  const [recording, setRecording] = useState(false);
+  const [phase, setPhase] = useState<Phase>(answered ? 'answered' : 'idle');
   const [transcript, setTranscript] = useState('');
   const [recordError, setRecordError] = useState('');
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -48,11 +50,18 @@ export function SpeakRepeatExercise({
     setHasSpeechAPI(!!(w.SpeechRecognition || w.webkitSpeechRecognition));
   }, []);
 
+  useEffect(() => {
+    if (answered) setPhase('answered');
+  }, [answered]);
+
   const langCode = language === 'fr' ? 'fr-FR' : 'en-US';
+  const isCorrect = transcript ? similarity(data.text, transcript) >= 0.85 : null;
 
   function startRecording() {
-    if (recording || answered) return;
+    if (phase === 'recording' || phase === 'answered') return;
     setRecordError('');
+    setTranscript('');
+    setPhase('recording');
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const w = window as any;
@@ -69,11 +78,11 @@ export function SpeakRepeatExercise({
         resultReceived = true;
         const result: string = e.results[0][0].transcript;
         setTranscript(result);
-        onAnswer(similarity(data.text, result) >= 0.85);
+        setPhase('review');
       };
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       rec.onerror = (e: any) => {
-        setRecording(false);
+        setPhase('idle');
         if (e.error === 'not-allowed') {
           setRecordError('Permissão de microfone negada.');
         } else if (e.error === 'network') {
@@ -83,20 +92,27 @@ export function SpeakRepeatExercise({
         }
       };
       rec.onend = () => {
-        setRecording(false);
         if (!resultReceived) {
+          setPhase('idle');
           setRecordError('Nenhuma fala detectada. Tente novamente.');
         }
       };
       recogRef.current = rec;
       rec.start();
-      setRecording(true);
     } catch {
+      setPhase('idle');
       setRecordError('Gravação não disponível neste navegador.');
     }
   }
 
-  const isCorrect = transcript ? similarity(data.text, transcript) >= 0.85 : null;
+  function handleSelfAssess(correct: boolean) {
+    setPhase('answered');
+    onAnswer(correct);
+  }
+
+  // Show self-assess when: no Speech API, or after a record error, or in review phase
+  const showSelfAssess =
+    phase === 'review' || (phase === 'idle' && (!hasSpeechAPI || !!recordError));
 
   return (
     <div className="flex flex-col gap-5">
@@ -117,24 +133,24 @@ export function SpeakRepeatExercise({
         </p>
       </div>
 
-      {/* Audio + optional Record button */}
+      {/* Audio + Record button */}
       <div className="flex flex-wrap items-center gap-3">
         <AudioPlayerButton text={data.text} language={language} size="sm" />
 
-        {!answered && hasSpeechAPI && !recordError && (
+        {phase !== 'answered' && hasSpeechAPI && !recordError && (
           <button
             type="button"
             onClick={startRecording}
-            disabled={recording}
+            disabled={phase === 'recording'}
             className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all active:scale-95 disabled:opacity-60"
             style={{
-              backgroundColor: recording ? 'var(--color-error-bg)' : 'var(--color-primary)',
-              color: recording ? 'var(--color-error)' : 'var(--color-text-inverse)',
-              border: recording ? '1px solid var(--color-error)' : 'none',
+              backgroundColor: phase === 'recording' ? 'var(--color-error-bg)' : 'var(--color-primary)',
+              color: phase === 'recording' ? 'var(--color-error)' : 'var(--color-text-inverse)',
+              border: phase === 'recording' ? '1px solid var(--color-error)' : 'none',
             }}
           >
-            {recording ? <MicOff size={15} /> : <Mic size={15} />}
-            {recording ? 'Gravando…' : 'Gravar'}
+            {phase === 'recording' ? <MicOff size={15} /> : <Mic size={15} />}
+            {phase === 'recording' ? 'Gravando…' : 'Gravar'}
           </button>
         )}
       </div>
@@ -149,8 +165,40 @@ export function SpeakRepeatExercise({
         </p>
       )}
 
-      {/* Primary self-assess — always visible while unanswered */}
-      {!answered && (
+      {/* Review phase: transcript + re-record */}
+      {phase === 'review' && transcript && (
+        <div className="flex flex-col gap-3">
+          <div
+            className="flex items-start gap-3 rounded-2xl p-4"
+            style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
+          >
+            {isCorrect
+              ? <CheckCircle size={18} className="shrink-0 mt-0.5" style={{ color: 'var(--color-success)' }} />
+              : <XCircle size={18} className="shrink-0 mt-0.5" style={{ color: 'var(--color-error)' }} />}
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-medium mb-0.5" style={{ color: 'var(--color-text-muted)' }}>Você disse:</p>
+              <p className="text-sm" style={{ color: 'var(--color-text-primary)' }}>{transcript}</p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={startRecording}
+            className="flex items-center gap-2 self-start rounded-xl px-4 py-2.5 text-sm font-semibold transition-all active:scale-95"
+            style={{
+              backgroundColor: 'var(--color-surface-raised)',
+              color: 'var(--color-text-secondary)',
+              border: '1px solid var(--color-border)',
+            }}
+          >
+            <RefreshCw size={14} />
+            Gravar novamente
+          </button>
+        </div>
+      )}
+
+      {/* Self-assess */}
+      {showSelfAssess && (
         <div
           className="flex flex-col gap-3 rounded-2xl p-4"
           style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
@@ -161,7 +209,7 @@ export function SpeakRepeatExercise({
           <div className="flex gap-3">
             <button
               type="button"
-              onClick={() => onAnswer(true)}
+              onClick={() => handleSelfAssess(true)}
               className="flex-1 rounded-xl py-2.5 text-sm font-semibold transition-all active:scale-95"
               style={{ backgroundColor: 'var(--color-success-bg)', color: 'var(--color-success)', border: '1px solid var(--color-success)' }}
             >
@@ -169,7 +217,7 @@ export function SpeakRepeatExercise({
             </button>
             <button
               type="button"
-              onClick={() => onAnswer(false)}
+              onClick={() => handleSelfAssess(false)}
               className="flex-1 rounded-xl py-2.5 text-sm font-semibold transition-all active:scale-95"
               style={{ backgroundColor: 'var(--color-error-bg)', color: 'var(--color-error)', border: '1px solid var(--color-error)' }}
             >
@@ -177,7 +225,7 @@ export function SpeakRepeatExercise({
             </button>
             <button
               type="button"
-              onClick={() => onAnswer(true)}
+              onClick={() => handleSelfAssess(true)}
               className="flex items-center gap-1.5 rounded-xl px-3 py-2.5 text-sm font-medium transition-all active:scale-95"
               style={{ backgroundColor: 'var(--color-surface-raised)', color: 'var(--color-text-muted)', border: '1px solid var(--color-border)' }}
             >
@@ -188,8 +236,8 @@ export function SpeakRepeatExercise({
         </div>
       )}
 
-      {/* Transcript result (when Speech API was used) */}
-      {answered && transcript && (
+      {/* Answered state: show final transcript if available */}
+      {phase === 'answered' && transcript && (
         <div
           className="flex items-start gap-3 rounded-2xl p-4"
           style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
