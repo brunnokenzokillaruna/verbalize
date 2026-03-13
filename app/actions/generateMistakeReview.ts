@@ -99,6 +99,7 @@ Exercise 2 — type "error-correction":
 - "correct_word" is the ideal correct replacement
 - "acceptable_answers" is an array of OTHER words that are also grammatically correct in that slot and demonstrate the same grammar concept. If no valid alternatives exist, use an empty array.
 - "explanation" is a brief explanation in Brazilian Portuguese of why the error is wrong and what the correct form should be
+- CRITICAL: "error_word" must appear EXACTLY ONCE in "sentence_with_error". Write the sentence so the error word does not repeat elsewhere. The sentence must be grammatically clean except for that single deliberate error.
 
 Exercise 3 — type "reverse-translation":
 - "portuguese_sentence" MUST be written ENTIRELY in Brazilian Portuguese — do NOT include any ${LANG_LABEL[language]} words. Express the meaning using only Portuguese words (e.g., use "Há" instead of "Il y a", "Existe" instead of "There is", etc.)

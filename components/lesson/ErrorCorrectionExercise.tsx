@@ -37,8 +37,10 @@ export function ErrorCorrectionExercise({ data, onAnswer, answered }: ErrorCorre
     onAnswer(status === 'correct');
   }
 
-  // Split sentence around the error word to highlight it
-  const parts = data.sentence_with_error.split(data.error_word);
+  // Split only on the FIRST occurrence of the error word to avoid highlighting duplicates
+  const firstIdx = data.sentence_with_error.indexOf(data.error_word);
+  const before = firstIdx >= 0 ? data.sentence_with_error.slice(0, firstIdx) : data.sentence_with_error;
+  const after = firstIdx >= 0 ? data.sentence_with_error.slice(firstIdx + data.error_word.length) : '';
 
   return (
     <div className="flex flex-col gap-5">
@@ -59,7 +61,7 @@ export function ErrorCorrectionExercise({ data, onAnswer, answered }: ErrorCorre
           className="font-display text-xl leading-relaxed"
           style={{ color: 'var(--color-text-primary)' }}
         >
-          {parts[0]}
+          {before}
           <span
             className="rounded px-1 font-bold"
             style={{
@@ -79,7 +81,7 @@ export function ErrorCorrectionExercise({ data, onAnswer, answered }: ErrorCorre
           >
             {data.error_word}
           </span>
-          {parts.slice(1).join(data.error_word)}
+          {after}
         </p>
       </div>
 
