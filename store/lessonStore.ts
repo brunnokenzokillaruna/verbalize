@@ -121,7 +121,10 @@ export const useLessonStore = create<LessonState>((set, get) => ({
   setPhase: (phase) => set({ phase }),
   setIsLoading: (isLoading) => set({ isLoading }),
 
-  setHook: (hook) => set({ hook, isLoading: false }),
+  setHook: (hook) => set({
+    hook: { ...hook, newVocabulary: [...new Set(hook.newVocabulary)] },
+    isLoading: false,
+  }),
 
   setGrammarBridge: (grammarBridge) => set({ grammarBridge, isLoading: false }),
 

@@ -917,7 +917,7 @@ export default function LessonPage() {
               </div>
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {store.hook.newVocabulary.map((word) => {
+              {[...new Set(store.hook.newVocabulary)].map((word) => {
                 const img = store.vocabImages[word];
                 const translation = store.vocabTranslations[word] ?? word;
                 return (
