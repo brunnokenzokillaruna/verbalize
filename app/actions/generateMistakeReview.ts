@@ -100,6 +100,10 @@ Exercise 2 — type "error-correction":
 - "acceptable_answers" is an array of OTHER words that are also grammatically correct in that slot and demonstrate the same grammar concept. If no valid alternatives exist, use an empty array.
 - "explanation" is a brief explanation in Brazilian Portuguese of why the error is wrong and what the correct form should be
 - CRITICAL: "error_word" must appear EXACTLY ONCE in "sentence_with_error". Write the sentence so the error word does not repeat elsewhere. The sentence must be grammatically clean except for that single deliberate error.
+- CRITICAL: The sentence_with_error must be OBJECTIVELY AND UNAMBIGUOUSLY WRONG. A native speaker would immediately recognize the error. NEVER create trick sentences where the "error" is actually grammatically valid.
+- SELF-CHECK before outputting: ask yourself "Is this sentence clearly wrong? Would every native speaker agree it contains an error?" If there is any doubt, choose a different, clearer error.
+- GOOD error types (clear and unambiguous): wrong verb conjugation, wrong gender agreement, wrong subject pronoun, missing negation particle, wrong required preposition.
+- BAD error types (AVOID — too ambiguous): swapping determiners that could both be valid, word-order variations acceptable in informal speech, register differences.
 
 Exercise 3 — type "reverse-translation":
 - "portuguese_sentence" MUST be written ENTIRELY in Brazilian Portuguese — do NOT include any ${LANG_LABEL[language]} words. Express the meaning using only Portuguese words (e.g., use "Há" instead of "Il y a", "Existe" instead of "There is", etc.)
@@ -146,7 +150,19 @@ Output format (exactly this structure, ${isFive ? 5 : 3} items):
       return null;
     }
 
-    return exercises.slice(0, isFive ? 5 : 3);
+    // Structural validation: drop error-correction exercises where
+    // error_word is absent from the sentence or equals correct_word
+    const validated = exercises.filter((ex) => {
+      if (ex.type !== 'error-correction') return true;
+      const { sentence_with_error, error_word, correct_word } = ex.data as {
+        sentence_with_error: string; error_word: string; correct_word: string;
+      };
+      const ok = sentence_with_error?.includes(error_word) && error_word !== correct_word;
+      if (!ok) console.warn('[generateMistakeReview] Dropped malformed error-correction exercise');
+      return ok;
+    });
+
+    return validated.slice(0, isFive ? 5 : 3);
   } catch (err) {
     console.error('[generateMistakeReview] Error:', err);
     return null;

@@ -67,6 +67,10 @@ Exercise 2 — type "error-correction":
 - "acceptable_answers" is an array of OTHER words that are also grammatically correct in that slot and would demonstrate the same grammar concept (e.g. if the slot takes a demonstrative determiner, list all valid ones like ["ce", "cet", "cette", "ces"] minus the one already in correct_word). If no valid alternatives exist, use an empty array.
 - "explanation" is a brief explanation in Brazilian Portuguese of why the error is wrong and what the correct form should be
 - CRITICAL: "error_word" must appear EXACTLY ONCE in "sentence_with_error". Write the sentence so the error word does not repeat elsewhere. The sentence must be grammatically clean except for that single deliberate error.
+- CRITICAL: The sentence_with_error must be OBJECTIVELY AND UNAMBIGUOUSLY WRONG. A native speaker would immediately recognize the error. NEVER create trick sentences where the "error" is actually grammatically valid.
+- SELF-CHECK before outputting: ask yourself "Is this sentence clearly wrong? Would every native speaker agree it contains an error?" If there is any doubt, choose a different, clearer error.
+- GOOD error types (clear and unambiguous): wrong verb conjugation ("ils mange" → "mangent"), wrong gender agreement ("un belle maison" → "une belle"), wrong subject pronoun, missing negation particle ("je pas mange" → "ne…pas"), wrong preposition required by a specific verb.
+- BAD error types (AVOID — too ambiguous): swapping determiners that could both be valid (le/ce/mon/son), word-order variations acceptable in informal speech, register differences.
 
 Exercise 3 — type "reverse-translation":
 - "portuguese_sentence" is a natural Brazilian Portuguese sentence related to the dialogue theme
@@ -173,7 +177,20 @@ Output format (exactly this structure, 8 items):
       return null;
     }
 
-    return exercises;
+    // Structural validation: remove error-correction exercises where
+    // error_word is absent from the sentence or equals correct_word
+    // (catches obvious Gemini mistakes before they reach the user)
+    const validated = exercises.filter((ex) => {
+      if (ex.type !== 'error-correction') return true;
+      const { sentence_with_error, error_word, correct_word } = ex.data as {
+        sentence_with_error: string; error_word: string; correct_word: string;
+      };
+      const ok = sentence_with_error?.includes(error_word) && error_word !== correct_word;
+      if (!ok) console.warn('[generatePracticeExercises] Dropped malformed error-correction exercise');
+      return ok;
+    });
+
+    return validated;
   } catch (err) {
     console.error('[generatePracticeExercises] Error:', err);
     return null;
