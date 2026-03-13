@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Mic, MicOff, CheckCircle, XCircle, SkipForward, RefreshCw } from 'lucide-react';
+import { Mic, MicOff, CheckCircle, XCircle, SkipForward, RefreshCw, Send } from 'lucide-react';
 import { AudioPlayerButton } from './AudioPlayerButton';
 import type { SpeakRepeatData, SupportedLanguage } from '@/types';
 
@@ -105,14 +105,10 @@ export function SpeakRepeatExercise({
     }
   }
 
-  function handleSelfAssess(correct: boolean) {
+  function submit(correct: boolean) {
     setPhase('answered');
     onAnswer(correct);
   }
-
-  // Show self-assess when: no Speech API, or after a record error, or in review phase
-  const showSelfAssess =
-    phase === 'review' || (phase === 'idle' && (!hasSpeechAPI || !!recordError));
 
   return (
     <div className="flex flex-col gap-5">
@@ -133,11 +129,11 @@ export function SpeakRepeatExercise({
         </p>
       </div>
 
-      {/* Audio + Record button */}
+      {/* Audio row — Record button only shown in idle/recording phases */}
       <div className="flex flex-wrap items-center gap-3">
         <AudioPlayerButton text={data.text} language={language} size="sm" />
 
-        {phase !== 'answered' && hasSpeechAPI && !recordError && (
+        {(phase === 'idle' || phase === 'recording') && hasSpeechAPI && !recordError && (
           <button
             type="button"
             onClick={startRecording}
@@ -165,9 +161,10 @@ export function SpeakRepeatExercise({
         </p>
       )}
 
-      {/* Review phase: transcript + re-record */}
-      {phase === 'review' && transcript && (
+      {/* Review phase: transcript + 3 action buttons */}
+      {phase === 'review' && (
         <div className="flex flex-col gap-3">
+          {/* Transcript */}
           <div
             className="flex items-start gap-3 rounded-2xl p-4"
             style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
@@ -181,53 +178,44 @@ export function SpeakRepeatExercise({
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={startRecording}
-            className="flex items-center gap-2 self-start rounded-xl px-4 py-2.5 text-sm font-semibold transition-all active:scale-95"
-            style={{
-              backgroundColor: 'var(--color-surface-raised)',
-              color: 'var(--color-text-secondary)',
-              border: '1px solid var(--color-border)',
-            }}
-          >
-            <RefreshCw size={14} />
-            Gravar novamente
-          </button>
-        </div>
-      )}
-
-      {/* Self-assess */}
-      {showSelfAssess && (
-        <div
-          className="flex flex-col gap-3 rounded-2xl p-4"
-          style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
-        >
-          <p className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>
-            Você conseguiu repetir corretamente?
-          </p>
+          {/* 3 action buttons */}
           <div className="flex gap-3">
             <button
               type="button"
-              onClick={() => handleSelfAssess(true)}
-              className="flex-1 rounded-xl py-2.5 text-sm font-semibold transition-all active:scale-95"
-              style={{ backgroundColor: 'var(--color-success-bg)', color: 'var(--color-success)', border: '1px solid var(--color-success)' }}
+              onClick={startRecording}
+              className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all active:scale-95"
+              style={{
+                backgroundColor: 'var(--color-surface-raised)',
+                color: 'var(--color-text-secondary)',
+                border: '1px solid var(--color-border)',
+              }}
             >
-              Sim ✓
+              <RefreshCw size={14} />
+              Gravar novamente
             </button>
+
             <button
               type="button"
-              onClick={() => handleSelfAssess(false)}
-              className="flex-1 rounded-xl py-2.5 text-sm font-semibold transition-all active:scale-95"
-              style={{ backgroundColor: 'var(--color-error-bg)', color: 'var(--color-error)', border: '1px solid var(--color-error)' }}
+              onClick={() => submit(true)}
+              className="flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold transition-all active:scale-95"
+              style={{
+                backgroundColor: 'var(--color-primary)',
+                color: 'var(--color-text-inverse)',
+              }}
             >
-              Não ✗
+              <Send size={14} />
+              Enviar
             </button>
+
             <button
               type="button"
-              onClick={() => handleSelfAssess(true)}
+              onClick={() => submit(true)}
               className="flex items-center gap-1.5 rounded-xl px-3 py-2.5 text-sm font-medium transition-all active:scale-95"
-              style={{ backgroundColor: 'var(--color-surface-raised)', color: 'var(--color-text-muted)', border: '1px solid var(--color-border)' }}
+              style={{
+                backgroundColor: 'var(--color-surface-raised)',
+                color: 'var(--color-text-muted)',
+                border: '1px solid var(--color-border)',
+              }}
             >
               <SkipForward size={13} />
               Pular
@@ -236,7 +224,39 @@ export function SpeakRepeatExercise({
         </div>
       )}
 
-      {/* Answered state: show final transcript if available */}
+      {/* No Speech API or after error: just Enviar + Pular */}
+      {phase === 'idle' && (!hasSpeechAPI || !!recordError) && (
+        <div className="flex gap-3">
+          <button
+            type="button"
+            onClick={() => submit(true)}
+            className="flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold transition-all active:scale-95"
+            style={{
+              backgroundColor: 'var(--color-primary)',
+              color: 'var(--color-text-inverse)',
+            }}
+          >
+            <Send size={14} />
+            Enviar
+          </button>
+
+          <button
+            type="button"
+            onClick={() => submit(true)}
+            className="flex items-center gap-1.5 rounded-xl px-3 py-2.5 text-sm font-medium transition-all active:scale-95"
+            style={{
+              backgroundColor: 'var(--color-surface-raised)',
+              color: 'var(--color-text-muted)',
+              border: '1px solid var(--color-border)',
+            }}
+          >
+            <SkipForward size={13} />
+            Pular
+          </button>
+        </div>
+      )}
+
+      {/* Answered state: show final transcript */}
       {phase === 'answered' && transcript && (
         <div
           className="flex items-start gap-3 rounded-2xl p-4"
