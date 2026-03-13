@@ -203,6 +203,7 @@ export interface ErrorCorrectionData {
   error_word: string;
   correct_word: string;
   explanation: string; // in Portuguese
+  acceptable_answers?: string[]; // other grammatically valid alternatives
 }
 
 export interface ConjugationDrillData {

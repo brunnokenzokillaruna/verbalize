@@ -63,8 +63,9 @@ Exercise 2 — type "error-correction":
 - Write a ${LANG_LABEL[language]} sentence inspired by the dialogue but containing ONE deliberate grammatical or vocabulary error
 - "sentence_with_error" is the full sentence as written (with the error)
 - "error_word" is the incorrect word or short phrase
-- "correct_word" is the correct replacement
-- "explanation" is a brief explanation in Brazilian Portuguese of why it is wrong
+- "correct_word" is the ideal correct replacement (the word that best fits the intended meaning)
+- "acceptable_answers" is an array of OTHER words that are also grammatically correct in that slot and would demonstrate the same grammar concept (e.g. if the slot takes a demonstrative determiner, list all valid ones like ["ce", "cet", "cette", "ces"] minus the one already in correct_word). If no valid alternatives exist, use an empty array.
+- "explanation" is a brief explanation in Brazilian Portuguese of why the error is wrong and what the correct form should be
 
 Exercise 3 — type "reverse-translation":
 - "portuguese_sentence" is a natural Brazilian Portuguese sentence related to the dialogue theme
@@ -107,6 +108,7 @@ Output format (exactly this structure, 8 items):
       "sentence_with_error": "sentence with one error",
       "error_word": "wrong word",
       "correct_word": "correct word",
+      "acceptable_answers": ["other_valid_word1", "other_valid_word2"],
       "explanation": "Explicação em português"
     }
   },
@@ -148,6 +150,7 @@ Output format (exactly this structure, 8 items):
       "sentence_with_error": "different sentence with one error",
       "error_word": "wrong word",
       "correct_word": "correct word",
+      "acceptable_answers": ["other_valid_word1", "other_valid_word2"],
       "explanation": "Explicação em português"
     }
   },

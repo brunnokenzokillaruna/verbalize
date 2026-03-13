@@ -19,8 +19,16 @@ export function ErrorCorrectionExercise({ data, onAnswer, answered }: ErrorCorre
   const normalize = (s: string) =>
     s.toLowerCase().replace(/[.,!?;:'"-]/g, '').replace(/\s+/g, ' ').trim();
 
-  const isCorrect = normalize(input) === normalize(data.correct_word);
-  const isAccentWarning = !isCorrect && isAccentOnlyDiff(input, data.correct_word);
+  const normalizedInput = normalize(input);
+  const isExactCorrect = normalizedInput === normalize(data.correct_word);
+  const isAlternativeCorrect =
+    !isExactCorrect &&
+    (data.acceptable_answers ?? []).some((alt) => normalize(alt) === normalizedInput);
+  const isCorrect = isExactCorrect || isAlternativeCorrect;
+  const isAccentWarning =
+    !isCorrect &&
+    (isAccentOnlyDiff(input, data.correct_word) ||
+      (data.acceptable_answers ?? []).some((alt) => isAccentOnlyDiff(input, alt)));
 
   function handleSubmit() {
     if (answered) return;
@@ -115,6 +123,17 @@ export function ErrorCorrectionExercise({ data, onAnswer, answered }: ErrorCorre
         >
           Quase! Verifique os acentos:{' '}
           <span className="font-semibold">{data.correct_word}</span>
+        </div>
+      )}
+
+      {/* Alternative-correct note */}
+      {answered && isAlternativeCorrect && (
+        <div
+          className="rounded-xl px-4 py-3 text-sm"
+          style={{ backgroundColor: 'var(--color-success-bg)', color: 'var(--color-success)' }}
+        >
+          Também correto! No diálogo foi usado{' '}
+          <span className="font-semibold">"{data.correct_word}"</span>.
         </div>
       )}
 

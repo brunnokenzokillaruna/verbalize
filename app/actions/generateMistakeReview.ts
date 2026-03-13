@@ -96,8 +96,9 @@ Exercise 2 — type "error-correction":
 - Write a ${LANG_LABEL[language]} sentence that contains ONE deliberate error related to this grammar point
 - "sentence_with_error" is the full sentence (with the error)
 - "error_word" is the incorrect word or short phrase
-- "correct_word" is the correct replacement
-- "explanation" is a brief explanation in Brazilian Portuguese of why it is wrong
+- "correct_word" is the ideal correct replacement
+- "acceptable_answers" is an array of OTHER words that are also grammatically correct in that slot and demonstrate the same grammar concept. If no valid alternatives exist, use an empty array.
+- "explanation" is a brief explanation in Brazilian Portuguese of why the error is wrong and what the correct form should be
 
 Exercise 3 — type "reverse-translation":
 - "portuguese_sentence" MUST be written ENTIRELY in Brazilian Portuguese — do NOT include any ${LANG_LABEL[language]} words. Express the meaning using only Portuguese words (e.g., use "Há" instead of "Il y a", "Existe" instead of "There is", etc.)
@@ -122,6 +123,7 @@ Output format (exactly this structure, ${isFive ? 5 : 3} items):
       "sentence_with_error": "sentence with one error",
       "error_word": "wrong word",
       "correct_word": "correct word",
+      "acceptable_answers": ["other_valid_word1"],
       "explanation": "Explicação em português"
     }
   },
