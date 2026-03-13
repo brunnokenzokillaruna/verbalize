@@ -167,8 +167,9 @@ Requirements:
 - Naturally uses this grammar: ${grammarFocus}
 - Exactly ${lineCount} lines total, alternating speakers
 - Every line MUST begin with the speaker name and a colon
+- CRITICAL COHERENCE: Before writing anything, mentally choose ONE tight, specific scenario within the topic (e.g. "planning a weekend hike", "choosing a dish at a restaurant"). ALL dialogue lines AND ALL vocabulary words must stay within that single scenario from start to finish. Do NOT switch sub-topics mid-dialogue.
 - CRITICAL: This must be a REAL conversation. Each line must directly react to what the previous speaker said (ask a question, answer it, agree, disagree, express surprise, follow up, etc.). The dialogue must have a clear narrative arc — a beginning, a middle exchange, and a natural conclusion. Do NOT write isolated sentences that happen to share a topic. Each speaker must address the other person, not just state facts independently.
-- BAD example (NEVER do this — isolated sentences, not a conversation): A: "I eat pasta." B: "I also eat soup." A: "The restaurant is good." B: "I like food."
+- BAD example (NEVER do this — topic switches mid-dialogue): A: "Tu aimes ce dessin ?" B: "Non, je ne regarde pas ce dessin." A: "Tu préfères le nouveau projet ?" B: "Oui, je dessine un beau projet." — this is broken because it jumps from 'dessin' to 'projet' with no logical connection.
 - The CONVERSATION EXAMPLE inside the LEVEL CONSTRAINTS below shows exactly the style and register you must follow.
 
 LEVEL CONSTRAINTS (follow these strictly):
@@ -215,7 +216,7 @@ Output ONLY this JSON object (no extra text):
 
 Rules:
 - dialogue must have exactly ${lineCount} lines
-- newVocabulary: first word is a verb (infinitive), then 4 nouns; all 5 must appear in the dialogue
+- newVocabulary: first word is a verb (infinitive), then 4 nouns; all 5 must appear in the dialogue AND must all belong to the same semantic theme so the conversation stays coherent on ONE topic
 - verbWord must equal newVocabulary[0]
 - dialogueTranslations: ${lineCount} strings, no speaker prefix, natural Brazilian Portuguese
 - imageKeywords keys must match the actual vocabulary words in newVocabulary
@@ -261,6 +262,7 @@ Requirements:
 - Naturally uses this grammar: ${grammarFocus}
 - Exactly ${lineCount} lines total, alternating speakers
 - Every line MUST begin with the speaker name and a colon
+- CRITICAL COHERENCE: Before writing, mentally choose ONE tight, specific scenario within the topic. ALL dialogue lines AND ALL vocabulary words must stay within that single scenario. Do NOT switch sub-topics mid-dialogue.
 - CRITICAL: This must be a REAL conversation. Each line must directly react to what the previous speaker said. Do NOT write isolated sentences — each speaker must address the other person. Follow the CONVERSATION EXAMPLE in the LEVEL CONSTRAINTS below.
 
 LEVEL CONSTRAINTS (follow these strictly):
@@ -275,7 +277,7 @@ Output this JSON (dialogue must have exactly ${lineCount} lines):
   "grammarFocus": "one sentence describing the grammar used"
 }
 
-Rules for newVocabulary: first word is a verb in infinitive form, then 4 nouns; all must appear in the dialogue.
+Rules for newVocabulary: first word is a verb in infinitive form, then 4 nouns; all must appear in the dialogue AND all 5 must belong to the same semantic theme as the conversation.
 Rules for dialogueTranslations: ${lineCount} natural Brazilian Portuguese translations, no speaker prefix.`;
 
   try {
