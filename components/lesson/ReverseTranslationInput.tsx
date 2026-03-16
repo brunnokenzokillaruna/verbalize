@@ -69,6 +69,10 @@ export function ReverseTranslationInput({ data, onAnswer, answered }: ReverseTra
         onChange={(e) => setInput(e.target.value)}
         disabled={answered}
         placeholder="Digite sua tradução aqui..."
+        autoComplete="off"
+        autoCorrect="off"
+        autoCapitalize="none"
+        spellCheck={false}
         className="w-full resize-none rounded-2xl px-4 py-3 text-base outline-none transition-all"
         style={{
           backgroundColor: 'var(--color-surface)',

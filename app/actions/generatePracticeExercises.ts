@@ -177,17 +177,31 @@ Output format (exactly this structure, 8 items):
       return null;
     }
 
-    // Structural validation: remove error-correction exercises where
-    // error_word is absent from the sentence or equals correct_word
-    // (catches obvious Gemini mistakes before they reach the user)
+    // Normalize dialogue for verbatim-check comparisons
+    const dialogueNorm = dialogue.toLowerCase().replace(/[.,!?;:'"«»]/g, '').replace(/\s+/g, ' ');
+
+    // Structural validation: drop exercises that are clearly malformed
     const validated = exercises.filter((ex) => {
-      if (ex.type !== 'error-correction') return true;
-      const { sentence_with_error, error_word, correct_word } = ex.data as {
-        sentence_with_error: string; error_word: string; correct_word: string;
-      };
-      const ok = sentence_with_error?.includes(error_word) && error_word !== correct_word;
-      if (!ok) console.warn('[generatePracticeExercises] Dropped malformed error-correction exercise');
-      return ok;
+      if (ex.type === 'error-correction') {
+        const { sentence_with_error, error_word, correct_word } = ex.data as {
+          sentence_with_error: string; error_word: string; correct_word: string;
+        };
+        const ok = sentence_with_error?.includes(error_word) && error_word !== correct_word;
+        if (!ok) console.warn('[generatePracticeExercises] Dropped malformed error-correction exercise');
+        return ok;
+      }
+      if (ex.type === 'audio-dictation' || ex.type === 'speak-repeat') {
+        const text = (ex.data as { text: string }).text?.trim();
+        if (!text) {
+          console.warn(`[generatePracticeExercises] Dropped ${ex.type} with empty text`);
+          return false;
+        }
+        const textNorm = text.toLowerCase().replace(/[.,!?;:'"«»]/g, '').replace(/\s+/g, ' ').trim();
+        const ok = dialogueNorm.includes(textNorm);
+        if (!ok) console.warn(`[generatePracticeExercises] Dropped ${ex.type} whose text is not verbatim from dialogue: "${text}"`);
+        return ok;
+      }
+      return true;
     });
 
     return validated;
