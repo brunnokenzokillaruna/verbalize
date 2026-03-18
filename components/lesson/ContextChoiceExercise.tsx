@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { ContextChoiceData } from '@/types';
 
 interface ContextChoiceExerciseProps {
@@ -13,6 +13,16 @@ interface ContextChoiceExerciseProps {
 
 export function ContextChoiceExercise({ data, onAnswer, answered }: ContextChoiceExerciseProps) {
   const [choice, setChoice] = useState<string | null>(null);
+
+  // Shuffle options once on mount so the correct answer isn't always top-left
+  const shuffledOptions = useMemo(() => {
+    const opts = [...data.options];
+    for (let i = opts.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [opts[i], opts[j]] = [opts[j], opts[i]];
+    }
+    return opts;
+  }, [data.options]);
 
   function handleSelect(option: string) {
     if (answered || choice !== null) return;
@@ -49,7 +59,7 @@ export function ContextChoiceExercise({ data, onAnswer, answered }: ContextChoic
 
       {/* Option pills */}
       <div className="grid grid-cols-2 gap-3">
-        {data.options.map((option) => {
+        {shuffledOptions.map((option) => {
           const isChosen = choice === option;
           const isCorrect = option === data.blankWord;
 

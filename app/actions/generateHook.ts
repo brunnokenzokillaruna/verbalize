@@ -217,6 +217,7 @@ Output ONLY this JSON object (no extra text):
 Rules:
 - dialogue must have exactly ${lineCount} lines
 - newVocabulary: first word is a verb (infinitive), then 4 nouns; all 5 must appear in the dialogue AND must all belong to the same semantic theme so the conversation stays coherent on ONE topic
+- NEVER include proper nouns (person names, place names, brand names) in newVocabulary — only common nouns and verbs
 - verbWord must equal newVocabulary[0]
 - dialogueTranslations: ${lineCount} strings, no speaker prefix, natural Brazilian Portuguese
 - imageKeywords keys must match the actual vocabulary words in newVocabulary
@@ -246,6 +247,11 @@ Rules:
           ];
         }
       }
+
+      // Strip proper nouns (words starting with an uppercase letter) from newVocabulary
+      result.newVocabulary = result.newVocabulary.filter(
+        (w) => w.length > 0 && w[0] === w[0].toLowerCase(),
+      );
 
       return result;
     }
@@ -277,7 +283,7 @@ Output this JSON (dialogue must have exactly ${lineCount} lines):
   "grammarFocus": "one sentence describing the grammar used"
 }
 
-Rules for newVocabulary: first word is a verb in infinitive form, then 4 nouns; all must appear in the dialogue AND all 5 must belong to the same semantic theme as the conversation.
+Rules for newVocabulary: first word is a verb in infinitive form, then 4 nouns; all must appear in the dialogue AND all 5 must belong to the same semantic theme as the conversation. NEVER include proper nouns (person names, place names) — only common nouns and verbs.
 Rules for dialogueTranslations: ${lineCount} natural Brazilian Portuguese translations, no speaker prefix.`;
 
   try {
@@ -297,6 +303,11 @@ Rules for dialogueTranslations: ${lineCount} natural Brazilian Portuguese transl
         ];
       }
     }
+
+    // Strip proper nouns from newVocabulary
+    fallback.newVocabulary = (fallback.newVocabulary ?? []).filter(
+      (w) => w.length > 0 && w[0] === w[0].toLowerCase(),
+    );
 
     return fallback;
   } catch (err) {
