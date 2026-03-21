@@ -976,6 +976,7 @@ export default function LessonPage() {
             {currentExercise.type === 'reverse-translation' && (
               <ReverseTranslationInput
                 data={currentExercise.data}
+                language={store.lesson.language}
                 onAnswer={handleAnswer}
                 answered={exerciseAnswer !== null}
               />
@@ -1067,6 +1068,7 @@ export default function LessonPage() {
             {currentReviewExercise.type === 'reverse-translation' && (
               <ReverseTranslationInput
                 data={currentReviewExercise.data}
+                language={store.lesson.language}
                 onAnswer={handleReviewAnswer}
                 answered={exerciseAnswer !== null}
               />

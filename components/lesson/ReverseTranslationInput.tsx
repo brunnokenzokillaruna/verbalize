@@ -1,12 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
 import type { ReverseTranslationData } from '@/types';
 import { isAccentOnlyDiff } from '@/utils/accent';
+import { validateReverseTranslation } from '@/app/actions/validateAnswer';
 
 interface ReverseTranslationInputProps {
   data: ReverseTranslationData;
+  language: string;
   onAnswer: (correct: boolean) => void;
   answered: boolean;
 }
@@ -19,12 +21,13 @@ function normalize(s: string): string {
     .trim();
 }
 
-type AnswerStatus = 'idle' | 'correct' | 'accent-warning' | 'wrong';
+type AnswerStatus = 'idle' | 'validating' | 'correct' | 'accent-warning' | 'wrong';
 
-export function ReverseTranslationInput({ data, onAnswer, answered }: ReverseTranslationInputProps) {
+export function ReverseTranslationInput({ data, language, onAnswer, answered }: ReverseTranslationInputProps) {
   const [input, setInput] = useState('');
   const [hintOpen, setHintOpen] = useState(false);
   const [answerStatus, setAnswerStatus] = useState<AnswerStatus>('idle');
+  const [aiNote, setAiNote] = useState<string | undefined>();
 
   const userNorm = normalize(input);
   const isCorrect =
@@ -36,12 +39,42 @@ export function ReverseTranslationInput({ data, onAnswer, answered }: ReverseTra
     (isAccentOnlyDiff(input, data.target_translation) ||
       data.acceptable_variants.some((v) => isAccentOnlyDiff(input, v)));
 
-  function handleSubmit() {
-    if (input.trim() === '' || answered) return;
-    const status: AnswerStatus = isCorrect ? 'correct' : isAccentWarning ? 'accent-warning' : 'wrong';
-    setAnswerStatus(status);
-    onAnswer(status === 'correct' || status === 'accent-warning');
+  async function handleSubmit() {
+    if (input.trim() === '' || answered || answerStatus === 'validating') return;
+
+    if (isCorrect) {
+      setAnswerStatus('correct');
+      onAnswer(true);
+      return;
+    }
+
+    if (isAccentWarning) {
+      setAnswerStatus('accent-warning');
+      onAnswer(true);
+      return;
+    }
+
+    // String check failed — ask AI if it's semantically correct
+    setAnswerStatus('validating');
+    const result = await validateReverseTranslation(
+      input,
+      data.target_translation,
+      data.portuguese_sentence,
+      language,
+    );
+
+    if (result.accepted) {
+      setAnswerStatus('correct');
+      onAnswer(true);
+    } else {
+      setAiNote(result.note);
+      setAnswerStatus('wrong');
+      onAnswer(false);
+    }
   }
+
+  const isSubmitting = answerStatus === 'validating';
+  const isAnswered = answered || (answerStatus !== 'idle' && answerStatus !== 'validating');
 
   return (
     <div className="flex flex-col gap-5">
@@ -67,7 +100,7 @@ export function ReverseTranslationInput({ data, onAnswer, answered }: ReverseTra
         rows={3}
         value={input}
         onChange={(e) => setInput(e.target.value)}
-        disabled={answered}
+        disabled={isAnswered || isSubmitting}
         placeholder="Digite sua tradução aqui..."
         autoComplete="off"
         autoCorrect="off"
@@ -77,23 +110,25 @@ export function ReverseTranslationInput({ data, onAnswer, answered }: ReverseTra
         style={{
           backgroundColor: 'var(--color-surface)',
           border: `2px solid ${
-            !answered
+            !isAnswered && !isSubmitting
               ? 'var(--color-border)'
               : answerStatus === 'correct'
                 ? 'var(--color-success)'
                 : answerStatus === 'accent-warning'
                   ? '#d97706'
-                  : 'var(--color-error)'
+                  : answerStatus === 'validating'
+                    ? 'var(--color-border)'
+                    : 'var(--color-error)'
           }`,
           color: 'var(--color-text-primary)',
           caretColor: 'var(--color-primary)',
         }}
         onFocus={(e) =>
-          !answered &&
+          !isAnswered && !isSubmitting &&
           (e.target.style.borderColor = 'var(--color-primary)')
         }
         onBlur={(e) =>
-          !answered &&
+          !isAnswered && !isSubmitting &&
           (e.target.style.borderColor = 'var(--color-border)')
         }
         onKeyDown={(e) => {
@@ -104,8 +139,16 @@ export function ReverseTranslationInput({ data, onAnswer, answered }: ReverseTra
         }}
       />
 
+      {/* Validating state */}
+      {answerStatus === 'validating' && (
+        <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--color-text-muted)' }}>
+          <Loader2 size={14} className="animate-spin" />
+          Verificando...
+        </div>
+      )}
+
       {/* Accent warning */}
-      {answered && answerStatus === 'accent-warning' && (
+      {isAnswered && answerStatus === 'accent-warning' && (
         <div
           className="rounded-xl px-4 py-3 text-sm"
           style={{ backgroundColor: '#fef3c7', color: '#92400e' }}
@@ -116,13 +159,20 @@ export function ReverseTranslationInput({ data, onAnswer, answered }: ReverseTra
       )}
 
       {/* Show correct answer on wrong */}
-      {answered && answerStatus === 'wrong' && (
-        <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-          Resposta certa:{' '}
-          <span className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>
-            {data.target_translation}
-          </span>
-        </p>
+      {isAnswered && answerStatus === 'wrong' && (
+        <div className="flex flex-col gap-1">
+          <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+            Resposta certa:{' '}
+            <span className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+              {data.target_translation}
+            </span>
+          </p>
+          {aiNote && (
+            <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+              {aiNote}
+            </p>
+          )}
+        </div>
       )}
 
       {/* Optional hint (collapsible) */}
@@ -150,16 +200,16 @@ export function ReverseTranslationInput({ data, onAnswer, answered }: ReverseTra
       )}
 
       {/* Submit trigger — pressing Enter works too */}
-      {!answered && (
+      {!isAnswered && (
         <button
           type="button"
           onClick={handleSubmit}
-          disabled={input.trim() === ''}
+          disabled={input.trim() === '' || isSubmitting}
           className="self-end rounded-xl px-5 py-2 text-sm font-semibold transition-all active:scale-95"
           style={{
-            backgroundColor: input.trim() ? 'var(--color-primary)' : 'var(--color-surface-raised)',
-            color: input.trim() ? 'var(--color-text-inverse)' : 'var(--color-text-muted)',
-            cursor: input.trim() ? 'pointer' : 'not-allowed',
+            backgroundColor: input.trim() && !isSubmitting ? 'var(--color-primary)' : 'var(--color-surface-raised)',
+            color: input.trim() && !isSubmitting ? 'var(--color-text-inverse)' : 'var(--color-text-muted)',
+            cursor: input.trim() && !isSubmitting ? 'pointer' : 'not-allowed',
           }}
         >
           Verificar resposta

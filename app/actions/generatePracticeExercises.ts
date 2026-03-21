@@ -74,8 +74,8 @@ Exercise 2 — type "error-correction":
 
 Exercise 3 — type "reverse-translation":
 - "portuguese_sentence" is a natural Brazilian Portuguese sentence related to the dialogue theme
-- "target_translation" is the correct ${LANG_LABEL[language]} translation
-- "acceptable_variants" lists 1-2 alternative correct phrasings (or empty array)
+- "target_translation" is the correct ${LANG_LABEL[language]} translation (the most natural/simple phrasing)
+- "acceptable_variants" MUST list at least 2-4 alternative correct phrasings that a learner might naturally produce. Think about: (a) different question formation styles (intonation vs est-ce que vs subject-verb inversion), (b) subject pronoun variations (il/elle/on/ça), (c) synonym verbs with equivalent meaning, (d) with or without explicit subject pronoun. Never leave this empty for questions or sentences with multiple valid phrasings.
 - "hint" is ${isEarly ? 'an optional grammar tip in Portuguese' : 'omitted (leave field out)'}
 
 Exercise 4 — type "audio-dictation":
@@ -94,7 +94,7 @@ Exercise 7 — type "error-correction" (second one, different sentence from Exer
 - Same rules as Exercise 2 but write a completely different sentence with a different error
 
 Exercise 8 — type "reverse-translation" (second one, different sentence from Exercise 3):
-- Same rules as Exercise 3 but use a different Brazilian Portuguese sentence
+- Same rules as Exercise 3 (including the requirement for 2-4 acceptable_variants) but use a different Brazilian Portuguese sentence
 
 Output format (exactly this structure, 8 items):
 [
@@ -122,7 +122,7 @@ Output format (exactly this structure, 8 items):
     "data": {
       "portuguese_sentence": "Frase em português.",
       "target_translation": "Target language sentence.",
-      "acceptable_variants": [],
+      "acceptable_variants": ["alternative phrasing 1", "alternative phrasing 2"],
       "hint": "Dica gramatical opcional"
     }
   },

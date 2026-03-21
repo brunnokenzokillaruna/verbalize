@@ -363,6 +363,7 @@ function ReviewContent() {
             {currentExercise.type === 'reverse-translation' && (
               <ReverseTranslationInput
                 data={currentExercise.data}
+                language={mistake?.language ?? 'fr'}
                 onAnswer={handleAnswer}
                 answered={exerciseAnswer !== null}
               />
