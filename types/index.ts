@@ -113,7 +113,7 @@ export interface PregeneratedLessonDocument {
 
 // ─── Lesson ───────────────────────────────────────────────────────────────────
 
-export type LessonStage = 'hook' | 'grammar' | 'vocabulary' | 'practice' | 'review';
+export type LessonStage = 'vocabulary' | 'hook' | 'grammar' | 'practice' | 'review';
 
 export type SupportedLanguage = 'fr' | 'en';
 

@@ -32,3 +32,10 @@ Thumbs.db
 # Editor
 .vscode/
 .idea/
+
+# Agent Skills
+.agents/skills
+skills-lock.json
+
+# Internal Docs
+pedagogical_framework_v2.md

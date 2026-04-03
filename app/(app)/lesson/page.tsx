@@ -26,6 +26,7 @@ import {
   deleteLessonMistake,
   getPregeneratedLesson,
   deletePregeneratedLesson,
+  getUserVocabulary,
 } from '@/services/firestore';
 
 import { LessonProgressHeader } from '@/components/lesson/LessonProgressHeader';
@@ -72,9 +73,9 @@ function buildMistakeContext(exercise: Exercise): string {
 
 function phaseToStage(phase: string): LessonStage {
   switch (phase) {
+    case 'vocabulary': return 'vocabulary';
     case 'hook':       return 'hook';
     case 'grammar':    return 'grammar';
-    case 'vocabulary': return 'vocabulary';
     case 'practice':   return 'practice';
     case 'review':     return 'review';
     case 'complete':   return 'review';
@@ -259,18 +260,22 @@ export default function LessonPage() {
         }
 
         if (!hook) {
+          const vocabDocs = user ? await getUserVocabulary(user.uid, lesson.language) : [];
+          const knownVocabulary = vocabDocs.map((v) => v.word);
+
           // No cache — generate normally (super-hook: dialogue + grammar bridge + keywords + translations)
           hook = await generateHook({
             language: lesson.language,
             level: lesson.level,
             interests: profile.interests ?? [],
             grammarFocus: lesson.grammarFocus,
+            knownVocabulary,
           });
         }
 
         if (hook) {
           store.setHook(hook);
-          store.setPhase('hook');
+          store.setPhase('vocabulary');
         } else {
           store.setIsLoading(false);
           setHookError(true);
@@ -286,9 +291,9 @@ export default function LessonPage() {
 
   // ── Prefetch: start next-screen data while user reads/listens ────────────
 
-  // 1. Hook phase active → resolve grammar bridge + start vocab images + translations early
+  // 1. Phase active → resolve grammar bridge + start vocab images + translations early
   useEffect(() => {
-    if (store.phase !== 'hook' || !store.hook || !store.lesson) return;
+    if ((store.phase !== 'hook' && store.phase !== 'vocabulary') || !store.hook || !store.lesson) return;
     const { hook, lesson } = store;
 
     // Grammar bridge: use bundled data if available, otherwise fall back to a separate call
@@ -443,6 +448,11 @@ export default function LessonPage() {
     return exercises;
   }
 
+  function advanceFromVocabulary() {
+    if (!store.lesson || !store.hook) return;
+    store.setPhase('hook');
+  }
+
   async function advanceFromHook() {
     if (!store.lesson || !store.hook || store.isLoading) return;
     store.setIsLoading(true);
@@ -462,14 +472,7 @@ export default function LessonPage() {
     store.setPhase('grammar');
   }
 
-  function advanceFromGrammar() {
-    if (!store.lesson || !store.hook) return;
-    // Vocab translations + images are already being fetched by the grammar-phase
-    // prefetch effect — just transition immediately.
-    store.setPhase('vocabulary');
-  }
-
-  async function advanceFromVocabulary() {
+  async function advanceFromGrammar() {
     if (!store.lesson || !store.hook || store.isLoading) return;
     store.setIsLoading(true);
 
@@ -809,9 +812,40 @@ export default function LessonPage() {
 
       <main className="mx-auto max-w-lg md:max-w-2xl lg:max-w-4xl px-5 pt-6 pb-48">
 
+        {/* ── Vocabulary phase ── */}
+        {phase === 'vocabulary' && store.hook && store.lesson && (
+          <div className="flex flex-col gap-4 animate-slide-up">
+            <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--color-text-muted)' }}>
+              Vocabulário da Lição
+            </p>
+            {store.isLoading && store.hook.newVocabulary.length === 0 && (
+              <div className="flex items-center gap-3">
+                <Loader2 size={18} className="animate-spin" style={{ color: 'var(--color-primary)' }} />
+                <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Carregando imagens…</span>
+              </div>
+            )}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {[...new Set(store.hook.newVocabulary)].map((word) => {
+                const img = store.vocabImages[word];
+                const translation = store.vocabTranslations[word] ?? word;
+                return (
+                  <VisualVocabCard
+                    key={word}
+                    word={word}
+                    translation={translation}
+                    language={store.lesson!.language}
+                    imageUrl={img?.imageUrl}
+                    imageAlt={img?.imageAlt}
+                  />
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* ── Hook phase ── */}
         {phase === 'hook' && store.hook && (
-          <div className="flex flex-col gap-5 animate-slide-up">
+          <div className="flex flex-col gap-6 animate-slide-up">
             <div>
               <div className="mb-2 flex items-center justify-between">
                 <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--color-text-muted)' }}>
@@ -904,36 +938,6 @@ export default function LessonPage() {
           </div>
         )}
 
-        {/* ── Vocabulary phase ── */}
-        {phase === 'vocabulary' && store.hook && store.lesson && (
-          <div className="flex flex-col gap-4 animate-slide-up">
-            <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--color-text-muted)' }}>
-              Novo vocabulário
-            </p>
-            {store.isLoading && store.hook.newVocabulary.length === 0 && (
-              <div className="flex items-center gap-3">
-                <Loader2 size={18} className="animate-spin" style={{ color: 'var(--color-primary)' }} />
-                <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Carregando imagens…</span>
-              </div>
-            )}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {[...new Set(store.hook.newVocabulary)].map((word) => {
-                const img = store.vocabImages[word];
-                const translation = store.vocabTranslations[word] ?? word;
-                return (
-                  <VisualVocabCard
-                    key={word}
-                    word={word}
-                    translation={translation}
-                    language={store.lesson!.language}
-                    imageUrl={img?.imageUrl}
-                    imageAlt={img?.imageAlt}
-                  />
-                );
-              })}
-            </div>
-          </div>
-        )}
 
         {/* ── Practice phase ── */}
         {phase === 'practice' && currentExercise && store.lesson && (
@@ -1087,11 +1091,11 @@ export default function LessonPage() {
             type="button"
             disabled={store.isLoading}
             onClick={
-              phase === 'hook'
-                ? advanceFromHook
-                : phase === 'grammar'
-                  ? advanceFromGrammar
-                  : advanceFromVocabulary
+              phase === 'vocabulary'
+                ? advanceFromVocabulary
+                : phase === 'hook'
+                  ? advanceFromHook
+                  : advanceFromGrammar
             }
             className="flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-4 text-base font-semibold transition-all active:scale-[0.98] disabled:cursor-not-allowed"
             style={{
@@ -1105,7 +1109,7 @@ export default function LessonPage() {
                 <Loader2 size={20} className="animate-spin" />
                 Carregando…
               </>
-            ) : phase === 'vocabulary' ? (
+            ) : phase === 'grammar' ? (
               'Praticar'
             ) : (
               'Continuar'

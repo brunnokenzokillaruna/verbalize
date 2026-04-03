@@ -4,9 +4,9 @@ import { X } from 'lucide-react';
 import type { LessonStage } from '@/types';
 
 const STAGES: { key: LessonStage; label: string }[] = [
+  { key: 'vocabulary', label: 'Vocabulário' },
   { key: 'hook', label: 'Diálogo' },
   { key: 'grammar', label: 'Gramática' },
-  { key: 'vocabulary', label: 'Vocabulário' },
   { key: 'practice', label: 'Prática' },
   { key: 'review', label: 'Revisão' },
 ];

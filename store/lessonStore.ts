@@ -11,9 +11,9 @@ import type {
 export type LessonPhase =
   | 'idle'
   | 'loading'
+  | 'vocabulary'
   | 'hook'
   | 'grammar'
-  | 'vocabulary'
   | 'practice'
   | 'review'     // mistake review — after practice, before complete
   | 'complete';

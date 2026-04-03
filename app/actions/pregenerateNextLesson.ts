@@ -1,7 +1,7 @@
 'use server';
 
 import { generateHook } from './generateHook';
-import { savePregeneratedLesson } from '@/services/firestore';
+import { savePregeneratedLesson, getUserVocabulary } from '@/services/firestore';
 import type { LessonDefinition } from '@/types';
 
 /**
@@ -15,11 +15,15 @@ export async function pregenerateNextLesson(
   interests: string[],
 ): Promise<void> {
   try {
+    const vocabDocs = await getUserVocabulary(uid, lesson.language);
+    const knownVocabulary = vocabDocs.map((doc) => doc.word);
+
     const hook = await generateHook({
       language: lesson.language,
       level: lesson.level,
       interests,
       grammarFocus: lesson.grammarFocus,
+      knownVocabulary,
     });
     if (hook) {
       await savePregeneratedLesson(uid, lesson.id, hook);

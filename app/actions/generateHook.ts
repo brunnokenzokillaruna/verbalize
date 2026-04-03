@@ -13,6 +13,7 @@ interface GenerateHookParams {
   level: ProficiencyLevel;
   interests: string[];
   grammarFocus: string;
+  knownVocabulary: string[];
 }
 
 function pickNames(language: SupportedLanguage) {
@@ -150,7 +151,7 @@ function fixDialogueLabels(dialogue: string, nameA: string, nameB: string): stri
  * invalid JSON or hits a quota error, so lessons always load.
  */
 export async function generateHook(params: GenerateHookParams): Promise<HookResult | null> {
-  const { language, level, interests, grammarFocus } = params;
+  const { language, level, interests, grammarFocus, knownVocabulary } = params;
   const { nameA, nameB } = pickNames(language);
   const topic = pickTopic(interests);
   const lineCount = DIALOGUE_LINES[level];
@@ -158,6 +159,10 @@ export async function generateHook(params: GenerateHookParams): Promise<HookResu
   const levelDesc = LEVEL_DESCRIPTORS[level];
 
   const systemPrompt = `You are an expert language teacher creating content for Brazilian Portuguese speakers learning ${lang}. Respond with ONLY valid JSON, no markdown, no explanation.`;
+
+  const knownVocabInstruction = knownVocabulary.length > 0 
+    ? `- CRITICAL: Do NOT include any of these words in 'newVocabulary' because the learner already knows them: [${knownVocabulary.slice(-100).join(', ')}]`
+    : '';
 
   // ── Attempt 1: Super-hook (all fields bundled) ───────────────────────────
   const superPrompt = `Write a 2-person dialogue in ${lang} between ${nameA} and ${nameB}.
@@ -171,6 +176,7 @@ Requirements:
 - CRITICAL: This must be a REAL conversation. Each line must directly react to what the previous speaker said (ask a question, answer it, agree, disagree, express surprise, follow up, etc.). The dialogue must have a clear narrative arc — a beginning, a middle exchange, and a natural conclusion. Do NOT write isolated sentences that happen to share a topic. Each speaker must address the other person, not just state facts independently.
 - BAD example (NEVER do this — topic switches mid-dialogue): A: "Tu aimes ce dessin ?" B: "Non, je ne regarde pas ce dessin." A: "Tu préfères le nouveau projet ?" B: "Oui, je dessine un beau projet." — this is broken because it jumps from 'dessin' to 'projet' with no logical connection.
 - The CONVERSATION EXAMPLE inside the LEVEL CONSTRAINTS below shows exactly the style and register you must follow.
+${knownVocabInstruction}
 
 LEVEL CONSTRAINTS (follow these strictly):
 ${levelDesc}
@@ -179,7 +185,7 @@ Output ONLY this JSON object (no extra text):
 {
   "dialogue": "${nameA}: <line 1>\\n${nameB}: <line 2>\\n...",
   "dialogueTranslations": ["<pt-BR line 1>", "<pt-BR line 2>", ...],
-  "newVocabulary": ["verb_infinitive", "noun1", "noun2", "noun3", "noun4"],
+  "newVocabulary": ["verb_infinitive", "noun1", "noun2"],
   "verbWord": "verb_infinitive",
   "grammarFocus": "one sentence describing the grammar used",
   "grammarBridge": {
@@ -194,29 +200,23 @@ Output ONLY this JSON object (no extra text):
   "imageKeywords": {
     "<vocab word 1>": "short English Pexels search term",
     "<vocab word 2>": "short English Pexels search term",
-    "<vocab word 3>": "short English Pexels search term",
-    "<vocab word 4>": "short English Pexels search term",
-    "<vocab word 5>": "short English Pexels search term"
+    "<vocab word 3>": "short English Pexels search term"
   },
   "vocabTranslations": {
     "<vocab word 1>": { "translation": "pt-BR", "explanation": "tip in Portuguese ≤20 words", "example": "sentence in ${lang}" },
     "<vocab word 2>": { "translation": "pt-BR", "explanation": "tip in Portuguese ≤20 words", "example": "sentence in ${lang}" },
-    "<vocab word 3>": { "translation": "pt-BR", "explanation": "tip in Portuguese ≤20 words", "example": "sentence in ${lang}" },
-    "<vocab word 4>": { "translation": "pt-BR", "explanation": "tip in Portuguese ≤20 words", "example": "sentence in ${lang}" },
-    "<vocab word 5>": { "translation": "pt-BR", "explanation": "tip in Portuguese ≤20 words", "example": "sentence in ${lang}" }
+    "<vocab word 3>": { "translation": "pt-BR", "explanation": "tip in Portuguese ≤20 words", "example": "sentence in ${lang}" }
   },
   "imageMatchDistractors": {
     "<vocab word 1>": ["distractor_a", "distractor_b", "distractor_c"],
     "<vocab word 2>": ["distractor_a", "distractor_b", "distractor_c"],
-    "<vocab word 3>": ["distractor_a", "distractor_b", "distractor_c"],
-    "<vocab word 4>": ["distractor_a", "distractor_b", "distractor_c"],
-    "<vocab word 5>": ["distractor_a", "distractor_b", "distractor_c"]
+    "<vocab word 3>": ["distractor_a", "distractor_b", "distractor_c"]
   }
 }
 
 Rules:
 - dialogue must have exactly ${lineCount} lines
-- newVocabulary: first word is a verb (infinitive), then 4 nouns; all 5 must appear in the dialogue AND must all belong to the same semantic theme so the conversation stays coherent on ONE topic
+- newVocabulary: first word is a verb (infinitive), then 2 nouns; all 3 must appear in the dialogue AND must all belong to the same semantic theme so the conversation stays coherent on ONE topic
 - NEVER include proper nouns (person names, place names, brand names) in newVocabulary — only common nouns and verbs
 - verbWord must equal newVocabulary[0]
 - dialogueTranslations: ${lineCount} strings, no speaker prefix, natural Brazilian Portuguese
@@ -227,7 +227,7 @@ Rules:
 
   try {
     const result = await callGeminiJSON<HookResult>(superPrompt, systemPrompt, 4096);
-    if (result?.dialogue && result?.newVocabulary?.length === 5) {
+    if (result?.dialogue && result?.newVocabulary?.length === 3) {
       result.dialogue = fixDialogueLabels(result.dialogue, nameA, nameB);
 
       // Normalize: verbWord must be present at newVocabulary[0].
@@ -238,7 +238,7 @@ Rules:
         const idx = result.newVocabulary.indexOf(result.verbWord);
         if (idx === -1) {
           // verbWord not in list — insert at front, drop the last noun
-          result.newVocabulary = [result.verbWord, ...result.newVocabulary.slice(0, 4)];
+          result.newVocabulary = [result.verbWord, ...result.newVocabulary.slice(0, 2)];
         } else if (idx !== 0) {
           // verbWord is in the list but not first — move it to front
           result.newVocabulary = [
@@ -270,6 +270,7 @@ Requirements:
 - Every line MUST begin with the speaker name and a colon
 - CRITICAL COHERENCE: Before writing, mentally choose ONE tight, specific scenario within the topic. ALL dialogue lines AND ALL vocabulary words must stay within that single scenario. Do NOT switch sub-topics mid-dialogue.
 - CRITICAL: This must be a REAL conversation. Each line must directly react to what the previous speaker said. Do NOT write isolated sentences — each speaker must address the other person. Follow the CONVERSATION EXAMPLE in the LEVEL CONSTRAINTS below.
+${knownVocabInstruction}
 
 LEVEL CONSTRAINTS (follow these strictly):
 ${levelDesc}
@@ -278,12 +279,12 @@ Output this JSON (dialogue must have exactly ${lineCount} lines):
 {
   "dialogue": "${nameA}: <first line>\\n${nameB}: <second line>\\n...",
   "dialogueTranslations": ["<pt-BR translation of line 1>", "<pt-BR translation of line 2>", ...],
-  "newVocabulary": ["verb_infinitive", "noun1", "noun2", "noun3", "noun4"],
+  "newVocabulary": ["verb_infinitive", "noun1", "noun2"],
   "verbWord": "verb_infinitive",
   "grammarFocus": "one sentence describing the grammar used"
 }
 
-Rules for newVocabulary: first word is a verb in infinitive form, then 4 nouns; all must appear in the dialogue AND all 5 must belong to the same semantic theme as the conversation. NEVER include proper nouns (person names, place names) — only common nouns and verbs.
+Rules for newVocabulary: first word is a verb in infinitive form, then 2 nouns; all 3 must appear in the dialogue AND all 3 must belong to the same semantic theme as the conversation. NEVER include proper nouns (person names, place names) — only common nouns and verbs.
 Rules for dialogueTranslations: ${lineCount} natural Brazilian Portuguese translations, no speaker prefix.`;
 
   try {
@@ -295,7 +296,7 @@ Rules for dialogueTranslations: ${lineCount} natural Brazilian Portuguese transl
     if (fallback.verbWord && fallback.newVocabulary?.length) {
       const idx = fallback.newVocabulary.indexOf(fallback.verbWord);
       if (idx === -1) {
-        fallback.newVocabulary = [fallback.verbWord, ...fallback.newVocabulary.slice(0, 4)];
+        fallback.newVocabulary = [fallback.verbWord, ...fallback.newVocabulary.slice(0, 2)];
       } else if (idx !== 0) {
         fallback.newVocabulary = [
           fallback.verbWord,
