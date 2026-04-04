@@ -181,9 +181,15 @@ export default function PreviewPage() {
         {/* ── Grammar Bridge ── */}
         <Section title="GrammarBridgeCard">
           <GrammarBridgeCard
-            rule='Em francês, usamos "Je voudrais" (condicional de vouloir) para fazer pedidos educados — exatamente como "Eu gostaria" em português.'
-            targetExample="Je voudrais un café, s'il vous plaît."
-            portugueseComparison="Eu gostaria de um café, por favor."
+            bridge={{
+              insight: 'Em francês, usamos "Je voudrais" (condicional de vouloir) para fazer pedidos educados.',
+              bridge: 'Exatamente como "Eu gostaria" em português.',
+              dialogueExample: {
+                target: "Je voudrais un café, s'il vous plaît.",
+                portuguese: 'Eu gostaria de um café, por favor.',
+              },
+              additionalExamples: [],
+            }}
             language="fr"
           />
         </Section>

@@ -79,7 +79,7 @@ function ReviewContent() {
     });
 
     return () => { cancelled = true; };
-  }, [mistakeId, router]);
+  }, [mistakeId, router, user]);
 
   function handleAnswer(correct: boolean) {
     setExerciseAnswer(correct);
