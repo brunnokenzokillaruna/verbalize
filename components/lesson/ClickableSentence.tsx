@@ -10,7 +10,34 @@ interface ClickableSentenceProps {
   className?: string;
 }
 
-const PUNCTUATION_RE = /([.,!?;:»«"'()[\]{}])/;
+const PUNCTUATION_RE = /([.,!?;:»«\u201c\u201d\u2018\u2019"'()[\]{}])/;
+
+/** Strip diacritics so e.g. "achète" and "achete" compare equal. */
+function normalize(s: string): string {
+  return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+}
+
+/**
+ * Checks whether a dialogue token matches a vocabulary word.
+ * Uses stem-based matching to handle verb conjugations and noun plurals.
+ * E.g. vocab "manger" matches dialogue token "mange" or "mangeons".
+ */
+function matchesVocab(token: string, vocabWords: string[]): boolean {
+  const normToken = normalize(token);
+  for (const vocab of vocabWords) {
+    const normVocab = normalize(vocab);
+    // Exact match
+    if (normToken === normVocab) return true;
+    // Stem match: check if both share a common prefix that is long enough
+    // to avoid false positives (min 3 chars, or full word if shorter).
+    const stemLen = Math.max(3, normVocab.length - 2);
+    const stem = normVocab.slice(0, stemLen);
+    if (stem.length >= 3 && normToken.length >= stem.length && normToken.startsWith(stem)) {
+      return true;
+    }
+  }
+  return false;
+}
 
 /**
  * Splits a sentence into individual ClickableWord tokens.
@@ -22,8 +49,6 @@ export function ClickableSentence({
   onWordClick,
   className = '',
 }: ClickableSentenceProps) {
-  const vocabSet = new Set(newVocabulary.map((w) => w.toLowerCase()));
-
   type Token =
     | { type: 'space'; value: string }
     | { type: 'punct'; value: string }
@@ -55,12 +80,12 @@ export function ClickableSentence({
             <ClickableWord key={i} word={token.value} isPunctuation />
           );
         }
-        const clean = token.value.toLowerCase().replace(/[.,!?;:]/g, '');
+        const clean = token.value.replace(/[.,!?;:]/g, '');
         return (
           <ClickableWord
             key={i}
             word={token.value}
-            isNewVocabulary={vocabSet.has(clean)}
+            isNewVocabulary={matchesVocab(clean, newVocabulary)}
             onWordClick={onWordClick}
           />
         );

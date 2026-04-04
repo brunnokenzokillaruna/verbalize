@@ -6,7 +6,7 @@ import { Loader2, Trophy, Volume2, VolumeX } from 'lucide-react';
 
 import { useAuthStore } from '@/store/authStore';
 import { useLessonStore } from '@/store/lessonStore';
-import { getNextLesson, getNextLessonId, getLessonById } from '@/lib/curriculum';
+import { getNextLesson, getNextLessonId, getLessonById, getPreviousTopics } from '@/lib/curriculum';
 
 import { generateHook } from '@/app/actions/generateHook';
 import { synthesizeDialogue } from '@/app/actions/synthesizeSpeech';
@@ -110,7 +110,7 @@ export default function LessonPage() {
   const [tooltip, setTooltip] = useState<TooltipState>(CLOSED_TOOLTIP);
   const [hookError, setHookError] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [showDialogueTranslation, setShowDialogueTranslation] = useState(true);
+  const [playingLineIdx, setPlayingLineIdx] = useState(-1);
 
   // ── Audio (Google Cloud TTS — two-voice dialogue) ────────────────────────
 
@@ -124,6 +124,10 @@ export default function LessonPage() {
   // Monotonically-increasing session ID prevents stale onended callbacks
   // from a previous play session from triggering the next chunk.
   const playSessionRef = useRef(0);
+
+  // Prevents the bootstrap from running more than once per component lifecycle.
+  // Resets on handleRetry() so that retries work correctly.
+  const lessonInitiatedRef = useRef(false);
 
   // Prefetch promises — start fetching the next screen's data while the user
   // is still reading/listening on the current screen.
@@ -139,6 +143,7 @@ export default function LessonPage() {
       audioRef.current = null;
     }
     setIsPlaying(false);
+    setPlayingLineIdx(-1);
   }
 
   function startAudio(chunks: string[]) {
@@ -154,15 +159,16 @@ export default function LessonPage() {
 
     function playIndex(i: number) {
       if (session !== playSessionRef.current) return; // cancelled
-      if (i >= chunks.length) { setIsPlaying(false); return; }
+      if (i >= chunks.length) { setIsPlaying(false); setPlayingLineIdx(-1); return; }
 
+      setPlayingLineIdx(i);
       audio.onended = () => setTimeout(() => playIndex(i + 1), 300);
       audio.onerror = () => {
-        if (session === playSessionRef.current) setIsPlaying(false);
+        if (session === playSessionRef.current) { setIsPlaying(false); setPlayingLineIdx(-1); }
       };
       audio.src = `data:audio/mp3;base64,${chunks[i]}`;
       audio.play().catch(() => {
-        if (session === playSessionRef.current) setIsPlaying(false);
+        if (session === playSessionRef.current) { setIsPlaying(false); setPlayingLineIdx(-1); }
       });
     }
 
@@ -232,6 +238,8 @@ export default function LessonPage() {
     if (!profile) return;
     if (exitingRef.current) return;
     if (store.phase !== 'idle') return;
+    if (lessonInitiatedRef.current) return;
+    lessonInitiatedRef.current = true;
 
     setHookError(false);
     const language = profile.currentTargetLanguage;
@@ -259,10 +267,12 @@ export default function LessonPage() {
           }
         }
 
-        if (!hook) {
-          const vocabDocs = user ? await getUserVocabulary(user.uid, lesson.language) : [];
-          const knownVocabulary = vocabDocs.map((v) => v.word);
+        // Fetch user's known vocabulary (needed both for hook generation and exercise constraints)
+        const vocabDocs = user ? await getUserVocabulary(user.uid, lesson.language) : [];
+        const knownVocabulary = vocabDocs.map((v) => v.word);
+        store.setKnownVocabulary(knownVocabulary);
 
+        if (!hook) {
           // No cache — generate normally (super-hook: dialogue + grammar bridge + keywords + translations)
           hook = await generateHook({
             language: lesson.language,
@@ -387,6 +397,8 @@ export default function LessonPage() {
       verbWord: store.hook.verbWord,
       language: store.lesson.language,
       level: store.lesson.level,
+      knownVocabulary: store.knownVocabulary,
+      previousTopics: getPreviousTopics(store.lesson.language, store.lesson.id),
     });
   }
 
@@ -397,26 +409,6 @@ export default function LessonPage() {
   function buildClientExercises(): Exercise[] {
     if (!store.hook) return [];
     const exercises: Exercise[] = [];
-
-    // sentence-builder: first suitable dialogue line
-    const dialogueSentences = store.hook.dialogue
-      .split('\n')
-      .filter((l) => l.trim().length > 0)
-      .map((line) => {
-        const m = line.match(/^[^:]+:\s*(.+)/);
-        return m ? m[1].trim() : line.trim();
-      })
-      .filter((text) => {
-        const wc = text.split(/\s+/).length;
-        return wc >= 3 && wc <= 10;
-      });
-    if (dialogueSentences[0]) {
-      const words = dialogueSentences[0].split(/\s+/).filter(Boolean);
-      exercises.push({
-        type: 'sentence-builder',
-        data: { words: [...words].sort(() => Math.random() - 0.5), correctOrder: words, translation: '' },
-      });
-    }
 
     // image-match: first vocab word with an image (vocabImages is populated by now)
     const vocabWithImage = store.hook.newVocabulary.find(
@@ -536,6 +528,7 @@ export default function LessonPage() {
 
   function handleRetry() {
     setHookError(false);
+    lessonInitiatedRef.current = false;
     store.reset(); // resets phase to 'idle' → bootstrap effect re-runs
   }
 
@@ -593,7 +586,7 @@ export default function LessonPage() {
           mistakeContext: mistake.mistakeContext,
           language: store.lesson.language,
           level: store.lesson.level,
-          knownVocabulary: store.hook?.newVocabulary,
+          knownVocabulary: [...store.knownVocabulary, ...(store.hook?.newVocabulary ?? [])],
         });
         if (exercises) {
           store.setReview(mistake, exercises);
@@ -852,20 +845,6 @@ export default function LessonPage() {
                   Diálogo
                 </p>
                 <div className="flex items-center gap-2">
-                  {store.hook.dialogueTranslations && store.hook.dialogueTranslations.length > 0 && (
-                    <button
-                      type="button"
-                      onClick={() => setShowDialogueTranslation((v) => !v)}
-                      className="rounded-full px-3 py-1 text-xs font-medium transition-all active:scale-90"
-                      style={{
-                        backgroundColor: showDialogueTranslation ? 'var(--color-bridge-bg)' : 'var(--color-surface-raised)',
-                        color: showDialogueTranslation ? 'var(--color-bridge)' : 'var(--color-text-muted)',
-                        border: `1px solid ${showDialogueTranslation ? 'var(--color-bridge)' : 'var(--color-border)'}`,
-                      }}
-                    >
-                      PT
-                    </button>
-                  )}
                   <button
                     type="button"
                     onClick={handleAudioButton}
@@ -890,9 +869,18 @@ export default function LessonPage() {
                 const speakerName = match?.[1]?.trim();
                 const text = match?.[2]?.trim() ?? line;
                 const isEven = i % 2 === 0;
-                const ptTranslation = store.hook!.dialogueTranslations?.[i];
+                const isActive = playingLineIdx === i;
                 return (
-                  <div key={i} className="mb-4">
+                  <div
+                    key={i}
+                    className="mb-3 rounded-xl px-3 py-2 -mx-3 transition-all duration-300"
+                    style={isActive ? {
+                      backgroundColor: isEven ? 'color-mix(in srgb, var(--color-primary) 10%, transparent)' : 'color-mix(in srgb, var(--color-accent, #e05c2a) 10%, transparent)',
+                      borderLeft: `3px solid ${isEven ? 'var(--color-primary)' : 'var(--color-accent, #e05c2a)'}`,
+                      marginLeft: '-9px',
+                      paddingLeft: '9px',
+                    } : {}}
+                  >
                     {speakerName && (
                       <p
                         className="mb-1 text-xs font-bold uppercase tracking-wide"
@@ -903,16 +891,16 @@ export default function LessonPage() {
                     )}
                     <ClickableSentence
                       text={text}
-                      newVocabulary={store.hook!.newVocabulary}
+                      newVocabulary={[...new Set(store.hook!.newVocabulary)]}
                       onWordClick={handleWordClick}
                       className="text-lg"
                     />
-                    {showDialogueTranslation && ptTranslation?.trim() && (
+                    {store.hook!.dialogueTranslations?.[i]?.trim() && (
                       <p
                         className="mt-1 text-sm italic"
                         style={{ color: 'var(--color-bridge)' }}
                       >
-                        {ptTranslation}
+                        {store.hook!.dialogueTranslations[i]}
                       </p>
                     )}
                   </div>
@@ -929,11 +917,8 @@ export default function LessonPage() {
         {phase === 'grammar' && store.grammarBridge && store.lesson && (
           <div className="animate-slide-up">
             <GrammarBridgeCard
-              rule={store.grammarBridge.rule}
-              targetExample={store.grammarBridge.targetExample}
-              portugueseComparison={store.grammarBridge.portugueseComparison}
+              bridge={store.grammarBridge}
               language={store.lesson.language}
-              additionalExamples={store.grammarBridge.additionalExamples}
             />
           </div>
         )}

@@ -151,10 +151,24 @@ export interface HookResult {
 }
 
 export interface GrammarBridgeResult {
-  rule: string;
-  targetExample: string;
-  portugueseComparison: string;
-  additionalExamples?: Array<{ target: string; portuguese: string }>;
+  // ── Novo formato estruturado (Portuguese Bridge Method) ───────────────────
+  insight?: string;           // 1 frase "aha!" em PT-BR — o gancho imediato
+  explanation?: string;       // 2-4 frases em PT-BR explicando a regra com profundidade, incluindo nuances e pegadinhas para brasileiros
+  bridge?: {
+    portuguese: string;       // Padrão/frase como se diz em PT-BR
+    target: string;           // Equivalente na língua-alvo
+    difference: string;       // 1 frase PT-BR explicando a diferença chave, ≤15 palavras
+  };
+  dialogueExample?: {
+    target: string;           // Frase real do diálogo atual
+    portuguese: string;       // Equivalente PT-BR
+  };
+  additionalExamples?: Array<{ target: string; portuguese: string }>; // 2 exemplos extras
+
+  // ── Campos legados (backward compat com lessons cacheadas no Firestore) ───
+  rule?: string;
+  targetExample?: string;
+  portugueseComparison?: string;
 }
 
 export interface VocabImageResult {

@@ -23,36 +23,54 @@ interface GeneratePracticeParams {
   verbWord: string;
   language: SupportedLanguage;
   level: ProficiencyLevel;
+  knownVocabulary: string[];
+  previousTopics: string[];
 }
 
 /**
- * Generates 8 practice exercises via Gemini:
+ * Generates 9 practice exercises via Gemini:
  *   2× context-choice, 2× error-correction, 2× reverse-translation,
- *   1× audio-dictation, 1× speak-repeat.
- * Two more are built client-side: sentence-builder + image-match → 10 total.
+ *   1× audio-dictation, 1× speak-repeat, 1× sentence-builder.
+ * One more is built client-side: image-match → 10 total.
+ *
+ * IMPORTANT: Exercises create ORIGINAL sentences — never copying from the dialogue.
+ * They use only vocabulary the user has already learned + the current lesson's new words.
  * Returns null on any error.
  */
 export async function generatePracticeExercises(
   params: GeneratePracticeParams,
 ): Promise<Exercise[] | null> {
-  const { dialogue, newVocabulary, language, level } = params;
-  const isEarly = level === 'A1' || level === 'A2';
+  const { dialogue, newVocabulary, language, level, knownVocabulary, previousTopics } = params;
   const levelDesc = LEVEL_EXERCISE_DESCRIPTORS[level];
+  const isEarly = level === 'A1' || level === 'A2';
+  const isEarlyLearner = knownVocabulary.length < 30;
+
+  const vocabConstraint = isEarlyLearner
+    ? `\nVOCABULARY CONSTRAINT: The learner is a beginner with very limited vocabulary. All exercise sentences must use ONLY: the key vocabulary words listed above, basic function words (articles, prepositions, pronouns, conjunctions, auxiliary verbs), and simple A1-level everyday words. Do NOT use any advanced or uncommon content words.`
+    : `\nVOCABULARY CONSTRAINT: All exercise sentences must use EXCLUSIVELY words the learner already knows: [${knownVocabulary.slice(-200).join(', ')}], plus the key vocabulary words listed above, plus basic function words (articles, prepositions, pronouns, conjunctions, auxiliary verbs). Do NOT introduce unknown content words.`;
+
+  const previousTopicsBlock = previousTopics.length > 0
+    ? `\nPREVIOUS LESSON TOPICS (for context and coherence — you may reference these themes): ${previousTopics.join(' | ')}`
+    : '';
 
   try {
     const systemPrompt = `You are a language exercise generator for Brazilian Portuguese speakers learning ${LANG_LABEL[language]}. Respond with ONLY a valid JSON array, no markdown, no explanation.`;
 
-    const prompt = `Based on this ${LANG_LABEL[language]} dialogue at ${level} level:
+    const prompt = `The learner just studied a ${LANG_LABEL[language]} dialogue at ${level} level with this theme and context:
 "${dialogue}"
 
-Key vocabulary words: ${newVocabulary.join(', ')}
+Key vocabulary words from this lesson: ${newVocabulary.join(', ')}
+${previousTopicsBlock}
+
+CRITICAL RULE: Do NOT copy or reuse any sentence from the dialogue above. Every exercise sentence must be ORIGINAL — newly created by you. The sentences should be related to the lesson's theme and grammar focus, but must be completely different from the dialogue lines.
 
 LEVEL CONSTRAINTS — all sentences you write must follow these rules: ${levelDesc}
+${vocabConstraint}
 
-Generate exactly 8 exercises as a JSON array in this order:
+Generate exactly 9 exercises as a JSON array in this order:
 
 Exercise 1 — type "context-choice":
-- Take ONE sentence from the dialogue that contains a key vocabulary word
+- Write an ORIGINAL ${LANG_LABEL[language]} sentence (NOT from the dialogue) that uses a key vocabulary word in a natural context
 - Replace that word with ___ in the "sentence" field
 - "blankWord" is the correct answer
 - "options" must have exactly 4 items: the correct word plus 3 distractors
@@ -60,7 +78,7 @@ Exercise 1 — type "context-choice":
 - "translation" is the Brazilian Portuguese translation of the full original sentence
 
 Exercise 2 — type "error-correction":
-- Write a ${LANG_LABEL[language]} sentence inspired by the dialogue but containing ONE deliberate grammatical or vocabulary error
+- Write an ORIGINAL ${LANG_LABEL[language]} sentence (NOT from the dialogue) related to the lesson theme, containing ONE deliberate grammatical or vocabulary error
 - "sentence_with_error" is the full sentence as written (with the error)
 - "error_word" is the incorrect word or short phrase
 - "correct_word" is the ideal correct replacement (the word that best fits the intended meaning)
@@ -73,17 +91,18 @@ Exercise 2 — type "error-correction":
 - BAD error types (AVOID — too ambiguous): swapping determiners that could both be valid (le/ce/mon/son), word-order variations acceptable in informal speech, register differences.
 
 Exercise 3 — type "reverse-translation":
-- "portuguese_sentence" is a natural Brazilian Portuguese sentence related to the dialogue theme
+- "portuguese_sentence" is a natural Brazilian Portuguese sentence related to the lesson theme (NOT a translation of any dialogue line)
 - "target_translation" is the correct ${LANG_LABEL[language]} translation (the most natural/simple phrasing)
 - "acceptable_variants" MUST list at least 2-4 alternative correct phrasings that a learner might naturally produce. Think about: (a) different question formation styles (intonation vs est-ce que vs subject-verb inversion), (b) subject pronoun variations (il/elle/on/ça), (c) synonym verbs with equivalent meaning, (d) with or without explicit subject pronoun. Never leave this empty for questions or sentences with multiple valid phrasings.
 - "hint" is ${isEarly ? 'an optional grammar tip in Portuguese' : 'omitted (leave field out)'}
 
 Exercise 4 — type "audio-dictation":
-- "text" is a sentence taken directly from the dialogue (in ${LANG_LABEL[language]}, without the speaker name prefix)
+- Write an ORIGINAL short ${LANG_LABEL[language]} sentence (NOT from the dialogue) related to the lesson theme, using known vocabulary
+- "text" is that sentence in ${LANG_LABEL[language]}
 - "translation" is the Brazilian Portuguese translation of that sentence
 
 Exercise 5 — type "speak-repeat":
-- Pick ONE sentence from the dialogue (without the speaker name prefix)
+- Write an ORIGINAL short ${LANG_LABEL[language]} sentence (NOT from the dialogue) related to the lesson theme, using known vocabulary
 - "text" is that sentence in ${LANG_LABEL[language]}
 - "translation" is the Brazilian Portuguese translation
 
@@ -96,7 +115,13 @@ Exercise 7 — type "error-correction" (second one, different sentence from Exer
 Exercise 8 — type "reverse-translation" (second one, different sentence from Exercise 3):
 - Same rules as Exercise 3 (including the requirement for 2-4 acceptable_variants) but use a different Brazilian Portuguese sentence
 
-Output format (exactly this structure, 8 items):
+Exercise 9 — type "sentence-builder":
+- Write an ORIGINAL short ${LANG_LABEL[language]} sentence (NOT from the dialogue) related to the lesson theme, between 3 and 8 words
+- "correctOrder" is an array of the words in the correct order
+- "words" is the same array but shuffled into a random order (NOT alphabetical — truly random)
+- "translation" is the Brazilian Portuguese translation
+
+Output format (exactly this structure, 9 items):
 [
   {
     "type": "context-choice",
@@ -129,14 +154,14 @@ Output format (exactly this structure, 8 items):
   {
     "type": "audio-dictation",
     "data": {
-      "text": "A sentence from the dialogue",
+      "text": "An original sentence",
       "translation": "Portuguese translation"
     }
   },
   {
     "type": "speak-repeat",
     "data": {
-      "text": "A sentence from the dialogue",
+      "text": "An original sentence",
       "translation": "Portuguese translation"
     }
   },
@@ -167,6 +192,14 @@ Output format (exactly this structure, 8 items):
       "acceptable_variants": [],
       "hint": "Dica gramatical opcional"
     }
+  },
+  {
+    "type": "sentence-builder",
+    "data": {
+      "words": ["shuffled", "word", "array"],
+      "correctOrder": ["word", "array", "shuffled"],
+      "translation": "Portuguese translation"
+    }
   }
 ]`;
 
@@ -176,9 +209,6 @@ Output format (exactly this structure, 8 items):
       console.error('[generatePracticeExercises] Unexpected response shape');
       return null;
     }
-
-    // Normalize dialogue for verbatim-check comparisons
-    const dialogueNorm = dialogue.toLowerCase().replace(/[.,!?;:'"«»]/g, '').replace(/\s+/g, ' ');
 
     // Structural validation: drop exercises that are clearly malformed
     const validated = exercises.filter((ex) => {
@@ -196,10 +226,15 @@ Output format (exactly this structure, 8 items):
           console.warn(`[generatePracticeExercises] Dropped ${ex.type} with empty text`);
           return false;
         }
-        const textNorm = text.toLowerCase().replace(/[.,!?;:'"«»]/g, '').replace(/\s+/g, ' ').trim();
-        const ok = dialogueNorm.includes(textNorm);
-        if (!ok) console.warn(`[generatePracticeExercises] Dropped ${ex.type} whose text is not verbatim from dialogue: "${text}"`);
-        return ok;
+        return true;
+      }
+      if (ex.type === 'sentence-builder') {
+        const { words, correctOrder } = ex.data as { words: string[]; correctOrder: string[] };
+        if (!words?.length || !correctOrder?.length || words.length !== correctOrder.length) {
+          console.warn('[generatePracticeExercises] Dropped malformed sentence-builder exercise');
+          return false;
+        }
+        return true;
       }
       return true;
     });

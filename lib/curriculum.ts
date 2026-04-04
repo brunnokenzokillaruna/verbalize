@@ -444,3 +444,15 @@ export function getNextLessonId(language: SupportedLanguage, completedLessonId: 
 export function getLessonById(id: string): LessonDefinition | undefined {
   return [...FRENCH_LESSONS, ...ENGLISH_LESSONS].find((l) => l.id === id);
 }
+
+/**
+ * Returns the grammarFocus topics of all lessons before `currentLessonId`
+ * (i.e. lessons the user has already completed). Capped at the last 10
+ * to keep the prompt concise.
+ */
+export function getPreviousTopics(language: SupportedLanguage, currentLessonId: string): string[] {
+  const lessons = LESSON_MAP[language];
+  const idx = lessons.findIndex((l) => l.id === currentLessonId);
+  if (idx <= 0) return [];
+  return lessons.slice(Math.max(0, idx - 10), idx).map((l) => l.grammarFocus);
+}

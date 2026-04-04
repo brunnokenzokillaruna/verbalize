@@ -27,30 +27,41 @@ export async function generateGrammarBridge(
   try {
     const systemPrompt = `You are an expert language teacher using the Portuguese Bridge Method for Brazilian Portuguese speakers learning ${LANG_LABEL[language]}. Respond with ONLY valid JSON, no markdown, no explanation.`;
 
-    const prompt = `Explain the grammar pattern "${grammarFocus}" from this dialogue:
+    const prompt = `Explique o padrão gramatical "${grammarFocus}" para um brasileiro aprendendo ${LANG_LABEL[language]}.
 
+Contexto do diálogo:
 "${dialogue}"
 
-Use the Portuguese Bridge Method: compare the ${LANG_LABEL[language]} structure directly to Brazilian Portuguese.
-Write a thorough but accessible explanation of 4-6 sentences in Brazilian Portuguese, covering:
-1. What the rule is
-2. How it compares/contrasts with Portuguese
-3. Any important nuances or exceptions a Brazilian learner must know
+Você está falando com um falante nativo de português brasileiro. Use isso a seu favor: compare diretamente com o português, aponte os erros clássicos que brasileiros cometem e explique POR QUÊ a estrutura funciona diferente.
 
-Then provide the main example plus 2 additional varied examples.
-
-Output JSON in exactly this format:
+Output ONLY este JSON (sem markdown):
 {
-  "rule": "Thorough explanation in Brazilian Portuguese (4-6 sentences, using the Portuguese Bridge Method)",
-  "targetExample": "Main example sentence in ${LANG_LABEL[language]} from or inspired by the dialogue",
-  "portugueseComparison": "The Brazilian Portuguese equivalent of the main example",
+  "insight": "1 frase de impacto em PT-BR — a sacada central da regra. Comece com 'Em português...' ou 'Ao contrário do português...' ou similar. MAX 20 palavras.",
+  "explanation": "2-4 frases em PT-BR explicando a regra com profundidade. Cubra: (1) como a estrutura funciona na língua-alvo, (2) por que difere do português e qual o erro típico de brasileiro, (3) qualquer nuance ou exceção importante. Tom de professor parceiro, não de livro didático.",
+  "bridge": {
+    "portuguese": "A frase-núcleo como um brasileiro diria naturalmente em PT-BR",
+    "target": "O equivalente correto em ${LANG_LABEL[language]}",
+    "difference": "1 frase em PT-BR apontando a diferença estrutural chave. MAX 15 palavras."
+  },
+  "dialogueExample": {
+    "target": "Frase do diálogo acima que melhor ilustra '${grammarFocus}' — VERBATIM, não inventada",
+    "portuguese": "Tradução natural PT-BR dessa frase"
+  },
   "additionalExamples": [
-    { "target": "Second example sentence in ${LANG_LABEL[language]}", "portuguese": "Its Brazilian Portuguese equivalent" },
-    { "target": "Third example sentence in ${LANG_LABEL[language]}", "portuguese": "Its Brazilian Portuguese equivalent" }
+    { "target": "Exemplo 2 em ${LANG_LABEL[language]} com contexto diferente do diálogo", "portuguese": "Equivalente PT-BR" },
+    { "target": "Exemplo 3 em ${LANG_LABEL[language]} — preferencialmente um erro comum de brasileiro corrigido", "portuguese": "Como o brasileiro tentaria dizer (errado ou literal)" }
   ]
-}`;
+}
 
-    return await callGeminiJSON<GrammarBridgeResult>(prompt, systemPrompt, 900);
+Regras:
+- insight: 1 frase, max 20 palavras, em PT-BR
+- explanation: 2-4 frases, sem jargão acadêmico, focado em brasileiros
+- bridge.difference: exatamente 1 frase, max 15 palavras, em PT-BR
+- dialogueExample.target: DEVE ser uma linha real do diálogo acima
+- additionalExamples: exatamente 2 itens
+- Todo texto em PT-BR exceto as frases na língua-alvo`;
+
+    return await callGeminiJSON<GrammarBridgeResult>(prompt, systemPrompt, 1400);
   } catch (err) {
     console.error('[generateGrammarBridge] Error:', err);
     return null;

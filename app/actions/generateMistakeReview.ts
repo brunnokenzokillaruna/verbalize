@@ -35,9 +35,10 @@ export async function generateMistakeReview(
   const { grammarFocus, mistakeContext, language, level, count = 3, knownVocabulary } = params;
   const isEarly = level === 'A1' || level === 'A2';
   const isFive = count >= 5;
-  const vocabHint = knownVocabulary && knownVocabulary.length > 0
-    ? `\nVocabulary the student already knows (prefer these words in your sentences): ${knownVocabulary.slice(0, 30).join(', ')}.`
-    : '';
+  const isEarlyLearner = !knownVocabulary || knownVocabulary.length < 30;
+  const vocabHint = isEarlyLearner
+    ? `\nVOCABULARY CONSTRAINT: The learner is a beginner with very limited vocabulary. All exercise sentences must use ONLY: basic function words (articles, prepositions, pronouns, conjunctions, auxiliary verbs) and simple A1-level everyday words. Do NOT use any advanced or uncommon content words.${knownVocabulary && knownVocabulary.length > 0 ? ` Words the student already knows: ${knownVocabulary.join(', ')}.` : ''}`
+    : `\nVOCABULARY CONSTRAINT: All exercise sentences must use EXCLUSIVELY words the learner already knows: [${knownVocabulary!.slice(-200).join(', ')}], plus basic function words (articles, prepositions, pronouns, conjunctions, auxiliary verbs). Do NOT introduce unknown content words.`;
 
   try {
     const systemPrompt = `You are a language exercise generator for Brazilian Portuguese speakers learning ${LANG_LABEL[language]}. Respond with ONLY a valid JSON array, no markdown, no explanation.`;

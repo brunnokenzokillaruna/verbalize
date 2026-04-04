@@ -29,6 +29,7 @@ interface LessonState {
   grammarBridge: GrammarBridgeResult | null;
   vocabImages: Record<string, VocabImageResult | null>; // keyed by word
   vocabTranslations: Record<string, string>; // keyed by word → PT-BR translation
+  knownVocabulary: string[]; // words the user already learned (from Firestore)
 
   // Practice exercises
   exercises: Exercise[];
@@ -50,6 +51,7 @@ interface LessonState {
   init: (lesson: LessonDefinition, interests: string[]) => void;
 
   setPhase: (phase: LessonPhase) => void;
+  setKnownVocabulary: (words: string[]) => void;
   setHook: (hook: HookResult) => void;
   setGrammarBridge: (bridge: GrammarBridgeResult) => void;
   setVocabImage: (word: string, image: VocabImageResult | null) => void;
@@ -88,6 +90,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
   grammarBridge: null,
   vocabImages: {},
   vocabTranslations: {},
+  knownVocabulary: [],
   exercises: [],
   exerciseIndex: 0,
   correctCount: 0,
@@ -108,6 +111,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       grammarBridge: null,
       vocabImages: {},
       vocabTranslations: {},
+      knownVocabulary: [],
       exercises: [],
       exerciseIndex: 0,
       correctCount: 0,
@@ -120,6 +124,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
 
   setPhase: (phase) => set({ phase }),
   setIsLoading: (isLoading) => set({ isLoading }),
+  setKnownVocabulary: (knownVocabulary) => set({ knownVocabulary }),
 
   setHook: (hook) => set({
     hook: { ...hook, newVocabulary: [...new Set(hook.newVocabulary)] },
@@ -173,6 +178,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       grammarBridge: null,
       vocabImages: {},
       vocabTranslations: {},
+      knownVocabulary: [],
       exercises: [],
       exerciseIndex: 0,
       correctCount: 0,
