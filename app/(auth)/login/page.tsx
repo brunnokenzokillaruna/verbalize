@@ -182,9 +182,7 @@ export default function LoginPage() {
                 style={{
                   backgroundColor: 'var(--color-error-bg)',
                   color: 'var(--color-error)',
-                  border: '1px solid',
-                  borderColor: 'var(--color-error)',
-                  borderOpacity: 0.2,
+                  border: '1px solid var(--color-error)',
                 }}
               >
                 <AlertCircle size={16} className="shrink-0" />
