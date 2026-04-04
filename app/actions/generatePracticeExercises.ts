@@ -89,6 +89,7 @@ Exercise 2 — type "error-correction":
 - SELF-CHECK before outputting: ask yourself "Is this sentence clearly wrong? Would every native speaker agree it contains an error?" If there is any doubt, choose a different, clearer error.
 - GOOD error types (clear and unambiguous): wrong verb conjugation ("ils mange" → "mangent"), wrong gender agreement ("un belle maison" → "une belle"), wrong subject pronoun, missing negation particle ("je pas mange" → "ne…pas"), wrong preposition required by a specific verb.
 - BAD error types (AVOID — too ambiguous): swapping determiners that could both be valid (le/ce/mon/son), word-order variations acceptable in informal speech, register differences.
+- CRITICAL — ELISION/CONTRACTION RULE: When the error involves elision or contraction (e.g., "Je" before a vowel that should become "J'"), the "error_word" MUST span ALL words involved in the contraction, and "correct_word" MUST be the complete contracted result. NEVER set correct_word to a bare clitic like "J'" that cannot stand alone. Example: error_word="Je écoute" → correct_word="J'écoute" (NOT error_word="Je" → correct_word="J'"). The same rule applies to "de + vowel" → "d'", "le/la + vowel" → "l'", etc.
 
 Exercise 3 — type "reverse-translation":
 - "portuguese_sentence" is a natural Brazilian Portuguese sentence related to the lesson theme (NOT a translation of any dialogue line)

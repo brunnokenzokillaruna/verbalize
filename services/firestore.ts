@@ -240,6 +240,37 @@ export async function updateVocabTranslation(
   }
 }
 
+/**
+ * Updates the SRS level and next review date for a vocabulary item after a review exercise.
+ * Correct → level up (max 5). Incorrect → level down (min 0) + increment mistakeCount.
+ */
+export async function updateVocabSrsAfterReview(
+  uid: string,
+  word: string,
+  language: SupportedLanguage,
+  correct: boolean,
+): Promise<void> {
+  const q = query(
+    collection(db, 'user_vocabulary'),
+    where('uid', '==', uid),
+    where('language', '==', language),
+    where('word', '==', word),
+  );
+  const snap = await getDocs(q);
+  if (snap.empty) return;
+
+  const docRef = snap.docs[0].ref;
+  const existing = snap.docs[0].data() as UserVocabularyDocument;
+  const { newLevel, nextReview } = calculateNextReview(existing.srsLevel, correct);
+
+  await updateDoc(docRef, {
+    srsLevel: newLevel,
+    lastReview: serverTimestamp(),
+    nextReview: Timestamp.fromDate(nextReview),
+    ...(correct ? {} : { mistakeCount: (existing.mistakeCount ?? 0) + 1 }),
+  });
+}
+
 // ─── Verb Cache ───────────────────────────────────────────────────────────────
 
 /**

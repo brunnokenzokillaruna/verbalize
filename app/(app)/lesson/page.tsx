@@ -667,42 +667,47 @@ export default function LessonPage() {
   if (hookError) {
     return (
       <div
-        className="flex min-h-dvh flex-col items-center justify-center gap-5 px-6 py-12 text-center"
+        className="flex min-h-dvh flex-col items-center justify-center gap-6 px-6 py-12 text-center"
         style={{ backgroundColor: 'var(--color-bg)' }}
       >
         <div
-          className="flex h-16 w-16 items-center justify-center rounded-full text-3xl"
-          style={{ backgroundColor: 'var(--color-error-bg)' }}
+          className="flex h-20 w-20 items-center justify-center rounded-3xl text-4xl animate-scale-in"
+          style={{
+            backgroundColor: 'var(--color-error-bg)',
+            border: '1.5px solid rgba(220,38,38,0.2)',
+          }}
         >
           ⚠️
         </div>
-        <div>
-          <h2
-            className="font-display text-xl font-semibold"
-            style={{ color: 'var(--color-text-primary)' }}
-          >
+        <div className="animate-slide-up delay-75">
+          <h2 className="font-display text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
             Erro ao gerar lição
           </h2>
-          <p className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--color-text-muted)' }}>
-            Não foi possível conectar ao servidor de IA.{'\n'}Verifique sua conexão e tente novamente.
+          <p className="mt-2 text-sm leading-relaxed max-w-xs mx-auto" style={{ color: 'var(--color-text-muted)' }}>
+            Não foi possível conectar ao servidor de IA. Verifique sua conexão e tente novamente.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={handleRetry}
-          className="rounded-2xl px-8 py-4 text-base font-semibold transition-all active:scale-95"
-          style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-text-inverse)' }}
-        >
-          Tentar novamente
-        </button>
-        <button
-          type="button"
-          onClick={() => exitLesson()}
-          className="text-sm transition-opacity hover:opacity-70"
-          style={{ color: 'var(--color-text-muted)' }}
-        >
-          Voltar ao início
-        </button>
+        <div className="flex flex-col items-center gap-3 w-full max-w-xs animate-slide-up delay-150">
+          <button
+            type="button"
+            onClick={handleRetry}
+            className="cta-shimmer relative w-full overflow-hidden rounded-2xl px-8 py-4 text-base font-bold text-white transition-all active:scale-95"
+            style={{
+              background: 'linear-gradient(135deg, var(--color-primary) 0%, #2563eb 100%)',
+              boxShadow: '0 6px 20px rgba(29,94,212,0.3)',
+            }}
+          >
+            Tentar novamente
+          </button>
+          <button
+            type="button"
+            onClick={() => exitLesson()}
+            className="text-sm font-medium transition-opacity hover:opacity-70 py-2"
+            style={{ color: 'var(--color-text-muted)' }}
+          >
+            Voltar ao início
+          </button>
+        </div>
       </div>
     );
   }
@@ -718,13 +723,35 @@ export default function LessonPage() {
   if (phase === 'idle' || phase === 'loading') {
     return (
       <div
-        className="flex min-h-dvh flex-col items-center justify-center gap-4"
+        className="flex min-h-dvh flex-col items-center justify-center gap-5 px-6"
         style={{ backgroundColor: 'var(--color-bg)' }}
       >
-        <Loader2 size={36} className="animate-spin" style={{ color: 'var(--color-primary)' }} />
-        <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
-          Gerando sua lição…
-        </p>
+        <div
+          className="flex h-20 w-20 items-center justify-center rounded-3xl animate-pulse"
+          style={{
+            background: 'linear-gradient(135deg, var(--color-primary-light), var(--color-surface-raised))',
+            border: '1.5px solid var(--color-border)',
+          }}
+        >
+          <Loader2 size={32} className="animate-spin" style={{ color: 'var(--color-primary)' }} />
+        </div>
+        <div className="text-center">
+          <p className="font-display text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+            Preparando sua lição
+          </p>
+          <p className="mt-1 text-sm" style={{ color: 'var(--color-text-muted)' }}>
+            A IA está gerando o conteúdo…
+          </p>
+        </div>
+        <div className="flex gap-1.5">
+          {[0, 1, 2].map((i) => (
+            <span
+              key={i}
+              className="h-1.5 w-1.5 rounded-full animate-bounce"
+              style={{ backgroundColor: 'var(--color-primary)', animationDelay: `${i * 150}ms`, opacity: 0.5 }}
+            />
+          ))}
+        </div>
       </div>
     );
   }
@@ -735,45 +762,102 @@ export default function LessonPage() {
     const total = store.exercises.length;
     const correct = store.correctCount;
     const pct = total > 0 ? Math.round((correct / total) * 100) : 100;
+    const isPerfect = pct === 100;
 
     return (
       <div
-        className="flex min-h-dvh flex-col items-center justify-center gap-6 px-5 py-12"
+        className="relative flex min-h-dvh flex-col items-center justify-center gap-6 px-5 py-12 overflow-hidden"
         style={{ backgroundColor: 'var(--color-bg)' }}
       >
-        <div
-          className="flex h-20 w-20 items-center justify-center rounded-full"
-          style={{ backgroundColor: 'var(--color-primary-light)' }}
-        >
-          <Trophy size={40} style={{ color: 'var(--color-primary)' }} />
+        {/* Background glow orbs */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+          <div
+            className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 h-72 w-72 rounded-full blur-3xl opacity-30"
+            style={{ background: 'radial-gradient(circle, rgba(29,94,212,0.4) 0%, transparent 70%)' }}
+          />
+          {isPerfect && (
+            <div
+              className="absolute bottom-1/4 left-1/2 -translate-x-1/2 h-48 w-48 rounded-full blur-3xl opacity-25"
+              style={{ background: 'radial-gradient(circle, rgba(217,119,6,0.5) 0%, transparent 70%)' }}
+            />
+          )}
         </div>
 
-        <div className="text-center">
-          <h1 className="font-display text-3xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
-            Lição concluída!
+        {/* Trophy icon */}
+        <div className="relative animate-scale-in">
+          <div
+            className="flex h-24 w-24 items-center justify-center rounded-3xl animate-glow-amber"
+            style={{
+              background: isPerfect
+                ? 'linear-gradient(135deg, #f59e0b, #d97706)'
+                : 'linear-gradient(135deg, var(--color-primary), #2563eb)',
+              boxShadow: isPerfect
+                ? '0 12px 40px rgba(217,119,6,0.4)'
+                : '0 12px 40px rgba(29,94,212,0.4)',
+            }}
+          >
+            <Trophy size={44} color="white" />
+          </div>
+          {isPerfect && (
+            <span className="absolute -top-2 -right-2 text-2xl animate-bounce">⭐</span>
+          )}
+        </div>
+
+        {/* Score */}
+        <div className="text-center animate-slide-up delay-75">
+          <h1 className="font-display text-4xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
+            {isPerfect ? 'Perfeito!' : 'Lição concluída!'}
           </h1>
-          <p className="mt-2 text-lg font-semibold" style={{ color: 'var(--color-primary)' }}>
-            {pct}% de acerto
-          </p>
+          <div className="mt-3 flex items-baseline justify-center gap-1">
+            <span
+              className="font-display text-5xl font-bold"
+              style={{ color: isPerfect ? 'var(--color-vocab)' : 'var(--color-primary)' }}
+            >
+              {pct}%
+            </span>
+            <span className="text-lg font-medium" style={{ color: 'var(--color-text-muted)' }}>de acerto</span>
+          </div>
           <p className="mt-1 text-sm" style={{ color: 'var(--color-text-muted)' }}>
             {correct} de {total} exercícios corretos
           </p>
         </div>
 
+        {/* Score bar */}
+        <div className="w-full max-w-xs animate-slide-up delay-150">
+          <div className="h-2 w-full rounded-full overflow-hidden" style={{ backgroundColor: 'var(--color-surface-raised)' }}>
+            <div
+              className="h-full rounded-full transition-all duration-700"
+              style={{
+                width: `${pct}%`,
+                background: isPerfect
+                  ? 'linear-gradient(90deg, #f59e0b, #fbbf24)'
+                  : 'linear-gradient(90deg, var(--color-primary), #60a5fa)',
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Learned words */}
         {store.hook && store.hook.newVocabulary.length > 0 && (
           <div
-            className="w-full max-w-sm rounded-2xl p-4"
-            style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
+            className="w-full max-w-sm rounded-2xl p-4 animate-slide-up delay-225"
+            style={{ backgroundColor: 'var(--color-surface)', border: '1.5px solid var(--color-border)' }}
           >
-            <p className="mb-3 text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--color-text-muted)' }}>
+            <p className="mb-3 text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--color-text-muted)' }}>
               Palavras aprendidas
             </p>
             <div className="flex flex-wrap gap-2">
-              {store.hook.newVocabulary.map((w) => (
+              {store.hook.newVocabulary.map((w, i) => (
                 <span
                   key={w}
-                  className="rounded-lg px-3 py-1 text-sm font-medium"
-                  style={{ backgroundColor: 'var(--color-vocab-bg)', color: 'var(--color-vocab)' }}
+                  className="rounded-xl px-3 py-1.5 text-sm font-semibold animate-scale-in"
+                  style={{
+                    animationDelay: `${300 + i * 80}ms`,
+                    animationFillMode: 'both',
+                    backgroundColor: 'var(--color-vocab-bg)',
+                    color: 'var(--color-vocab)',
+                    border: '1px solid rgba(217,119,6,0.2)',
+                  }}
                 >
                   {w}
                 </span>
@@ -782,14 +866,20 @@ export default function LessonPage() {
           </div>
         )}
 
-        <button
-          type="button"
-          onClick={() => exitLesson()}
-          className="rounded-2xl px-8 py-4 text-base font-semibold transition-all active:scale-95"
-          style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-text-inverse)' }}
-        >
-          Voltar ao início
-        </button>
+        {/* CTA */}
+        <div className="w-full max-w-sm animate-slide-up delay-300">
+          <button
+            type="button"
+            onClick={() => exitLesson()}
+            className="cta-shimmer relative w-full overflow-hidden rounded-2xl py-4 text-base font-bold text-white transition-all active:scale-[0.98]"
+            style={{
+              background: 'linear-gradient(135deg, var(--color-primary) 0%, #2563eb 100%)',
+              boxShadow: '0 8px 24px rgba(29,94,212,0.35)',
+            }}
+          >
+            Continuar →
+          </button>
+        </div>
       </div>
     );
   }
@@ -807,29 +897,40 @@ export default function LessonPage() {
 
         {/* ── Vocabulary phase ── */}
         {phase === 'vocabulary' && store.hook && store.lesson && (
-          <div className="flex flex-col gap-4 animate-slide-up">
-            <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--color-text-muted)' }}>
-              Vocabulário da Lição
-            </p>
+          <div className="flex flex-col gap-5 animate-slide-up-spring">
+            <div className="flex items-center gap-2">
+              <span className="text-base">📖</span>
+              <p className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--color-text-muted)' }}>
+                Vocabulário da Lição
+              </p>
+            </div>
             {store.isLoading && store.hook.newVocabulary.length === 0 && (
-              <div className="flex items-center gap-3">
-                <Loader2 size={18} className="animate-spin" style={{ color: 'var(--color-primary)' }} />
+              <div
+                className="flex items-center gap-3 rounded-2xl px-4 py-3"
+                style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
+              >
+                <Loader2 size={16} className="animate-spin" style={{ color: 'var(--color-primary)' }} />
                 <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Carregando imagens…</span>
               </div>
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {[...new Set(store.hook.newVocabulary)].map((word) => {
+              {[...new Set(store.hook.newVocabulary)].map((word, idx) => {
                 const img = store.vocabImages[word];
                 const translation = store.vocabTranslations[word] ?? word;
                 return (
-                  <VisualVocabCard
+                  <div
                     key={word}
-                    word={word}
-                    translation={translation}
-                    language={store.lesson!.language}
-                    imageUrl={img?.imageUrl}
-                    imageAlt={img?.imageAlt}
-                  />
+                    className="animate-slide-up"
+                    style={{ animationDelay: `${idx * 80}ms`, animationFillMode: 'both' }}
+                  >
+                    <VisualVocabCard
+                      word={word}
+                      translation={translation}
+                      language={store.lesson!.language}
+                      imageUrl={img?.imageUrl}
+                      imageAlt={img?.imageAlt}
+                    />
+                  </div>
                 );
               })}
             </div>
@@ -838,84 +939,119 @@ export default function LessonPage() {
 
         {/* ── Hook phase ── */}
         {phase === 'hook' && store.hook && (
-          <div className="flex flex-col gap-6 animate-slide-up">
-            <div>
-              <div className="mb-2 flex items-center justify-between">
-                <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--color-text-muted)' }}>
+          <div className="flex flex-col gap-5 animate-slide-up-spring">
+            {/* Header row */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-base">💬</span>
+                <p className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--color-text-muted)' }}>
                   Diálogo
                 </p>
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={handleAudioButton}
-                    disabled={isLoadingAudio}
-                    aria-label={isPlaying ? 'Parar áudio' : 'Ouvir diálogo'}
-                    className="flex h-8 w-8 items-center justify-center rounded-full transition-all active:scale-90 disabled:cursor-not-allowed"
-                    style={{
-                      backgroundColor: isPlaying ? 'var(--color-primary)' : 'var(--color-surface-raised)',
-                      color: isPlaying ? 'var(--color-text-inverse)' : 'var(--color-text-muted)',
-                    }}
-                  >
-                    {isLoadingAudio
-                      ? <Loader2 size={15} className="animate-spin" />
-                      : isPlaying
-                        ? <VolumeX size={15} />
-                        : <Volume2 size={15} />}
-                  </button>
-                </div>
               </div>
+              <button
+                type="button"
+                onClick={handleAudioButton}
+                disabled={isLoadingAudio}
+                aria-label={isPlaying ? 'Parar áudio' : 'Ouvir diálogo'}
+                className="flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold transition-all active:scale-90 disabled:cursor-not-allowed"
+                style={{
+                  backgroundColor: isPlaying ? 'var(--color-primary)' : 'var(--color-surface)',
+                  border: `1.5px solid ${isPlaying ? 'var(--color-primary)' : 'var(--color-border)'}`,
+                  color: isPlaying ? '#fff' : 'var(--color-text-muted)',
+                }}
+              >
+                {isLoadingAudio
+                  ? <Loader2 size={13} className="animate-spin" />
+                  : isPlaying
+                    ? <VolumeX size={13} />
+                    : <Volume2 size={13} />}
+                {isPlaying ? 'Parar' : isLoadingAudio ? 'Carregando…' : 'Ouvir'}
+              </button>
+            </div>
+
+            {/* Dialogue bubbles */}
+            <div className="flex flex-col gap-3">
               {store.hook.dialogue.split('\n').filter((l) => l.trim()).map((line, i) => {
                 const match = line.match(/^([^:]+):\s*(.+)/);
                 const speakerName = match?.[1]?.trim();
                 const text = match?.[2]?.trim() ?? line;
                 const isEven = i % 2 === 0;
                 const isActive = playingLineIdx === i;
+
+                const speakerColor = isEven ? 'var(--color-primary)' : '#d97706';
+                const bubbleBg = isEven ? 'var(--color-primary-light)' : 'var(--color-vocab-bg)';
+                const bubbleBorder = isEven
+                  ? `1.5px solid ${isActive ? 'var(--color-primary)' : 'rgba(29,94,212,0.2)'}`
+                  : `1.5px solid ${isActive ? '#d97706' : 'rgba(217,119,6,0.2)'}`;
+
                 return (
                   <div
                     key={i}
-                    className="mb-3 rounded-xl px-3 py-2 -mx-3 transition-all duration-300"
-                    style={isActive ? {
-                      backgroundColor: isEven ? 'color-mix(in srgb, var(--color-primary) 10%, transparent)' : 'color-mix(in srgb, var(--color-accent, #e05c2a) 10%, transparent)',
-                      borderLeft: `3px solid ${isEven ? 'var(--color-primary)' : 'var(--color-accent, #e05c2a)'}`,
-                      marginLeft: '-9px',
-                      paddingLeft: '9px',
-                    } : {}}
+                    className={`flex flex-col ${isEven ? 'items-start' : 'items-end'} animate-slide-up`}
+                    style={{ animationDelay: `${i * 60}ms`, animationFillMode: 'both' }}
                   >
                     {speakerName && (
                       <p
-                        className="mb-1 text-xs font-bold uppercase tracking-wide"
-                        style={{ color: isEven ? 'var(--color-primary)' : 'var(--color-accent, #e05c2a)' }}
+                        className="mb-1 px-1 text-xs font-bold uppercase tracking-wide"
+                        style={{ color: speakerColor }}
                       >
                         {speakerName}
                       </p>
                     )}
-                    <ClickableSentence
-                      text={text}
-                      newVocabulary={[...new Set(store.hook!.newVocabulary)]}
-                      onWordClick={handleWordClick}
-                      className="text-lg"
-                    />
-                    {store.hook!.dialogueTranslations?.[i]?.trim() && (
-                      <p
-                        className="mt-1 text-sm italic"
-                        style={{ color: 'var(--color-bridge)' }}
-                      >
-                        {store.hook!.dialogueTranslations[i]}
-                      </p>
-                    )}
+                    <div
+                      className="max-w-[88%] rounded-2xl px-4 py-3 transition-all duration-300"
+                      style={{
+                        backgroundColor: bubbleBg,
+                        border: bubbleBorder,
+                        borderRadius: isEven
+                          ? '4px 18px 18px 18px'
+                          : '18px 4px 18px 18px',
+                        boxShadow: isActive
+                          ? `0 4px 16px ${isEven ? 'rgba(29,94,212,0.2)' : 'rgba(217,119,6,0.2)'}`
+                          : 'none',
+                      }}
+                    >
+                      <ClickableSentence
+                        text={text}
+                        newVocabulary={[...new Set(store.hook!.newVocabulary)]}
+                        onWordClick={handleWordClick}
+                        className="text-lg"
+                      />
+                      {store.hook!.dialogueTranslations?.[i]?.trim() && (
+                        <p
+                          className="mt-1.5 text-sm italic border-t pt-1.5"
+                          style={{
+                            color: 'var(--color-bridge)',
+                            borderColor: isEven ? 'rgba(29,94,212,0.15)' : 'rgba(217,119,6,0.15)',
+                          }}
+                        >
+                          {store.hook!.dialogueTranslations[i]}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 );
               })}
             </div>
-            <p className="text-xs" style={{ color: 'var(--color-text-muted)', fontStyle: 'italic' }}>
-              Toque nas palavras para ver a tradução
+
+            <p
+              className="text-center text-xs italic"
+              style={{ color: 'var(--color-text-muted)' }}
+            >
+              Toque nas palavras destacadas para ver a tradução
             </p>
           </div>
         )}
 
         {/* ── Grammar phase ── */}
         {phase === 'grammar' && store.grammarBridge && store.lesson && (
-          <div className="animate-slide-up">
+          <div className="flex flex-col gap-5 animate-slide-up-spring">
+            <div className="flex items-center gap-2">
+              <span className="text-base">🧠</span>
+              <p className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--color-text-muted)' }}>
+                Ponte Gramatical
+              </p>
+            </div>
             <GrammarBridgeCard
               bridge={store.grammarBridge}
               language={store.lesson.language}
@@ -926,22 +1062,36 @@ export default function LessonPage() {
 
         {/* ── Practice phase ── */}
         {phase === 'practice' && currentExercise && store.lesson && (
-          <div key={store.exerciseIndex} className="animate-slide-up">
-            <div className="mb-4 flex items-center justify-between">
-              <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--color-text-muted)' }}>
-                Exercício {store.exerciseIndex + 1} / {store.exercises.length}
-              </p>
+          <div key={store.exerciseIndex} className="animate-slide-up-spring">
+            {/* Progress header */}
+            <div className="mb-5">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-base">✏️</span>
+                  <p className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--color-text-muted)' }}>
+                    Prática
+                  </p>
+                </div>
+                <span
+                  className="rounded-full px-2.5 py-1 text-xs font-bold tabular-nums"
+                  style={{ backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)' }}
+                >
+                  {store.exerciseIndex + 1} / {store.exercises.length}
+                </span>
+              </div>
+              {/* Segmented progress bar */}
               <div className="flex gap-1">
                 {store.exercises.map((_, i) => (
                   <div
                     key={i}
-                    className="h-1.5 w-6 rounded-full"
+                    className="h-1.5 flex-1 rounded-full transition-all duration-300"
                     style={{
                       backgroundColor: i < store.exerciseIndex
                         ? 'var(--color-success)'
                         : i === store.exerciseIndex
                           ? 'var(--color-primary)'
                           : 'var(--color-border)',
+                      transform: i === store.exerciseIndex ? 'scaleY(1.3)' : 'scaleY(1)',
                     }}
                   />
                 ))}
@@ -1012,21 +1162,38 @@ export default function LessonPage() {
 
         {/* ── Review phase ── */}
         {phase === 'review' && currentReviewExercise && store.lesson && (
-          <div key={`review-${store.reviewIndex}`} className="animate-slide-up">
-            <div className="mb-4 flex items-center justify-between">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--color-error)' }}>
-                  Revisão de erros
-                </p>
-                <p className="mt-0.5 text-xs" style={{ color: 'var(--color-text-muted)' }}>
-                  {store.reviewMistake?.grammarFocus}
-                </p>
+          <div key={`review-${store.reviewIndex}`} className="animate-slide-up-spring">
+            {/* Review header */}
+            <div className="mb-5">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <span
+                    className="flex h-5 w-5 items-center justify-center rounded-full animate-ping"
+                    style={{ backgroundColor: 'var(--color-error)', opacity: 0.4 }}
+                  />
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--color-error)' }}>
+                      Revisão de erros
+                    </p>
+                    {store.reviewMistake?.grammarFocus && (
+                      <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-muted)' }}>
+                        {store.reviewMistake.grammarFocus}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <span
+                  className="rounded-full px-2.5 py-1 text-xs font-bold tabular-nums"
+                  style={{ backgroundColor: 'var(--color-error-bg)', color: 'var(--color-error)' }}
+                >
+                  {store.reviewIndex + 1} / {store.reviewExercises.length}
+                </span>
               </div>
               <div className="flex gap-1">
                 {store.reviewExercises.map((_, i) => (
                   <div
                     key={i}
-                    className="h-1.5 w-6 rounded-full"
+                    className="h-1.5 flex-1 rounded-full transition-all duration-300"
                     style={{
                       backgroundColor:
                         i < store.reviewIndex
@@ -1034,6 +1201,7 @@ export default function LessonPage() {
                           : i === store.reviewIndex
                             ? 'var(--color-error)'
                             : 'var(--color-border)',
+                      transform: i === store.reviewIndex ? 'scaleY(1.3)' : 'scaleY(1)',
                     }}
                   />
                 ))}
@@ -1069,37 +1237,48 @@ export default function LessonPage() {
       {/* ── Bottom CTA bar (non-practice, non-review phases) ── */}
       {phase !== 'practice' && phase !== 'review' && (
         <div
-          className="fixed bottom-0 left-0 right-0 z-20 mx-auto max-w-lg md:max-w-2xl lg:max-w-4xl px-5 pb-6 pt-3"
-          style={{ backgroundColor: 'var(--color-bg)' }}
+          className="fixed bottom-0 left-0 right-0 z-20 px-5 pb-6 pt-3"
+          style={{
+            backgroundColor: 'var(--color-bg)',
+            borderTop: '1px solid var(--color-border)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+          }}
         >
-          <button
-            type="button"
-            disabled={store.isLoading}
-            onClick={
-              phase === 'vocabulary'
-                ? advanceFromVocabulary
-                : phase === 'hook'
-                  ? advanceFromHook
-                  : advanceFromGrammar
-            }
-            className="flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-4 text-base font-semibold transition-all active:scale-[0.98] disabled:cursor-not-allowed"
-            style={{
-              backgroundColor: store.isLoading ? 'var(--color-surface-raised)' : 'var(--color-primary)',
-              color: store.isLoading ? 'var(--color-text-muted)' : 'var(--color-text-inverse)',
-              boxShadow: store.isLoading ? 'none' : '0 4px 16px rgba(29, 94, 212, 0.3)',
-            }}
-          >
-            {store.isLoading ? (
-              <>
-                <Loader2 size={20} className="animate-spin" />
-                Carregando…
-              </>
-            ) : phase === 'grammar' ? (
-              'Praticar'
-            ) : (
-              'Continuar'
-            )}
-          </button>
+          <div className="mx-auto max-w-lg md:max-w-2xl lg:max-w-4xl">
+            <button
+              type="button"
+              disabled={store.isLoading}
+              onClick={
+                phase === 'vocabulary'
+                  ? advanceFromVocabulary
+                  : phase === 'hook'
+                    ? advanceFromHook
+                    : advanceFromGrammar
+              }
+              className="cta-shimmer relative flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-2xl px-6 py-4 text-base font-bold transition-all active:scale-[0.98] disabled:cursor-not-allowed"
+              style={{
+                background: store.isLoading
+                  ? 'var(--color-surface-raised)'
+                  : 'linear-gradient(135deg, var(--color-primary) 0%, #2563eb 100%)',
+                color: store.isLoading ? 'var(--color-text-muted)' : '#fff',
+                boxShadow: store.isLoading ? 'none' : '0 6px 20px rgba(29,94,212,0.35)',
+              }}
+            >
+              {store.isLoading ? (
+                <>
+                  <Loader2 size={18} className="animate-spin" />
+                  Carregando…
+                </>
+              ) : phase === 'grammar' ? (
+                <>Praticar ✏️</>
+              ) : phase === 'hook' ? (
+                <>Entendi 🧠</>
+              ) : (
+                <>Continuar →</>
+              )}
+            </button>
+          </div>
         </div>
       )}
 

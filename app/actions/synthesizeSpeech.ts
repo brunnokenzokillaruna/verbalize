@@ -122,6 +122,17 @@ function stripSpeakerPrefix(line: string): string {
   return line.replace(/^[^:]+:\s*/, '').trim();
 }
 
+/**
+ * Converts plain text to a TTS `input` object.
+ * If the text contains "/" (e.g. "il/elle"), uses SSML so each alternative
+ * is pronounced separately with a short pause — instead of reading "slash".
+ */
+function buildTTSInput(text: string): { text: string } | { ssml: string } {
+  if (!text.includes('/')) return { text };
+  const ssmlContent = text.replace(/\s*\/\s*/g, '<break time="350ms"/>');
+  return { ssml: `<speak>${ssmlContent}</speak>` };
+}
+
 async function callTTS(
   text: string,
   voice: VoiceConfig,
@@ -132,7 +143,7 @@ async function callTTS(
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        input: { text },
+        input: buildTTSInput(text),
         voice,
         audioConfig: { audioEncoding: 'MP3', speakingRate: 0.88 },
       }),
@@ -156,9 +167,18 @@ async function callTTS(
 /*  Public API                                                        */
 /* ------------------------------------------------------------------ */
 
+/** Studio voice names per language — reliable for single words and short phrases. */
+const STUDIO_VOICES: Record<SupportedLanguage, string[]> = {
+  fr: ['fr-FR-Studio-A', 'fr-FR-Studio-D'],
+  en: ['en-US-Studio-O', 'en-US-Studio-Q'],
+};
+
 /**
  * Synthesizes a single piece of text with a random voice.
  * Used for word-click audio in TranslationTooltip.
+ *
+ * Chirp-HD / Chirp3-HD voices require full sentences and fail silently on
+ * single words, so short texts (≤ 3 words) always use Studio voices.
  */
 export async function synthesizeSpeech(
   text: string,
@@ -167,11 +187,16 @@ export async function synthesizeSpeech(
   const apiKey = process.env.GOOGLE_TTS_API_KEY;
   if (!apiKey) return null;
 
-  const pool = VOICE_POOLS[language];
-  const allVoices = [...pool.female, ...pool.male];
+  const wordCount = text.trim().split(/\s+/).length;
+  const isShort = wordCount <= 3;
+
+  const candidateNames = isShort
+    ? STUDIO_VOICES[language]
+    : [...VOICE_POOLS[language].female, ...VOICE_POOLS[language].male];
+
   const voice: VoiceConfig = {
     languageCode: LANG_CODES[language],
-    name: pickRandom(allVoices),
+    name: pickRandom(candidateNames),
   };
   return callTTS(text, voice, apiKey);
 }

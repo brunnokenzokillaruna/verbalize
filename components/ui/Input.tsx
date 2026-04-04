@@ -16,20 +16,20 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="text-sm font-medium"
+            className="text-sm font-semibold"
             style={{ color: 'var(--color-text-secondary)' }}
           >
             {label}
           </label>
         )}
 
-        <div className="relative">
+        <div className="relative group">
           {Icon && (
             <span
-              className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2"
+              className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-150"
               style={{ color: 'var(--color-text-muted)' }}
             >
-              <Icon size={18} />
+              <Icon size={17} />
             </span>
           )}
 
@@ -37,31 +37,37 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             ref={ref}
             id={inputId}
             className={[
-              'w-full rounded-xl border px-4 py-3 text-base outline-none transition-all duration-150',
+              'w-full rounded-2xl border px-4 py-3 text-base outline-none transition-all duration-150',
               Icon ? 'pl-10' : '',
-              error ? '' : '',
               className,
             ]
               .filter(Boolean)
               .join(' ')}
             style={{
               backgroundColor: 'var(--color-surface)',
-              borderColor: error ? 'var(--color-error)' : 'var(--color-border-strong)',
+              borderColor: error ? 'var(--color-error)' : 'var(--color-border)',
               color: 'var(--color-text-primary)',
-              boxShadow: error ? '0 0 0 3px var(--color-error-bg)' : undefined,
+              boxShadow: error
+                ? '0 0 0 3px var(--color-error-bg)'
+                : undefined,
             }}
             onFocus={(e) => {
               if (!error) {
                 e.currentTarget.style.borderColor = 'var(--color-primary)';
                 e.currentTarget.style.boxShadow = '0 0 0 3px var(--color-primary-light)';
               }
+              // Tint the icon on focus
+              const icon = e.currentTarget.previousElementSibling as HTMLElement | null;
+              if (icon) icon.style.color = 'var(--color-primary)';
               rest.onFocus?.(e);
             }}
             onBlur={(e) => {
               if (!error) {
-                e.currentTarget.style.borderColor = 'var(--color-border-strong)';
+                e.currentTarget.style.borderColor = 'var(--color-border)';
                 e.currentTarget.style.boxShadow = 'none';
               }
+              const icon = e.currentTarget.previousElementSibling as HTMLElement | null;
+              if (icon) icon.style.color = 'var(--color-text-muted)';
               rest.onBlur?.(e);
             }}
             {...rest}
@@ -69,7 +75,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         </div>
 
         {error && (
-          <p className="text-sm" style={{ color: 'var(--color-error)' }}>
+          <p className="text-xs font-medium" style={{ color: 'var(--color-error)' }}>
             {error}
           </p>
         )}

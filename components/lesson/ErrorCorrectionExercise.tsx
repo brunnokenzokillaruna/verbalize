@@ -20,11 +20,20 @@ export function ErrorCorrectionExercise({ data, onAnswer, answered }: ErrorCorre
     s.toLowerCase().replace(/[.,!?;:'"-]/g, '').replace(/\s+/g, ' ').trim();
 
   const normalizedInput = normalize(input);
-  const isExactCorrect = normalizedInput === normalize(data.correct_word);
+  const normalizedCorrect = normalize(data.correct_word);
+  const isExactCorrect = normalizedInput === normalizedCorrect;
+  // Safety net: if correct_word is a bare clitic ending with ' (e.g. "J'"),
+  // also accept answers that start with it (e.g. "J'écoute").
+  // Use raw (non-normalized) strings so the apostrophe isn't stripped.
+  const isElisionPrefix =
+    !isExactCorrect &&
+    data.correct_word.trimEnd().endsWith("'") &&
+    input.toLowerCase().startsWith(data.correct_word.toLowerCase());
   const isAlternativeCorrect =
     !isExactCorrect &&
+    !isElisionPrefix &&
     (data.acceptable_answers ?? []).some((alt) => normalize(alt) === normalizedInput);
-  const isCorrect = isExactCorrect || isAlternativeCorrect;
+  const isCorrect = isExactCorrect || isElisionPrefix || isAlternativeCorrect;
   const isAccentWarning =
     !isCorrect &&
     (isAccentOnlyDiff(input, data.correct_word) ||

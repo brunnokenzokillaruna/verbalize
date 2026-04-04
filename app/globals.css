@@ -148,13 +148,43 @@ body {
   100% { box-shadow: 0 0 0 0 rgba(29, 94, 212, 0); }
 }
 
-.animate-tooltip     { animation: tooltip-enter 150ms ease forwards; }
-.animate-correct     { animation: correct-bounce 400ms cubic-bezier(0.34, 1.56, 0.64, 1); }
-.animate-stage       { animation: stage-enter 200ms ease forwards; }
-.animate-shake       { animation: shake 350ms ease; }
-.animate-fade-in     { animation: fade-in 300ms ease both; }
-.animate-slide-up    { animation: slide-up 350ms ease both; }
-.animate-slide-in    { animation: slide-in-right 300ms ease both; }
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(var(--float-rotate, 0deg)); }
+  50%       { transform: translateY(-8px) rotate(var(--float-rotate, 0deg)); }
+}
+
+@keyframes shimmer-sweep {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes glow-amber {
+  0%, 100% { box-shadow: 0 0 12px 0 rgba(217, 119, 6, 0.25); }
+  50%       { box-shadow: 0 0 24px 4px rgba(217, 119, 6, 0.45); }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slide-up-spring {
+  0%   { opacity: 0; transform: translateY(32px) scale(0.97); }
+  60%  { opacity: 1; transform: translateY(-4px) scale(1.005); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.animate-tooltip       { animation: tooltip-enter 150ms ease forwards; }
+.animate-correct       { animation: correct-bounce 400ms cubic-bezier(0.34, 1.56, 0.64, 1); }
+.animate-stage         { animation: stage-enter 200ms ease forwards; }
+.animate-shake         { animation: shake 350ms ease; }
+.animate-fade-in       { animation: fade-in 300ms ease both; }
+.animate-slide-up      { animation: slide-up 350ms ease both; }
+.animate-slide-up-spring { animation: slide-up-spring 500ms cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.animate-slide-in      { animation: slide-in-right 300ms ease both; }
+.animate-scale-in      { animation: scale-in 250ms cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.animate-float         { animation: float 4s ease-in-out infinite; }
+.animate-glow-amber    { animation: glow-amber 2.5s ease-in-out infinite; }
 
 .delay-75  { animation-delay: 75ms; }
 .delay-150 { animation-delay: 150ms; }
@@ -162,3 +192,51 @@ body {
 .delay-300 { animation-delay: 300ms; }
 .delay-375 { animation-delay: 375ms; }
 .delay-450 { animation-delay: 450ms; }
+.delay-525 { animation-delay: 525ms; }
+.delay-600 { animation-delay: 600ms; }
+
+/* ─── Dashboard card hover lift ─────────────────────────────────────────────── */
+.card-lift {
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+.card-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.10);
+}
+.dark .card-lift:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+/* ─── CTA shimmer button ─────────────────────────────────────────────────────── */
+.cta-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.12) 50%,
+    transparent 70%
+  );
+  background-size: 200% 100%;
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+.cta-shimmer:hover::after {
+  opacity: 1;
+  animation: shimmer-sweep 700ms ease forwards;
+}
+
+/* ─── Lesson card progress dot ───────────────────────────────────────────────── */
+.lesson-current-dot {
+  position: relative;
+}
+.lesson-current-dot::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  background: transparent;
+  animation: pulse-ring 2s ease-out infinite;
+}
