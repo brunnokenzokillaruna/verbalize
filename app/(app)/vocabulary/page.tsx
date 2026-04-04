@@ -703,7 +703,6 @@ function ReviewOverlay({
   // ── Done screen ──────────────────────────────────────────────────────────────
   if (state === 'done') {
     const correctCount = results.filter((r) => r.correct).length;
-    const incorrectCount = results.length - correctCount;
     const pct = Math.round((correctCount / results.length) * 100);
 
     return (

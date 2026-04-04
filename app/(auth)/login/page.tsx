@@ -8,7 +8,6 @@ import { signInWithEmail, signInWithGoogle } from '@/services/auth';
 import { getUser } from '@/services/firestore';
 import { useAuthStore } from '@/store/authStore';
 import { BrandPanel } from '@/components/auth/BrandPanel';
-import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 
 const GoogleIcon = () => (
