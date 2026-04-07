@@ -1,0 +1,176 @@
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/store/authStore';
+import { useLessonStore } from '@/store/lessonStore';
+import { getNextLesson, getLessonById } from '@/lib/curriculum';
+import { generateHook } from '@/app/actions/generateHook';
+import { generateGrammarBridge } from '@/app/actions/generateGrammarBridge';
+import { getVocabImage } from '@/app/actions/getVocabImage';
+import { translateWord } from '@/app/actions/translateWord';
+import { getPregeneratedLesson, deletePregeneratedLesson, getUserVocabulary } from '@/services/firestore';
+import type { GrammarBridgeResult, Exercise } from '@/types';
+
+interface UseLessonBootstrapProps {
+  requestedLessonId: string | undefined;
+  exitingRef: React.MutableRefObject<boolean>;
+  lessonInitiatedRef: React.MutableRefObject<boolean>;
+  grammarBridgePrefetchRef: React.MutableRefObject<Promise<GrammarBridgeResult | null> | null>;
+  exercisesPrefetchRef: React.MutableRefObject<Promise<Exercise[] | null> | null>;
+  fetchAiExercises: () => Promise<Exercise[] | null>;
+}
+
+export function useLessonBootstrap({
+  requestedLessonId,
+  exitingRef,
+  lessonInitiatedRef,
+  grammarBridgePrefetchRef,
+  exercisesPrefetchRef,
+  fetchAiExercises
+}: UseLessonBootstrapProps) {
+  const router = useRouter();
+  const { user, profile } = useAuthStore();
+  const store = useLessonStore();
+  
+  const [hookError, setHookError] = useState(false);
+
+  useEffect(() => {
+    if (!profile) return;
+    if (exitingRef.current) return;
+    if (store.phase !== 'idle') return;
+    if (lessonInitiatedRef.current) return;
+    lessonInitiatedRef.current = true;
+
+    setHookError(false);
+    const language = profile.currentTargetLanguage;
+    const lesson =
+      (requestedLessonId ? getLessonById(requestedLessonId) : undefined) ??
+      getNextLesson(language, profile.lessonProgress?.[language]);
+    store.init(lesson, profile.interests ?? []);
+
+    (async () => {
+      store.setIsLoading(true);
+      try {
+        let hook = null;
+        if (user) {
+          try {
+            const pregenDoc = await getPregeneratedLesson(user.uid, lesson.id);
+            if (pregenDoc?.hook) {
+              hook = pregenDoc.hook;
+              deletePregeneratedLesson(user.uid, lesson.id).catch(console.error);
+            }
+          } catch {
+            // Permission error or network issue — fall through to normal generation
+          }
+        }
+
+        const vocabDocs = user ? await getUserVocabulary(user.uid, lesson.language) : [];
+        const knownVocabulary = vocabDocs.map((v) => v.word);
+        store.setKnownVocabulary(knownVocabulary);
+
+        if (!hook) {
+          hook = await generateHook({
+            language: lesson.language,
+            level: lesson.level,
+            interests: profile.interests ?? [],
+            grammarFocus: lesson.grammarFocus,
+            knownVocabulary,
+          });
+        }
+
+        if (hook) {
+          store.setHook(hook);
+          store.setPhase('vocabulary');
+        } else {
+          store.setIsLoading(false);
+          setHookError(true);
+        }
+      } catch (err) {
+        console.error('[LessonPage] generateHook threw:', err);
+        store.setIsLoading(false);
+        setHookError(true);
+      }
+    })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile, store.phase]);
+
+  useEffect(() => {
+    if ((store.phase !== 'hook' && store.phase !== 'vocabulary') || !store.hook || !store.lesson) return;
+    const { hook, lesson } = store;
+
+    if (hook.grammarBridge) {
+      grammarBridgePrefetchRef.current = Promise.resolve(hook.grammarBridge);
+    } else {
+      grammarBridgePrefetchRef.current = generateGrammarBridge({
+        dialogue: hook.dialogue,
+        grammarFocus: hook.grammarFocus,
+        language: lesson.language,
+      });
+    }
+
+    const words = hook.newVocabulary;
+    const dialogue = hook.dialogue;
+    const language = lesson.language;
+
+    if (hook.vocabTranslations) {
+      words.forEach((word) => {
+        const result = hook.vocabTranslations![word];
+        if (result?.translation) store.setVocabTranslation(word, result.translation);
+      });
+    } else {
+      words.forEach(async (word) => {
+        const result = await translateWord(word, dialogue, language);
+        if (result?.translation) store.setVocabTranslation(word, result.translation);
+      });
+    }
+
+    (async () => {
+      const imagePromises = words.map(async (word) => {
+        const precomputedKeyword = hook.imageKeywords?.[word];
+        const result = await getVocabImage(word, dialogue, language, [], precomputedKeyword);
+        store.setVocabImage(word, result);
+        return { word, result };
+      });
+      const imageResults = await Promise.all(imagePromises);
+
+      const usedUrls: string[] = [];
+      const refetchWords: string[] = [];
+      imageResults.forEach(({ word, result }) => {
+        if (result?.imageUrl && usedUrls.includes(result.imageUrl)) {
+          refetchWords.push(word);
+          store.setVocabImage(word, null);
+        } else if (result?.imageUrl) {
+          usedUrls.push(result.imageUrl);
+        }
+      });
+
+      if (refetchWords.length > 0) {
+        await Promise.all(
+          refetchWords.map(async (word) => {
+            const precomputedKeyword = hook.imageKeywords?.[word];
+            const result = await getVocabImage(word, dialogue, language, [...usedUrls], precomputedKeyword);
+            store.setVocabImage(word, result);
+            if (result?.imageUrl && !usedUrls.includes(result.imageUrl)) {
+              usedUrls.push(result.imageUrl);
+            }
+          }),
+        );
+      }
+    })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [store.phase]);
+
+  useEffect(() => {
+    if (store.phase !== 'grammar' || !store.hook || !store.lesson) return;
+    exercisesPrefetchRef.current = fetchAiExercises();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [store.phase]);
+
+  useEffect(() => {
+    if (store.phase === 'complete') {
+      router.prefetch('/');
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [store.phase]);
+
+  return { hookError, setHookError };
+}

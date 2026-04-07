@@ -7,11 +7,15 @@ import {
   AlertCircle, Loader2, Flame, BookOpen, Target, User,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
-import { updateUser, deleteUserData, getUserMistakes } from '@/services/firestore';
-import { logOut, deleteAccount } from '@/services/auth';
+import { updateUser } from '@/services/firestore';
+import { logOut } from '@/services/auth';
 import { Input } from '@/components/ui/Input';
 import { ImageCacheManager } from '@/components/admin/ImageCacheManager';
-import type { SupportedLanguage, LessonMistakeDocument } from '@/types';
+import type { SupportedLanguage } from '@/types';
+
+import { SectionLabel } from '@/components/profile/SectionLabel';
+import { MistakesSection } from '@/components/profile/MistakesSection';
+import { DeleteAccountSheet } from '@/components/profile/DeleteAccountSheet';
 
 const ADMIN_EMAIL = 'brunnokenzokillaruna@gmail.com';
 
@@ -38,13 +42,7 @@ const INTERESTS = [
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
-function SectionLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <p className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--color-text-muted)' }}>
-      {children}
-    </p>
-  );
-}
+
 
 function SelectPill({ label, selected, onClick }: { label: string; selected: boolean; onClick: () => void }) {
   return (
@@ -90,20 +88,6 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [showDeleteSheet, setShowDeleteSheet] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-  const [deleteError, setDeleteError] = useState('');
-
-  const [mistakes, setMistakes] = useState<LessonMistakeDocument[]>([]);
-  const [mistakesLoading, setMistakesLoading] = useState(true);
-  const [mistakeIndex, setMistakeIndex] = useState(0);
-
-  useEffect(() => {
-    if (!user) return;
-    setMistakesLoading(true);
-    getUserMistakes(user.uid)
-      .then((list) => { setMistakes(list); setMistakesLoading(false); })
-      .catch(() => setMistakesLoading(false));
-  }, [user]);
 
   if (!profile || !user) return null;
 
@@ -141,25 +125,7 @@ export default function ProfilePage() {
     router.replace('/login');
   }
 
-  async function handleDeleteAccount() {
-    if (!user) return;
-    setDeleting(true);
-    setDeleteError('');
-    try {
-      await deleteUserData(user.uid);
-      await deleteAccount(user);
-      reset();
-      router.replace('/login');
-    } catch (err: unknown) {
-      const code = (err as { code?: string })?.code;
-      setDeleteError(
-        code === 'auth/requires-recent-login'
-          ? 'Por segurança, saia e faça login novamente antes de excluir sua conta.'
-          : 'Erro ao excluir conta. Tente novamente.',
-      );
-      setDeleting(false);
-    }
-  }
+
 
   return (
     <div className="min-h-dvh pb-40 md:pb-24" style={{ backgroundColor: 'var(--color-bg)' }}>
@@ -377,112 +343,7 @@ export default function ProfilePage() {
         </section>
 
         {/* ── Erros para revisar ── */}
-        <section className="flex flex-col gap-4 animate-slide-up-spring delay-300">
-          <div className="flex items-center justify-between">
-            <SectionLabel>Erros para revisar</SectionLabel>
-            {mistakes.length > 0 && (
-              <span
-                className="rounded-full px-2.5 py-0.5 text-xs font-bold"
-                style={{ backgroundColor: 'var(--color-error-bg)', color: 'var(--color-error)' }}
-              >
-                {mistakes.length}
-              </span>
-            )}
-          </div>
-
-          {mistakesLoading ? (
-            <div className="flex items-center gap-2.5 rounded-2xl px-4 py-4" style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
-              <Loader2 size={16} className="animate-spin" style={{ color: 'var(--color-text-muted)' }} />
-              <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Carregando erros…</span>
-            </div>
-          ) : mistakes.length === 0 ? (
-            <div
-              className="flex items-center gap-3 rounded-2xl px-4 py-4"
-              style={{ backgroundColor: 'var(--color-success-bg)', border: '1px solid rgba(5,150,105,0.2)' }}
-            >
-              <span
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl"
-                style={{ backgroundColor: 'var(--color-success)', background: 'linear-gradient(135deg, #059669, #10b981)' }}
-              >
-                <Check size={15} color="white" strokeWidth={3} />
-              </span>
-              <p className="text-sm font-medium" style={{ color: 'var(--color-success)' }}>
-                Nenhum erro pendente. Continue assim! 🎉
-              </p>
-            </div>
-          ) : (() => {
-            const safeIndex = Math.min(mistakeIndex, mistakes.length - 1);
-            const m = mistakes[safeIndex];
-            return (
-              <div className="flex flex-col gap-3">
-                <div className="flex items-stretch gap-2">
-                  <button
-                    type="button"
-                    disabled={safeIndex === 0}
-                    onClick={() => setMistakeIndex((i) => Math.max(0, i - 1))}
-                    className="flex w-9 shrink-0 items-center justify-center rounded-xl transition-all active:scale-90 disabled:opacity-30"
-                    style={{ backgroundColor: 'var(--color-surface)', border: '1.5px solid var(--color-border)', color: 'var(--color-text-muted)' }}
-                    aria-label="Erro anterior"
-                  >
-                    <ChevronLeft size={16} />
-                  </button>
-
-                  <button
-                    type="button"
-                    className="card-lift flex flex-1 items-start gap-3 rounded-2xl px-4 py-3.5 text-left transition-all active:opacity-80"
-                    onClick={() => m.id && router.push(`/review?id=${m.id}`)}
-                    style={{ backgroundColor: 'var(--color-surface)', border: '1.5px solid var(--color-error)', boxShadow: '0 0 0 3px var(--color-error-bg)' }}
-                  >
-                    <span
-                      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg mt-0.5"
-                      style={{ backgroundColor: 'var(--color-error-bg)' }}
-                    >
-                      <AlertCircle size={15} style={{ color: 'var(--color-error)' }} />
-                    </span>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5 mb-0.5">
-                        <span className="text-xs">{m.language === 'fr' ? '🇫🇷' : '🇬🇧'}</span>
-                        <span className="text-xs font-medium" style={{ color: 'var(--color-text-muted)' }}>Nível {m.level}</span>
-                      </div>
-                      <p className="text-sm font-semibold leading-snug" style={{ color: 'var(--color-text-primary)' }}>
-                        {m.grammarFocus}
-                      </p>
-                      <p className="mt-0.5 text-xs line-clamp-2 leading-snug" style={{ color: 'var(--color-text-muted)' }}>
-                        {m.mistakeContext}
-                      </p>
-                    </div>
-                    <div className="flex shrink-0 items-center gap-0.5 self-center ml-1">
-                      <span className="text-xs font-bold" style={{ color: 'var(--color-primary)' }}>Revisar</span>
-                      <ChevronRight size={13} style={{ color: 'var(--color-primary)' }} />
-                    </div>
-                  </button>
-
-                  <button
-                    type="button"
-                    disabled={safeIndex >= mistakes.length - 1}
-                    onClick={() => setMistakeIndex((i) => Math.min(mistakes.length - 1, i + 1))}
-                    className="flex w-9 shrink-0 items-center justify-center rounded-xl transition-all active:scale-90 disabled:opacity-30"
-                    style={{ backgroundColor: 'var(--color-surface)', border: '1.5px solid var(--color-border)', color: 'var(--color-text-muted)' }}
-                    aria-label="Próximo erro"
-                  >
-                    <ChevronRight size={16} />
-                  </button>
-                </div>
-
-                <div className="flex items-center justify-between px-1">
-                  <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
-                    Toque para revisar · ao acertar 100% o erro é removido
-                  </p>
-                  {mistakes.length > 1 && (
-                    <span className="text-xs font-bold tabular-nums shrink-0 ml-2" style={{ color: 'var(--color-text-muted)' }}>
-                      {safeIndex + 1} / {mistakes.length}
-                    </span>
-                  )}
-                </div>
-              </div>
-            );
-          })()}
-        </section>
+        <MistakesSection uid={user.uid} />
 
         {/* ── Admin ── */}
         {profile.email === ADMIN_EMAIL && (
@@ -515,7 +376,7 @@ export default function ProfilePage() {
 
           <button
             type="button"
-            onClick={() => { setDeleteError(''); setShowDeleteSheet(true); }}
+            onClick={() => setShowDeleteSheet(true)}
             className="card-lift flex items-center gap-3 rounded-2xl px-4 py-3.5 text-left transition-all active:scale-95"
             style={{ backgroundColor: 'var(--color-error-bg)', border: '1.5px solid rgba(220,38,38,0.25)' }}
           >
@@ -571,68 +432,11 @@ export default function ProfilePage() {
 
       {/* ── Delete bottom sheet ── */}
       {showDeleteSheet && (
-        <div
-          className="fixed inset-0 z-50 flex items-end md:items-center md:justify-center animate-fade-in"
-          style={{ backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)' }}
-          onClick={(e) => { if (e.target === e.currentTarget) setShowDeleteSheet(false); }}
-        >
-          <div
-            className="w-full max-w-lg mx-auto rounded-t-3xl px-6 pb-10 pt-5 flex flex-col gap-5 md:rounded-3xl md:max-w-sm md:pb-6 animate-slide-up"
-            style={{ backgroundColor: 'var(--color-surface)', boxShadow: '0 -8px 40px rgba(0,0,0,0.15)' }}
-          >
-            <div className="mx-auto h-1 w-10 rounded-full md:hidden" style={{ backgroundColor: 'var(--color-border-strong)' }} />
-
-            <div
-              className="flex h-14 w-14 items-center justify-center rounded-2xl"
-              style={{ backgroundColor: 'var(--color-error-bg)', border: '1.5px solid rgba(220,38,38,0.2)' }}
-            >
-              <Trash2 size={24} style={{ color: 'var(--color-error)' }} />
-            </div>
-
-            <div>
-              <h2 className="font-display text-xl font-semibold" style={{ color: 'var(--color-text-primary)' }}>
-                Excluir conta?
-              </h2>
-              <p className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--color-text-secondary)' }}>
-                Todo o seu progresso, vocabulário e histórico de lições serão apagados permanentemente. Essa ação não pode ser desfeita.
-              </p>
-            </div>
-
-            {deleteError && (
-              <div
-                className="flex items-center gap-2 rounded-2xl px-4 py-3 text-sm animate-scale-in"
-                style={{ backgroundColor: 'var(--color-error-bg)', color: 'var(--color-error)', border: '1px solid rgba(220,38,38,0.2)' }}
-              >
-                <AlertCircle size={15} className="shrink-0" />
-                {deleteError}
-              </div>
-            )}
-
-            <button
-              type="button"
-              disabled={deleting}
-              onClick={handleDeleteAccount}
-              className="w-full rounded-2xl py-3.5 text-sm font-bold text-white transition-all active:scale-[0.98] disabled:opacity-60"
-              style={{ background: 'linear-gradient(135deg, #dc2626, #ef4444)', boxShadow: '0 6px 20px rgba(220,38,38,0.3)' }}
-            >
-              {deleting ? (
-                <span className="flex items-center justify-center gap-2">
-                  <span className="h-4 w-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
-                  Excluindo…
-                </span>
-              ) : 'Excluir definitivamente'}
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setShowDeleteSheet(false)}
-              className="text-center text-sm font-semibold py-1 transition-opacity hover:opacity-70"
-              style={{ color: 'var(--color-text-muted)' }}
-            >
-              Cancelar
-            </button>
-          </div>
-        </div>
+        <DeleteAccountSheet
+          user={user}
+          onClose={() => setShowDeleteSheet(false)}
+          onReset={reset}
+        />
       )}
     </div>
   );

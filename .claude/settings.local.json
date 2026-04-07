@@ -15,7 +15,13 @@
       "Bash(git remote add:*)",
       "Bash(git push:*)",
       "Bash(curl:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(npx next:*)",
+      "Bash(node -e ':*)",
+      "Bash(xargs -I{} curl -s \"https://texttospeech.googleapis.com/v1/voices?languageCode=fr-FR&key={}\")",
+      "Bash(xargs -I{} curl -s \"https://texttospeech.googleapis.com/v1/voices?languageCode=en-US&key={}\")",
+      "Bash(npx skills:*)",
+      "WebFetch(domain:skills.sh)"
     ]
   }
 }

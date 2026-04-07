@@ -4,86 +4,8 @@ import { useState, useRef, useCallback } from 'react';
 import { Volume2, Loader2, Square, ArrowLeft, Play, Users } from 'lucide-react';
 import Link from 'next/link';
 import { synthesizeSpeechWithVoice } from '@/app/actions/synthesizeSpeech';
-
-/* ------------------------------------------------------------------ */
-/*  Voice catalogue — sourced from Google TTS API for fr-FR           */
-/* ------------------------------------------------------------------ */
-
-interface VoiceOption {
-  id: string;
-  name: string;
-  label: string;
-  gender: 'Feminina' | 'Masculina';
-  type: string;
-  current?: boolean;
-}
-
-const FRENCH_VOICES: VoiceOption[] = [
-  // Studio
-  { id: 'fr-FR-Studio-A', name: 'fr-FR-Studio-A', label: 'Studio-A', gender: 'Feminina', type: 'Studio' },
-  { id: 'fr-FR-Studio-D', name: 'fr-FR-Studio-D', label: 'Studio-D', gender: 'Masculina', type: 'Studio' },
-
-  // Chirp-HD
-  { id: 'fr-FR-Chirp-HD-D', name: 'fr-FR-Chirp-HD-D', label: 'Chirp-HD-D', gender: 'Masculina', type: 'Chirp-HD' },
-  { id: 'fr-FR-Chirp-HD-F', name: 'fr-FR-Chirp-HD-F', label: 'Chirp-HD-F', gender: 'Feminina', type: 'Chirp-HD' },
-  { id: 'fr-FR-Chirp-HD-O', name: 'fr-FR-Chirp-HD-O', label: 'Chirp-HD-O', gender: 'Feminina', type: 'Chirp-HD' },
-
-  // Chirp3-HD — Female
-  { id: 'fr-FR-Chirp3-HD-Achernar', name: 'fr-FR-Chirp3-HD-Achernar', label: 'Achernar', gender: 'Feminina', type: 'Chirp3-HD' },
-  { id: 'fr-FR-Chirp3-HD-Aoede', name: 'fr-FR-Chirp3-HD-Aoede', label: 'Aoede', gender: 'Feminina', type: 'Chirp3-HD' },
-  { id: 'fr-FR-Chirp3-HD-Autonoe', name: 'fr-FR-Chirp3-HD-Autonoe', label: 'Autonoe', gender: 'Feminina', type: 'Chirp3-HD' },
-  { id: 'fr-FR-Chirp3-HD-Callirrhoe', name: 'fr-FR-Chirp3-HD-Callirrhoe', label: 'Callirrhoe', gender: 'Feminina', type: 'Chirp3-HD' },
-  { id: 'fr-FR-Chirp3-HD-Despina', name: 'fr-FR-Chirp3-HD-Despina', label: 'Despina', gender: 'Feminina', type: 'Chirp3-HD' },
-  { id: 'fr-FR-Chirp3-HD-Erinome', name: 'fr-FR-Chirp3-HD-Erinome', label: 'Erinome', gender: 'Feminina', type: 'Chirp3-HD' },
-  { id: 'fr-FR-Chirp3-HD-Gacrux', name: 'fr-FR-Chirp3-HD-Gacrux', label: 'Gacrux', gender: 'Feminina', type: 'Chirp3-HD' },
-  { id: 'fr-FR-Chirp3-HD-Kore', name: 'fr-FR-Chirp3-HD-Kore', label: 'Kore', gender: 'Feminina', type: 'Chirp3-HD' },
-  { id: 'fr-FR-Chirp3-HD-Laomedeia', name: 'fr-FR-Chirp3-HD-Laomedeia', label: 'Laomedeia', gender: 'Feminina', type: 'Chirp3-HD' },
-  { id: 'fr-FR-Chirp3-HD-Leda', name: 'fr-FR-Chirp3-HD-Leda', label: 'Leda', gender: 'Feminina', type: 'Chirp3-HD' },
-  { id: 'fr-FR-Chirp3-HD-Pulcherrima', name: 'fr-FR-Chirp3-HD-Pulcherrima', label: 'Pulcherrima', gender: 'Feminina', type: 'Chirp3-HD' },
-  { id: 'fr-FR-Chirp3-HD-Sulafat', name: 'fr-FR-Chirp3-HD-Sulafat', label: 'Sulafat', gender: 'Feminina', type: 'Chirp3-HD' },
-  { id: 'fr-FR-Chirp3-HD-Vindemiatrix', name: 'fr-FR-Chirp3-HD-Vindemiatrix', label: 'Vindemiatrix', gender: 'Feminina', type: 'Chirp3-HD' },
-  { id: 'fr-FR-Chirp3-HD-Zephyr', name: 'fr-FR-Chirp3-HD-Zephyr', label: 'Zephyr', gender: 'Feminina', type: 'Chirp3-HD' },
-
-  // Chirp3-HD — Male
-  { id: 'fr-FR-Chirp3-HD-Achird', name: 'fr-FR-Chirp3-HD-Achird', label: 'Achird', gender: 'Masculina', type: 'Chirp3-HD' },
-  { id: 'fr-FR-Chirp3-HD-Algenib', name: 'fr-FR-Chirp3-HD-Algenib', label: 'Algenib', gender: 'Masculina', type: 'Chirp3-HD' },
-  { id: 'fr-FR-Chirp3-HD-Algieba', name: 'fr-FR-Chirp3-HD-Algieba', label: 'Algieba', gender: 'Masculina', type: 'Chirp3-HD' },
-  { id: 'fr-FR-Chirp3-HD-Alnilam', name: 'fr-FR-Chirp3-HD-Alnilam', label: 'Alnilam', gender: 'Masculina', type: 'Chirp3-HD' },
-  { id: 'fr-FR-Chirp3-HD-Charon', name: 'fr-FR-Chirp3-HD-Charon', label: 'Charon', gender: 'Masculina', type: 'Chirp3-HD' },
-  { id: 'fr-FR-Chirp3-HD-Enceladus', name: 'fr-FR-Chirp3-HD-Enceladus', label: 'Enceladus', gender: 'Masculina', type: 'Chirp3-HD' },
-  { id: 'fr-FR-Chirp3-HD-Fenrir', name: 'fr-FR-Chirp3-HD-Fenrir', label: 'Fenrir', gender: 'Masculina', type: 'Chirp3-HD' },
-  { id: 'fr-FR-Chirp3-HD-Iapetus', name: 'fr-FR-Chirp3-HD-Iapetus', label: 'Iapetus', gender: 'Masculina', type: 'Chirp3-HD' },
-  { id: 'fr-FR-Chirp3-HD-Orus', name: 'fr-FR-Chirp3-HD-Orus', label: 'Orus', gender: 'Masculina', type: 'Chirp3-HD' },
-  { id: 'fr-FR-Chirp3-HD-Puck', name: 'fr-FR-Chirp3-HD-Puck', label: 'Puck', gender: 'Masculina', type: 'Chirp3-HD' },
-  { id: 'fr-FR-Chirp3-HD-Rasalgethi', name: 'fr-FR-Chirp3-HD-Rasalgethi', label: 'Rasalgethi', gender: 'Masculina', type: 'Chirp3-HD' },
-  { id: 'fr-FR-Chirp3-HD-Sadachbia', name: 'fr-FR-Chirp3-HD-Sadachbia', label: 'Sadachbia', gender: 'Masculina', type: 'Chirp3-HD' },
-  { id: 'fr-FR-Chirp3-HD-Sadaltager', name: 'fr-FR-Chirp3-HD-Sadaltager', label: 'Sadaltager', gender: 'Masculina', type: 'Chirp3-HD' },
-  { id: 'fr-FR-Chirp3-HD-Schedar', name: 'fr-FR-Chirp3-HD-Schedar', label: 'Schedar', gender: 'Masculina', type: 'Chirp3-HD' },
-  { id: 'fr-FR-Chirp3-HD-Umbriel', name: 'fr-FR-Chirp3-HD-Umbriel', label: 'Umbriel', gender: 'Masculina', type: 'Chirp3-HD' },
-  { id: 'fr-FR-Chirp3-HD-Zubenelgenubi', name: 'fr-FR-Chirp3-HD-Zubenelgenubi', label: 'Zubenelgenubi', gender: 'Masculina', type: 'Chirp3-HD' },
-];
-
-/* ------------------------------------------------------------------ */
-/*  Sample dialogue                                                   */
-/* ------------------------------------------------------------------ */
-
-const SAMPLE_TEXTS = [
-  { label: 'Saudacao', text: 'Bonjour ! Comment allez-vous aujourd\'hui ?' },
-  { label: 'Pedido', text: 'Je voudrais un croissant et un cafe, s\'il vous plait.' },
-  { label: 'Frase longa', text: 'La vie est belle quand on prend le temps de regarder autour de soi et d\'apprecier les petits moments.' },
-  { label: 'Pergunta', text: 'Est-ce que vous pourriez me dire ou se trouve la gare, s\'il vous plait ?' },
-];
-
-const DIALOGUE_LINES = [
-  { speaker: 'Marie', text: 'Bonjour ! Vous avez choisi ?' },
-  { speaker: 'Pierre', text: 'Oui, je voudrais un croissant et un cafe, s\'il vous plait.' },
-  { speaker: 'Marie', text: 'Un cafe creme ou un cafe noir ?' },
-  { speaker: 'Pierre', text: 'Un cafe creme, avec un peu de sucre.' },
-  { speaker: 'Marie', text: 'Tres bien ! Et pour le croissant, nature ou au beurre ?' },
-  { speaker: 'Pierre', text: 'Au beurre, bien sur ! C\'est toujours meilleur.' },
-  { speaker: 'Marie', text: 'Excellent choix ! Ce sera tout ?' },
-  { speaker: 'Pierre', text: 'Oui, merci beaucoup. L\'addition, s\'il vous plait.' },
-];
+import { FRENCH_VOICES, SAMPLE_TEXTS, DIALOGUE_LINES, type VoiceOption } from './data';
+import { TYPE_COLORS, VoiceCard, DialogueLineCard } from './components';
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                             */
@@ -92,11 +14,7 @@ const DIALOGUE_LINES = [
 type Tab = 'voices' | 'dialogue';
 type PlayingState = string | null; // voice id or `dialogue-${index}`
 
-const TYPE_COLORS: Record<string, string> = {
-  Studio: 'bg-purple-50 text-purple-700 border-purple-300',
-  'Chirp-HD': 'bg-teal-50 text-teal-700 border-teal-300',
-  'Chirp3-HD': 'bg-orange-50 text-orange-700 border-orange-300',
-};
+
 
 /* ------------------------------------------------------------------ */
 /*  Component                                                         */
@@ -359,59 +277,15 @@ export default function VoiceTestPage() {
                 const isThisLoading = loadingId === voice.id;
 
                 return (
-                  <div
+                  <VoiceCard
                     key={voice.id}
-                    className={`bg-white rounded-2xl p-3.5 shadow-sm border transition-colors ${
-                      isThisPlaying
-                        ? 'border-indigo-400 ring-2 ring-indigo-100'
-                        : voice.current
-                          ? 'border-amber-300 bg-amber-50/30'
-                          : 'border-slate-200'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <button
-                        onClick={() => isThisPlaying ? stop() : playVoice(voice)}
-                        disabled={!!loadingId}
-                        className={`flex-shrink-0 w-11 h-11 rounded-full flex items-center justify-center transition-all ${
-                          isThisPlaying
-                            ? 'bg-indigo-600 text-white scale-110'
-                            : isThisLoading
-                              ? 'bg-indigo-100 text-indigo-400'
-                              : 'bg-slate-100 text-slate-600 hover:bg-indigo-100 hover:text-indigo-600 active:scale-95'
-                        }`}
-                      >
-                        {isThisLoading ? (
-                          <Loader2 size={18} className="animate-spin" />
-                        ) : isThisPlaying ? (
-                          <Square size={14} fill="currentColor" />
-                        ) : (
-                          <Volume2 size={18} />
-                        )}
-                      </button>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="font-semibold text-sm text-slate-900">{voice.label}</span>
-                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium border ${TYPE_COLORS[voice.type]}`}>
-                            {voice.type}
-                          </span>
-                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${
-                            voice.gender === 'Feminina'
-                              ? 'bg-pink-50 text-pink-600 border border-pink-200'
-                              : 'bg-sky-50 text-sky-600 border border-sky-200'
-                          }`}>
-                            {voice.gender}
-                          </span>
-                          {voice.current && (
-                            <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-100 text-amber-700 border border-amber-300">
-                              Atual
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-[11px] text-slate-400 mt-0.5 font-mono truncate">{voice.name}</p>
-                      </div>
-                    </div>
-                  </div>
+                    voice={voice}
+                    isPlaying={isThisPlaying}
+                    isLoading={isThisLoading}
+                    onPlay={() => playVoice(voice)}
+                    onStop={stop}
+                    loadingId={loadingId}
+                  />
                 );
               })}
             </section>
@@ -508,76 +382,33 @@ export default function VoiceTestPage() {
                 const isLinePlaying = playing === `dialogue-${i}`;
 
                 return (
-                  <div
+                  <DialogueLineCard
                     key={i}
-                    className={`rounded-2xl p-3.5 border transition-all ${
-                      isActive
-                        ? isMarie
-                          ? 'bg-pink-50 border-pink-300 ring-2 ring-pink-100'
-                          : 'bg-sky-50 border-sky-300 ring-2 ring-sky-100'
-                        : 'bg-white border-slate-200'
-                    }`}
-                  >
-                    <div className="flex items-start gap-3">
-                      {/* Avatar */}
-                      <div className={`flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold ${
-                        isMarie
-                          ? 'bg-pink-100 text-pink-600'
-                          : 'bg-sky-100 text-sky-600'
-                      }`}>
-                        {isMarie ? 'M' : 'P'}
-                      </div>
-
-                      {/* Content */}
-                      <div className="flex-1 min-w-0">
-                        <span className={`text-[11px] font-semibold ${
-                          isMarie ? 'text-pink-500' : 'text-sky-500'
-                        }`}>
-                          {line.speaker}
-                        </span>
-                        <p className="text-sm text-slate-800 mt-0.5 leading-relaxed">{line.text}</p>
-                      </div>
-
-                      {/* Individual play */}
-                      <button
-                        onClick={async () => {
-                          stop();
-                          const voiceName = isMarie ? femaleVoice : maleVoice;
-                          setLoadingId(`dialogue-${i}`);
-                          try {
-                            const base64 = await fetchAudio(line.text, voiceName);
-                            if (!base64) return;
-                            setLoadingId(null);
-                            setPlaying(`dialogue-${i}`);
-                            setDialogueLineIdx(i);
-                            await playBase64(base64);
-                          } catch {
-                            // ignore
-                          } finally {
-                            setPlaying(null);
-                            setLoadingId(null);
-                            setDialogueLineIdx(-1);
-                          }
-                        }}
-                        disabled={!!loadingId}
-                        className={`flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center transition-all ${
-                          isLinePlaying
-                            ? 'bg-indigo-600 text-white'
-                            : isLineLoading
-                              ? 'bg-indigo-100 text-indigo-400'
-                              : 'bg-slate-100 text-slate-500 hover:bg-indigo-100 hover:text-indigo-600 active:scale-90'
-                        }`}
-                      >
-                        {isLineLoading ? (
-                          <Loader2 size={14} className="animate-spin" />
-                        ) : isLinePlaying ? (
-                          <Square size={12} fill="currentColor" />
-                        ) : (
-                          <Volume2 size={14} />
-                        )}
-                      </button>
-                    </div>
-                  </div>
+                    line={line}
+                    isActive={isActive}
+                    isLineLoading={isLineLoading}
+                    isLinePlaying={isLinePlaying}
+                    loadingId={loadingId}
+                    onPlay={async () => {
+                      stop();
+                      const voiceName = isMarie ? femaleVoice : maleVoice;
+                      setLoadingId(`dialogue-${i}`);
+                      try {
+                        const base64 = await fetchAudio(line.text, voiceName);
+                        if (!base64) return;
+                        setLoadingId(null);
+                        setPlaying(`dialogue-${i}`);
+                        setDialogueLineIdx(i);
+                        await playBase64(base64);
+                      } catch {
+                        // ignore
+                      } finally {
+                        setPlaying(null);
+                        setLoadingId(null);
+                        setDialogueLineIdx(-1);
+                      }
+                    }}
+                  />
                 );
               })}
             </section>
