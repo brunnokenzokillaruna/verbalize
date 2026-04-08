@@ -17,6 +17,7 @@ import { db } from './firebase';
 import type { UserDocument, UserVocabularyDocument, ImageCacheDocument, VerbDocument, LessonMistakeDocument, PregeneratedLessonDocument, SupportedLanguage, ProficiencyLevel } from '@/types';
 import { calculateNextReview } from '@/lib/srs';
 import { getNextLessonId } from '@/lib/curriculum';
+import { getEffectiveStreak } from '@/lib/stats';
 
 // ─── Users ────────────────────────────────────────────────────────────────────
 
@@ -172,10 +173,13 @@ export async function updateLessonStats(
     ? Math.round((todayStart.getTime() - lastDayStart.getTime()) / 86_400_000)
     : Infinity;
 
+  // Use the effective streak as the base (handles resets automatically)
+  const effectiveBase = getEffectiveStreak(profile);
+
   // diffDays === 0 → already counted today; === 1 → consecutive; > 1 → streak broken
   const newStreak =
-    diffDays === 0 ? profile.currentStreak :
-    diffDays === 1 ? profile.currentStreak + 1 :
+    diffDays === 0 ? effectiveBase :
+    diffDays === 1 ? effectiveBase + 1 :
     1;
 
   // Advance lesson progress only when the user completes their current frontier lesson

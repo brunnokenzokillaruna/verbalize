@@ -142,12 +142,13 @@ export interface HookResult {
   dialogueTranslations?: string[]; // pt-BR translations, one per dialogue line
   newVocabulary: string[];
   grammarFocus: string;
-  verbWord: string;
+  verbWord?: string;
   // Bundled from super-hook (eliminates separate Gemini round-trips)
   grammarBridge?: GrammarBridgeResult;
   imageKeywords?: Record<string, string>;            // word → Pexels search term
   vocabTranslations?: Record<string, TranslateWordResult>; // word → translation data
   imageMatchDistractors?: Record<string, string[]>;  // word → 3 visually distinct distractors
+  dialogueVerbs?: string[];                          // all verbs (infinitives) used in the dialogue
 }
 
 export interface GrammarBridgeResult {
@@ -164,6 +165,14 @@ export interface GrammarBridgeResult {
     portuguese: string;       // Equivalente PT-BR
   };
   additionalExamples?: Array<{ target: string; portuguese: string }>; // 2 exemplos extras
+  items?: Array<{ target: string; portuguese: string; logic?: string }>; // OPCIONAL: Usado para lições com múltiplos itens (ex: interrogativas, expressões)
+  brazilianTrap?: string;     // O "Radar do Erro": foca em interferências do PT-BR
+  usageContext?: string;      // O "Cenário de Uso": explica a vibe social (formal, casual, etc)
+  patterns?: Array<{          // "Pattern Strips": mostra a regra em 2-3 variações rápidas
+    label: string;            // ex: "Plural", "Negativa", "Pessoa"
+    target: string; 
+    portuguese: string; 
+  }>;
 
   // ── Campos legados (backward compat com lessons cacheadas no Firestore) ───
   rule?: string;

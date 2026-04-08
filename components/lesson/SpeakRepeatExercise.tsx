@@ -10,6 +10,8 @@ interface SpeakRepeatExerciseProps {
   language: SupportedLanguage;
   onAnswer: (correct: boolean) => void;
   answered: boolean;
+  setIsExerciseReady: (ready: boolean) => void;
+  submitTrigger: number;
 }
 
 function normalizeText(s: string): string {
@@ -36,6 +38,8 @@ export function SpeakRepeatExercise({
   language,
   onAnswer,
   answered,
+  setIsExerciseReady,
+  submitTrigger
 }: SpeakRepeatExerciseProps) {
   const [hasSpeechAPI, setHasSpeechAPI] = useState(false);
   const [phase, setPhase] = useState<Phase>(answered ? 'answered' : 'idle');
@@ -43,6 +47,25 @@ export function SpeakRepeatExercise({
   const [recordError, setRecordError] = useState('');
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recogRef = useRef<any>(null);
+
+  const langCode = language === 'fr' ? 'fr-FR' : 'en-US';
+  const isCorrect = transcript ? similarity(data.text, transcript) >= 0.85 : null;
+
+  // Notify parent of readiness
+  useEffect(() => {
+    if (phase !== 'answered') {
+      setIsExerciseReady(phase === 'review' || !hasSpeechAPI || !!recordError);
+    } else {
+      setIsExerciseReady(false);
+    }
+  }, [phase, hasSpeechAPI, recordError, setIsExerciseReady]);
+
+  // Listen for global submit
+  useEffect(() => {
+    if (submitTrigger > 0 && phase !== 'answered') {
+      submit(isCorrect ?? true);
+    }
+  }, [submitTrigger, isCorrect, phase]);
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -53,9 +76,6 @@ export function SpeakRepeatExercise({
   useEffect(() => {
     if (answered) setPhase('answered');
   }, [answered]);
-
-  const langCode = language === 'fr' ? 'fr-FR' : 'en-US';
-  const isCorrect = transcript ? similarity(data.text, transcript) >= 0.85 : null;
 
   function startRecording() {
     if (phase === 'recording' || phase === 'answered') return;
@@ -111,163 +131,151 @@ export function SpeakRepeatExercise({
   }
 
   return (
-    <div className="flex flex-col gap-5">
-      <p className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>
-        Ouça a frase e repita em voz alta:
-      </p>
+    <div className="flex flex-col gap-8">
+      {/* Instruction */}
+      <div className="flex items-center gap-3 px-1 opacity-70">
+        <span className="h-px w-6 bg-[var(--color-border)]" />
+        <p className="text-xs font-medium italic text-[var(--color-text-muted)]">
+          Ouça a frase e repita em voz alta:
+        </p>
+      </div>
 
       {/* Sentence card */}
       <div
-        className="rounded-2xl p-5"
-        style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
+        className="rounded-xl p-6 bg-[var(--color-surface-raised)]/30 border border-[var(--color-border)] space-y-3"
       >
-        <p className="font-display text-xl leading-relaxed" style={{ color: 'var(--color-text-primary)' }}>
+        <p className="font-display text-2xl font-bold leading-relaxed text-[var(--color-text-primary)]">
           {data.text}
         </p>
-        <p className="mt-1.5 text-sm" style={{ color: 'var(--color-text-muted)', fontStyle: 'italic' }}>
+        <p className="text-xs font-medium italic text-[var(--color-text-muted)] opacity-70 border-l-2 border-[var(--color-primary)]/20 pl-4">
           {data.translation}
         </p>
       </div>
 
-      {/* Audio row — Record button only shown in idle/recording phases */}
-      <div className="flex flex-wrap items-center gap-3">
-        <AudioPlayerButton text={data.text} language={language} size="sm" />
+      {/* Audio & Record Controls */}
+      <div className="flex items-center gap-4 px-1">
+        <AudioPlayerButton text={data.text} language={language} size="md" />
 
         {(phase === 'idle' || phase === 'recording') && hasSpeechAPI && !recordError && (
           <button
             type="button"
             onClick={startRecording}
             disabled={phase === 'recording'}
-            className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all active:scale-95 disabled:opacity-60"
+            className="flex items-center gap-2.5 rounded-xl px-5 py-2.5 text-sm font-bold transition-all duration-300 active:scale-95 disabled:opacity-60 shadow-sm"
             style={{
-              backgroundColor: phase === 'recording' ? 'var(--color-error-bg)' : 'var(--color-primary)',
-              color: phase === 'recording' ? 'var(--color-error)' : 'var(--color-text-inverse)',
-              border: phase === 'recording' ? '1px solid var(--color-error)' : 'none',
+              backgroundColor: phase === 'recording' ? 'var(--color-error)' : 'var(--color-primary)',
+              color: '#fff',
             }}
           >
-            {phase === 'recording' ? <MicOff size={15} /> : <Mic size={15} />}
-            {phase === 'recording' ? 'Gravando…' : 'Gravar'}
+            {phase === 'recording' ? (
+              <>
+                <div className="h-2 w-2 rounded-full bg-white animate-pulse" />
+                <span>Gravando…</span>
+              </>
+            ) : (
+              <>
+                <Mic size={16} />
+                <span>Gravar Voz</span>
+              </>
+            )}
           </button>
         )}
       </div>
 
       {/* Record error */}
       {recordError && (
-        <p
-          className="text-xs rounded-xl px-3 py-2"
-          style={{ backgroundColor: 'var(--color-error-bg)', color: 'var(--color-error)' }}
-        >
-          {recordError}
-        </p>
+        <div className="p-3 rounded-lg bg-red-50 border border-red-100 animate-in fade-in duration-300">
+          <p className="text-[11px] font-medium text-red-600">
+            {recordError}
+          </p>
+        </div>
       )}
 
-      {/* Review phase: transcript + 3 action buttons */}
+      {/* Review phase: transcript + action buttons */}
       {phase === 'review' && (
-        <div className="flex flex-col gap-3">
-          {/* Transcript */}
+        <div className="flex flex-col gap-5 animate-in slide-in-from-bottom-2 duration-500">
+          {/* Transcript Feedback */}
           <div
-            className="flex items-start gap-3 rounded-2xl p-4"
-            style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
+            className="flex items-start gap-4 rounded-xl p-5 bg-[var(--color-surface-raised)]/50 border border-[var(--color-border)]"
           >
-            {isCorrect
-              ? <CheckCircle size={18} className="shrink-0 mt-0.5" style={{ color: 'var(--color-success)' }} />
-              : <XCircle size={18} className="shrink-0 mt-0.5" style={{ color: 'var(--color-error)' }} />}
-            <div className="min-w-0 flex-1">
-              <p className="text-xs font-medium mb-0.5" style={{ color: 'var(--color-text-muted)' }}>Você disse:</p>
-              <p className="text-sm" style={{ color: 'var(--color-text-primary)' }}>{transcript}</p>
+            <div className="mt-1">
+              {isCorrect
+                ? <CheckCircle size={20} className="text-[var(--color-success)]" />
+                : <XCircle size={20} className="text-[var(--color-error)]" />}
+            </div>
+            <div className="flex-1">
+              <p className="text-[10px] font-black uppercase tracking-widest text-[var(--color-text-muted)] mb-1 opacity-60">Você disse:</p>
+              <p className="text-base font-semibold text-[var(--color-text-primary)] leading-relaxed italic">&ldquo;{transcript}&rdquo;</p>
             </div>
           </div>
 
-          {/* 3 action buttons */}
+          {/* Action Row */}
           <div className="flex gap-3">
             <button
               type="button"
               onClick={startRecording}
-              className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all active:scale-95"
-              style={{
-                backgroundColor: 'var(--color-surface-raised)',
-                color: 'var(--color-text-secondary)',
-                border: '1px solid var(--color-border)',
-              }}
+              className="flex items-center gap-2 rounded-xl px-4 py-3 text-xs font-bold uppercase tracking-widest transition-all duration-300 active:scale-95 bg-[var(--color-surface-raised)] text-[var(--color-text-muted)] border border-[var(--color-border)] hover:bg-[var(--color-bg)]"
             >
               <RefreshCw size={14} />
-              Gravar novamente
+              Refazer
             </button>
 
             <button
               type="button"
               onClick={() => submit(true)}
-              className="flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold transition-all active:scale-95"
-              style={{
-                backgroundColor: 'var(--color-primary)',
-                color: 'var(--color-text-inverse)',
-              }}
+              className="flex-1 flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition-all duration-300 active:scale-95 bg-[var(--color-primary)] text-white shadow-lg shadow-[var(--color-primary)]/20"
             >
-              <Send size={14} />
-              Enviar
+              <Send size={15} />
+              Enviar Resposta
             </button>
 
             <button
               type="button"
               onClick={() => submit(true)}
-              className="flex items-center gap-1.5 rounded-xl px-3 py-2.5 text-sm font-medium transition-all active:scale-95"
-              style={{
-                backgroundColor: 'var(--color-surface-raised)',
-                color: 'var(--color-text-muted)',
-                border: '1px solid var(--color-border)',
-              }}
+              className="flex items-center gap-1.5 rounded-xl px-4 py-3 text-xs font-bold uppercase tracking-widest text-[var(--color-text-muted)] opacity-60 hover:opacity-100 transition-all active:scale-95"
             >
-              <SkipForward size={13} />
               Pular
+              <SkipForward size={14} />
             </button>
           </div>
         </div>
       )}
 
-      {/* No Speech API or after error: just Enviar + Pular */}
+      {/* No Speech API or after error fallback */}
       {phase === 'idle' && (!hasSpeechAPI || !!recordError) && (
-        <div className="flex gap-3">
+        <div className="flex gap-4">
           <button
             type="button"
             onClick={() => submit(true)}
-            className="flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold transition-all active:scale-95"
-            style={{
-              backgroundColor: 'var(--color-primary)',
-              color: 'var(--color-text-inverse)',
-            }}
+            className="flex-1 flex items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-bold transition-all duration-300 active:scale-95 bg-[var(--color-primary)] text-white shadow-lg shadow-[var(--color-primary)]/20"
           >
-            <Send size={14} />
-            Enviar
+            <Send size={16} />
+            Continuar sem áudio
           </button>
 
           <button
             type="button"
             onClick={() => submit(true)}
-            className="flex items-center gap-1.5 rounded-xl px-3 py-2.5 text-sm font-medium transition-all active:scale-95"
-            style={{
-              backgroundColor: 'var(--color-surface-raised)',
-              color: 'var(--color-text-muted)',
-              border: '1px solid var(--color-border)',
-            }}
+            className="flex items-center gap-2 rounded-xl px-6 py-3.5 text-xs font-bold uppercase tracking-widest text-[var(--color-text-muted)] border border-[var(--color-border)] hover:bg-[var(--color-surface-raised)] transition-all active:scale-95"
           >
-            <SkipForward size={13} />
             Pular
           </button>
         </div>
       )}
 
-      {/* Answered state: show final transcript */}
+      {/* Final Answered State Feedback */}
       {phase === 'answered' && transcript && (
         <div
-          className="flex items-start gap-3 rounded-2xl p-4"
-          style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
+          className="flex items-start gap-4 rounded-xl p-5 bg-[var(--color-surface-raised)]/30 border border-[var(--color-border)]/50 opacity-80"
         >
-          {isCorrect
-            ? <CheckCircle size={18} className="shrink-0 mt-0.5" style={{ color: 'var(--color-success)' }} />
-            : <XCircle size={18} className="shrink-0 mt-0.5" style={{ color: 'var(--color-error)' }} />}
+          <div className="mt-1">
+            {isCorrect
+              ? <CheckCircle size={18} className="text-[var(--color-success)]" />
+              : <XCircle size={18} className="text-[var(--color-error)]" />}
+          </div>
           <div>
-            <p className="text-xs font-medium" style={{ color: 'var(--color-text-muted)' }}>Você disse:</p>
-            <p className="text-sm" style={{ color: 'var(--color-text-primary)' }}>{transcript}</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-[var(--color-text-muted)] mb-1 opacity-60">Sua fala registrada:</p>
+            <p className="text-sm font-semibold text-[var(--color-text-primary)] italic leading-relaxed">&ldquo;{transcript}&rdquo;</p>
           </div>
         </div>
       )}

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Lock, Check, ChevronRight, ChevronLeft } from 'lucide-react';
 import type { ProficiencyLevel, SupportedLanguage } from '@/types';
@@ -15,8 +15,56 @@ interface LessonBrowserProps {
   initialLevel: ProficiencyLevel;
 }
 
+function MarqueeText({ text, className, style }: { text: string; className?: string; style?: any }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLSpanElement>(null);
+  const [scrollDist, setScrollDist] = useState(0);
+
+  useEffect(() => {
+    const checkOverflow = () => {
+      if (containerRef.current && contentRef.current) {
+        const containerWidth = containerRef.current.offsetWidth;
+        const contentWidth = contentRef.current.scrollWidth;
+        // Small buffer to avoid unnecessary scrolling
+        if (contentWidth > containerWidth + 2) {
+          setScrollDist(containerWidth - contentWidth);
+        } else {
+          setScrollDist(0);
+        }
+      }
+    };
+
+    checkOverflow();
+    const timer = setTimeout(checkOverflow, 100); // Small delay for layout
+    window.addEventListener('resize', checkOverflow);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('resize', checkOverflow);
+    };
+  }, [text]);
+
+  return (
+    <div
+      ref={containerRef}
+      className={`overflow-hidden whitespace-nowrap ${className}`}
+      style={style}
+    >
+      <span
+        ref={contentRef}
+        className="inline-block"
+        style={{
+          animation: scrollDist < 0 ? `marquee-slide ${Math.abs(scrollDist) / 25 + 6}s linear infinite` : 'none',
+          '--scroll-dist': `${scrollDist}px`,
+        } as any}
+      >
+        {text}
+      </span>
+    </div>
+  );
+}
+
 const ALL_LEVELS: ProficiencyLevel[] = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
-const LESSONS_PER_PAGE = 5;
+const LESSONS_PER_PAGE = 6;
 
 export function LessonBrowser({
   allLessons,
@@ -168,8 +216,9 @@ export function LessonBrowser({
 
                   {/* Lesson info */}
                   <div className="flex-1 min-w-0">
-                    <p
-                      className="text-sm font-semibold truncate"
+                    <MarqueeText
+                      text={title}
+                      className="text-sm font-semibold"
                       style={{
                         color: isLocked
                           ? 'var(--color-text-muted)'
@@ -177,9 +226,7 @@ export function LessonBrowser({
                             ? 'var(--color-primary)'
                             : 'var(--color-text-primary)',
                       }}
-                    >
-                      {title}
-                    </p>
+                    />
                     <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-muted)' }}>
                       {lesson.level}
                       {isCurrent && (

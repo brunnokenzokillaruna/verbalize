@@ -12,6 +12,7 @@ import { logOut } from '@/services/auth';
 import { Input } from '@/components/ui/Input';
 import { ImageCacheManager } from '@/components/admin/ImageCacheManager';
 import type { SupportedLanguage } from '@/types';
+import { getEffectiveStreak } from '@/lib/stats';
 
 import { SectionLabel } from '@/components/profile/SectionLabel';
 import { MistakesSection } from '@/components/profile/MistakesSection';
@@ -122,7 +123,7 @@ export default function ProfilePage() {
   async function handleLogout() {
     await logOut();
     reset();
-    router.replace('/login');
+    router.replace('/');
   }
 
 
@@ -206,10 +207,17 @@ export default function ProfilePage() {
               >
                 <Flame size={18} style={{ color: '#fbbf24' }} />
                 <div>
-                  <p className="text-lg font-bold leading-none text-white">{profile.currentStreak}</p>
-                  <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                    {profile.currentStreak === 1 ? 'dia seguido' : 'dias seguidos'}
-                  </p>
+                  {(() => {
+                    const currentStreak = getEffectiveStreak(profile);
+                    return (
+                      <>
+                        <p className="text-lg font-bold leading-none text-white">{currentStreak}</p>
+                        <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                          {currentStreak === 1 ? 'dia seguido' : 'dias seguidos'}
+                        </p>
+                      </>
+                    );
+                  })()}
                 </div>
               </div>
               <div
@@ -220,7 +228,7 @@ export default function ProfilePage() {
                 <div>
                   <p className="text-lg font-bold leading-none text-white">{profile.totalLessonsCompleted}</p>
                   <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                    lição{profile.totalLessonsCompleted !== 1 ? 'ões' : ''} concluída{profile.totalLessonsCompleted !== 1 ? 's' : ''}
+                    {profile.totalLessonsCompleted === 1 ? 'lição' : 'lições'} concluída{profile.totalLessonsCompleted !== 1 ? 's' : ''}
                   </p>
                 </div>
               </div>

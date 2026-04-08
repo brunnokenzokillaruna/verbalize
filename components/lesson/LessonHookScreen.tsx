@@ -25,109 +25,127 @@ export function LessonHookScreen({
   onWordClick,
 }: LessonHookScreenProps) {
   return (
-    <div className="flex flex-col gap-5 animate-slide-up-spring">
-      {/* Header row */}
+    <div className="flex flex-col gap-10 animate-slide-up-spring">
+      {/* Refined Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="text-base">💬</span>
-          <p className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--color-text-muted)' }}>
-            Diálogo
-          </p>
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/5 text-base shadow-inner ring-1 ring-white/10 backdrop-blur-md dark:bg-white/5">
+            💬
+          </div>
+          <div className="flex flex-col">
+            <h2 className="font-display text-xl font-bold tracking-tight text-[var(--color-text-primary)]">
+              Diálogo contextual
+            </h2>
+            <p className="text-[10px] font-semibold text-[var(--color-text-muted)] uppercase tracking-[0.2em]">
+              Ouça e aprenda na prática
+            </p>
+          </div>
         </div>
+
+        {/* Delicate Audio Pill */}
         <button
           type="button"
           onClick={onAudioButton}
           disabled={isLoadingAudio}
-          aria-label={isPlaying ? 'Parar áudio' : 'Ouvir diálogo'}
-          className="flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold transition-all active:scale-90 disabled:cursor-not-allowed"
-          style={{
-            backgroundColor: isPlaying ? 'var(--color-primary)' : 'var(--color-surface)',
-            border: `1.5px solid ${isPlaying ? 'var(--color-primary)' : 'var(--color-border)'}`,
-            color: isPlaying ? '#fff' : 'var(--color-text-muted)',
-          }}
+          className={`flex items-center gap-2 rounded-full px-4 py-1.5 text-[11px] font-bold uppercase tracking-wider transition-all active:scale-95 disabled:opacity-50 ${
+            isPlaying 
+              ? 'bg-[var(--color-primary)] text-white shadow-lg shadow-[var(--color-primary)]/20' 
+              : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)] hover:bg-[var(--color-surface-raised)]'
+          }`}
         >
           {isLoadingAudio ? (
-            <Loader2 size={13} className="animate-spin" />
+            <Loader2 size={12} className="animate-spin" />
           ) : isPlaying ? (
-            <VolumeX size={13} />
+            <VolumeX size={12} />
           ) : (
-            <Volume2 size={13} />
+            <Volume2 size={12} />
           )}
-          {isPlaying ? 'Parar' : isLoadingAudio ? 'Carregando…' : 'Ouvir'}
+          <span>{isPlaying ? 'Parar' : isLoadingAudio ? 'Carregando' : 'Ouvir Diálogo'}</span>
         </button>
       </div>
 
-      {/* Dialogue bubbles */}
-      <div className="flex flex-col gap-3">
+      {/* Dialogue area with alternating conversation flow */}
+      <div className="relative flex flex-col gap-10">
         {dialogue.split('\n').filter((l) => l.trim()).map((line, i) => {
           const match = line.match(/^([^:]+):\s*(.+)/);
-          const speakerName = match?.[1]?.trim();
+          const speakerName = match?.[1]?.trim() ?? '';
           const text = match?.[2]?.trim() ?? line;
-          const isEven = i % 2 === 0;
+          const isSecondSpeaker = i % 2 !== 0;
           const isActive = playingLineIdx === i;
-
-          const speakerColor = isEven ? 'var(--color-primary)' : '#d97706';
-          const bubbleBg = isEven ? 'var(--color-primary-light)' : 'var(--color-vocab-bg)';
-          const bubbleBorder = isEven
-            ? `1.5px solid ${isActive ? 'var(--color-primary)' : 'rgba(29,94,212,0.2)'}`
-            : `1.5px solid ${isActive ? '#d97706' : 'rgba(217,119,6,0.2)'}`;
+          
+          const speakerInitials = speakerName.substring(0, 1).toUpperCase();
+          const speakerColor = isSecondSpeaker ? '#ec4899' : 'var(--color-primary)';
 
           return (
             <div
               key={i}
-              className={`flex flex-col ${isEven ? 'items-start' : 'items-end'} animate-slide-up`}
-              style={{ animationDelay: `${i * 60}ms`, animationFillMode: 'both' }}
+              className={`group flex transition-all duration-500 ${isSecondSpeaker ? 'flex-row-reverse' : 'flex-row'} gap-4 ${isActive ? 'scale-[1.02]' : 'opacity-90'}`}
+              style={{ animationDelay: `${i * 100}ms`, animationFillMode: 'both' }}
             >
-              {speakerName && (
-                <p
-                  className="mb-1 px-1 text-xs font-bold uppercase tracking-wide"
-                  style={{ color: speakerColor }}
+              {/* Refined Speaker Avatar */}
+              <div className="shrink-0 pt-0.5">
+                <div 
+                  className={`flex h-9 w-9 items-center justify-center rounded-full text-xs font-black shadow-sm ring-4 ring-[var(--color-bg)] transition-all duration-500 ${
+                    isActive 
+                      ? 'text-white scale-110' 
+                      : 'bg-[var(--color-surface-raised)] text-[var(--color-text-muted)] group-hover:bg-[var(--color-surface)]'
+                  }`}
+                  style={{ backgroundColor: isActive ? speakerColor : undefined }}
                 >
-                  {speakerName}
-                </p>
-              )}
-              <div
-                className="max-w-[88%] rounded-2xl px-4 py-3 transition-all duration-300"
-                style={{
-                  backgroundColor: bubbleBg,
-                  border: bubbleBorder,
-                  borderRadius: isEven
-                    ? '4px 18px 18px 18px'
-                    : '18px 4px 18px 18px',
-                  boxShadow: isActive
-                    ? `0 4px 16px ${isEven ? 'rgba(29,94,212,0.2)' : 'rgba(217,119,6,0.2)'}`
-                    : 'none',
-                }}
-              >
-                <ClickableSentence
-                  text={text}
-                  newVocabulary={[...new Set(newVocabulary)]}
-                  onWordClick={onWordClick}
-                  className="text-lg"
-                />
-                {dialogueTranslations?.[i]?.trim() && (
-                  <p
-                    className="mt-1.5 text-sm italic border-t pt-1.5"
-                    style={{
-                      color: 'var(--color-bridge)',
-                      borderColor: isEven ? 'rgba(29,94,212,0.15)' : 'rgba(217,119,6,0.15)',
-                    }}
+                  {speakerInitials}
+                </div>
+              </div>
+
+              {/* Message Content */}
+              <div className={`flex flex-col gap-2 flex-1 min-w-0 ${isSecondSpeaker ? 'items-end' : 'items-start'}`}>
+                <div className={`flex items-center gap-2.5 ${isSecondSpeaker ? 'flex-row-reverse' : 'flex-row'}`}>
+                  <span 
+                    className="text-[10px] font-bold uppercase tracking-widest transition-colors duration-300"
+                    style={{ color: isActive ? speakerColor : 'var(--color-text-muted)' }}
                   >
-                    {dialogueTranslations[i]}
-                  </p>
-                )}
+                    {speakerName}
+                  </span>
+                  {isActive && (
+                    <span className="flex gap-0.5 h-2 items-end">
+                      <span className="w-0.5 h-full animate-bounce [animation-duration:0.6s]" style={{ backgroundColor: speakerColor }}></span>
+                      <span className="w-0.5 h-2/3 animate-bounce [animation-duration:0.8s]" style={{ backgroundColor: speakerColor }}></span>
+                      <span className="w-0.5 h-1/2 animate-bounce [animation-duration:1s]" style={{ backgroundColor: speakerColor }}></span>
+                    </span>
+                  )}
+                </div>
+
+                <div className={`max-w-[95%] transition-all duration-300 ${isActive ? (isSecondSpeaker ? '-translate-x-1' : 'translate-x-1') : ''}`}>
+                  <ClickableSentence
+                    text={text}
+                    newVocabulary={[...new Set(newVocabulary)]}
+                    onWordClick={onWordClick}
+                    className={`leading-relaxed transition-all duration-300 ${isSecondSpeaker ? 'text-right' : 'text-left'} ${isActive ? 'text-[1.05rem] font-medium' : 'text-base opacity-90'}`}
+                  />
+                  
+                  {dialogueTranslations?.[i]?.trim() && (
+                    <div className="mt-2.5 transition-all duration-500">
+                      <p 
+                        className={`text-xs italic text-[var(--color-text-secondary)] px-4 leading-relaxed border-l-2 transition-colors ${isSecondSpeaker ? 'text-right border-r-2 border-l-0' : 'text-left border-l-2'}`}
+                        style={{ borderColor: `${speakerColor}40` }}
+                      >
+                        {dialogueTranslations[i]}
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           );
         })}
       </div>
 
-      <p
-        className="text-center text-xs italic"
-        style={{ color: 'var(--color-text-muted)' }}
-      >
-        Toque nas palavras destacadas para ver a tradução
-      </p>
+      <div className="mt-4 flex items-center justify-center gap-3 opacity-40">
+        <span className="h-px w-8 bg-[var(--color-border)]"></span>
+        <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
+          Toque para traduzir
+        </p>
+        <span className="h-px w-8 bg-[var(--color-border)]"></span>
+      </div>
     </div>
   );
 }

@@ -44,26 +44,22 @@ export function ClickableWord({
         role="button"
         tabIndex={0}
         onKeyDown={(e) => e.key === 'Enter' && handleClick(e as never)}
-        className="relative inline-block cursor-pointer select-none rounded px-1 transition-colors duration-150"
+        className="relative inline-block cursor-pointer select-none rounded-[4px] px-1 transition-all duration-200"
         style={{
           color: 'var(--color-vocab)',
-          backgroundColor: ripple ? 'var(--color-vocab)' : 'var(--color-vocab-bg)',
-          textDecoration: 'underline',
-          textDecorationStyle: 'dotted',
-          textDecorationColor: 'var(--color-vocab)',
-          textUnderlineOffset: '3px',
-          fontWeight: 500,
-          transition: 'background-color 0.15s ease',
+          borderBottom: `1.5px solid ${ripple ? 'var(--color-vocab)' : 'rgba(217, 119, 6, 0.25)'}`,
+          fontWeight: 600,
+          backgroundColor: ripple ? 'var(--color-vocab-bg)' : 'transparent',
         }}
         aria-label={`Traduzir: ${word}`}
       >
         {ripple && (
           <span
-            className="absolute inset-0 rounded"
+            className="absolute inset-0 rounded-[4px]"
             style={{
               backgroundColor: 'var(--color-vocab)',
-              opacity: 0.25,
-              animation: 'tooltip-enter 400ms ease forwards',
+              opacity: 0.1,
+              animation: 'fade-in 400ms ease forwards',
               pointerEvents: 'none',
             }}
           />

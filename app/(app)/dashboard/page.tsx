@@ -13,6 +13,7 @@ import { useTheme } from '@/components/ThemeProvider';
 import { logOut } from '@/services/auth';
 import { updateUser } from '@/services/firestore';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { getLessonsForLanguage } from '@/lib/curriculum';
 import type { ProficiencyLevel, SupportedLanguage } from '@/types';
 
@@ -22,7 +23,6 @@ const LANG_LABEL: Record<string, { name: string; flag: string; countryCode: stri
 };
 
 const ALL_LEVELS: ProficiencyLevel[] = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
-const LESSONS_PER_PAGE = 5;
 
 export default function DashboardPage() {
   const { profile, user, setProfile, reset } = useAuthStore();
@@ -43,7 +43,7 @@ export default function DashboardPage() {
   async function handleLogout() {
     await logOut();
     reset();
-    router.replace('/login');
+    router.replace('/');
   }
 
   async function handleSwitchLanguage(lang: SupportedLanguage) {
@@ -189,10 +189,9 @@ export default function DashboardPage() {
         )}
 
         {/* ── Next lesson CTA ── */}
-        <button
-          type="button"
-          onClick={() => router.push('/lesson')}
-          className="cta-shimmer relative w-full rounded-3xl p-6 text-left overflow-hidden transition-transform duration-150 active:scale-[0.98] animate-slide-up-spring delay-300"
+        <Link
+          href="/lesson"
+          className="cta-shimmer block relative w-full rounded-3xl p-6 text-left overflow-hidden transition-transform duration-150 active:scale-[0.98] animate-slide-up-spring delay-300"
           style={{
             background: 'linear-gradient(135deg, #0a1628 0%, #1d5ed4 100%)',
             boxShadow: '0 12px 40px rgba(29, 94, 212, 0.35)',
@@ -222,15 +221,15 @@ export default function DashboardPage() {
               </div>
               <div>
                 <div className="flex items-center gap-2 mb-0.5">
-                  <Sparkles size={12} style={{ color: 'rgba(255,255,255,0.6)' }} />
-                  <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                  <Sparkles size={12} style={{ color: 'rgba(255,255,255,0.9)' }} />
+                  <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.85)' }}>
                     {!frontierLessonId ? 'Começar' : 'Continuar'}
                   </p>
                 </div>
                 <p className="font-display text-xl font-bold" style={{ color: 'white' }}>
                   {!frontierLessonId ? 'Lição 1' : `Lição ${frontierIndex + 1}`}
                 </p>
-                <p className="text-sm mt-0.5" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                <p className="text-sm mt-0.5" style={{ color: 'rgba(255,255,255,0.9)' }}>
                   {lang.flag} {lang.name} · {allLessons[frontierIndex]?.grammarFocus.split(' — ')[0]}
                 </p>
               </div>
@@ -242,7 +241,7 @@ export default function DashboardPage() {
               <ChevronRight size={20} color="white" />
             </div>
           </div>
-        </button>
+        </Link>
 
         {/* Lessons completed counter */}
         <p

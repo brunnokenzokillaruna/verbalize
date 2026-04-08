@@ -23,7 +23,7 @@ export function DeleteAccountSheet({ user, onClose, onReset }: DeleteAccountShee
       await deleteUserData(user.uid);
       await deleteAccount(user);
       onReset();
-      router.replace('/login');
+      router.replace('/');
     } catch (err: unknown) {
       const code = (err as { code?: string })?.code;
       setDeleteError(

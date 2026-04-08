@@ -22,7 +22,8 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
 
   if (!initialized) {
     return (
-      <div
+      <main
+        id="main-content"
         className="flex min-h-dvh items-center justify-center"
         style={{ backgroundColor: 'var(--color-bg)' }}
       >
@@ -39,7 +40,10 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
             style={{ color: 'var(--color-text-muted)' }}
           />
         </div>
-      </div>
+        <noscript>
+          <a href="/login" className="sr-only">Acessar a página de login</a>
+        </noscript>
+      </main>
     );
   }
 

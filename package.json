@@ -10,6 +10,8 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@splinetool/react-spline": "^4.1.0",
+    "@splinetool/runtime": "^1.12.74",
     "firebase": "^11.x",
     "lucide-react": "^0.468.0",
     "next": "^15.3.9",

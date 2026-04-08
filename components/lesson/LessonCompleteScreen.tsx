@@ -73,6 +73,21 @@ export function LessonCompleteScreen({
         <p className="mt-1 text-sm" style={{ color: 'var(--color-text-muted)' }}>
           {correctExercises} de {totalExercises} exercícios corretos
         </p>
+        {pct >= 80 && (
+          <div
+            className="mt-4 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-bold animate-slide-up"
+            style={{
+              backgroundColor: 'rgba(16,185,129,0.1)',
+              color: 'var(--color-success)',
+              border: '1px solid rgba(16,185,129,0.2)',
+              animationDelay: '400ms',
+              animationFillMode: 'both'
+            }}
+          >
+            <span className="text-sm">✨</span>
+            ISENTO DE REVISÃO POR EXCELÊNCIA
+          </div>
+        )}
       </div>
 
       {/* Score bar */}

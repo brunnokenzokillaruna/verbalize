@@ -11,27 +11,9 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-/**
- * Initialize Firebase once — works in both browser and Node.js (server actions).
- * NEXT_PUBLIC_* vars are available in both contexts on Vercel.
- *
- * - `app` and `db` (Firestore) are safe server-side (used by server actions).
- * - `auth` is only instantiated in the browser because it relies on
- *   localStorage persistence. Client components use it via AuthProvider;
- *   server actions must never call auth directly.
- */
-const _app: FirebaseApp =
-  getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+// Initialize Firebase
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+const db = getFirestore(app);
+const auth = getAuth(app);
 
-const _db: Firestore = getFirestore(_app);
-
-// Auth persistence (localStorage) is browser-only — instantiate lazily
-let _auth: Auth;
-if (typeof window !== 'undefined') {
-  _auth = getAuth(_app);
-}
-
-export const app = _app;
-export const db = _db;
-// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-export const auth = _auth!;
+export { app, db, auth };

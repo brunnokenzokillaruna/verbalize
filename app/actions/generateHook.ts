@@ -19,13 +19,13 @@ interface GenerateHookParams {
 function pickNames(language: SupportedLanguage) {
   const femaleNames = language === 'fr'
     ? ['Marie', 'Sophie', 'Camille', 'Lea', 'Emma', 'Chloe', 'Manon', 'Ines', 'Sarah',
-       'Jade', 'Louise', 'Alice', 'Lina', 'Julia', 'Eva', 'Clara', 'Lucie', 'Romane',
-       'Agathe', 'Jeanne', 'Margaux', 'Noemie', 'Elise', 'Anais']
+      'Jade', 'Louise', 'Alice', 'Lina', 'Julia', 'Eva', 'Clara', 'Lucie', 'Romane',
+      'Agathe', 'Jeanne', 'Margaux', 'Noemie', 'Elise', 'Anais']
     : ['Emma', 'Sarah', 'Olivia', 'Chloe'];
   const maleNames = language === 'fr'
     ? ['Lucas', 'Thomas', 'Julien', 'Antoine', 'Louis', 'Hugo', 'Arthur', 'Nathan',
-       'Gabriel', 'Raphael', 'Leo', 'Enzo', 'Paul', 'Jules', 'Adam', 'Victor',
-       'Noah', 'Ethan', 'Mathis', 'Maxime', 'Alexandre', 'Clement', 'Baptiste', 'Romain']
+      'Gabriel', 'Raphael', 'Leo', 'Enzo', 'Paul', 'Jules', 'Adam', 'Victor',
+      'Noah', 'Ethan', 'Mathis', 'Maxime', 'Alexandre', 'Clement', 'Baptiste', 'Romain']
     : ['Jake', 'Michael', 'Daniel', 'Ryan'];
   return {
     nameA: femaleNames[Math.floor(Math.random() * femaleNames.length)],
@@ -60,32 +60,32 @@ const DIALOGUE_LINES: Record<ProficiencyLevel, number> = {
 const LEVEL_DESCRIPTORS: Record<ProficiencyLevel, string> = {
   A1: `
 STRICT A1 BEGINNER rules — the learner knows almost nothing yet:
-- Vocabulary: use ONLY the 300–500 most common everyday words (e.g. hello, eat, drink, house, water, go, have, be, name, like). No complex or uncommon words at all.
-- Grammar: present tense of être/avoir (FR) or to be/to have (EN) and the most basic -ER verbs (FR) or simple present (EN). Simple yes/no questions or "où est…?" allowed. NO subordinate clauses, NO past, NO future.
+- Vocabulary: use ONLY the 300–500 most common everyday words (e.g. hello, eat, drink, walk, look, house, water, go, have, be, name, like, today).
+- Grammar: present tense of être/avoir (FR) or to be/to have (EN) and basic -ER verbs (FR) or simple present (EN). Simple yes/no questions allowed. NO past, NO future (except futur proche with 'aller').
 - Sentence length: max 8 words per line.
-- Topics: greetings, self-introduction, numbers, colors, family, food/drink, daily objects, simple actions.
-- CONVERSATION EXAMPLE (French, prepositions topic — notice how each line reacts to the previous):
-  Marie: "Où est mon sac ?"
-  Hugo: "Il est sous la table."
-  Marie: "Et mon livre ? Il est là aussi ?"
-  Hugo: "Non, ton livre est sur la chaise."
+- Tone: Informal and friendly. Use "Salut !", "Ça va ?", "On + verb" (in FR), "Tiens !".
+- CONVERSATION EXAMPLE (French, prepositions topic — notice the human reaction):
+  Marie: "Salut Hugo ! Ça va ?"
+  Hugo: "Salut ! Oui, ça va très bien."
+  Marie: "Où est le café ?"
+  Hugo: "Il est là, sur la table."
 - CONVERSATION EXAMPLE (English):
-  Emma: "Where is my bag?"
-  Jake: "It is under the table."
-  Emma: "And my book? Is it there too?"
-  Jake: "No, your book is on the chair."`,
+  Emma: "Hi Jake! How are you?"
+  Jake: "I'm great, thanks! And you?"
+  Emma: "Good! Where is the coffee?"
+  Jake: "It's there, on the table."`,
 
   A2: `
 A2 ELEMENTARY rules — the learner handles basic everyday situations:
-- Vocabulary: common everyday vocabulary (500–1 500 words). Simple nouns, verbs, adjectives that appear in daily life. Avoid rare, abstract or technical words.
-- Grammar: present tense, passé composé with avoir (FR) / simple past (EN), futur proche (FR) / going to (EN), basic modals (pouvoir/vouloir FR; can/want EN). Simple connectors: et, mais, parce que / and, but, because. ONE simple subordinate clause at most.
+- Vocabulary: common everyday vocabulary (500–1 500 words).
+- Grammar: present, passé composé with avoir (FR) / simple past (EN), futur proche/simple (FR) / going to/will (EN), basic modals.
 - Sentence length: 8–12 words per line.
-- Topics: shopping, café/restaurant, weather, transport, hobbies, professions, daily routines.
+- Tone: Conversational and alive. Use common fillers (alors, donc, bah, eh bien / so, well, actually).
 - CONVERSATION EXAMPLE (French):
-  Sophie: "Tu veux aller au café cet après-midi ?"
-  Lucas: "Oui, bonne idée ! J'ai très faim."
-  Sophie: "Moi aussi. J'ai mangé seulement une pomme ce matin."
-  Lucas: "D'accord, on y va à 14h ?"`,
+  Sophie: "Salut Lucas ! Tu viens au café ?"
+  Lucas: "Ah, j'aimerais bien, mais j'ai faim !"
+  Sophie: "Moi aussi ! On mange une pizza ?"
+  Lucas: "Carrément ! On y va à 14h ?"`,
 
   B1: `
 B1 INTERMEDIATE rules — the learner can handle familiar topics:
@@ -162,13 +162,15 @@ export async function generateHook(params: GenerateHookParams): Promise<HookResu
 
   const isEarlyLearner = knownVocabulary.length < 30; // first ~10 lessons
 
-  const knownVocabInstruction = knownVocabulary.length > 0
-    ? `- CRITICAL: Do NOT include any of these words in 'newVocabulary' because the learner already knows them: [${knownVocabulary.slice(-100).join(', ')}]`
+  const normalizedKnown = knownVocabulary.map((w) => w.toLowerCase());
+  const knownVocabInstruction = normalizedKnown.length > 0
+    ? `- CRITICAL REPETITION RULE: The user has already learned the following words. You MUST NOT include any of these in 'newVocabulary': [${normalizedKnown.slice(-1000).join(', ')}]`
     : '';
 
-  const vocabConstraint = isEarlyLearner
-    ? `- VOCABULARY CONSTRAINT: The learner is a beginner with very limited vocabulary. The dialogue must use ONLY: (a) the 4 new vocabulary words, (b) basic function words (articles, prepositions, pronouns, conjunctions, common verbs like être/avoir/aller/faire for French or be/have/go/do for English), and (c) simple A1-level everyday words (greetings, numbers, colors, family, food, daily objects). Keep sentences short and simple.`
-    : `- VOCABULARY CONSTRAINT: The dialogue must use EXCLUSIVELY: (a) the 4 new vocabulary words being taught, (b) words the learner already knows: [${knownVocabulary.slice(-200).join(', ')}], and (c) basic function words that don't need explicit teaching (articles, prepositions, pronouns, conjunctions, auxiliary verbs). Do NOT introduce unknown content words beyond the 4 new vocabulary items.`;
+  const vocabConstraint = `- VOCABULARY DYNAMICS: While the 4 new vocabulary words are the focus, you MAY use other common, simple, and transparent words (especially cognates like 'restaurant', 'manger', 'amigo') to ensure the conversation feels natural and human.
+- DIALOGUE FLOW: This MUST be a REAL conversation. Use fillers and connectors (FR: "Eh bien", "Alors", "Tiens", "D'accord", "Bah"; EN: "Well", "So", "Actually", "Sure", "Right"). 
+- AVOID ROBOTS: One speaker should initiate with a need/feeling/question, and the other should react with emotion or a relevant answer. Avoid the "Question-Answer-Question-Answer" pattern.
+- NATURAL TRANSLATIONS: The 'dialogueTranslations' must be NATURAL Portuguese (PT-BR) as spoken in Brazil. NO dictionary-style explanations like "(fazer uma visita a)". Just translate the meaning as a Brazilian would say it in that context.`;
 
   // ── Attempt 1: Super-hook (all fields bundled) ───────────────────────────
   const superPrompt = `Write a 2-person dialogue in ${lang} between ${nameA} and ${nameB}.
@@ -179,9 +181,11 @@ Requirements:
 - Exactly ${lineCount} lines total, alternating speakers
 - Every line MUST begin with the speaker name and a colon
 - CRITICAL COHERENCE: Before writing anything, mentally choose ONE tight, specific scenario within the topic (e.g. "planning a weekend hike", "choosing a dish at a restaurant"). ALL dialogue lines AND ALL vocabulary words must stay within that single scenario from start to finish. Do NOT switch sub-topics mid-dialogue.
-- CRITICAL: This must be a REAL conversation. Each line must directly react to what the previous speaker said (ask a question, answer it, agree, disagree, express surprise, follow up, etc.). The dialogue must have a clear narrative arc — a beginning, a middle exchange, and a natural conclusion. Do NOT write isolated sentences that happen to share a topic. Each speaker must address the other person, not just state facts independently.
-- BAD example (NEVER do this — topic switches mid-dialogue): A: "Tu aimes ce dessin ?" B: "Non, je ne regarde pas ce dessin." A: "Tu préfères le nouveau projet ?" B: "Oui, je dessine un beau projet." — this is broken because it jumps from 'dessin' to 'projet' with no logical connection.
+- CRITICAL: This must be a REAL conversation. Each line must directly react to what the previous speaker said. The dialogue must have a clear narrative arc — a beginning, a middle exchange, and a natural conclusion. Avoid "visiting" a gym if the context is just going to work out. Choose scenarios where the vocabulary and grammar actually make sense for native speakers.
+- AVOID REPETITION and QUESTION BARRAGE.
 - The CONVERSATION EXAMPLE inside the LEVEL CONSTRAINTS below shows exactly the style and register you must follow.
+- NO STILTED LANGUAGE: Use "On" instead of "Nous" for French (unless very formal), use contractions, and sounds human.
+- CONTEXTUAL MATCH: Ensure the scenario justifies the use of the grammar focus. If the focus is "Visiter vs Rendre visite", use a tourist scenario or a museum, not a gym trip.
 ${knownVocabInstruction}
 ${vocabConstraint}
 
@@ -192,117 +196,85 @@ Output ONLY this JSON object (no extra text):
 {
   "dialogue": "${nameA}: <line 1>\\n${nameB}: <line 2>\\n...",
   "dialogueTranslations": ["<pt-BR line 1>", "<pt-BR line 2>", ...],
-  "newVocabulary": ["verb_infinitive", "non_verb_word_1", "non_verb_word_2", "non_verb_word_3"],
-  "verbWord": "verb_infinitive",
+  "newVocabulary": ["non_verb_word_1", "non_verb_word_2", "non_verb_word_3", "non_verb_word_4"],
+  "dialogueVerbs": ["verb_infinitive_1", "verb_infinitive_2", ...],
   "grammarFocus": "one sentence describing the grammar used",
   "grammarBridge": {
-    "insight": "1 frase de impacto em PT-BR — a sacada central da regra. Começa com 'Em português...' ou 'Ao contrário do português...'. MAX 20 palavras.",
-    "explanation": "2-4 frases em PT-BR explicando a regra com profundidade: como funciona na língua-alvo, por que difere do português, erro típico de brasileiro e qualquer nuance importante. Tom de professor parceiro.",
+    "insight": "1 frase de impacto em PT-BR — a sacada central da regra. MAX 20 palavras.",
+    "explanation": "2-4 frases em PT-BR explicando a regra com profundidade.",
     "bridge": {
-      "portuguese": "A frase-núcleo como um brasileiro diria naturalmente em PT-BR",
-      "target": "O equivalente correto em ${lang}",
-      "difference": "1 frase PT-BR apontando a diferença estrutural chave. MAX 15 palavras."
+      "portuguese": "A frase-núcleo em PT-BR",
+      "target": "O equivalente em ${lang}",
+      "difference": "1 frase PT-BR sobre a diferença estrutural chave."
     },
+    "items": [
+      { "target": "Expressão 1 em ${lang}", "portuguese": "Tradução PT-BR", "logic": "Pequena sacada (OPCIONAL)" }
+    ],
     "dialogueExample": {
       "target": "Frase VERBATIM do campo dialogue que melhor ilustra o grammarFocus",
       "portuguese": "Tradução natural PT-BR dessa frase"
     },
     "additionalExamples": [
-      { "target": "Exemplo 2 em ${lang} com contexto diferente", "portuguese": "Equivalente PT-BR" },
-      { "target": "Exemplo 3 em ${lang} — preferencialmente erro comum de brasileiro corrigido", "portuguese": "Como o brasileiro tentaria dizer" }
+      { "target": "Exemplo extra em ${lang}", "portuguese": "Equivalente PT-BR" }
     ]
   },
   "imageKeywords": {
     "<vocab word 1>": "short English Pexels search term",
-    "<vocab word 2>": "short English Pexels search term",
-    "<vocab word 3>": "short English Pexels search term",
-    "<vocab word 4>": "short English Pexels search term"
+    ...
   },
   "vocabTranslations": {
     "<vocab word 1>": { "translation": "pt-BR", "explanation": "tip in Portuguese ≤20 words", "example": "sentence in ${lang}" },
-    "<vocab word 2>": { "translation": "pt-BR", "explanation": "tip in Portuguese ≤20 words", "example": "sentence in ${lang}" },
-    "<vocab word 3>": { "translation": "pt-BR", "explanation": "tip in Portuguese ≤20 words", "example": "sentence in ${lang}" },
-    "<vocab word 4>": { "translation": "pt-BR", "explanation": "tip in Portuguese ≤20 words", "example": "sentence in ${lang}" }
+    ...
   },
   "imageMatchDistractors": {
     "<vocab word 1>": ["distractor_a", "distractor_b", "distractor_c"],
-    "<vocab word 2>": ["distractor_a", "distractor_b", "distractor_c"],
-    "<vocab word 3>": ["distractor_a", "distractor_b", "distractor_c"],
-    "<vocab word 4>": ["distractor_a", "distractor_b", "distractor_c"]
+    ...
   }
 }
 
 Rules:
 - dialogue must have exactly ${lineCount} lines
-- newVocabulary: EXACTLY 4 DISTINCT words (no duplicates). The first word MUST be a verb in infinitive form. The other 3 MUST be non-verb words (nouns, adjectives, or adverbs — NOT verbs). All 4 must appear LITERALLY in the dialogue text (the verb in a conjugated form, the other words as-is or with plural -s). They must all belong to the same semantic theme so the conversation stays coherent on ONE topic.
-- CRITICAL VALIDATION: Before finalizing newVocabulary, re-read the dialogue and verify each of the 4 words actually appears in it. If a word is missing, replace it with a different word that IS present in the dialogue. All 4 slots must map to 4 different words.
-- NEVER include proper nouns (person names, place names, brand names) in newVocabulary — only common nouns, adjectives, and verbs
-- verbWord must equal newVocabulary[0]
-- dialogueTranslations: ${lineCount} strings, no speaker prefix, natural Brazilian Portuguese
-- imageKeywords keys must match the actual vocabulary words in newVocabulary
-- vocabTranslations keys must match the actual vocabulary words in newVocabulary
-- imageMatchDistractors keys must match the actual vocabulary words in newVocabulary
-- imageMatchDistractors: for each vocab word, provide 3 concrete nouns in ${lang} from a COMPLETELY different semantic category (e.g., if the word is "restaurant", distractors could be "avion", "chien", "montagne"). The distractors must be visually unambiguous and obviously wrong for that word's image. Do NOT use other words from newVocabulary as distractors.
-- grammarBridge.insight: ≤20 palavras, 1 frase com ponte explícita. EXEMPLO para passé composé: "Em português usamos 'eu fui' para tudo; em francês existe um tempo só para ações concluídas."
-- grammarBridge.explanation: 2-4 frases sem jargão, focadas em brasileiros. EXEMPLO: "O passé composé funciona como nosso pretérito perfeito, mas precisa de um verbo auxiliar (avoir ou être) antes do verbo principal. Brasileiro costuma esquecer esse auxiliar e dizer apenas o particípio. A boa notícia: a maioria dos verbos usa 'avoir', então você vai acertar na maioria das vezes."
-- grammarBridge.bridge.difference: ≤15 palavras, exatamente 1 frase em PT-BR
-- grammarBridge.dialogueExample.target: deve ser verbatim de uma linha do campo dialogue
-- grammarBridge.additionalExamples: exatamente 2 itens`;
+- newVocabulary: EXACTLY 4 DISTINCT NON-VERB words (no verbs allowed). Nouns, adjectives, or adverbs only. All 4 must appear LITERALLY in the dialogue.
+- dialogueVerbs: List EVERY verb used in the dialogue in its infinitive form.
+- NEVER include days of the week, months of the year, or proper nouns in newVocabulary.
+- imageKeywords, vocabTranslations, imageMatchDistractors: provide data for the 4 words in newVocabulary.
+- grammarBridge: (1) Use 'bridge' for single systemic rules (leave 'items' null). (2) Use 'items' for lists of expressions/vocabulary (leave 'bridge' null). (3) If the topic implies a number (e.g., "11 ways"), you MUST provide all of them in 'items'. (4) insight ≤20 words, explanation 2-4 phrases.`;
 
   try {
     const result = await callGeminiJSON<HookResult>(superPrompt, systemPrompt, 4096);
     if (result?.dialogue && result?.newVocabulary?.length === 4) {
       result.dialogue = fixDialogueLabels(result.dialogue, nameA, nameB);
 
-      // Normalize: verbWord must be present at newVocabulary[0].
-      // Gemini sometimes returns a verbWord that is absent from the list
-      // (or puts it at a non-zero index), causing the verb to be saved as
-      // a noun or lost entirely. Fix it deterministically here.
-      if (result.verbWord) {
-        const idx = result.newVocabulary.indexOf(result.verbWord);
-        if (idx === -1) {
-          // verbWord not in list — insert at front, drop the last noun
-          result.newVocabulary = [result.verbWord, ...result.newVocabulary.slice(0, 3)];
-        } else if (idx !== 0) {
-          // verbWord is in the list but not first — move it to front
-          result.newVocabulary = [
-            result.verbWord,
-            ...result.newVocabulary.filter((w) => w !== result.verbWord),
-          ];
-        }
-      }
-
       // Normalize vocabulary: lowercase all words, remove empty entries, deduplicate.
-      // Previously this filtered out words starting with uppercase, which could
-      // reduce the list below 3 words when Gemini capitalised a common noun.
       result.newVocabulary = [...new Set(
         result.newVocabulary
-          .map((w) => w.trim().toLowerCase())
-          .filter((w) => w.length > 0),
+          .map((w: string) => w.trim().toLowerCase())
+          .filter((w: string) => w.length > 0),
       )];
 
-      // Normalize keys of bundled objects to match the lowercased vocabulary.
-      // Gemini may return keys like "Peindre" while newVocabulary is normalized
-      // to "peindre", causing all lookups to silently fail.
+      // Normalize dialogueVerbs
+      if (result.dialogueVerbs) {
+        result.dialogueVerbs = [...new Set(
+          result.dialogueVerbs
+            .map((v: string) => v.trim().toLowerCase())
+            .filter((v: string) => v.length > 0)
+        )];
+      }
+
+      // Final normalization of secondary objects
       if (result.vocabTranslations) {
         const vt: typeof result.vocabTranslations = {};
-        for (const [k, v] of Object.entries(result.vocabTranslations)) {
-          vt[k.trim().toLowerCase()] = v;
-        }
+        for (const [k, v] of Object.entries(result.vocabTranslations)) vt[k.trim().toLowerCase()] = v;
         result.vocabTranslations = vt;
       }
       if (result.imageKeywords) {
         const ik: typeof result.imageKeywords = {};
-        for (const [k, v] of Object.entries(result.imageKeywords)) {
-          ik[k.trim().toLowerCase()] = v;
-        }
+        for (const [k, v] of Object.entries(result.imageKeywords)) ik[k.trim().toLowerCase()] = v;
         result.imageKeywords = ik;
       }
       if (result.imageMatchDistractors) {
         const imd: typeof result.imageMatchDistractors = {};
-        for (const [k, v] of Object.entries(result.imageMatchDistractors)) {
-          imd[k.trim().toLowerCase()] = v;
-        }
+        for (const [k, v] of Object.entries(result.imageMatchDistractors)) imd[k.trim().toLowerCase()] = v;
         result.imageMatchDistractors = imd;
       }
 
@@ -314,57 +286,36 @@ Rules:
 
   // ── Fallback: minimal hook-only prompt (original behavior) ───────────────
   console.warn('[generateHook] Using simple hook fallback');
-  const simplePrompt = `Write a 2-person dialogue in ${lang} between ${nameA} and ${nameB}.
-
-Requirements:
-- Topic: ${topic}
-- Naturally uses this grammar: ${grammarFocus}
-- Exactly ${lineCount} lines total, alternating speakers
-- Every line MUST begin with the speaker name and a colon
-- CRITICAL COHERENCE: Before writing, mentally choose ONE tight, specific scenario within the topic. ALL dialogue lines AND ALL vocabulary words must stay within that single scenario. Do NOT switch sub-topics mid-dialogue.
-- CRITICAL: This must be a REAL conversation. Each line must directly react to what the previous speaker said. Do NOT write isolated sentences — each speaker must address the other person. Follow the CONVERSATION EXAMPLE in the LEVEL CONSTRAINTS below.
-${knownVocabInstruction}
-${vocabConstraint}
-
-LEVEL CONSTRAINTS (follow these strictly):
-${levelDesc}
-
-Output this JSON (dialogue must have exactly ${lineCount} lines):
+  const simplePrompt = `Write a 2-person dialogue in ${lang} between ${nameA} and ${nameB}. Topic: ${topic}. Grammar: ${grammarFocus}.
+Make it sound like a NATURAL conversation between humans, using informal language and reactions. Avoid robotic "textbook" sentences.
+Output JSON:
 {
   "dialogue": "${nameA}: <first line>\\n${nameB}: <second line>\\n...",
-  "dialogueTranslations": ["<pt-BR translation of line 1>", "<pt-BR translation of line 2>", ...],
-  "newVocabulary": ["verb_infinitive", "non_verb_word_1", "non_verb_word_2", "non_verb_word_3"],
-  "verbWord": "verb_infinitive",
+  "dialogueTranslations": ["<pt-BR translation 1>", ...],
+  "newVocabulary": ["non_verb_1", "non_verb_2", "non_verb_3", "non_verb_4"],
+  "dialogueVerbs": ["verb_inf_1", "verb_inf_2", ...],
   "grammarFocus": "one sentence describing the grammar used"
 }
-
-Rules for newVocabulary: EXACTLY 4 DISTINCT words (no duplicates). First word MUST be a verb in infinitive form. The other 3 MUST be non-verb words (nouns, adjectives, or adverbs — NOT verbs). All 4 must appear LITERALLY in the dialogue text (the verb in a conjugated form, the other words as-is or with plural -s). All 4 must belong to the same semantic theme. NEVER include proper nouns — only common nouns, adjectives, and verbs. CRITICAL: Verify each word appears in the dialogue before submitting — if one is missing, replace it with a word that IS in the dialogue.
-Rules for dialogueTranslations: ${lineCount} natural Brazilian Portuguese translations, no speaker prefix.`;
+Rules: 4 non-verb vocab words, all used in dialogue. List all infinitive verbs used in dialogueVerbs.`;
 
   try {
     const fallback = await callGeminiJSON<HookResult>(simplePrompt, systemPrompt, 1024);
     if (!fallback) return null;
     fallback.dialogue = fixDialogueLabels(fallback.dialogue, nameA, nameB);
 
-    // Same normalization as super-hook: ensure verbWord is at newVocabulary[0]
-    if (fallback.verbWord && fallback.newVocabulary?.length) {
-      const idx = fallback.newVocabulary.indexOf(fallback.verbWord);
-      if (idx === -1) {
-        fallback.newVocabulary = [fallback.verbWord, ...fallback.newVocabulary.slice(0, 3)];
-      } else if (idx !== 0) {
-        fallback.newVocabulary = [
-          fallback.verbWord,
-          ...fallback.newVocabulary.filter((w) => w !== fallback.verbWord),
-        ];
-      }
-    }
-
-    // Normalize vocabulary: lowercase all words, remove empty entries, deduplicate.
     fallback.newVocabulary = [...new Set(
       (fallback.newVocabulary ?? [])
-        .map((w) => w.trim().toLowerCase())
-        .filter((w) => w.length > 0),
+        .map((w: string) => w.trim().toLowerCase())
+        .filter((w: string) => w.length > 0),
     )];
+
+    if (fallback.dialogueVerbs) {
+      fallback.dialogueVerbs = [...new Set(
+        fallback.dialogueVerbs
+          .map((v: string) => v.trim().toLowerCase())
+          .filter((v: string) => v.length > 0)
+      )];
+    }
 
     return fallback;
   } catch (err) {

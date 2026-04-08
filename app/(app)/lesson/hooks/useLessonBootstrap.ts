@@ -7,7 +7,7 @@ import { generateHook } from '@/app/actions/generateHook';
 import { generateGrammarBridge } from '@/app/actions/generateGrammarBridge';
 import { getVocabImage } from '@/app/actions/getVocabImage';
 import { translateWord } from '@/app/actions/translateWord';
-import { getPregeneratedLesson, deletePregeneratedLesson, getUserVocabulary } from '@/services/firestore';
+import { getPregeneratedLesson, deletePregeneratedLesson, getUserVocabulary, upsertVocabularyItem } from '@/services/firestore';
 import type { GrammarBridgeResult, Exercise } from '@/types';
 
 interface UseLessonBootstrapProps {
@@ -64,7 +64,7 @@ export function useLessonBootstrap({
         }
 
         const vocabDocs = user ? await getUserVocabulary(user.uid, lesson.language) : [];
-        const knownVocabulary = vocabDocs.map((v) => v.word);
+        const knownVocabulary = vocabDocs.map((v) => v.word.toLowerCase());
         store.setKnownVocabulary(knownVocabulary);
 
         if (!hook) {
@@ -92,6 +92,36 @@ export function useLessonBootstrap({
     })();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile, store.phase]);
+
+  // Automatic Verb Registration
+  useEffect(() => {
+    if (!user || !store.hook?.dialogueVerbs || !store.lesson) return;
+    
+    const language = store.lesson.language;
+    const knownSet = new Set(store.knownVocabulary.map(v => v.toLowerCase()));
+    const newVerbsFound = store.hook.dialogueVerbs.filter(v => !knownSet.has(v.toLowerCase()));
+
+    if (newVerbsFound.length === 0) return;
+
+    // Register each new verb
+    newVerbsFound.forEach((verb) => {
+      // Upsert to Firestore. We don't wait for completion here (fire-and-forget)
+      // because we want to update the store immediately.
+      upsertVocabularyItem(
+        user.uid,
+        verb.toLowerCase(),
+        verb, // placeholder translation; updated if user clicks tooltip
+        language,
+        undefined,
+        'verb'
+      ).catch(console.error);
+    });
+
+    // Update store's knownVocabulary so they don't get re-registered and
+    // so the UI can use them if needed.
+    store.setKnownVocabulary([...store.knownVocabulary, ...newVerbsFound]);
+    store.setDiscoveredVerbs(newVerbsFound);
+  }, [user, store.hook, store.lesson]);
 
   useEffect(() => {
     if ((store.phase !== 'hook' && store.phase !== 'vocabulary') || !store.hook || !store.lesson) return;

@@ -18,47 +18,42 @@ interface LessonProgressHeaderProps {
 
 export function LessonProgressHeader({ currentStage, onExit }: LessonProgressHeaderProps) {
   const currentIndex = STAGES.findIndex((s) => s.key === currentStage);
-  const currentLabel = STAGES[currentIndex]?.label ?? '';
 
   return (
-    <header
-      className="sticky top-0 z-30 px-4 pt-4 pb-3"
-      style={{
-        backgroundColor: 'var(--color-bg)',
-        borderBottom: '1px solid var(--color-border)',
-      }}
-    >
-      <div className="mx-auto max-w-lg md:max-w-2xl lg:max-w-4xl flex items-center gap-3">
-        {/* Exit button */}
+    <header className="sticky top-0 z-50 w-full px-4 py-4 sm:px-8">
+      {/* Glassmorphic Background */}
+      <div className="absolute inset-0 bg-[var(--color-bg)]/90 backdrop-blur-xl shadow-md border-b border-[var(--color-border)]/60 pointer-events-none" />
+
+      <div className="relative mx-auto max-w-2xl flex items-center gap-6">
+        {/* Minimal Exit button */}
         <button
           type="button"
           onClick={onExit}
-          aria-label="Sair da lição"
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-all duration-150 active:scale-90 hover:opacity-70"
-          style={{ backgroundColor: 'var(--color-surface-raised)' }}
+          className="group flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-all duration-300 active:scale-95 hover:bg-[var(--color-surface-raised)]"
         >
-          <X size={18} style={{ color: 'var(--color-text-muted)' }} />
+          <X size={20} className="text-[var(--color-text-muted)] group-hover:text-[var(--color-text-primary)] transition-colors" />
         </button>
 
-        {/* Segmented progress track */}
-        <div className="relative flex flex-1 items-center gap-1">
+        {/* Improved Progress Track */}
+        <div className="flex flex-1 items-center gap-1.5 h-1.5">
           {STAGES.map((stage, i) => {
             const isCompleted = i < currentIndex;
             const isActive = i === currentIndex;
+            const isFuture = i > currentIndex;
 
             return (
               <div
                 key={stage.key}
-                className="relative h-2 flex-1 overflow-hidden rounded-full"
-                style={{ backgroundColor: 'var(--color-border)' }}
+                className="relative h-1 flex-1 rounded-full overflow-hidden bg-[var(--color-border)]/40"
               >
                 <div
-                  className="absolute inset-y-0 left-0 rounded-full"
+                  className={`absolute inset-0 transition-all duration-700 ease-in-out ${
+                    isActive ? 'animate-pulse shadow-[0_0_8px_var(--color-primary)]' : ''
+                  }`}
                   style={{
-                    backgroundColor: 'var(--color-primary)',
-                    width: isCompleted ? '100%' : isActive ? '50%' : '0%',
-                    transition: 'width 400ms ease',
-                    opacity: isActive ? 0.7 : 1,
+                    backgroundColor: isFuture ? 'transparent' : 'var(--color-primary)',
+                    width: (isCompleted || isActive) ? '100%' : '0%',
+                    opacity: isActive ? 0.8 : 1,
                   }}
                 />
               </div>
@@ -66,13 +61,15 @@ export function LessonProgressHeader({ currentStage, onExit }: LessonProgressHea
           })}
         </div>
 
-        {/* Stage label */}
-        <span
-          className="shrink-0 text-sm font-medium"
-          style={{ color: 'var(--color-text-muted)', minWidth: '72px', textAlign: 'right' }}
-        >
-          {currentLabel}
-        </span>
+        {/* Delicate Stage Counter */}
+        <div className="flex flex-col items-end min-w-[80px]">
+          <span className="text-[11px] font-black uppercase tracking-[0.2em] text-[var(--color-primary)]">
+            ETAPA {currentIndex + 1}
+          </span>
+          <span className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase whitespace-nowrap opacity-80">
+            {STAGES[currentIndex]?.label}
+          </span>
+        </div>
       </div>
     </header>
   );

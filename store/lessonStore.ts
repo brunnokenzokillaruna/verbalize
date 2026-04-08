@@ -41,6 +41,10 @@ interface LessonState {
   reviewExercises: Exercise[];
   reviewIndex: number;
   reviewCorrectCount: number;
+  mistakes: Exercise[]; // practice exercises user got wrong
+
+  // Newly discovered verbs in this session (not yet in knownVocabulary at start)
+  discoveredVerbs: string[];
 
   // Loading state
   isLoading: boolean;
@@ -58,9 +62,13 @@ interface LessonState {
   setVocabTranslation: (word: string, translation: string) => void;
   setExercises: (exercises: Exercise[]) => void;
   setIsLoading: (loading: boolean) => void;
+  setDiscoveredVerbs: (verbs: string[]) => void;
 
   /** Record a correct answer for the current practice exercise. */
   recordCorrect: () => void;
+
+  /** Record a mistake for the current practice exercise. */
+  recordMistake: (exercise: Exercise) => void;
 
   /**
    * Advance to the next practice exercise.
@@ -91,6 +99,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
   vocabImages: {},
   vocabTranslations: {},
   knownVocabulary: [],
+  discoveredVerbs: [],
   exercises: [],
   exerciseIndex: 0,
   correctCount: 0,
@@ -98,6 +107,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
   reviewExercises: [],
   reviewIndex: 0,
   reviewCorrectCount: 0,
+  mistakes: [],
   isLoading: false,
 
   // ── Actions ────────────────────────────────────────────────────────────────
@@ -112,6 +122,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       vocabImages: {},
       vocabTranslations: {},
       knownVocabulary: [],
+      discoveredVerbs: [],
       exercises: [],
       exerciseIndex: 0,
       correctCount: 0,
@@ -119,6 +130,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       reviewExercises: [],
       reviewIndex: 0,
       reviewCorrectCount: 0,
+      mistakes: [],
       isLoading: true,
     }),
 
@@ -130,6 +142,8 @@ export const useLessonStore = create<LessonState>((set, get) => ({
     hook: { ...hook, newVocabulary: [...new Set(hook.newVocabulary)] },
     isLoading: false,
   }),
+
+  setDiscoveredVerbs: (verbs: string[]) => set({ discoveredVerbs: verbs }),
 
   setGrammarBridge: (grammarBridge) => set({ grammarBridge, isLoading: false }),
 
@@ -147,6 +161,9 @@ export const useLessonStore = create<LessonState>((set, get) => ({
 
   recordCorrect: () =>
     set((state) => ({ correctCount: state.correctCount + 1 })),
+
+  recordMistake: (exercise) =>
+    set((state) => ({ mistakes: [...state.mistakes, exercise] })),
 
   nextExercise: () => {
     const { exerciseIndex } = get();
@@ -179,6 +196,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       vocabImages: {},
       vocabTranslations: {},
       knownVocabulary: [],
+      discoveredVerbs: [],
       exercises: [],
       exerciseIndex: 0,
       correctCount: 0,
@@ -186,6 +204,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       reviewExercises: [],
       reviewIndex: 0,
       reviewCorrectCount: 0,
+      mistakes: [],
       isLoading: false,
     }),
 }));

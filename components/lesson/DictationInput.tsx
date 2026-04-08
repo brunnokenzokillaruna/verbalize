@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { AudioPlayerButton } from './AudioPlayerButton';
 import type { DictationData, SupportedLanguage } from '@/types';
@@ -11,6 +11,8 @@ interface DictationInputProps {
   language: SupportedLanguage;
   onAnswer: (correct: boolean) => void;
   answered: boolean;
+  setIsExerciseReady: (ready: boolean) => void;
+  submitTrigger: number;
 }
 
 function normalize(s: string): string {
@@ -23,10 +25,33 @@ function normalize(s: string): string {
 
 type AnswerStatus = 'idle' | 'correct' | 'accent-warning' | 'wrong';
 
-export function DictationInput({ data, language, onAnswer, answered }: DictationInputProps) {
+export function DictationInput({ 
+  data, 
+  language, 
+  onAnswer, 
+  answered,
+  setIsExerciseReady,
+  submitTrigger
+}: DictationInputProps) {
   const [input, setInput] = useState('');
   const [hintOpen, setHintOpen] = useState(false);
   const [answerStatus, setAnswerStatus] = useState<AnswerStatus>('idle');
+
+  // Notify parent of readiness
+  useEffect(() => {
+    if (!answered) {
+      setIsExerciseReady(input.trim().length > 0);
+    } else {
+      setIsExerciseReady(false);
+    }
+  }, [input, answered, setIsExerciseReady]);
+
+  // Listen for global submit
+  useEffect(() => {
+    if (submitTrigger > 0 && !answered) {
+      handleSubmit();
+    }
+  }, [submitTrigger]);
 
   const isCorrect = normalize(input) === normalize(data.text);
   const isAccentWarning = !isCorrect && isAccentOnlyDiff(input, data.text);
@@ -39,118 +64,121 @@ export function DictationInput({ data, language, onAnswer, answered }: Dictation
   }
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-8">
       {/* Instruction */}
       <div
-        className="flex flex-col items-center gap-4 rounded-2xl p-6"
-        style={{
-          backgroundColor: 'var(--color-surface)',
-          border: '1px solid var(--color-border)',
-        }}
+        className="flex flex-col items-center gap-5 rounded-xl p-8 bg-[var(--color-surface-raised)]/30 border border-[var(--color-border)]"
       >
-        <p className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>
-          Ouça e escreva o que ouvir
-        </p>
+        <div className="flex items-center gap-2 opacity-60">
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
+            Ditado Inteligente
+          </span>
+        </div>
+        
         <AudioPlayerButton text={data.text} language={language} size="lg" />
-        <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
-          Toque para ouvir (pode ouvir quantas vezes quiser)
+        
+        <p className="text-xs font-medium text-center leading-relaxed text-[var(--color-text-muted)] opacity-70 max-w-[200px]">
+          Ouça e escreva o que ouvir. Você pode repetir quantas vezes precisar.
         </p>
       </div>
 
-      {/* Text input */}
-      <textarea
-        rows={3}
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        disabled={answered}
-        placeholder="Escreva o que ouviu..."
-        autoComplete="off"
-        autoCorrect="off"
-        autoCapitalize="none"
-        spellCheck={false}
-        className="w-full resize-none rounded-2xl px-4 py-3 text-base outline-none transition-all"
-        style={{
-          backgroundColor: 'var(--color-surface)',
-          border: `2px solid ${
-            !answered
-              ? 'var(--color-border)'
-              : answerStatus === 'correct'
-                ? 'var(--color-success)'
-                : answerStatus === 'accent-warning'
-                  ? '#d97706'
-                  : 'var(--color-error)'
-          }`,
-          color: 'var(--color-text-primary)',
-          caretColor: 'var(--color-primary)',
-        }}
-        onFocus={(e) => !answered && (e.target.style.borderColor = 'var(--color-primary)')}
-        onBlur={(e) => !answered && (e.target.style.borderColor = 'var(--color-border)')}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            handleSubmit();
-          }
-        }}
-      />
+      {/* Text input container */}
+      <div className="relative group">
+        <textarea
+          rows={3}
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          disabled={answered}
+          placeholder="Escreva o que ouviu..."
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="none"
+          spellCheck={false}
+          className="w-full resize-none rounded-xl bg-[var(--color-surface-raised)] px-6 py-5 text-base font-medium outline-none transition-all duration-300 ring-1 shadow-inner"
+          style={{
+            borderColor: 
+              !answered
+                ? 'var(--color-border)'
+                : answerStatus === 'correct'
+                  ? 'var(--color-success)'
+                  : answerStatus === 'accent-warning'
+                    ? '#d97706'
+                    : 'var(--color-error)',
+            boxShadow: 
+              answered && answerStatus === 'correct'
+                ? '0 0 0 3px rgba(34, 197, 94, 0.1), inset 0 2px 4px rgba(0,0,0,0.05)'
+                : answered && answerStatus === 'accent-warning'
+                  ? '0 0 0 3px rgba(217, 119, 6, 0.1), inset 0 2px 4px rgba(0,0,0,0.05)'
+                  : answered && answerStatus === 'wrong'
+                    ? '0 0 0 3px rgba(239, 68, 68, 0.1), inset 0 2px 4px rgba(0,0,0,0.05)'
+                    : 'inset 0 2px 4px rgba(0,0,0,0.02)',
+            color: 'var(--color-text-primary)',
+            caretColor: 'var(--color-primary)',
+          }}
+          onFocus={(e) => {
+            if (!answered) {
+              e.target.style.borderColor = 'var(--color-primary)';
+            }
+          }}
+          onBlur={(e) => {
+            if (!answered) {
+              e.target.style.borderColor = 'var(--color-border)';
+            }
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              handleSubmit();
+            }
+          }}
+        />
+      </div>
 
       {/* Accent warning */}
       {answered && answerStatus === 'accent-warning' && (
-        <div
-          className="rounded-xl px-4 py-3 text-sm"
-          style={{ backgroundColor: '#fef3c7', color: '#92400e' }}
-        >
-          Quase! Verifique os acentos:{' '}
-          <span className="font-semibold">{data.text}</span>
+        <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 animate-in fade-in zoom-in-95 duration-300">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-amber-700 mb-1 opacity-80">
+            Quase lá! Atenção aos acentos:
+          </p>
+          <p className="text-sm font-semibold text-amber-900 italic">
+            {data.text}
+          </p>
         </div>
       )}
 
       {/* Show correct text on wrong */}
       {answered && answerStatus === 'wrong' && (
-        <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-          Texto correto:{' '}
-          <span className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+        <div className="p-4 rounded-xl bg-[var(--color-error-bg)]/30 border border-[var(--color-error)]/20 animate-in fade-in slide-in-from-top-2 duration-400">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--color-error)] mb-1 opacity-70">
+            Texto correto:
+          </p>
+          <p className="text-sm font-semibold text-[var(--color-text-primary)] italic">
             {data.text}
-          </span>
-        </p>
+          </p>
+        </div>
       )}
 
-      {/* Translation hint */}
-      <button
-        type="button"
-        onClick={() => setHintOpen((o) => !o)}
-        className="flex items-center gap-1.5 text-sm font-medium"
-        style={{ color: 'var(--color-text-muted)' }}
-      >
-        {hintOpen ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
-        {hintOpen ? 'Ocultar tradução' : 'Ver tradução'}
-      </button>
-      {hintOpen && (
-        <p
-          className="rounded-xl px-4 py-3 text-sm"
-          style={{
-            backgroundColor: 'var(--color-primary-light)',
-            color: 'var(--color-primary-dark)',
-          }}
-        >
-          {data.translation}
-        </p>
-      )}
-
-      {!answered && (
+      {/* Translation hint (collapsible) */}
+      <div className="flex flex-col gap-2.5">
         <button
           type="button"
-          onClick={handleSubmit}
-          disabled={input.trim() === ''}
-          className="self-end rounded-xl px-5 py-2 text-sm font-semibold transition-all active:scale-95"
-          style={{
-            backgroundColor: input.trim() ? 'var(--color-primary)' : 'var(--color-surface-raised)',
-            color: input.trim() ? 'var(--color-text-inverse)' : 'var(--color-text-muted)',
-            cursor: input.trim() ? 'pointer' : 'not-allowed',
-          }}
+          onClick={() => setHintOpen((o) => !o)}
+          className="flex items-center gap-1.5 text-xs font-bold text-[var(--color-text-muted)] hover:text-[var(--color-primary)] transition-colors uppercase tracking-widest group"
         >
-          Verificar
+          <div className={`transition-transform duration-300 ${hintOpen ? 'rotate-180' : ''}`}>
+            <ChevronDown size={14} />
+          </div>
+          {hintOpen ? 'Esconder tradução' : 'Ver tradução'}
         </button>
-      )}
+        
+        {hintOpen && (
+          <div className="p-4 rounded-xl bg-[var(--color-primary-light)] ring-1 ring-[var(--color-primary)]/10 animate-in slide-in-from-top-2 duration-300">
+            <p className="text-xs italic leading-relaxed text-[var(--color-primary-dark)]">
+              {data.translation}
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

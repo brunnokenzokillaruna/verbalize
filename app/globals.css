@@ -29,6 +29,7 @@
 
   --color-border:        #e7e5e0;
   --color-border-strong: #c7c4be;
+  --color-bg-rgb:        250, 250, 247;
 }
 
 /* ─── Dark Mode Tokens ───────────────────────────────────────────────────────── */
@@ -60,6 +61,7 @@
 
   --color-border:        #374151;
   --color-border-strong: #4b5563;
+  --color-bg-rgb:        17, 24, 39;
 }
 
 /* ─── Base Styles ────────────────────────────────────────────────────────────── */
@@ -81,6 +83,14 @@ body {
   min-height: 100dvh;
   background-color: var(--color-bg);
   font-family: var(--font-body, 'DM Sans', system-ui, sans-serif);
+}
+
+/* ─── Hack to definitively remove the Spline Watermark ─── */
+a[href*="spline.design"], .spline-watermark {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 /* ─── Typography ─────────────────────────────────────────────────────────────── */
@@ -174,6 +184,19 @@ body {
   100% { opacity: 1; transform: translateY(0) scale(1); }
 }
 
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(calc(-50% - (var(--gap, 96px) / 2))); }
+}
+
+@keyframes marquee-slide {
+  0%   { transform: translateX(0); }
+  15%  { transform: translateX(0); }
+  75%  { transform: translateX(var(--scroll-dist)); }
+  95%  { transform: translateX(var(--scroll-dist)); }
+  100% { transform: translateX(0); }
+}
+
 .animate-tooltip       { animation: tooltip-enter 150ms ease forwards; }
 .animate-correct       { animation: correct-bounce 400ms cubic-bezier(0.34, 1.56, 0.64, 1); }
 .animate-stage         { animation: stage-enter 200ms ease forwards; }
@@ -185,6 +208,7 @@ body {
 .animate-scale-in      { animation: scale-in 250ms cubic-bezier(0.34, 1.56, 0.64, 1) both; }
 .animate-float         { animation: float 4s ease-in-out infinite; }
 .animate-glow-amber    { animation: glow-amber 2.5s ease-in-out infinite; }
+.animate-marquee       { animation: marquee 30s linear infinite; }
 
 .delay-75  { animation-delay: 75ms; }
 .delay-150 { animation-delay: 150ms; }

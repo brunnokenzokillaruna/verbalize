@@ -1,5 +1,6 @@
 import { Flame, ArrowLeftRight } from 'lucide-react';
 import type { UserDocument } from '@/types';
+import { getEffectiveStreak } from '@/lib/stats';
 
 export interface LangLabel {
   name: string;
@@ -58,47 +59,48 @@ export function StatsRow({ profile, lang, theme, onShowLangSheet }: StatsRowProp
         </div>
 
         {/* Big number */}
-        <p
-          className="relative text-4xl font-bold leading-none tabular-nums"
-          style={{ color: theme === 'dark' ? '#fbbf24' : '#92400e' }}
-        >
-          {profile.currentStreak}
-        </p>
-        <p
-          className="relative text-xs mt-0.5 font-medium"
-          style={{ color: theme === 'dark' ? 'rgba(251,191,36,0.65)' : '#b45309' }}
-        >
-          {profile.currentStreak === 1 ? 'dia seguido' : 'dias seguidos'}
-        </p>
+        {(() => {
+          const currentStreak = getEffectiveStreak(profile);
 
-        {/* Weekly progress dots */}
-        <div className="relative flex gap-1 mt-4">
-          {Array.from({ length: 7 }).map((_, i) => {
-            const currentStreak = profile.currentStreak ?? 0;
-            const filled = currentStreak === 0 ? 0
-              : currentStreak % 7 === 0 ? 7
-              : currentStreak % 7;
-            const isActive = i < filled;
-            return (
-              <div
-                key={i}
-                className="h-1.5 flex-1 rounded-full transition-all duration-500"
-                style={{
-                  backgroundColor: isActive
-                    ? (theme === 'dark' ? '#fbbf24' : '#d97706')
-                    : (theme === 'dark' ? 'rgba(251,191,36,0.15)' : 'rgba(217,119,6,0.2)'),
-                  boxShadow: isActive ? '0 0 4px rgba(217,119,6,0.5)' : 'none',
-                }}
-              />
-            );
-          })}
-        </div>
-        <p
-          className="relative text-xs mt-1"
-          style={{ color: theme === 'dark' ? 'rgba(251,191,36,0.35)' : 'rgba(180,83,9,0.55)' }}
-        >
-          Meta semanal
-        </p>
+          return (
+            <>
+              <p
+                className="relative text-4xl font-bold leading-none tabular-nums"
+                style={{ color: theme === 'dark' ? '#fbbf24' : '#92400e' }}
+              >
+                {currentStreak}
+              </p>
+              <p
+                className="relative text-xs mt-0.5 font-medium"
+                style={{ color: theme === 'dark' ? 'rgba(251,191,36,0.65)' : '#b45309' }}
+              >
+                {currentStreak === 1 ? 'dia seguido' : 'dias seguidos'}
+              </p>
+
+              {/* Weekly progress dots */}
+              <div className="relative flex gap-1 mt-4">
+                {Array.from({ length: 7 }).map((_, i) => {
+                  const filled = currentStreak === 0 ? 0
+                    : currentStreak % 7 === 0 ? 7
+                    : currentStreak % 7;
+                  const isActive = i < filled;
+                  return (
+                    <div
+                      key={i}
+                      className="h-1.5 flex-1 rounded-full transition-all duration-500"
+                      style={{
+                        backgroundColor: isActive
+                          ? (theme === 'dark' ? '#fbbf24' : '#d97706')
+                          : (theme === 'dark' ? 'rgba(251,191,36,0.15)' : 'rgba(217,119,6,0.2)'),
+                        boxShadow: isActive ? '0 0 4px rgba(217,119,6,0.5)' : 'none',
+                      }}
+                    />
+                  );
+                })}
+              </div>
+            </>
+          );
+        })()}
       </div>
 
       {/* Language card */}

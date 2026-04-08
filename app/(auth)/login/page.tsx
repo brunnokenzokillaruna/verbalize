@@ -21,7 +21,7 @@ const GoogleIcon = () => (
 
 export default function LoginPage() {
   const router = useRouter();
-  const { user, initialized, setProfile } = useAuthStore();
+  const { user, initialized, profile, setProfile } = useAuthStore();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -30,8 +30,11 @@ export default function LoginPage() {
   const [loadingGoogle, setLoadingGoogle] = useState(false);
 
   useEffect(() => {
-    if (initialized && user) router.replace('/');
-  }, [initialized, user, router]);
+    if (initialized && user) {
+      if (profile) router.replace('/dashboard');
+      else router.replace('/onboarding');
+    }
+  }, [initialized, user, profile, router]);
 
   async function handleEmailLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -41,7 +44,7 @@ export default function LoginPage() {
       const cred = await signInWithEmail(email, password);
       const profile = await getUser(cred.user.uid);
       setProfile(profile);
-      router.replace(profile ? '/' : '/onboarding');
+      router.replace(profile ? '/dashboard' : '/onboarding');
     } catch {
       setError('E-mail ou senha incorretos. Tente novamente.');
     } finally {
@@ -56,7 +59,7 @@ export default function LoginPage() {
       const cred = await signInWithGoogle();
       const profile = await getUser(cred.user.uid);
       setProfile(profile);
-      router.replace(profile ? '/' : '/onboarding');
+      router.replace(profile ? '/dashboard' : '/onboarding');
     } catch {
       setError('Erro ao entrar com Google. Tente novamente.');
     } finally {

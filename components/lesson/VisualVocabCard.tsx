@@ -23,93 +23,73 @@ export function VisualVocabCard({
 }: VisualVocabCardProps) {
   return (
     <div
-      className="overflow-hidden rounded-3xl animate-slide-up"
+      className="group relative overflow-hidden rounded-[1.25rem] transition-all duration-500 hover:-translate-y-1 hover:shadow-xl dark:hover:shadow-2xl/50"
       style={{
         backgroundColor: 'var(--color-surface)',
         border: '1px solid var(--color-border)',
-        boxShadow: '0 4px 24px rgba(0,0,0,0.07)',
       }}
     >
-      {/* Image area */}
+      {/* Image area with refined treatment */}
       <div
-        className="relative w-full"
-        style={{ aspectRatio: '16/9', backgroundColor: 'var(--color-surface-raised)' }}
+        className="relative w-full overflow-hidden"
+        style={{ aspectRatio: '16/10', backgroundColor: 'var(--color-surface-raised)' }}
       >
         {imageUrl ? (
           <Image
             src={imageUrl}
             alt={imageAlt ?? word}
             fill
-            className="object-cover"
-            sizes="(max-width: 640px) 100vw, 640px"
+            className="object-cover transition-transform duration-1000 group-hover:scale-105"
+            sizes="(max-width: 640px) 100vw, 400px"
           />
         ) : (
-          // Placeholder while image loads progressively
           <div
-            className="flex h-full w-full animate-pulse items-center justify-center"
-            style={{ backgroundColor: 'var(--color-primary-light)' }}
+            className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[var(--color-primary-light)] to-transparent opacity-40"
           >
-            <span className="text-6xl opacity-20" role="img" aria-label={word}>
+            <span className="text-3xl grayscale filter group-hover:scale-110 transition-transform duration-500" role="img" aria-label={word}>
               🖼️
             </span>
           </div>
         )}
 
-        {/* Gradient overlay — word sits on top */}
-        {imageUrl && (
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                'linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.15) 50%, transparent 100%)',
-            }}
-          />
-        )}
+        {/* Delicate Gradient Overlay */}
+        <div
+          className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent opacity-60 transition-opacity duration-700"
+        />
 
-        {/* Word overlay on image */}
-        {imageUrl && (
-          <div className="absolute bottom-0 left-0 p-5">
-            <p
-              className="font-display text-3xl font-bold leading-tight text-white drop-shadow-lg"
-              style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}
+        {/* Word Overlay with sophisticated typography */}
+        <div className="absolute bottom-0 left-0 right-0 p-4">
+          <div className="flex flex-col gap-0 transformation-gpu transition-transform duration-500 group-hover:translate-x-0.5">
+            <h3
+              className="font-display text-2xl font-bold tracking-tight text-white"
             >
               {word}
-            </p>
-          </div>
-        )}
-      </div>
-
-      {/* Bottom content area */}
-      <div className="px-5 py-4">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex-1">
-            {!imageUrl && (
-              <p
-                className="font-display text-2xl font-bold"
-                style={{ color: 'var(--color-vocab)' }}
-              >
-                {word}
-              </p>
-            )}
-            <p
-              className="text-lg"
-              style={{ color: 'var(--color-text-secondary)', marginTop: imageUrl ? 0 : 4 }}
-            >
+            </h3>
+            <p className="mt-0.5 text-xs font-medium text-white/80 italic tracking-wide">
               {translation}
             </p>
+          </div>
+        </div>
+      </div>
 
+      {/* Subtle Control Bar */}
+      <div className="relative px-4 py-3 bg-[var(--color-surface)]">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex-1 min-w-0">
             {exampleSentence && (
-              <p
-                className="mt-2 text-sm leading-relaxed"
-                style={{ color: 'var(--color-text-muted)', fontStyle: 'italic' }}
-              >
-                {exampleSentence}
+              <p className="text-[11px] leading-relaxed text-[var(--color-text-secondary)] opacity-70 italic line-clamp-1 group-hover:opacity-100 transition-opacity">
+                "{exampleSentence}"
               </p>
             )}
           </div>
 
-          <AudioPlayerButton text={word} language={language} size="md" />
+          <div className="shrink-0 scale-90 transition-transform duration-300 hover:scale-100">
+            <AudioPlayerButton text={word} language={language} size="sm" />
+          </div>
         </div>
+        
+        {/* Very subtle Accent Line */}
+        <div className="absolute bottom-0 left-0 h-[2px] w-0 bg-[var(--color-primary)] opacity-60 transition-all duration-700 group-hover:w-full"></div>
       </div>
     </div>
   );

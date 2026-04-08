@@ -14,8 +14,6 @@ const VOICE_POOLS: Record<SupportedLanguage, { female: string[]; male: string[] 
   fr: {
     female: [
       'fr-FR-Studio-A',
-      'fr-FR-Chirp-HD-F',
-      'fr-FR-Chirp-HD-O',
       'fr-FR-Chirp3-HD-Achernar',
       'fr-FR-Chirp3-HD-Aoede',
       'fr-FR-Chirp3-HD-Autonoe',
@@ -30,10 +28,23 @@ const VOICE_POOLS: Record<SupportedLanguage, { female: string[]; male: string[] 
       'fr-FR-Chirp3-HD-Sulafat',
       'fr-FR-Chirp3-HD-Vindemiatrix',
       'fr-FR-Chirp3-HD-Zephyr',
+      'fr-CA-Chirp3-HD-Achernar',
+      'fr-CA-Chirp3-HD-Aoede',
+      'fr-CA-Chirp3-HD-Autonoe',
+      'fr-CA-Chirp3-HD-Callirrhoe',
+      'fr-CA-Chirp3-HD-Despina',
+      'fr-CA-Chirp3-HD-Erinome',
+      'fr-CA-Chirp3-HD-Gacrux',
+      'fr-CA-Chirp3-HD-Kore',
+      'fr-CA-Chirp3-HD-Laomedeia',
+      'fr-CA-Chirp3-HD-Leda',
+      'fr-CA-Chirp3-HD-Pulcherrima',
+      'fr-CA-Chirp3-HD-Sulafat',
+      'fr-CA-Chirp3-HD-Vindemiatrix',
+      'fr-CA-Chirp3-HD-Zephyr',
     ],
     male: [
       'fr-FR-Studio-D',
-      'fr-FR-Chirp-HD-D',
       'fr-FR-Chirp3-HD-Achird',
       'fr-FR-Chirp3-HD-Algenib',
       'fr-FR-Chirp3-HD-Algieba',
@@ -50,13 +61,27 @@ const VOICE_POOLS: Record<SupportedLanguage, { female: string[]; male: string[] 
       'fr-FR-Chirp3-HD-Schedar',
       'fr-FR-Chirp3-HD-Umbriel',
       'fr-FR-Chirp3-HD-Zubenelgenubi',
+      'fr-CA-Chirp3-HD-Achird',
+      'fr-CA-Chirp3-HD-Algenib',
+      'fr-CA-Chirp3-HD-Algieba',
+      'fr-CA-Chirp3-HD-Alnilam',
+      'fr-CA-Chirp3-HD-Charon',
+      'fr-CA-Chirp3-HD-Enceladus',
+      'fr-CA-Chirp3-HD-Fenrir',
+      'fr-CA-Chirp3-HD-Iapetus',
+      'fr-CA-Chirp3-HD-Orus',
+      'fr-CA-Chirp3-HD-Puck',
+      'fr-CA-Chirp3-HD-Rasalgethi',
+      'fr-CA-Chirp3-HD-Sadachbia',
+      'fr-CA-Chirp3-HD-Sadaltager',
+      'fr-CA-Chirp3-HD-Schedar',
+      'fr-CA-Chirp3-HD-Umbriel',
+      'fr-CA-Chirp3-HD-Zubenelgenubi',
     ],
   },
   en: {
     female: [
       'en-US-Studio-O',
-      'en-US-Chirp-HD-F',
-      'en-US-Chirp-HD-O',
       'en-US-Chirp3-HD-Achernar',
       'en-US-Chirp3-HD-Aoede',
       'en-US-Chirp3-HD-Autonoe',
@@ -74,7 +99,6 @@ const VOICE_POOLS: Record<SupportedLanguage, { female: string[]; male: string[] 
     ],
     male: [
       'en-US-Studio-Q',
-      'en-US-Chirp-HD-D',
       'en-US-Chirp3-HD-Achird',
       'en-US-Chirp3-HD-Algenib',
       'en-US-Chirp3-HD-Algieba',
@@ -108,13 +132,21 @@ function pickRandom<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
+/** Extracts the language code from a voice name (e.g., 'fr-CA-Chirp3-HD-Achernar' -> 'fr-CA'). */
+function getLangFromVoice(voiceName: string): string {
+  const parts = voiceName.split('-');
+  return `${parts[0]}-${parts[1]}`;
+}
+
 /** Pick two distinct voices — one female, one male — for a dialogue. */
 function pickDialoguePair(language: SupportedLanguage): [VoiceConfig, VoiceConfig] {
   const pool = VOICE_POOLS[language];
-  const langCode = LANG_CODES[language];
+  const fName = pickRandom(pool.female);
+  const mName = pickRandom(pool.male);
+
   return [
-    { languageCode: langCode, name: pickRandom(pool.female) },
-    { languageCode: langCode, name: pickRandom(pool.male) },
+    { languageCode: getLangFromVoice(fName), name: fName },
+    { languageCode: getLangFromVoice(mName), name: mName },
   ];
 }
 
@@ -194,9 +226,10 @@ export async function synthesizeSpeech(
     ? STUDIO_VOICES[language]
     : [...VOICE_POOLS[language].female, ...VOICE_POOLS[language].male];
 
+  const name = pickRandom(candidateNames);
   const voice: VoiceConfig = {
-    languageCode: LANG_CODES[language],
-    name: pickRandom(candidateNames),
+    languageCode: getLangFromVoice(name),
+    name,
   };
   return callTTS(text, voice, apiKey);
 }

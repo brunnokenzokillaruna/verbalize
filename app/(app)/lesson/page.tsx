@@ -134,8 +134,13 @@ export default function LessonPage() {
 
 
 
+  const [isExerciseReady, setIsExerciseReady] = useState(false);
+  const [submitTrigger, setSubmitTrigger] = useState(0);
+
   function handleRetry() {
     setHookError(false);
+    setExerciseAnswer(null);
+    setIsExerciseReady(false);
     lessonInitiatedRef.current = false;
     store.reset(); // resets phase to 'idle' → bootstrap effect re-runs
   }
@@ -147,23 +152,15 @@ export default function LessonPage() {
     if (correct) {
       store.recordCorrect();
     } else if (store.lesson) {
-      // Record this mistake to Firestore (fire-and-forget, deduplicates by grammarFocus)
       const exercise = store.exercises[store.exerciseIndex];
       if (exercise) {
-        saveLessonMistake(
-          user!.uid,
-          store.lesson.language,
-          store.lesson.grammarFocus,
-          buildMistakeContext(exercise),
-          store.lesson.id,
-          store.lesson.level,
-        ).catch(console.error);
+        store.recordMistake(exercise);
       }
     }
   }
 
   function handleCheck() {
-    // CheckButton in 'idle' state — nothing to do here; exercises call onAnswer directly
+    setSubmitTrigger(prev => prev + 1);
   }
 
   function handleReviewAnswer(correct: boolean) {
@@ -175,6 +172,7 @@ export default function LessonPage() {
     const isLast = store.exerciseIndex >= store.exercises.length - 1;
     if (!isLast) {
       setExerciseAnswer(null);
+      setIsExerciseReady(false);
       store.nextExercise();
       return;
     }
@@ -182,9 +180,31 @@ export default function LessonPage() {
     // Last practice exercise — finish lesson stats, then check for a mistake to review
     store.setPhase('complete'); // optimistic: overridden below if review is needed
     setExerciseAnswer(null);
+    setIsExerciseReady(false);
     finishLesson();
 
     if (!user || !store.lesson) return;
+
+    // 80% Accuracy Rule: Only save mistakes and show immediate review if accuracy < 80%
+    const accuracy = store.correctCount / store.exercises.length;
+    if (accuracy >= 0.8) {
+      store.setIsLoading(false);
+      store.setPhase('complete');
+      return;
+    }
+
+    // Fire-and-forget saving of all recorded mistakes
+    store.mistakes.forEach((m) => {
+      saveLessonMistake(
+        user.uid,
+        store.lesson!.language,
+        store.lesson!.grammarFocus,
+        buildMistakeContext(m),
+        store.lesson!.id,
+        store.lesson!.level,
+      ).catch(console.error);
+    });
+
     try {
       store.setIsLoading(true);
       const mistake = await getOldestMistake(user.uid, store.lesson.language);
@@ -213,12 +233,14 @@ export default function LessonPage() {
     const isLastReview = store.reviewIndex >= store.reviewExercises.length - 1;
     if (!isLastReview) {
       setExerciseAnswer(null);
+      setIsExerciseReady(false);
       store.nextReviewExercise();
       return;
     }
 
     // Last review exercise — if all 3 correct, delete the mistake
     setExerciseAnswer(null);
+    setIsExerciseReady(false);
     if (store.reviewMistake?.id && store.reviewCorrectCount + (exerciseAnswer === true ? 1 : 0) >= store.reviewExercises.length) {
       deleteLessonMistake(store.reviewMistake.id).catch(console.error);
     }
@@ -252,8 +274,10 @@ export default function LessonPage() {
   const activeExercise = phase === 'review' ? currentReviewExercise : currentExercise;
 
   const checkState = (() => {
-    if (exerciseAnswer === null) return 'disabled' as const;
-    return exerciseAnswer ? 'correct' as const : 'incorrect' as const;
+    if (exerciseAnswer !== null) {
+      return exerciseAnswer ? 'correct' as const : 'incorrect' as const;
+    }
+    return isExerciseReady ? 'idle' as const : 'disabled' as const;
   })();
 
   // Correct answer shown in CheckButton banner when wrong
@@ -310,7 +334,9 @@ export default function LessonPage() {
         onExit={exitLesson}
       />
 
-      <main className="mx-auto max-w-lg md:max-w-2xl lg:max-w-4xl px-5 pt-6 pb-48">
+      <main className={`mx-auto max-w-lg md:max-w-2xl lg:max-w-4xl px-6 pt-10 ${
+        phase === 'practice' || phase === 'review' ? 'pb-48' : 'pb-20'
+      }`}>
 
         {/* ── Vocabulary phase ── */}
         {phase === 'vocabulary' && store.hook && store.lesson && (
@@ -327,7 +353,7 @@ export default function LessonPage() {
         {phase === 'hook' && store.hook && store.lesson && (
           <LessonHookScreen
             dialogue={store.hook.dialogue}
-            newVocabulary={store.hook.newVocabulary}
+            newVocabulary={[...store.hook.newVocabulary, ...store.discoveredVerbs]}
             dialogueTranslations={store.hook.dialogueTranslations}
             isPlaying={isPlaying}
             isLoadingAudio={isLoadingAudio}
@@ -348,42 +374,35 @@ export default function LessonPage() {
 
         {/* ── Practice phase ── */}
         {phase === 'practice' && currentExercise && store.lesson && (
-          <LessonPracticeScreen
-            exercises={store.exercises}
-            exerciseIndex={store.exerciseIndex}
-            currentExercise={currentExercise}
-            exerciseAnswer={exerciseAnswer}
-            language={store.lesson.language}
-            onAnswer={handleAnswer}
-          />
+            <LessonPracticeScreen
+              exercises={store.exercises}
+              exerciseIndex={store.exerciseIndex}
+              currentExercise={currentExercise}
+              exerciseAnswer={exerciseAnswer}
+              language={store.lesson.language}
+              onAnswer={handleAnswer}
+              setIsExerciseReady={setIsExerciseReady}
+              submitTrigger={submitTrigger}
+            />
         )}
 
         {/* ── Review phase ── */}
         {phase === 'review' && currentReviewExercise && store.lesson && (
-          <LessonReviewScreen
-            reviewExercises={store.reviewExercises}
-            reviewIndex={store.reviewIndex}
-            currentReviewExercise={currentReviewExercise}
+          <LessonPracticeScreen
+            exercises={store.reviewExercises}
+            exerciseIndex={store.reviewIndex}
+            currentExercise={currentReviewExercise}
             exerciseAnswer={exerciseAnswer}
             language={store.lesson.language}
-            reviewMistake={store.reviewMistake}
             onAnswer={handleReviewAnswer}
+            setIsExerciseReady={setIsExerciseReady}
+            submitTrigger={submitTrigger}
           />
         )}
-      </main>
 
-      {/* ── Bottom CTA bar (non-practice, non-review phases) ── */}
-      {phase !== 'practice' && phase !== 'review' && (
-        <div
-          className="fixed bottom-0 left-0 right-0 z-20 px-5 pb-6 pt-3"
-          style={{
-            backgroundColor: 'var(--color-bg)',
-            borderTop: '1px solid var(--color-border)',
-            backdropFilter: 'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
-          }}
-        >
-          <div className="mx-auto max-w-lg md:max-w-2xl lg:max-w-4xl">
+        {/* ── Integrated Continue Button (non-practice, non-review phases) ── */}
+        {phase !== 'practice' && phase !== 'review' && (
+          <div className="mt-10 animate-slide-up delay-300">
             <button
               type="button"
               disabled={store.isLoading}
@@ -394,31 +413,34 @@ export default function LessonPage() {
                     ? advanceFromHook
                     : advanceFromGrammar
               }
-              className="cta-shimmer relative flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-2xl px-6 py-4 text-base font-bold transition-all active:scale-[0.98] disabled:cursor-not-allowed"
+              className="cta-shimmer relative flex w-full max-w-sm mx-auto items-center justify-center gap-2.5 overflow-hidden rounded-xl px-6 py-3.5 text-base font-bold transition-all active:scale-[0.98] disabled:cursor-not-allowed"
               style={{
                 background: store.isLoading
                   ? 'var(--color-surface-raised)'
                   : 'linear-gradient(135deg, var(--color-primary) 0%, #2563eb 100%)',
                 color: store.isLoading ? 'var(--color-text-muted)' : '#fff',
-                boxShadow: store.isLoading ? 'none' : '0 6px 20px rgba(29,94,212,0.35)',
+                boxShadow: store.isLoading ? 'none' : '0 8px 20px rgba(29,94,212,0.3)',
               }}
             >
               {store.isLoading ? (
                 <>
                   <Loader2 size={18} className="animate-spin" />
-                  Carregando…
+                  <span className="text-sm">Sincronizando…</span>
                 </>
               ) : phase === 'grammar' ? (
-                <>Praticar ✏️</>
+                <>Praticar agora</>
               ) : phase === 'hook' ? (
-                <>Entendi 🧠</>
+                <>Entendido</>
               ) : (
-                <>Continuar →</>
+                <>Avançar</>
               )}
             </button>
+            <p className="mt-3 text-center text-[10px] font-semibold text-[var(--color-text-muted)] uppercase tracking-[0.2em] opacity-50">
+              Próximo: {phase === 'vocabulary' ? 'Diálogo' : phase === 'hook' ? 'Gramática' : 'Prática'}
+            </p>
           </div>
-        </div>
-      )}
+        )}
+      </main>
 
       {/* ── CheckButton (practice + review phases) ── */}
       {(phase === 'practice' || phase === 'review') && (

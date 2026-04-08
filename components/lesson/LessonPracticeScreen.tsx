@@ -16,6 +16,8 @@ interface LessonPracticeScreenProps {
   exerciseAnswer: boolean | null;
   language: SupportedLanguage;
   onAnswer: (correct: boolean) => void;
+  setIsExerciseReady: (ready: boolean) => void;
+  submitTrigger: number;
 }
 
 export function LessonPracticeScreen({
@@ -25,41 +27,41 @@ export function LessonPracticeScreen({
   exerciseAnswer,
   language,
   onAnswer,
+  setIsExerciseReady,
+  submitTrigger,
 }: LessonPracticeScreenProps) {
   return (
-    <div key={exerciseIndex} className="animate-slide-up-spring">
-      {/* Progress header */}
-      <div className="mb-5">
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-2">
-            <span className="text-base">✏️</span>
-            <p className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--color-text-muted)' }}>
-              Prática
-            </p>
+    <div key={exerciseIndex} className="flex flex-col gap-8 animate-slide-up-spring">
+      {/* Refined Header & Progress */}
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/5 text-base shadow-inner ring-1 ring-white/10 backdrop-blur-md dark:bg-white/5">
+              ✏️
+            </div>
+            <div className="flex flex-col">
+              <h2 className="font-display text-xl font-bold tracking-tight text-[var(--color-text-primary)]">
+                Praticar & Fixar
+              </h2>
+              <p className="text-[10px] font-semibold text-[var(--color-text-muted)] uppercase tracking-[0.2em]">
+                Etapa {exerciseIndex + 1} de {exercises.length}
+              </p>
+            </div>
           </div>
-          <span
-            className="rounded-full px-2.5 py-1 text-xs font-bold tabular-nums"
-            style={{ backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)' }}
-          >
-            {exerciseIndex + 1} / {exercises.length}
-          </span>
+          
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-black tracking-widest text-[var(--color-primary)] opacity-40 tabular-nums">
+              LEVEL {Math.floor((exerciseIndex / exercises.length) * 100)}%
+            </span>
+          </div>
         </div>
-        {/* Segmented progress bar */}
-        <div className="flex gap-1">
-          {exercises.map((_, i) => (
-            <div
-              key={i}
-              className="h-1.5 flex-1 rounded-full transition-all duration-300"
-              style={{
-                backgroundColor: i < exerciseIndex
-                  ? 'var(--color-success)'
-                  : i === exerciseIndex
-                    ? 'var(--color-primary)'
-                    : 'var(--color-border)',
-                transform: i === exerciseIndex ? 'scaleY(1.3)' : 'scaleY(1)',
-              }}
-            />
-          ))}
+
+        {/* Delicate Progress Line */}
+        <div className="relative h-1 w-full overflow-hidden rounded-full bg-[var(--color-surface-raised)]">
+          <div 
+            className="absolute left-0 top-0 h-full bg-gradient-to-r from-[var(--color-primary)] to-[#2563eb] transition-all duration-700 ease-out"
+            style={{ width: `${((exerciseIndex + 1) / exercises.length) * 100}%` }}
+          />
         </div>
       </div>
 
@@ -68,6 +70,8 @@ export function LessonPracticeScreen({
           data={currentExercise.data}
           onAnswer={onAnswer}
           answered={exerciseAnswer !== null}
+          setIsExerciseReady={setIsExerciseReady}
+          submitTrigger={submitTrigger}
         />
       )}
       {currentExercise.type === 'sentence-builder' && (
@@ -75,6 +79,8 @@ export function LessonPracticeScreen({
           data={currentExercise.data}
           onAnswer={onAnswer}
           answered={exerciseAnswer !== null}
+          setIsExerciseReady={setIsExerciseReady}
+          submitTrigger={submitTrigger}
         />
       )}
       {currentExercise.type === 'reverse-translation' && (
@@ -83,6 +89,8 @@ export function LessonPracticeScreen({
           language={language}
           onAnswer={onAnswer}
           answered={exerciseAnswer !== null}
+          setIsExerciseReady={setIsExerciseReady}
+          submitTrigger={submitTrigger}
         />
       )}
       {currentExercise.type === 'audio-dictation' && (
@@ -91,6 +99,8 @@ export function LessonPracticeScreen({
           language={language}
           onAnswer={onAnswer}
           answered={exerciseAnswer !== null}
+          setIsExerciseReady={setIsExerciseReady}
+          submitTrigger={submitTrigger}
         />
       )}
       {currentExercise.type === 'error-correction' && (
@@ -98,6 +108,8 @@ export function LessonPracticeScreen({
           data={currentExercise.data}
           onAnswer={onAnswer}
           answered={exerciseAnswer !== null}
+          setIsExerciseReady={setIsExerciseReady}
+          submitTrigger={submitTrigger}
         />
       )}
       {currentExercise.type === 'verb-conjugation-drill' && (
@@ -105,6 +117,8 @@ export function LessonPracticeScreen({
           data={currentExercise.data}
           onAnswer={onAnswer}
           answered={exerciseAnswer !== null}
+          setIsExerciseReady={setIsExerciseReady}
+          submitTrigger={submitTrigger}
         />
       )}
       {currentExercise.type === 'speak-repeat' && (
@@ -113,6 +127,8 @@ export function LessonPracticeScreen({
           language={language}
           onAnswer={onAnswer}
           answered={exerciseAnswer !== null}
+          setIsExerciseReady={setIsExerciseReady}
+          submitTrigger={submitTrigger}
         />
       )}
       {currentExercise.type === 'image-match' && (
@@ -120,6 +136,8 @@ export function LessonPracticeScreen({
           data={currentExercise.data}
           onAnswer={onAnswer}
           answered={exerciseAnswer !== null}
+          setIsExerciseReady={setIsExerciseReady}
+          submitTrigger={submitTrigger}
         />
       )}
     </div>

@@ -1,19 +1,45 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { SentenceBuilderData } from '@/types';
 
 interface SentenceBuilderProps {
   data: SentenceBuilderData;
   onAnswer: (correct: boolean) => void;
   answered: boolean;
+  setIsExerciseReady: (ready: boolean) => void;
+  submitTrigger: number;
 }
 
-export function SentenceBuilder({ data, onAnswer, answered }: SentenceBuilderProps) {
-  // Words still in the bank (shuffled on mount)
-  const [bank, setBank] = useState<string[]>(() => [...data.words]);
-  // Words assembled by the user
+export function SentenceBuilder({ 
+  data, 
+  onAnswer, 
+  answered,
+  setIsExerciseReady,
+  submitTrigger
+}: SentenceBuilderProps) {
+  const [bank, setBank] = useState<string[]>(() => [...data.words].sort(() => Math.random() - 0.5));
   const [assembled, setAssembled] = useState<string[]>([]);
+
+  // Notify parent of readiness
+  useEffect(() => {
+    if (!answered) {
+      setIsExerciseReady(assembled.length > 0);
+    } else {
+      setIsExerciseReady(false);
+    }
+  }, [assembled, answered, setIsExerciseReady]);
+
+  // Listen for global submit
+  useEffect(() => {
+    if (submitTrigger > 0 && !answered && assembled.length > 0) {
+      handleSubmit();
+    }
+  }, [submitTrigger]);
+
+  function handleSubmit() {
+    onAnswer(assembled.join(' ') === data.correctOrder.join(' '));
+  }
 
   function moveToAssembled(index: number) {
     if (answered) return;
@@ -38,49 +64,54 @@ export function SentenceBuilder({ data, onAnswer, answered }: SentenceBuilderPro
   const isCorrect = assembled.join(' ') === data.correctOrder.join(' ');
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
       {/* Portuguese translation hint */}
-      <p className="text-sm" style={{ color: 'var(--color-text-muted)', fontStyle: 'italic' }}>
-        {data.translation}
-      </p>
+      <div className="flex items-center gap-3 px-1 opacity-70">
+        <span className="h-px w-6 bg-[var(--color-border)]" />
+        <p className="text-xs font-medium italic text-[var(--color-text-muted)]">
+          {data.translation}
+        </p>
+      </div>
 
       {/* Answer area */}
       <div
-        className="min-h-[64px] rounded-2xl p-4"
+        className="min-h-[100px] flex items-center justify-center rounded-2xl p-6 transition-all duration-500 bg-[var(--color-surface-raised)]/30"
         style={{
-          backgroundColor: 'var(--color-surface)',
-          border: `2px solid ${answered ? (isCorrect ? 'var(--color-success)' : 'var(--color-error)') : 'var(--color-border)'}`,
-          transition: 'border-color 200ms',
+          border: `1px solid ${answered ? (isCorrect ? 'var(--color-success)' : 'var(--color-error)') : 'var(--color-border)'}`,
         }}
       >
         {assembled.length === 0 ? (
-          <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
-            Toque nas palavras abaixo para montar a frase...
+          <p className="text-xs text-center font-medium opacity-40 text-[var(--color-text-muted)] uppercase tracking-widest leading-relaxed max-w-[200px]">
+            Toque nas palavras para montar a frase
           </p>
         ) : (
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap items-center justify-center gap-2">
             {assembled.map((word, i) => (
               <button
                 key={i}
                 type="button"
                 disabled={answered}
                 onClick={() => moveToBank(i)}
-                className="rounded-xl px-3 py-1.5 text-base font-medium transition-all active:scale-95"
+                className="group relative rounded-xl px-4 py-2 text-sm font-semibold transition-all duration-300 active:scale-95"
                 style={{
                   backgroundColor: answered
                     ? isCorrect
                       ? 'var(--color-success-bg)'
                       : 'var(--color-error-bg)'
-                    : 'var(--color-primary-light)',
+                    : 'var(--color-bg)',
                   color: answered
                     ? isCorrect
                       ? 'var(--color-success)'
                       : 'var(--color-error)'
-                    : 'var(--color-primary-dark)',
-                  border: `1px solid ${answered ? (isCorrect ? 'var(--color-success)' : 'var(--color-error)') : 'var(--color-primary)'}`,
+                    : 'var(--color-text-primary)',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
+                  border: `1px solid ${answered ? (isCorrect ? 'var(--color-success)' : 'var(--color-error)') : 'var(--color-border)'}`,
                 }}
               >
                 {word}
+                {!answered && (
+                  <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl" />
+                )}
               </button>
             ))}
           </div>
@@ -89,32 +120,38 @@ export function SentenceBuilder({ data, onAnswer, answered }: SentenceBuilderPro
 
       {/* Correct order shown on incorrect answer */}
       {answered && !isCorrect && (
-        <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-          Ordem correta:{' '}
-          <span className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+        <div className="p-4 rounded-xl bg-[var(--color-error-bg)]/30 border border-[var(--color-error)]/20 animate-in fade-in slide-in-from-top-2 duration-300">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--color-error)] mb-1 opacity-70">
+            Ordem correta:
+          </p>
+          <p className="text-sm font-semibold text-[var(--color-text-primary)]">
             {data.correctOrder.join(' ')}
-          </span>
-        </p>
+          </p>
+        </div>
       )}
 
       {/* Word bank */}
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap items-center justify-center gap-2.5 px-2">
         {bank.map((word, i) => (
           <button
             key={i}
             type="button"
             disabled={answered}
             onClick={() => moveToAssembled(i)}
-            className="rounded-xl px-3 py-1.5 text-base font-medium transition-all active:scale-95"
+            className="group relative rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-300 active:scale-95"
             style={{
-              backgroundColor: 'var(--color-surface-raised)',
+              backgroundColor: 'var(--color-surface)',
               color: 'var(--color-text-primary)',
               border: '1px solid var(--color-border)',
               cursor: answered ? 'default' : 'pointer',
-              opacity: answered ? 0.5 : 1,
+              opacity: answered ? 0.4 : 1,
+              boxShadow: '0 1px 2px rgba(0,0,0,0.02)'
             }}
           >
             {word}
+            {!answered && (
+              <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl" />
+            )}
           </button>
         ))}
       </div>

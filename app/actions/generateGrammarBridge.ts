@@ -36,30 +36,40 @@ Você está falando com um falante nativo de português brasileiro. Use isso a s
 
 Output ONLY este JSON (sem markdown):
 {
-  "insight": "1 frase de impacto em PT-BR — a sacada central da regra. Comece com 'Em português...' ou 'Ao contrário do português...' ou similar. MAX 20 palavras.",
-  "explanation": "2-4 frases em PT-BR explicando a regra com profundidade. Cubra: (1) como a estrutura funciona na língua-alvo, (2) por que difere do português e qual o erro típico de brasileiro, (3) qualquer nuance ou exceção importante. Tom de professor parceiro, não de livro didático.",
+  "insight": "1 frase de impacto em PT-BR — a sacada central da regra. Comece com 'Em português...' ou 'Ao contrário do português...' ou similar. MAX 20 words.",
+  "explanation": "2-4 frases em PT-BR. Explique: (1) como a estrutura funciona, (2) por que brasileiros costumam errar e (3) qualquer nuance importante.",
+  "usageContext": "Descreva em 1-2 palavras a 'vibe' social (ex: 'Casual/Amigos', 'Polidez/Formal', 'Dia-a-dia').",
+  "brazilianTrap": "Explique o 'Erro de Brasileiro' clássico aqui em 1 frase curta e direta.",
+  "patterns": [
+    { "label": "Eu falo", "target": "I speak", "portuguese": "Eu falo" },
+    { "label": "Ela fala", "target": "She speaks", "portuguese": "Ela fala" }
+  ],
   "bridge": {
-    "portuguese": "A frase-núcleo como um brasileiro diria naturalmente em PT-BR",
-    "target": "O equivalente correto em ${LANG_LABEL[language]}",
-    "difference": "1 frase em PT-BR apontando a diferença estrutural chave. MAX 15 palavras."
+    "portuguese": "Use ^^ para destacar a parte da frase que gera a regra em PT-BR. ex: 'Eu ^^falo^^'",
+    "target": "Use ^^ para destacar a parte equivalente. ex: 'I ^^speak^^'",
+    "difference": "1 frase em PT-BR apontando a diferença estrutural chave. MAX 15 words."
   },
+  "items": [
+    { "target": "Expressão 1", "portuguese": "Tradução PT-BR", "logic": "A pequena 'sacada' por trás deste item específico (OPCIONAL)" }
+  ],
   "dialogueExample": {
     "target": "Frase do diálogo acima que melhor ilustra '${grammarFocus}' — VERBATIM, não inventada",
     "portuguese": "Tradução natural PT-BR dessa frase"
   },
   "additionalExamples": [
-    { "target": "Exemplo 2 em ${LANG_LABEL[language]} com contexto diferente do diálogo", "portuguese": "Equivalente PT-BR" },
-    { "target": "Exemplo 3 em ${LANG_LABEL[language]} — preferencialmente um erro comum de brasileiro corrigido", "portuguese": "Como o brasileiro tentaria dizer (errado ou literal)" }
+    { "target": "Exemplo 2", "portuguese": "Equivalente PT-BR" }
   ]
 }
 
-Regras:
-- insight: 1 frase, max 20 palavras, em PT-BR
-- explanation: 2-4 frases, sem jargão acadêmico, focado em brasileiros
-- bridge.difference: exatamente 1 frase, max 15 palavras, em PT-BR
-- dialogueExample.target: DEVE ser uma linha real do diálogo acima
-- additionalExamples: exatamente 2 itens
-- Todo texto em PT-BR exceto as frases na língua-alvo`;
+Regras Cruciais:
+1. Se o tema for uma REGRA SISTÊMICA (ex: Plural, Passado), use o campo 'bridge' e preencha 'patterns' com 2-3 variações. Deixe 'items' como null.
+2. Se o tema for uma LISTA de expressões, preencha o campo 'items'. Deixe 'bridge' e 'patterns' como null.
+3. brazilianTrap: FOQUE no erro de interferência do Português. Seja direto: "Não esqueça de...", "Evite dizer...".
+4. Destaque Visual: Use ^^ envolta das palavras-chave em bridge.target e bridge.portuguese para criar o mapeamento visual.
+5. explanation: Tom de professor parceiro, direto ao ponto.
+6. dialogueExample.target: DEVE ser uma linha real do diálogo acima.
+7. additionalExamples: exatamente 1-2 itens extras.
+8. Todo texto em PT-BR exceto as frases na língua-alvo.`;
 
     return await callGeminiJSON<GrammarBridgeResult>(prompt, systemPrompt, 1400);
   } catch (err) {

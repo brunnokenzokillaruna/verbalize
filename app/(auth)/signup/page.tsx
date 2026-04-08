@@ -83,7 +83,7 @@ function PasswordStrength({ password }: { password: string }) {
 
 export default function SignupPage() {
   const router = useRouter();
-  const { user, initialized } = useAuthStore();
+  const { user, profile, initialized } = useAuthStore();
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -93,8 +93,11 @@ export default function SignupPage() {
   const [loadingGoogle, setLoadingGoogle] = useState(false);
 
   useEffect(() => {
-    if (initialized && user) router.replace('/');
-  }, [initialized, user, router]);
+    if (initialized && user) {
+      if (profile) router.replace('/dashboard');
+      else router.replace(`/onboarding${name ? `?name=${encodeURIComponent(name)}` : ''}`);
+    }
+  }, [initialized, user, profile, router, name]);
 
   async function handleEmailSignup(e: React.FormEvent) {
     e.preventDefault();
@@ -106,13 +109,29 @@ export default function SignupPage() {
     setLoadingEmail(true);
     try {
       await signUpWithEmail(email, password);
-      router.replace('/onboarding');
+      router.replace(`/onboarding?name=${encodeURIComponent(name)}`);
     } catch (err: unknown) {
       const code = (err as { code?: string }).code;
-      if (code === 'auth/email-already-in-use') {
-        setError('Este e-mail já está cadastrado. Tente fazer login.');
-      } else {
-        setError('Erro ao criar conta. Verifique seus dados.');
+      console.error('Signup error:', err);
+      
+      switch (code) {
+        case 'auth/email-already-in-use':
+          setError('Este e-mail já está cadastrado. Tente fazer login.');
+          break;
+        case 'auth/invalid-email':
+          setError('E-mail inválido. Verifique o formato digitado.');
+          break;
+        case 'auth/weak-password':
+          setError('Senha muito fraca. Tente uma senha mais complexa.');
+          break;
+        case 'auth/operation-not-allowed':
+          setError('O cadastro com e-mail não está ativado. Contate o suporte.');
+          break;
+        case 'auth/network-request-failed':
+          setError('Falha na rede. Verifique sua conexão.');
+          break;
+        default:
+          setError('Erro ao criar conta. Tente novamente em instantes.');
       }
     } finally {
       setLoadingEmail(false);
@@ -291,22 +310,6 @@ export default function SignupPage() {
               )}
             </button>
           </form>
-
-          {/* Benefits chips */}
-          <div className="mt-5 flex flex-wrap justify-center gap-2 animate-slide-up-spring delay-375">
-            {['✅ 100% gratuito', '⚡ 5 min por dia', '🧠 Método eficiente'].map((item) => (
-              <span
-                key={item}
-                className="rounded-full px-3 py-1 text-xs font-medium"
-                style={{
-                  backgroundColor: 'var(--color-surface-raised)',
-                  color: 'var(--color-text-muted)',
-                }}
-              >
-                {item}
-              </span>
-            ))}
-          </div>
 
           {/* Switch to login */}
           <p
