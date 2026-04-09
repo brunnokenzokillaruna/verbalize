@@ -39,3 +39,6 @@ skills-lock.json
 
 # Internal Docs
 pedagogical_framework_v2.md
+
+# Agent Config
+.claude/
