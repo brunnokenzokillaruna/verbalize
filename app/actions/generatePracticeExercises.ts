@@ -21,6 +21,7 @@ interface GeneratePracticeParams {
   dialogue: string;
   newVocabulary: string[];
   verbWord: string;
+  grammarFocus: string;
   language: SupportedLanguage;
   level: ProficiencyLevel;
   knownVocabulary: string[];
@@ -28,10 +29,8 @@ interface GeneratePracticeParams {
 }
 
 /**
- * Generates 9 practice exercises via Gemini:
- *   2× context-choice, 2× error-correction, 2× reverse-translation,
- *   1× audio-dictation, 1× speak-repeat, 1× sentence-builder.
- * One more is built client-side: image-match → 10 total.
+ * Generates exactly 5 practice exercises via Gemini.
+ * The types are chosen randomly and variedly from the available pool.
  *
  * IMPORTANT: Exercises create ORIGINAL sentences — never copying from the dialogue.
  * They use only vocabulary the user has already learned + the current lesson's new words.
@@ -40,14 +39,14 @@ interface GeneratePracticeParams {
 export async function generatePracticeExercises(
   params: GeneratePracticeParams,
 ): Promise<Exercise[] | null> {
-  const { dialogue, newVocabulary, language, level, knownVocabulary, previousTopics } = params;
+  const { dialogue, newVocabulary, grammarFocus, language, level, knownVocabulary, previousTopics } = params;
   const levelDesc = LEVEL_EXERCISE_DESCRIPTORS[level];
   const isEarly = level === 'A1' || level === 'A2';
   const isEarlyLearner = knownVocabulary.length < 30;
 
   const vocabConstraint = isEarlyLearner
-    ? `\nVOCABULARY CONSTRAINT: The learner is a beginner with very limited vocabulary. All exercise sentences must use ONLY: the key vocabulary words listed above, basic function words (articles, prepositions, pronouns, conjunctions, auxiliary verbs), and simple A1-level everyday words. Do NOT use any advanced or uncommon content words.`
-    : `\nVOCABULARY CONSTRAINT: All exercise sentences must use EXCLUSIVELY words the learner already knows: [${knownVocabulary.slice(-1000).join(', ')}], plus the key vocabulary words listed above, plus basic function words (articles, prepositions, pronouns, conjunctions, auxiliary verbs). Do NOT introduce unknown content words.`;
+    ? `\nVOCABULARY CONSTRAINT: The learner is a beginner with very limited vocabulary. All exercise sentences must use ONLY: the key vocabulary words listed above, the words involved in the grammar focus ("${grammarFocus}"), basic function words (articles, prepositions, pronouns, conjunctions, auxiliary verbs), and simple A1-level everyday words. Do NOT use any advanced or uncommon content words.`
+    : `\nVOCABULARY CONSTRAINT: All exercise sentences must use EXCLUSIVELY words the learner already knows: [${knownVocabulary.slice(-1000).join(', ')}], plus the key vocabulary words listed above, plus the words involved in the grammar focus ("${grammarFocus}"), plus basic function words (articles, prepositions, pronouns, conjunctions, auxiliary verbs). Do NOT introduce unknown content words.`;
 
   const previousTopicsBlock = previousTopics.length > 0
     ? `\nPREVIOUS LESSON TOPICS (for context and coherence — you may reference these themes): ${previousTopics.join(' | ')}`
@@ -56,7 +55,10 @@ export async function generatePracticeExercises(
   try {
     const systemPrompt = `You are a language exercise generator for Brazilian Portuguese speakers learning ${LANG_LABEL[language]}. Respond with ONLY a valid JSON array, no markdown, no explanation.`;
 
-    const prompt = `The learner just studied a ${LANG_LABEL[language]} dialogue at ${level} level with this theme and context:
+    const prompt = `The learner just studied a ${LANG_LABEL[language]} dialogue at ${level} level. 
+
+GRAMMAR FOCUS: ${grammarFocus}
+THEME/CONTEXT (from dialogue):
 "${dialogue}"
 
 Key vocabulary words from this lesson: ${newVocabulary.join(', ')}
@@ -67,147 +69,75 @@ CRITICAL RULE: Do NOT copy or reuse any sentence from the dialogue above. Every 
 LEVEL CONSTRAINTS — all sentences you write must follow these rules: ${levelDesc}
 ${vocabConstraint}
 
-Generate exactly 9 exercises as a JSON array in this order:
+Generate exactly 5 exercises as a JSON array. Choose varied types from the following pool for a balanced practice session:
 
-Exercise 1 — type "context-choice":
-- Write an ORIGINAL ${LANG_LABEL[language]} sentence (NOT from the dialogue) that uses a key vocabulary word in a natural context
-- Replace that word with ___ in the "sentence" field
-- "blankWord" is the correct answer
-- "options" must have exactly 4 items: the correct word plus 3 distractors
-- CRITICAL: the 3 distractors must be CLEARLY WRONG in this specific sentence — they must not make logical or grammatical sense in the blank. Choose words from different semantic fields or grammatical categories so that ONLY the correct answer fits. Never use synonyms or words from the same category that could also make the sentence true.
-- "translation" is the Brazilian Portuguese translation of the full original sentence
+--- POOL OF EXERCISE TYPES ---
 
-Exercise 2 — type "error-correction":
-- Write an ORIGINAL ${LANG_LABEL[language]} sentence (NOT from the dialogue) related to the lesson theme, containing ONE deliberate grammatical or vocabulary error
-- "sentence_with_error" is the full sentence as written (with the error)
-- "error_word" is the incorrect word or short phrase
-- "correct_word" is the ideal correct replacement (the word that best fits the intended meaning)
-- "acceptable_answers" is an array of OTHER words that are also grammatically correct in that slot and would demonstrate the same grammar concept (e.g. if the slot takes a demonstrative determiner, list all valid ones like ["ce", "cet", "cette", "ces"] minus the one already in correct_word). If no valid alternatives exist, use an empty array.
-- "explanation" is a brief explanation in Brazilian Portuguese of why the error is wrong and what the correct form should be
-- CRITICAL: "error_word" must appear EXACTLY ONCE in "sentence_with_error". Write the sentence so the error word does not repeat elsewhere. The sentence must be grammatically clean except for that single deliberate error.
-- CRITICAL: The sentence_with_error must be OBJECTIVELY AND UNAMBIGUOUSLY WRONG. A native speaker would immediately recognize the error. NEVER create trick sentences where the "error" is actually grammatically valid.
-- SELF-CHECK before outputting: ask yourself "Is this sentence clearly wrong? Would every native speaker agree it contains an error?" If there is any doubt, choose a different, clearer error.
-- GOOD error types (clear and unambiguous): wrong verb conjugation ("ils mange" → "mangent"), wrong gender agreement ("un belle maison" → "une belle"), wrong subject pronoun, missing negation particle ("je pas mange" → "ne…pas"), wrong preposition required by a specific verb.
-- BAD error types (AVOID — too ambiguous): swapping determiners that could both be valid (le/ce/mon/son), word-order variations acceptable in informal speech, register differences.
-- CRITICAL — ELISION/CONTRACTION RULE: When the error involves elision or contraction (e.g., "Je" before a vowel that should become "J'"), the "error_word" MUST span ALL words involved in the contraction, and "correct_word" MUST be the complete contracted result. NEVER set correct_word to a bare clitic like "J'" that cannot stand alone. Example: error_word="Je écoute" → correct_word="J'écoute" (NOT error_word="Je" → correct_word="J'"). The same rule applies to "de + vowel" → "d'", "le/la + vowel" → "l'", etc.
+1. type "context-choice":
+   - Write an ORIGINAL sentence with a blank (___) for a key vocabulary word or grammar item.
+   - "blankWord" is correct answer. "options" has 4 items (1 correct + 3 clearly wrong distractors).
+   - "translation" in PT-BR.
 
-Exercise 3 — type "reverse-translation":
-- "portuguese_sentence" is a natural Brazilian Portuguese sentence related to the lesson theme (NOT a translation of any dialogue line)
-- "target_translation" is the correct ${LANG_LABEL[language]} translation (the most natural/simple phrasing)
-- "acceptable_variants" MUST list at least 2-4 alternative correct phrasings that a learner might naturally produce. Think about: (a) different question formation styles (intonation vs est-ce que vs subject-verb inversion), (b) subject pronoun variations (il/elle/on/ça), (c) synonym verbs with equivalent meaning, (d) with or without explicit subject pronoun. Never leave this empty for questions or sentences with multiple valid phrasings.
-- "hint" is ${isEarly ? 'an optional grammar tip in Portuguese' : 'omitted (leave field out)'}
+2. type "error-correction":
+   - Write an ORIGINAL sentence with ONE deliberate error.
+   - "sentence_with_error", "error_word", "correct_word", "explanation" (PT-BR).
+   - "acceptable_answers" is an array of other valid options or empty.
 
-Exercise 4 — type "audio-dictation":
-- Write an ORIGINAL short ${LANG_LABEL[language]} sentence (NOT from the dialogue) related to the lesson theme, using known vocabulary
-- "text" is that sentence in ${LANG_LABEL[language]}
-- "translation" is the Brazilian Portuguese translation of that sentence
+3. type "reverse-translation":
+   - "portuguese_sentence" (PT-BR) → "target_translation" (${LANG_LABEL[language]}).
+   - "acceptable_variants" (2-4 alternative phrasings).
+   - "hint" (optional grammar tip in PT-BR).
 
-Exercise 5 — type "speak-repeat":
-- Write an ORIGINAL short ${LANG_LABEL[language]} sentence (NOT from the dialogue) related to the lesson theme, using known vocabulary
-- "text" is that sentence in ${LANG_LABEL[language]}
-- "translation" is the Brazilian Portuguese translation
+4. type "audio-dictation":
+   - Short ORIGINAL sentence. "text" (${LANG_LABEL[language]}), "translation" (PT-BR).
 
-Exercise 6 — type "context-choice" (second one, different sentence and word from Exercise 1):
-- Same rules as Exercise 1 (including the CRITICAL distractor rule) but use a different sentence and vocabulary word
+5. type "speak-repeat":
+   - Short ORIGINAL sentence. "text" (${LANG_LABEL[language]}), "translation" (PT-BR).
 
-Exercise 7 — type "error-correction" (second one, different sentence from Exercise 2):
-- Same rules as Exercise 2 but write a completely different sentence with a different error
+6. type "sentence-builder":
+   - Short ORIGINAL sentence (3-8 words).
+   - "words" (shuffled array), "correctOrder" (correct array), "translation" (PT-BR).
 
-Exercise 8 — type "reverse-translation" (second one, different sentence from Exercise 3):
-- Same rules as Exercise 3 (including the requirement for 2-4 acceptable_variants) but use a different Brazilian Portuguese sentence
+7. type "social-roleplay":
+   - "context" (PT-BR) describing the situation.
+   - "promptLine" (${LANG_LABEL[language]}) what the NPC says.
+   - "options" (3 possible natural responses in target language).
+   - "correctIndex" (0-2), "explanation" (PT-BR).
 
-Exercise 9 — type "sentence-builder":
-- Write an ORIGINAL short ${LANG_LABEL[language]} sentence (NOT from the dialogue) related to the lesson theme, between 3 and 8 words
-- "correctOrder" is an array of the words in the correct order
-- "words" is the same array but shuffled into a random order (NOT alphabetical — truly random)
-- "translation" is the Brazilian Portuguese translation
+8. type "scrambled-conversation":
+   - A short sequence of 3-4 dialogue lines.
+   - "lines" (correct order), "shuffledLines" (random order).
 
-Output format (exactly this structure, 9 items):
-[
-  {
-    "type": "context-choice",
-    "data": {
-      "sentence": "sentence with ___",
-      "blankWord": "correct word",
-      "options": ["correct", "wrong1", "wrong2", "wrong3"],
-      "translation": "Portuguese translation"
-    }
-  },
-  {
-    "type": "error-correction",
-    "data": {
-      "sentence_with_error": "sentence with one error",
-      "error_word": "wrong word",
-      "correct_word": "correct word",
-      "acceptable_answers": ["other_valid_word1", "other_valid_word2"],
-      "explanation": "Explicação em português"
-    }
-  },
-  {
-    "type": "reverse-translation",
-    "data": {
-      "portuguese_sentence": "Frase em português.",
-      "target_translation": "Target language sentence.",
-      "acceptable_variants": ["alternative phrasing 1", "alternative phrasing 2"],
-      "hint": "Dica gramatical opcional"
-    }
-  },
-  {
-    "type": "audio-dictation",
-    "data": {
-      "text": "An original sentence",
-      "translation": "Portuguese translation"
-    }
-  },
-  {
-    "type": "speak-repeat",
-    "data": {
-      "text": "An original sentence",
-      "translation": "Portuguese translation"
-    }
-  },
-  {
-    "type": "context-choice",
-    "data": {
-      "sentence": "different sentence with ___",
-      "blankWord": "correct word",
-      "options": ["correct", "wrong1", "wrong2", "wrong3"],
-      "translation": "Portuguese translation"
-    }
-  },
-  {
-    "type": "error-correction",
-    "data": {
-      "sentence_with_error": "different sentence with one error",
-      "error_word": "wrong word",
-      "correct_word": "correct word",
-      "acceptable_answers": ["other_valid_word1", "other_valid_word2"],
-      "explanation": "Explicação em português"
-    }
-  },
-  {
-    "type": "reverse-translation",
-    "data": {
-      "portuguese_sentence": "Outra frase em português.",
-      "target_translation": "Target language sentence.",
-      "acceptable_variants": [],
-      "hint": "Dica gramatical opcional"
-    }
-  },
-  {
-    "type": "sentence-builder",
-    "data": {
-      "words": ["shuffled", "word", "array"],
-      "correctOrder": ["word", "array", "shuffled"],
-      "translation": "Portuguese translation"
-    }
+9. type "interactive-subtitles":
+   - "correctText" (original sentence).
+   - "errorText" (copy of correctText but with 1-2 words swapped for wrong ones or misspelled).
+   - "wrongWords" (array of the words that are WRONG in errorText).
+   - "translations" (PT-BR).
+
+10. type "logic-connectors":
+    - "partA" (first half), "partB" (second half).
+    - "options" (3 connectors like 'but', 'because', 'so').
+    - "correctConnector", "translation" (PT-BR).
+
+--- OUTPUT FORMAT ---
+Return a JSON array of 5 objects, each with "type" and "data".
+Example for social-roleplay:
+{
+  "type": "social-roleplay",
+  "data": {
+    "context": "Você está pedindo um café.",
+    "promptLine": "Bonjour ! Vous désirez ?",
+    "options": ["Je voudrais um café, s'il vous plaît.", "Je suis un café.", "Merci beaucoup !"],
+    "correctIndex": 0,
+    "explanation": "A primeira opção é a forma polida de pedir algo."
   }
-]`;
+}
+`;
 
-    const exercises = await callGeminiJSON<Exercise[]>(prompt, systemPrompt, 2048);
+    const exercises = await callGeminiJSON<Exercise[]>(prompt, systemPrompt, 3072);
 
-    if (!Array.isArray(exercises) || exercises.length < 7) {
-      console.error('[generatePracticeExercises] Unexpected response shape');
+    if (!Array.isArray(exercises) || exercises.length < 3) {
+      console.error('[generatePracticeExercises] Unexpected response shape or too few exercises');
       return null;
     }
 
@@ -215,9 +145,16 @@ Output format (exactly this structure, 9 items):
     const validated = exercises.filter((ex) => {
       if (ex.type === 'error-correction') {
         const { sentence_with_error, error_word, correct_word } = ex.data as {
-          sentence_with_error: string; error_word: string; correct_word: string;
+          sentence_with_error: string;
+          error_word: string;
+          correct_word: string;
         };
-        const ok = sentence_with_error?.includes(error_word) && error_word !== correct_word;
+        const ok =
+          sentence_with_error &&
+          error_word &&
+          correct_word &&
+          sentence_with_error.toLowerCase().includes(error_word.toLowerCase()) &&
+          error_word.toLowerCase() !== correct_word.toLowerCase();
         if (!ok) console.warn('[generatePracticeExercises] Dropped malformed error-correction exercise');
         return ok;
       }
@@ -233,6 +170,14 @@ Output format (exactly this structure, 9 items):
         const { words, correctOrder } = ex.data as { words: string[]; correctOrder: string[] };
         if (!words?.length || !correctOrder?.length || words.length !== correctOrder.length) {
           console.warn('[generatePracticeExercises] Dropped malformed sentence-builder exercise');
+          return false;
+        }
+        return true;
+      }
+      if (ex.type === 'context-choice') {
+        const { sentence, blankWord, options } = ex.data as { sentence: string; blankWord: string; options: string[] };
+        if (!sentence || !blankWord || !Array.isArray(options) || options.length < 2) {
+          console.warn('[generatePracticeExercises] Dropped malformed context-choice');
           return false;
         }
         return true;

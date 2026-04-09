@@ -122,12 +122,14 @@ export type ProficiencyLevel = 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2';
 export type ExerciseType =
   | 'context-choice'
   | 'sentence-builder'
-  | 'image-match'
   | 'audio-dictation'
   | 'speak-repeat'
   | 'error-correction'
   | 'reverse-translation'
-  | 'verb-conjugation-drill';
+  | 'social-roleplay'
+  | 'scrambled-conversation'
+  | 'interactive-subtitles'
+  | 'logic-connectors';
 
 // ─── Server Action Result Types ───────────────────────────────────────────────
 
@@ -147,14 +149,13 @@ export interface HookResult {
   grammarBridge?: GrammarBridgeResult;
   imageKeywords?: Record<string, string>;            // word → Pexels search term
   vocabTranslations?: Record<string, TranslateWordResult>; // word → translation data
-  imageMatchDistractors?: Record<string, string[]>;  // word → 3 visually distinct distractors
   dialogueVerbs?: string[];                          // all verbs (infinitives) used in the dialogue
 }
 
 export interface GrammarBridgeResult {
   // ── Novo formato estruturado (Portuguese Bridge Method) ───────────────────
   insight?: string;           // 1 frase "aha!" em PT-BR — o gancho imediato
-  explanation?: string;       // 2-4 frases em PT-BR explicando a regra com profundidade, incluindo nuances e pegadinhas para brasileiros
+  explanation?: string | string[]; // 2-4 frases em PT-BR explicando a regra com profundidade. Pode ser um array para múltiplos tópicos.
   bridge?: {
     portuguese: string;       // Padrão/frase como se diz em PT-BR
     target: string;           // Equivalente na língua-alvo
@@ -229,23 +230,36 @@ export interface ErrorCorrectionData {
   acceptable_answers?: string[]; // other grammatically valid alternatives
 }
 
-export interface ConjugationDrillData {
-  verb: string;
-  tense: string;
-  conjugations: Array<{ pronoun: string; form: string; blank: boolean }>;
-  tip?: string;
-}
-
 export interface SpeakRepeatData {
   text: string;        // sentence to say aloud (in target language)
   translation: string; // Portuguese hint
 }
 
-export interface ImageMatchData {
-  imageUrl: string;
-  imageAlt: string;
-  word: string;      // correct answer
-  options: string[]; // 4 shuffled options (includes correct)
+export interface SocialRoleplayData {
+  context: string;      // A short setup (e.g. "Você está em um café")
+  promptLine: string;   // What the other person says
+  options: string[];    // 3 possible responses
+  correctIndex: number;
+  explanation: string;  // Why this is the best response
+}
+
+export interface ScrambledConversationData {
+  lines: string[];         // The lines in correct order
+  shuffledLines: string[]; // Shuffled for the user to sort
+}
+
+export interface InteractiveSubtitlesData {
+  correctText: string;     // The original clean sentence
+  errorText: string;       // The sentence with some words swapped/wrong
+  wrongWords: string[];    // The words the user must click to "fix"
+  translations: string;    // Portuguese translation
+}
+
+export interface LogicConnectorsData {
+  partA: string;           // First part of the sentence
+  partB: string;           // Second part
+  options: string[];       // Connector options (but, because, so...)
+  correctConnector: string;
   translation: string;
 }
 
@@ -255,6 +269,8 @@ export type Exercise =
   | { type: 'reverse-translation';    data: ReverseTranslationData }
   | { type: 'audio-dictation';        data: DictationData }
   | { type: 'error-correction';       data: ErrorCorrectionData }
-  | { type: 'verb-conjugation-drill'; data: ConjugationDrillData }
   | { type: 'speak-repeat';           data: SpeakRepeatData }
-  | { type: 'image-match';            data: ImageMatchData }
+  | { type: 'social-roleplay';        data: SocialRoleplayData }
+  | { type: 'scrambled-conversation'; data: ScrambledConversationData }
+  | { type: 'interactive-subtitles';  data: InteractiveSubtitlesData }
+  | { type: 'logic-connectors';       data: LogicConnectorsData };

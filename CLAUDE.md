@@ -10,7 +10,7 @@ The project MUST operate at zero cost. When suggesting tools, libraries, or depl
 - **Frontend Framework:** Next.js (React)
 - **Styling:** Tailwind CSS (Vanilla utilities, avoid heavy component libraries unless necessary)
 - **Backend & Database:** Firebase (Spark Plan) - Firestore for DB, Firebase Auth for authentication.
-- **AI Services:** Google Gemini (Model: Gemini 3.1 Flash-Lite Preview)
+- **AI Services:** Google Gemini (Model: Gemini 2.5 Flash)
 - **Image Sourcing:** Pexels API
 - **Web Hosting:** Vercel (Free Tier)
 

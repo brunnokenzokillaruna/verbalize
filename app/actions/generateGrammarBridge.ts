@@ -37,7 +37,7 @@ Você está falando com um falante nativo de português brasileiro. Use isso a s
 Output ONLY este JSON (sem markdown):
 {
   "insight": "1 frase de impacto em PT-BR — a sacada central da regra. Comece com 'Em português...' ou 'Ao contrário do português...' ou similar. MAX 20 words.",
-  "explanation": "2-4 frases em PT-BR. Explique: (1) como a estrutura funciona, (2) por que brasileiros costumam errar e (3) qualquer nuance importante.",
+  "explanation": "2-4 frases em PT-BR. Explique: (1) como a estrutura funciona, (2) por que brasileiros costumam errar e (3) qualquer nuance importante. SE o tema tiver múltiplos tópicos/conceitos distintos (ex: Qui, Que, Combien), use um ARRAY de strings, uma para cada conceito.",
   "usageContext": "Descreva em 1-2 palavras a 'vibe' social (ex: 'Casual/Amigos', 'Polidez/Formal', 'Dia-a-dia').",
   "brazilianTrap": "Explique o 'Erro de Brasileiro' clássico aqui em 1 frase curta e direta.",
   "patterns": [

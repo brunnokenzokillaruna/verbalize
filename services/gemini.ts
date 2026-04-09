@@ -1,7 +1,8 @@
 import { getGeminiKey } from '@/lib/env';
 
 // Latest free-tier Gemini model as specified in CLAUDE.md
-const GEMINI_MODEL = 'gemini-3.1-flash-lite-preview';
+// Latest free-tier Gemini model as selected by the user
+const GEMINI_MODEL = 'gemini-2.5-flash';
 
 interface GeminiResponse {
   candidates?: Array<{
@@ -12,16 +13,18 @@ interface GeminiResponse {
   error?: { message: string };
 }
 
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 /**
  * Calls the Gemini REST API and returns the text response.
  * Runs server-side only (uses GEMINI_API_KEY).
- *
- * @param prompt - The user prompt (required)
- * @param systemPrompt - Optional system-level instruction
- * @param maxOutputTokens - Token budget (default 1024; tune per call to reduce latency)
- * @throws Error with a descriptive message on failure
  */
-export async function callGemini(prompt: string, systemPrompt?: string, maxOutputTokens = 1024): Promise<string> {
+export async function callGemini(
+  prompt: string, 
+  systemPrompt?: string, 
+  maxOutputTokens = 1024,
+  retries = 3
+): Promise<string> {
   const apiKey = getGeminiKey();
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
 
@@ -37,24 +40,46 @@ export async function callGemini(prompt: string, systemPrompt?: string, maxOutpu
     body.systemInstruction = { parts: [{ text: systemPrompt }] };
   }
 
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
+  let lastError: Error | null = null;
+  
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
 
-  const data: GeminiResponse = await res.json();
+      const data: GeminiResponse = await res.json();
 
-  if (!res.ok) {
-    throw new Error(`Gemini API error ${res.status}: ${data.error?.message ?? 'Unknown error'}`);
+      if (!res.ok) {
+        // Retry on 503 (Service Unavailable/High Demand) or 429 (Rate Limit)
+        if ((res.status === 503 || res.status === 429) && attempt < retries) {
+          const delay = Math.pow(2, attempt) * 1000 + Math.random() * 500;
+          console.warn(`[Gemini] Attempt ${attempt + 1} failed with ${res.status}. Retrying in ${Math.round(delay)}ms...`);
+          await wait(delay);
+          continue;
+        }
+        throw new Error(`Gemini API error ${res.status}: ${data.error?.message ?? 'Unknown error'}`);
+      }
+
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!text) {
+        throw new Error('Gemini returned empty content');
+      }
+
+      return text.trim();
+    } catch (err) {
+      lastError = err as Error;
+      if (attempt === retries) break;
+      
+      // For network errors, we also retry
+      const delay = Math.pow(2, attempt) * 1000 + Math.random() * 500;
+      await wait(delay);
+    }
   }
 
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!text) {
-    throw new Error('Gemini returned empty content');
-  }
-
-  return text.trim();
+  throw lastError || new Error('Unknown error in callGemini');
 }
 
 /**

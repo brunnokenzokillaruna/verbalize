@@ -4,9 +4,10 @@ import { SentenceBuilder } from './SentenceBuilder';
 import { ReverseTranslationInput } from './ReverseTranslationInput';
 import { DictationInput } from './DictationInput';
 import { ErrorCorrectionExercise } from './ErrorCorrectionExercise';
-import { VerbConjugationDrill } from './VerbConjugationDrill';
-import { SpeakRepeatExercise } from './SpeakRepeatExercise';
-import { ImageMatchExercise } from './ImageMatchExercise';
+import { SocialRoleplay } from './SocialRoleplay';
+import { ScrambledConversation } from './ScrambledConversation';
+import { InteractiveSubtitles } from './InteractiveSubtitles';
+import { LogicConnectors } from './LogicConnectors';
 import type { Exercise, SupportedLanguage } from '@/types';
 
 interface LessonPracticeScreenProps {
@@ -112,15 +113,6 @@ export function LessonPracticeScreen({
           submitTrigger={submitTrigger}
         />
       )}
-      {currentExercise.type === 'verb-conjugation-drill' && (
-        <VerbConjugationDrill
-          data={currentExercise.data}
-          onAnswer={onAnswer}
-          answered={exerciseAnswer !== null}
-          setIsExerciseReady={setIsExerciseReady}
-          submitTrigger={submitTrigger}
-        />
-      )}
       {currentExercise.type === 'speak-repeat' && (
         <SpeakRepeatExercise
           data={currentExercise.data}
@@ -131,13 +123,36 @@ export function LessonPracticeScreen({
           submitTrigger={submitTrigger}
         />
       )}
-      {currentExercise.type === 'image-match' && (
-        <ImageMatchExercise
+      {currentExercise.type === 'social-roleplay' && (
+        <SocialRoleplay
           data={currentExercise.data}
           onAnswer={onAnswer}
           answered={exerciseAnswer !== null}
           setIsExerciseReady={setIsExerciseReady}
-          submitTrigger={submitTrigger}
+        />
+      )}
+      {currentExercise.type === 'scrambled-conversation' && (
+        <ScrambledConversation
+          data={currentExercise.data}
+          onAnswer={onAnswer}
+          answered={exerciseAnswer !== null}
+          setIsExerciseReady={setIsExerciseReady}
+        />
+      )}
+      {currentExercise.type === 'interactive-subtitles' && (
+        <InteractiveSubtitles
+          data={currentExercise.data}
+          onAnswer={onAnswer}
+          answered={exerciseAnswer !== null}
+          setIsExerciseReady={setIsExerciseReady}
+        />
+      )}
+      {currentExercise.type === 'logic-connectors' && (
+        <LogicConnectors
+          data={currentExercise.data}
+          onAnswer={onAnswer}
+          answered={exerciseAnswer !== null}
+          setIsExerciseReady={setIsExerciseReady}
         />
       )}
     </div>

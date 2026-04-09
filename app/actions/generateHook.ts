@@ -225,10 +225,6 @@ Output ONLY this JSON object (no extra text):
   "vocabTranslations": {
     "<vocab word 1>": { "translation": "pt-BR", "explanation": "tip in Portuguese ≤20 words", "example": "sentence in ${lang}" },
     ...
-  },
-  "imageMatchDistractors": {
-    "<vocab word 1>": ["distractor_a", "distractor_b", "distractor_c"],
-    ...
   }
 }
 
@@ -237,7 +233,7 @@ Rules:
 - newVocabulary: EXACTLY 4 DISTINCT NON-VERB words (no verbs allowed). Nouns, adjectives, or adverbs only. All 4 must appear LITERALLY in the dialogue.
 - dialogueVerbs: List EVERY verb used in the dialogue in its infinitive form.
 - NEVER include days of the week, months of the year, or proper nouns in newVocabulary.
-- imageKeywords, vocabTranslations, imageMatchDistractors: provide data for the 4 words in newVocabulary.
+- imageKeywords, vocabTranslations: provide data for the 4 words in newVocabulary.
 - grammarBridge: (1) Use 'bridge' for single systemic rules (leave 'items' null). (2) Use 'items' for lists of expressions/vocabulary (leave 'bridge' null). (3) If the topic implies a number (e.g., "11 ways"), you MUST provide all of them in 'items'. (4) insight ≤20 words, explanation 2-4 phrases.`;
 
   try {
@@ -271,11 +267,6 @@ Rules:
         const ik: typeof result.imageKeywords = {};
         for (const [k, v] of Object.entries(result.imageKeywords)) ik[k.trim().toLowerCase()] = v;
         result.imageKeywords = ik;
-      }
-      if (result.imageMatchDistractors) {
-        const imd: typeof result.imageMatchDistractors = {};
-        for (const [k, v] of Object.entries(result.imageMatchDistractors)) imd[k.trim().toLowerCase()] = v;
-        result.imageMatchDistractors = imd;
       }
 
       return result;

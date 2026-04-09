@@ -14,10 +14,14 @@ export function buildMistakeContext(exercise: Exercise): string {
       return `Speak & repeat: "${exercise.data.text}"`;
     case 'sentence-builder':
       return `Sentence builder: correct order "${exercise.data.correctOrder.join(' ')}"`;
-    case 'image-match':
-      return `Image match: correct word "${exercise.data.word}"`;
-    case 'verb-conjugation-drill':
-      return `Verb conjugation: "${exercise.data.verb}" in ${exercise.data.tense}`;
+    case 'social-roleplay':
+      return `Social Roleplay content — context: "${exercise.data.context}"`;
+    case 'scrambled-conversation':
+      return `Scrambled conversation with ${exercise.data.lines.length} lines`;
+    case 'interactive-subtitles':
+      return `Subtitles fix: "${exercise.data.correctText}"`;
+    case 'logic-connectors':
+      return `Connectors: "${exercise.data.partA} [ ] ${exercise.data.partB}"`;
   }
 }
 

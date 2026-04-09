@@ -117,10 +117,24 @@ export function GrammarBridgeCard({ bridge, language }: GrammarBridgeCardProps) 
 
         {/* Explanation */}
         {explanation ? (
-          <div className="px-1">
-            <p className="text-sm leading-relaxed text-[var(--color-text-secondary)] opacity-90">
-              {explanation}
-            </p>
+          <div className="px-1 flex flex-col gap-4">
+            {Array.isArray(explanation) ? (
+              explanation.map((item, idx) => (
+                <div 
+                  key={idx} 
+                  className="relative p-4 rounded-2xl bg-[var(--color-surface-raised)]/50 border border-[var(--color-border)]/50 transition-all hover:bg-[var(--color-surface-raised)]"
+                >
+                  <div className="absolute -left-1 top-4 w-2 h-6 bg-[var(--color-primary)] rounded-full opacity-50 shadow-[0_0_10px_rgba(var(--color-primary-rgb),0.3)]" />
+                  <p className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
+                    {item}
+                  </p>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm leading-relaxed text-[var(--color-text-secondary)] opacity-90">
+                {explanation}
+              </p>
+            )}
           </div>
         ) : null}
 

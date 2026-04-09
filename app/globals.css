@@ -85,14 +85,6 @@ body {
   font-family: var(--font-body, 'DM Sans', system-ui, sans-serif);
 }
 
-/* ─── Hack to definitively remove the Spline Watermark ─── */
-a[href*="spline.design"], .spline-watermark {
-  display: none !important;
-  opacity: 0 !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
-}
-
 /* ─── Typography ─────────────────────────────────────────────────────────────── */
 
 .font-display {

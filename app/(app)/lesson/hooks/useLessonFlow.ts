@@ -31,6 +31,7 @@ export function useLessonFlow({
       dialogue: store.hook.dialogue,
       newVocabulary: store.hook.newVocabulary,
       verbWord: store.hook.verbWord,
+      grammarFocus: store.lesson.grammarFocus,
       language: store.lesson.language,
       level: store.lesson.level,
       knownVocabulary: store.knownVocabulary,
@@ -39,35 +40,8 @@ export function useLessonFlow({
   }, [store]);
 
   const buildClientExercises = useCallback((): Exercise[] => {
-    if (!store.hook) return [];
-    const exercises: Exercise[] = [];
-
-    const vocabWithImage = store.hook.newVocabulary.find(
-      (w) => store.vocabImages[w]?.imageUrl,
-    );
-    if (vocabWithImage) {
-      const imgData = store.vocabImages[vocabWithImage]!;
-      const precomputedDistractors = store.hook.imageMatchDistractors?.[vocabWithImage];
-      const distractors = precomputedDistractors && precomputedDistractors.length >= 3
-        ? precomputedDistractors.slice(0, 3)
-        : store.hook.newVocabulary
-            .filter((w) => w !== vocabWithImage)
-            .sort(() => Math.random() - 0.5)
-            .slice(0, 3);
-      exercises.push({
-        type: 'image-match',
-        data: {
-          imageUrl: imgData.imageUrl,
-          imageAlt: imgData.imageAlt ?? vocabWithImage,
-          word: vocabWithImage,
-          options: [...distractors, vocabWithImage].sort(() => Math.random() - 0.5),
-          translation: store.vocabTranslations[vocabWithImage] ?? vocabWithImage,
-        },
-      });
-    }
-
-    return exercises;
-  }, [store]);
+    return [];
+  }, []);
 
   const advanceFromVocabulary = useCallback(() => {
     if (!store.lesson || !store.hook) return;
