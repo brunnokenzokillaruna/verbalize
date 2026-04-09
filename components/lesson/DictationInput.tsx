@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { AudioPlayerButton } from './AudioPlayerButton';
 import type { DictationData, SupportedLanguage } from '@/types';
 import { isAccentOnlyDiff } from '@/utils/accent';

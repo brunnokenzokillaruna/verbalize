@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { InteractiveSubtitlesData } from '@/types';
-import { CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
+import { CheckCircle2, AlertCircle } from 'lucide-react';
 
 interface InteractiveSubtitlesProps {
   data: InteractiveSubtitlesData;
@@ -66,7 +66,7 @@ export function InteractiveSubtitles({ data, onAnswer, answered, setIsExerciseRe
       </div>
 
       <div className="p-4 rounded-xl bg-white/5 border border-white/5 italic text-sm text-[var(--color-text-muted)]">
-        "{data.translations}"
+        &quot;{data.translations}&quot;
       </div>
 
       {!answered && (

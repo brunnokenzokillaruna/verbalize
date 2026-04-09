@@ -78,7 +78,7 @@ export function VisualVocabCard({
           <div className="flex-1 min-w-0">
             {exampleSentence && (
               <p className="text-[11px] leading-relaxed text-[var(--color-text-secondary)] opacity-70 italic line-clamp-1 group-hover:opacity-100 transition-opacity">
-                "{exampleSentence}"
+                &quot;{exampleSentence}&quot;
               </p>
             )}
           </div>

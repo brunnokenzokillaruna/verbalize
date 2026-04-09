@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Mic, MicOff, CheckCircle, XCircle, SkipForward, RefreshCw, Send } from 'lucide-react';
+import { Mic, CheckCircle, XCircle, SkipForward, RefreshCw, Send } from 'lucide-react';
 import { AudioPlayerButton } from './AudioPlayerButton';
 import type { SpeakRepeatData, SupportedLanguage } from '@/types';
 

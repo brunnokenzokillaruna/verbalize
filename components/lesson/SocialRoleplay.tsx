@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { SocialRoleplayData } from '@/types';
-import { Button } from '@/components/ui/button';
 import { MessageSquare, CheckCircle2, XCircle } from 'lucide-react';
 
 interface SocialRoleplayProps {
@@ -62,7 +61,7 @@ export function SocialRoleplay({ data, onAnswer, answered, setIsExerciseReady }:
       {answered && (
         <div className="mt-2 p-4 rounded-xl bg-[var(--color-primary-light)] ring-1 ring-[var(--color-primary)]/20 animate-in zoom-in-95 duration-300">
           <p className="text-sm text-[var(--color-primary)] font-medium leading-relaxed">
-            {data.explanation}
+            &quot;{data.explanation}&quot;
           </p>
         </div>
       )}

@@ -8,6 +8,7 @@ import { SocialRoleplay } from './SocialRoleplay';
 import { ScrambledConversation } from './ScrambledConversation';
 import { InteractiveSubtitles } from './InteractiveSubtitles';
 import { LogicConnectors } from './LogicConnectors';
+import { SpeakRepeatExercise } from './SpeakRepeatExercise';
 import type { Exercise, SupportedLanguage } from '@/types';
 
 interface LessonPracticeScreenProps {

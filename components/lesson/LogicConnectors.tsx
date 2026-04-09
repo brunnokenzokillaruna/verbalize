@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { LogicConnectorsData } from '@/types';
-import { CheckCircle2, XCircle, Link } from 'lucide-react';
+import { Link } from 'lucide-react';
 
 interface LogicConnectorsProps {
   data: LogicConnectorsData;
@@ -48,7 +48,7 @@ export function LogicConnectors({ data, onAnswer, answered, setIsExerciseReady }
       </div>
 
       <div className="text-center italic text-sm text-[var(--color-text-muted)] mb-2">
-        "{data.translation}"
+        &quot;{data.translation}&quot;
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">

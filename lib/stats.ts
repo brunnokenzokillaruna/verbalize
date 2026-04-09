@@ -8,7 +8,7 @@ import type { UserDocument } from '@/types';
 export function getEffectiveStreak(profile: UserDocument | null): number {
   if (!profile || !profile.lastLessonDate) return 0;
 
-  const lastDate = profile.lastLessonDate.toDate ? profile.lastLessonDate.toDate() : new Date(profile.lastLessonDate as any);
+  const lastDate = profile.lastLessonDate.toDate ? profile.lastLessonDate.toDate() : new Date(profile.lastLessonDate as unknown as string);
   const now = new Date();
   
   // Normalise to midnight local time for day comparison

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronDown, Volume2 } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { AudioPlayerButton } from './AudioPlayerButton';
 import type { GrammarBridgeResult, SupportedLanguage } from '@/types';
 
