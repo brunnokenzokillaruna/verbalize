@@ -33,12 +33,20 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Agent Skills
-.agents/skills
-skills-lock.json
-
-# Internal Docs
-pedagogical_framework_v2.md
-
 # Agent Config
 .claude/
+.agents/
+skills-lock.json
+
+# Internal Docs & Data
+CLAUDE.md
+.env.local.example
+ai_prompts.md
+tasks.md
+tech_stack.md
+curriculum_*.md
+search-structure.txt
+component_library.md
+database_model.md
+design_system.md
+pedagogical_framework_v2.md
