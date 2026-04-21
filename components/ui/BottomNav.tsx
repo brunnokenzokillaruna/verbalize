@@ -22,10 +22,10 @@ export function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-30 mx-auto max-w-[640px] md:hidden"
+      className="fixed bottom-0 left-0 right-0 z-30 mx-auto w-full max-w-[600px] md:hidden"
       style={{
         backgroundColor: 'var(--color-bg)',
-        borderTop: '1px solid var(--color-border)',
+        borderTop: '2px solid var(--color-border)',
         paddingBottom: 'env(safe-area-inset-bottom, 0px)',
       }}
     >

@@ -251,8 +251,111 @@ body {
 .lesson-current-dot::before {
   content: '';
   position: absolute;
-  inset: -3px;
+  inset: -4px;
   border-radius: 50%;
   background: transparent;
   animation: pulse-ring 2s ease-out infinite;
+}
+
+/* ─── Duo-style 3D button effect ─────────────────────────────────────────────── */
+.duo-cta > div {
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+.duo-cta:active > div {
+  transform: translateY(2px);
+  box-shadow: 0 4px 12px rgba(29, 94, 212, 0.2) !important;
+}
+
+/* ─── Duo-style level chip bounce ────────────────────────────────────────────── */
+.duo-level-chip {
+  transition: transform 120ms ease, box-shadow 200ms ease, border-bottom-width 120ms ease;
+}
+.duo-level-chip:active:not(:disabled) {
+  transform: translateY(2px);
+  border-bottom-width: 2px !important;
+}
+
+/* ─── Lesson path node interactions ──────────────────────────────────────────── */
+.duo-lesson-node {
+  transition: transform 150ms ease;
+}
+.duo-lesson-node:hover:not(:disabled) {
+  transform: translateX(4px);
+}
+.duo-lesson-node:active:not(:disabled) {
+  transform: translateX(2px) scale(0.99);
+}
+
+/* ─── Stat pill subtle shine ─────────────────────────────────────────────────── */
+.duo-stat-pill {
+  position: relative;
+  overflow: hidden;
+  transition: transform 200ms ease;
+}
+.duo-stat-pill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.06),
+    transparent
+  );
+  transition: left 400ms ease;
+}
+.duo-stat-pill:hover::after {
+  left: 150%;
+}
+.duo-stat-pill:hover {
+  transform: translateY(-1px);
+}
+
+/* ─── Icon button hover glow ─────────────────────────────────────────────────── */
+.duo-icon-btn {
+  transition: transform 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+}
+.duo-icon-btn:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+.dark .duo-icon-btn:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+/* ─── Flat button style ──────────────────────────────────────────────────────── */
+.duo-btn-flat {
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+.duo-btn-flat:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
+}
+.dark .duo-btn-flat:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* ─── Duo circular node 3D press ─────────────────────────────────────────────── */
+.duo-node {
+  transition: transform 100ms ease, box-shadow 100ms ease;
+  cursor: pointer;
+}
+.duo-node:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+.duo-node:active:not(:disabled) {
+  transform: translateY(4px) !important;
+  box-shadow: 0 2px 0 var(--color-primary-dark), 0 4px 10px rgba(0,0,0,0.15) !important;
+}
+
+/* ─── Tooltip floating animation ─────────────────────────────────────────────── */
+.duo-tooltip {
+  position: relative;
+  animation: duo-tooltip-bounce 2s ease-in-out infinite;
+}
+@keyframes duo-tooltip-bounce {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-4px); }
 }

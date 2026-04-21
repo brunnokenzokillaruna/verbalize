@@ -41,6 +41,8 @@ import { LessonHookScreen } from '@/components/lesson/LessonHookScreen';
 import { LessonGrammarScreen } from '@/components/lesson/LessonGrammarScreen';
 import { LessonPracticeScreen } from '@/components/lesson/LessonPracticeScreen';
 import { LessonReviewScreen } from '@/components/lesson/LessonReviewScreen';
+import { LessonMissionScreen } from '@/components/lesson/LessonMissionScreen';
+import { LessonPhoneticsScreen } from '@/components/lesson/LessonPhoneticsScreen';
 
 import { useLessonAudio } from './hooks/useLessonAudio';
 import { useLessonFlow } from './hooks/useLessonFlow';
@@ -112,10 +114,14 @@ export default function LessonPage() {
 
   const {
     fetchAiExercises,
+    advanceFromIntro,
+    advanceFromMission,
     advanceFromVocabulary,
     advanceFromHook,
     advanceFromGrammar,
+    advanceFromPhonetics,
     finishLesson,
+    skipLesson,
     exitLesson,
   } = useLessonFlow({
     exitingRef,
@@ -148,6 +154,7 @@ export default function LessonPage() {
   // ── Exercise check / continue ─────────────────────────────────────────────
 
   function handleAnswer(correct: boolean) {
+    if (exerciseAnswer !== null) return;
     setExerciseAnswer(correct);
     if (correct) {
       store.recordCorrect();
@@ -164,6 +171,7 @@ export default function LessonPage() {
   }
 
   function handleReviewAnswer(correct: boolean) {
+    if (exerciseAnswer !== null) return;
     setExerciseAnswer(correct);
     if (correct) store.recordReviewCorrect();
   }
@@ -266,6 +274,11 @@ export default function LessonPage() {
     [store.lesson, store.hook],
   );
 
+  const handleFastComplete = useCallback(async () => {
+    await finishLesson();
+    store.setPhase('complete');
+  }, [finishLesson, store]);
+
   // ── Derived state ─────────────────────────────────────────────────────────
 
   const phase = store.phase;
@@ -331,7 +344,9 @@ export default function LessonPage() {
     <div style={{ backgroundColor: 'var(--color-bg)', minHeight: '100dvh' }}>
       <LessonProgressHeader
         currentStage={phaseToStage(phase)}
+        tag={store.lesson?.tag}
         onExit={exitLesson}
+        onComplete={handleFastComplete}
       />
 
       <main className={`mx-auto max-w-lg md:max-w-2xl lg:max-w-4xl px-6 pt-10 ${
@@ -371,6 +386,22 @@ export default function LessonPage() {
           />
         )}
 
+        {/* ── Mission phase — MISS: before vocabulary ── */}
+        {phase === 'mission' && store.hook?.missionBriefing && store.lesson && (
+          <LessonMissionScreen
+            briefing={store.hook.missionBriefing}
+            language={store.lesson.language}
+          />
+        )}
+
+        {/* ── Phonetics phase — PRON: after hook ── */}
+        {phase === 'phonetics' && store.hook?.phoneticsTip && store.lesson && (
+          <LessonPhoneticsScreen
+            tip={store.hook.phoneticsTip}
+            language={store.lesson.language}
+            grammarFocus={store.lesson.grammarFocus}
+          />
+        )}
 
         {/* ── Practice phase ── */}
         {phase === 'practice' && currentExercise && store.lesson && (
@@ -407,11 +438,11 @@ export default function LessonPage() {
               type="button"
               disabled={store.isLoading}
               onClick={
-                phase === 'vocabulary'
-                  ? advanceFromVocabulary
-                  : phase === 'hook'
-                    ? advanceFromHook
-                    : advanceFromGrammar
+                phase === 'vocabulary'  ? advanceFromVocabulary :
+                phase === 'hook'        ? advanceFromHook :
+                phase === 'mission'     ? advanceFromMission :
+                phase === 'phonetics'   ? advanceFromPhonetics :
+                                          advanceFromGrammar
               }
               className="cta-shimmer relative flex w-full max-w-sm mx-auto items-center justify-center gap-2.5 overflow-hidden rounded-xl px-6 py-3.5 text-base font-bold transition-all active:scale-[0.98] disabled:cursor-not-allowed"
               style={{
@@ -428,15 +459,26 @@ export default function LessonPage() {
                   <span className="text-sm">Sincronizando…</span>
                 </>
               ) : phase === 'grammar' ? (
-                <>Praticar agora</>
+                <>Praticar agora 💪</>
               ) : phase === 'hook' ? (
-                <>Entendido</>
+                <>Entendido!</>
+              ) : phase === 'mission' ? (
+                <>Aceitar Missão 🚀</>
+              ) : phase === 'phonetics' ? (
+                <>Entendido, vamos praticar!</>
               ) : (
-                <>Avançar</>
+                <>Avançar →</>
               )}
             </button>
             <p className="mt-3 text-center text-[10px] font-semibold text-[var(--color-text-muted)] uppercase tracking-[0.2em] opacity-50">
-              Próximo: {phase === 'vocabulary' ? 'Diálogo' : phase === 'hook' ? 'Gramática' : 'Prática'}
+              Próximo:{' '}
+              {phase === 'vocabulary'
+                ? 'Diálogo'
+                : phase === 'hook'
+                  ? (store.lesson?.tag === 'GRAM' ? 'Gramática' : store.lesson?.tag === 'PRON' ? 'Fonética' : 'Prática')
+                  : phase === 'mission'
+                    ? 'Vocabulário'
+                    : 'Prática'}
             </p>
           </div>
         )}

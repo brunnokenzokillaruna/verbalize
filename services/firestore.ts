@@ -16,7 +16,7 @@ import {
 import { db } from './firebase';
 import type { UserDocument, UserVocabularyDocument, ImageCacheDocument, VerbDocument, LessonMistakeDocument, PregeneratedLessonDocument, SupportedLanguage, ProficiencyLevel } from '@/types';
 import { calculateNextReview } from '@/lib/srs';
-import { getNextLessonId } from '@/lib/curriculum';
+import { getNextLessonId, getLessonsForLanguage } from '@/lib/curriculum';
 import { getEffectiveStreak } from '@/lib/stats';
 
 // ─── Users ────────────────────────────────────────────────────────────────────
@@ -156,10 +156,12 @@ export async function logLesson(data: {
  */
 export async function updateLessonStats(
   uid: string,
-  profile: UserDocument,
+  initialProfile: UserDocument,
   completedLessonId: string,
   language: SupportedLanguage,
 ): Promise<Pick<UserDocument, 'totalLessonsCompleted' | 'currentStreak' | 'lastLessonDate' | 'lessonProgress'>> {
+  // Fetch fresh profile to avoid stale progress updates
+  const profile = await getUser(uid) || initialProfile;
   const now = new Date();
   // Normalise to midnight local time so we compare calendar days, not exact times
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -182,15 +184,27 @@ export async function updateLessonStats(
     diffDays === 1 ? effectiveBase + 1 :
     1;
 
-  // Advance lesson progress only when the user completes their current frontier lesson
+  // Advance lesson progress only when the user completes their current frontier lesson (or something ahead of it)
   const currentProgress = profile.lessonProgress ?? {};
-  const frontierLessonId = currentProgress[language]; // undefined = user hasn't started yet
-  const isAtFrontier = completedLessonId === frontierLessonId || !frontierLessonId;
-  const newLessonProgress: Partial<Record<SupportedLanguage, string>> = { ...currentProgress };
-  if (isAtFrontier) {
-    const nextId = getNextLessonId(language, completedLessonId);
-    // If nextId is null we're at the last lesson — keep frontier pointing to the same lesson
-    newLessonProgress[language] = nextId ?? completedLessonId;
+  const frontierLessonId = currentProgress[language];
+  
+  const allLessons = getLessonsForLanguage(language);
+  const frontierIdx = frontierLessonId ? allLessons.findIndex(l => l.id === frontierLessonId) : 0;
+  const completedIdx = allLessons.findIndex(l => l.id === completedLessonId);
+
+  // If we can't find the completed lesson, we can't safely advance
+  const nextId = getNextLessonId(language, completedLessonId);
+  const isAtFrontier = completedIdx !== -1 && (completedIdx >= frontierIdx || !frontierLessonId);
+  
+  const newLessonProgress: Record<string, string> = { ...currentProgress };
+  
+  if (isAtFrontier && nextId) {
+    newLessonProgress[language] = nextId;
+    console.log(`[updateLessonStats] Advancing frontier for ${language}: ${completedLessonId} -> ${nextId}`);
+  } else if (isAtFrontier && !nextId) {
+    console.log(`[updateLessonStats] Reached end for ${language} at ${completedLessonId}`);
+  } else {
+    console.log(`[updateLessonStats] Finished older lesson ${completedLessonId} (frontier is ${frontierLessonId}). No advancement.`);
   }
 
   const updates = {

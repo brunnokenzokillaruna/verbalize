@@ -21,7 +21,10 @@ export async function pregenerateNextLesson(
     const hook = await generateHook({
       language: lesson.language,
       level: lesson.level,
+      tag: lesson.tag,
       interests,
+      theme: lesson.theme,
+      uiTitle: lesson.uiTitle,
       grammarFocus: lesson.grammarFocus,
       knownVocabulary,
     });

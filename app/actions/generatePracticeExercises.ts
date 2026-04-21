@@ -1,7 +1,7 @@
 'use server';
 
 import { callGeminiJSON } from '@/services/gemini';
-import type { Exercise, SupportedLanguage, ProficiencyLevel } from '@/types';
+import type { Exercise, SupportedLanguage, ProficiencyLevel, LessonTag } from '@/types';
 
 const LANG_LABEL: Record<SupportedLanguage, string> = {
   fr: 'French',
@@ -22,6 +22,7 @@ interface GeneratePracticeParams {
   newVocabulary: string[];
   verbWord: string;
   grammarFocus: string;
+  tag: LessonTag;
   language: SupportedLanguage;
   level: ProficiencyLevel;
   knownVocabulary: string[];
@@ -39,7 +40,7 @@ interface GeneratePracticeParams {
 export async function generatePracticeExercises(
   params: GeneratePracticeParams,
 ): Promise<Exercise[] | null> {
-  const { dialogue, newVocabulary, grammarFocus, language, level, knownVocabulary, previousTopics } = params;
+  const { dialogue, newVocabulary, grammarFocus, tag, language, level, knownVocabulary, previousTopics } = params;
   const levelDesc = LEVEL_EXERCISE_DESCRIPTORS[level];
   const isEarly = level === 'A1' || level === 'A2';
   const isEarlyLearner = knownVocabulary.length < 30;
@@ -53,7 +54,7 @@ export async function generatePracticeExercises(
     : '';
 
   try {
-    const systemPrompt = `You are a language exercise generator for Brazilian Portuguese speakers learning ${LANG_LABEL[language]}. Respond with ONLY a valid JSON array, no markdown, no explanation.`;
+    const systemPrompt = `You are a language exercise generator for Brazilian Portuguese speakers learning ${LANG_LABEL[language]}. The student is Brazilian — use scenarios, cultural references, and situations that are engaging and relevant for a Brazilian learner (e.g., a Brazilian tourist in Paris, a Brazilian professional in a French meeting, a Brazilian student abroad, ordering food in Lyon, asking for directions in London). Respond with ONLY a valid JSON array, no markdown, no explanation.`;
 
     const prompt = `The learner just studied a ${LANG_LABEL[language]} dialogue at ${level} level. 
 
@@ -63,6 +64,12 @@ THEME/CONTEXT (from dialogue):
 
 Key vocabulary words from this lesson: ${newVocabulary.join(', ')}
 ${previousTopicsBlock}
+
+TAG-SPECIFIC EXERCISE BALANCE (follow this strictly):
+${tag === 'PRON' ? "- Focus heavily on 'speak-repeat' and 'audio-dictation' (at least 3 out of 5)." : ""}
+${tag === 'GRAM' ? "- Focus on 'error-correction', 'sentence-builder', and 'context-choice' to reinforce the grammar structure." : ""}
+${tag === 'VOC' ? "- Focus on 'context-choice', 'reverse-translation', and 'sentence-builder' used in very simple sentences." : ""}
+${tag === 'DIAL' || tag === 'MISS' ? "- Focus on 'social-roleplay', 'scrambled-conversation', and 'interactive-subtitles' to simulate real-world usage. Use scenarios a Brazilian would realistically encounter: at a French restaurant, at a hotel in Lyon, on the Paris metro, at a French pharmacy, at an airport, in a Parisian shop." : ""}
 
 CRITICAL RULE: Do NOT copy or reuse any sentence from the dialogue above. Every exercise sentence must be ORIGINAL — newly created by you. The sentences should be related to the lesson's theme and grammar focus, but must be completely different from the dialogue lines.
 

@@ -71,7 +71,7 @@ Regras Cruciais:
 7. additionalExamples: exatamente 1-2 itens extras.
 8. Todo texto em PT-BR exceto as frases na língua-alvo.`;
 
-    return await callGeminiJSON<GrammarBridgeResult>(prompt, systemPrompt, 1400);
+    return await callGeminiJSON<GrammarBridgeResult>(prompt, systemPrompt, 2000, 0);
   } catch (err) {
     console.error('[generateGrammarBridge] Error:', err);
     return null;

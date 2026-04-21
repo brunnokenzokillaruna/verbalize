@@ -1,371 +1,3487 @@
 import type { LessonDefinition } from "@/types";
 
 export const FRENCH_LESSONS: LessonDefinition[] = [
-  // ── A1: Beginner ──────────────────────────────────────────────────────
-  { id: 'fr-a1-01', language: 'fr', level: 'A1', grammarFocus: 'O Alfabeto Francês e a Pronúncia' },
-  { id: 'fr-sup-ways-01', language: 'fr', level: 'A1', grammarFocus: 'Maneiras de Dizer: 8 Maneiras de Dizer Bonjour: Alternativas informais e formais para cumprimentar em francês (Ex: Salut, Coucou, Bonsoir, Bonjour à todos, Allô, Ça roule ?...)' },
-  { id: 'fr-a1-02', language: 'fr', level: 'A1', grammarFocus: 'Acentos (É, È, Ê, Ë) e Caracteres Especiais (Ç)' },
-  { id: 'fr-sup-ways-02', language: 'fr', level: 'A1', grammarFocus: 'Maneiras de Dizer: 11 Maneiras de Dizer Comment ça va: Expressões naturais para perguntar como a pessoa está (Ex: Tu vas bien ?, Ça baigne ?, Quoi de neuf ?, La forme ?, Comment ça se passe ?...)' },
-  { id: 'fr-a1-03', language: 'fr', level: 'A1', grammarFocus: 'Combinações de Vogais (AI, EI, OU, AU, EAU)' },
-  { id: 'fr-sup-ways-03', language: 'fr', level: 'A1', grammarFocus: 'Maneiras de Dizer: 15 Maneiras de Dizer Ça va bien: Respostas naturais e variadas a \'Como vai?\' em francês (Ex: Très bien merci !, Pas trop mal, Je pète la forme, Ça roule, Impeccable !...)' },
-  { id: 'fr-a1-04', language: 'fr', level: 'A1', grammarFocus: 'Sons Nasais (AN, EN, IN, ON, UN)' },
-  { id: 'fr-sup-ways-04', language: 'fr', level: 'A1', grammarFocus: 'Maneiras de Dizer: 11 Maneiras de Dizer Merci: Formas de agradecer com diferentes graus de formalidade (Ex: Merci infiniment, Je vous remercie, C\'est très gentil, Je vous suis reconnaissant(e)...)' },
-  { id: 'fr-a1-05', language: 'fr', level: 'A1', grammarFocus: 'Letras Mudas (D, E, G, H, P, S, T, X) e Liaison' },
-  { id: 'fr-sup-ways-05', language: 'fr', level: 'A1', grammarFocus: 'Maneiras de Dizer: 12 Maneiras de Dizer De rien: Alternativas naturais para responder a um agradecimento (Ex: Avec plaisir, Il n\'y a pas de quoi, Pas de problème, C\'est normal, Je vous en prie...)' },
-  { id: 'fr-a1-06', language: 'fr', level: 'A1', grammarFocus: 'Saudações e Expressões Comuns (Bonjour, Merci, Au revoir, S\'il vous plaît...)' },
-  { id: 'fr-sup-ways-06', language: 'fr', level: 'A1', grammarFocus: 'Maneiras de Dizer: 9 Maneiras de Dizer Oui: Formas afirmativas com nuances de grau, ênfase e registro (Ex: Tout à fait, Bien sûr, Absolument, Évidemment, Carrément...)' },
-  { id: 'fr-a1-07', language: 'fr', level: 'A1', grammarFocus: 'Apresentando-se (Je m\'appelle..., J\'ai... ans, Je suis...)' },
-  { id: 'fr-sup-ways-07', language: 'fr', level: 'A1', grammarFocus: 'Maneiras de Dizer: 9 Maneiras de Dizer Non: Formas negativas com nuances de registro e intensidade (Ex: Pas du tout, Absolument pas, Hélas non, Jamais de la vie, Je n\'en veux pas...)' },
-  { id: 'fr-a1-08', language: 'fr', level: 'A1', grammarFocus: 'Números de 0 a 20' },
-  { id: 'fr-sup-ways-08', language: 'fr', level: 'A1', grammarFocus: 'Maneiras de Dizer: 9 Maneiras de Dizer Désolé: Formas de se desculpar com diferentes níveis de formalidade (Ex: Pardon, Excusez-moi, Je vous prie de m\'excuser, J\'ai honte, Toutes mes excuses...)' },
-  { id: 'fr-a1-09', language: 'fr', level: 'A1', grammarFocus: 'Pronomes Sujeitos (Je, tu, il/elle, on, nous, vous, ils/elles)' },
-  { id: 'fr-sup-ways-09', language: 'fr', level: 'A1', grammarFocus: 'Maneiras de Dizer: 11 Maneiras de Dizer Je suis fatigué(e): Expressões para descrever cansaço de forma natural e variada (Ex: Je suis épuisé(e), J\'en peux plus, Je tombe de fatigue, Je suis à plat...)' },
-  { id: 'fr-a1-10', language: 'fr', level: 'A1', grammarFocus: 'O verbo Être (ser/estar) no presente' },
-  { id: 'fr-sup-ways-10', language: 'fr', level: 'A1', grammarFocus: 'Maneiras de Dizer: 9 Maneiras de Dizer Je ne sais pas: Alternativas para expressar incerteza e ignorância sobre algo (Ex: Je n\'en sais rien, Je n\'ai aucune idée, Je n\'étais pas au courant, À moi de le savoir...)' },
-  { id: 'fr-a1-11', language: 'fr', level: 'A1', grammarFocus: 'O verbo Avoir (ter) no presente' },
-  { id: 'fr-sup-ways-11', language: 'fr', level: 'A1', grammarFocus: 'Maneiras de Dizer: 9 Maneiras de Dizer Je t\'aime: Expressões de afeto do mais sutil ao mais intenso em francês (Ex: Je tiens à toi, Tu me manques, Tu comptes beaucoup pour moi, Je t\'adore...)' },
-  { id: 'fr-a1-12', language: 'fr', level: 'A1', grammarFocus: 'Artigos Definidos (le, la, l\', les)' },
-  { id: 'fr-sup-ways-12', language: 'fr', level: 'A1', grammarFocus: 'Maneiras de Dizer: 8 Maneiras de Dizer Félicitations: Formas de parabenizar com registro e contexto variados (Ex: Bravo !, Bien joué !, Mes compliments, Je suis fier(e) de toi, C\'est super !...)' },
-  { id: 'fr-a1-13', language: 'fr', level: 'A1', grammarFocus: 'Artigos Indefinidos (un, une, des)' },
-  { id: 'fr-sup-ways-13', language: 'fr', level: 'A1', grammarFocus: 'Maneiras de Dizer: 14 Maneiras de Dizer Au revoir: Formas de se despedir com diferentes graus de formalidade e afeto (Ex: À bientôt, Bonne journée, À tout à l\'heure, Bonne nuit, Ciao, À la prochaine...)' },
-  { id: 'fr-a1-14', language: 'fr', level: 'A1', grammarFocus: 'Gênero dos Substantivos (Regras básicas e terminações comuns)' },
-  { id: 'fr-sup-daily-01', language: 'fr', level: 'A1', grammarFocus: 'Frases do Dia a Dia: Parte 1 — 20 Frases Essenciais de Boas-Vindas e Apresentação em Francês (Bonjour, Comment vous appelez-vous ?, Enchanté(e), D\'où venez-vous ?, Quel âge avez-vous ?...)' },
-  { id: 'fr-a1-15', language: 'fr', level: 'A1', grammarFocus: 'Plural dos Substantivos (Adição regular de -s)' },
-  { id: 'fr-sup-daily-02', language: 'fr', level: 'A1', grammarFocus: 'Frases do Dia a Dia: Parte 2 — 20 Frases de Pedidos e Agradecimentos em Francês (S\'il vous plaît, Merci beaucoup, Pourriez-vous...?, Je voudrais..., C\'est très gentil de votre part...)' },
-  { id: 'fr-a1-16', language: 'fr', level: 'A1', grammarFocus: 'Cores (les couleurs)' },
-  { id: 'fr-sup-daily-03', language: 'fr', level: 'A1', grammarFocus: 'Frases do Dia a Dia: Parte 3 — 20 Frases para Fazer Compras e Pedir Informações em Francês (C\'est combien ?, Est-ce que vous avez...?, Je cherche..., Où se trouve...?, Avez-vous quelque chose de moins cher ?...)' },
-  { id: 'fr-a1-17', language: 'fr', level: 'A1', grammarFocus: 'Posição dos Adjetivos (Antes vs. Depois do substantivo — Regra BANGS)' },
-  { id: 'fr-sup-daily-04', language: 'fr', level: 'A1', grammarFocus: 'Frases do Dia a Dia: Parte 4 — 20 Frases para Restaurantes e Anfitrionagem em Francês (Je voudrais réserver une table, L\'addition, s\'il vous plaît, Qu\'est-ce que vous recommandez ?, C\'était délicieux, Je suis allergé(e) à...)' },
-  { id: 'fr-a1-18', language: 'fr', level: 'A1', grammarFocus: 'Concordância dos Adjetivos (Gênero)' },
-  { id: 'fr-sup-daily-05', language: 'fr', level: 'A1', grammarFocus: 'Frases do Dia a Dia: Parte 5 — 20 Frases de Transporte e Orientação em Francês (Où est l\'arrêt de bus ?, Comment puis-je aller à...?, À quelle heure part le train ?, Est-ce loin d\'ici ?, Je me suis perdu(e)...)' },
-  { id: 'fr-a1-19', language: 'fr', level: 'A1', grammarFocus: 'Concordância dos Adjetivos (Número)' },
-  { id: 'fr-sup-daily-06', language: 'fr', level: 'A1', grammarFocus: 'Frases do Dia a Dia: Parte 6 — 20 Frases de Trabalho e Ambiente Profissional em Francês (Pouvez-vous m\'envoyer le dossier ?, Je serai en réunion, Quel est le délai ?, Je suis disponible vendredi, Je vais vérifier et vous recontacter...)' },
-  { id: 'fr-a1-20', language: 'fr', level: 'A1', grammarFocus: 'Números de 21 a 69' },
-  { id: 'fr-sup-daily-07', language: 'fr', level: 'A1', grammarFocus: 'Frases do Dia a Dia: Parte 7 — 20 Frases de Situações de Emergência e Saúde em Francês (J\'ai besoin d\'un médecin, Appelez une ambulance !, J\'ai mal à..., Est-ce qu\'il y a une pharmacie à proximité ?, Je suis allergique à...)' },
-  { id: 'fr-a1-21', language: 'fr', level: 'A1', grammarFocus: 'Números de 70 a 100' },
-  { id: 'fr-sup-conf-01', language: 'fr', level: 'A1', grammarFocus: 'Confusão: Penser à VS Penser de' },
-  { id: 'fr-a1-22', language: 'fr', level: 'A1', grammarFocus: 'Dias da Semana e Tempo Relativo (aujourd\'hui, demain, hier)' },
-  { id: 'fr-sup-conf-02', language: 'fr', level: 'A1', grammarFocus: 'Confusão: Décider de VS Se décider à' },
-  { id: 'fr-a1-23', language: 'fr', level: 'A1', grammarFocus: 'Meses do Ano' },
-  { id: 'fr-sup-conf-03', language: 'fr', level: 'A1', grammarFocus: 'Confusão: Tout à coup VS Tout d\'un coup' },
-  { id: 'fr-a1-24', language: 'fr', level: 'A1', grammarFocus: 'Il y a (Há / Existe / Existem)' },
-  { id: 'fr-sup-conf-04', language: 'fr', level: 'A1', grammarFocus: 'Confusão: En fait VS Au fait' },
-  { id: 'fr-a1-25', language: 'fr', level: 'A1', grammarFocus: 'Preposições de Lugar (sur, sous, dans, devant, derrière, entre, près de)' },
-  { id: 'fr-sup-conf-05', language: 'fr', level: 'A1', grammarFocus: 'Confusão: Une tâche VS Une tache' },
-  { id: 'fr-a1-26', language: 'fr', level: 'A1', grammarFocus: 'Lugares na Cidade (la banque, l\'école, le parc, etc.)' },
-  { id: 'fr-sup-conf-06', language: 'fr', level: 'A1', grammarFocus: 'Confusão: Quand VS Lorsque' },
-  { id: 'fr-a1-27', language: 'fr', level: 'A1', grammarFocus: 'Verbos regulares terminados em -er no presente (Sujeitos no singular)' },
-  { id: 'fr-sup-conf-07', language: 'fr', level: 'A1', grammarFocus: 'Confusão: Encore VS Toujours' },
-  { id: 'fr-a1-28', language: 'fr', level: 'A1', grammarFocus: 'Verbos regulares terminados em -er no presente (Sujeitos no plural)' },
-  { id: 'fr-sup-conf-08', language: 'fr', level: 'A1', grammarFocus: 'Confusão: Déjà VS Jamais' },
-  { id: 'fr-a1-29', language: 'fr', level: 'A1', grammarFocus: 'Negação Básica (ne... pas) com être e avoir' },
-  { id: 'fr-sup-conf-09', language: 'fr', level: 'A1', grammarFocus: 'Confusão: Tant pis VS Tant mieux' },
-  { id: 'fr-a1-30', language: 'fr', level: 'A1', grammarFocus: 'Negação Básica com verbos regulares' },
-  { id: 'fr-sup-conf-10', language: 'fr', level: 'A1', grammarFocus: 'Confusão: Près de VS Proche de' },
-  { id: 'fr-a1-31', language: 'fr', level: 'A1', grammarFocus: 'Fazendo perguntas básicas (Entonação e est-ce que)' },
-  { id: 'fr-sup-conf-11', language: 'fr', level: 'A1', grammarFocus: 'Confusão: Que VS Qui (Pronomes relativos em contexto)' },
-  { id: 'fr-a1-32', language: 'fr', level: 'A1', grammarFocus: 'Palavras interrogativas: Où (Onde) e Quand (Quando)' },
-  { id: 'fr-sup-conf-12', language: 'fr', level: 'A1', grammarFocus: 'Confusão: Poser VS Demander' },
-  { id: 'fr-a1-33', language: 'fr', level: 'A1', grammarFocus: 'Palavras interrogativas: Comment (Como) e Pourquoi (Por que)' },
-  { id: 'fr-sup-conf-13', language: 'fr', level: 'A1', grammarFocus: 'Confusão: Visiter VS Rendre visite à' },
-  { id: 'fr-a1-34', language: 'fr', level: 'A1', grammarFocus: 'Palavras interrogativas: Qui (Quem), Que / Qu\'est-ce que (O que), Combien (Quanto/Quantos)' },
-  { id: 'fr-sup-conf-14', language: 'fr', level: 'A1', grammarFocus: 'Confusão: Quand VS Quant' },
-  { id: 'fr-a1-35', language: 'fr', level: 'A1', grammarFocus: 'Adjetivos Possessivos (Parte 1: mon/ma/mes, ton/ta/tes, son/sa/ses)' },
-  { id: 'fr-sup-conf-15', language: 'fr', level: 'A1', grammarFocus: 'Confusão: Deuxième VS Second' },
-  { id: 'fr-a1-36', language: 'fr', level: 'A1', grammarFocus: 'Adjetivos Possessivos (Parte 2: notre/nos, votre/vos, leur/leurs)' },
-  { id: 'fr-sup-conf-16', language: 'fr', level: 'A1', grammarFocus: 'Confusão: Leur VS Leurs' },
-  { id: 'fr-a1-37', language: 'fr', level: 'A1', grammarFocus: 'Adjetivos Demonstrativos (ce, cet, cette, ces)' },
-  { id: 'fr-sup-conf-17', language: 'fr', level: 'A1', grammarFocus: 'Confusão: Aussi... que VS Autant de' },
-  { id: 'fr-a1-38', language: 'fr', level: 'A1', grammarFocus: 'Dizendo as Horas: Horas e Conceitos Básicos (Quelle heure est-il ?)' },
-  { id: 'fr-sup-conf-18', language: 'fr', level: 'A1', grammarFocus: 'Confusão: Bon VS Bien' },
-  { id: 'fr-a1-39', language: 'fr', level: 'A1', grammarFocus: 'Dizendo as Horas: Minutos e Frações (et quart, moins le quart, et demie)' },
-  { id: 'fr-sup-conf-19', language: 'fr', level: 'A1', grammarFocus: 'Confusão: Décrocher VS Raccrocher' },
-  { id: 'fr-a1-40', language: 'fr', level: 'A1', grammarFocus: 'Países e Nacionalidades Básicas' },
-  { id: 'fr-sup-conf-20', language: 'fr', level: 'A1', grammarFocus: 'Confusão: Sortir VS Partir VS Quitter VS Laisser' },
-  { id: 'fr-a1-41', language: 'fr', level: 'A1', grammarFocus: 'Preposições de lugar com cidades e países (à, en, au, aux)' },
-  { id: 'fr-sup-conf-21', language: 'fr', level: 'A1', grammarFocus: 'Confusão: Un lieu VS Un endroit VS Une place' },
-  { id: 'fr-a1-42', language: 'fr', level: 'A1', grammarFocus: 'O verbo Aller (ir)' },
-  { id: 'fr-sup-conf-22', language: 'fr', level: 'A1', grammarFocus: 'Confusão: Parce que VS Car' },
-  { id: 'fr-a1-43', language: 'fr', level: 'A1', grammarFocus: 'Contrações de Artigos com à (au, à la, à l\', aux)' },
-  { id: 'fr-sup-conf-23', language: 'fr', level: 'A1', grammarFocus: 'Confusão: Lequel VS Laquelle VS Lesquels VS Lesquelles' },
-  { id: 'fr-a1-44', language: 'fr', level: 'A1', grammarFocus: 'Contrações de Artigos com de (du, de la, de l\', des)' },
-  { id: 'fr-sup-conf-24', language: 'fr', level: 'A1', grammarFocus: 'Confusão: Nouveau VS Nouvel VS Nouvelle' },
-  { id: 'fr-a1-45', language: 'fr', level: 'A1', grammarFocus: 'O verbo Faire (fazer)' },
-  { id: 'fr-sup-conf-25', language: 'fr', level: 'A1', grammarFocus: 'Confusão: Si VS Tellement VS Tant' },
-  { id: 'fr-a1-46', language: 'fr', level: 'A1', grammarFocus: 'Expressões com Avoir (avoir faim, avoir soif, avoir chaud, avoir froid, etc.)' },
-  { id: 'fr-sup-conf-26', language: 'fr', level: 'A1', grammarFocus: 'Confusão: Tout VS Tous VS Toute VS Toutes' },
-  { id: 'fr-a1-47', language: 'fr', level: 'A1', grammarFocus: 'Futuro Próximo (Futur proche: aller + infinitivo)' },
-  { id: 'fr-sup-conf-27', language: 'fr', level: 'A1', grammarFocus: 'Confusão: Moi aussi VS Moi non plus VS Moi si VS Moi non' },
-  { id: 'fr-a1-48', language: 'fr', level: 'A1', grammarFocus: 'Passado Recente (Passé récent: venir de + infinitivo)' },
-  { id: 'fr-sup-conf-28', language: 'fr', level: 'A1', grammarFocus: 'Confusão: Sentir VS Se sentir VS Ressentir' },
-  { id: 'fr-a1-49', language: 'fr', level: 'A1', grammarFocus: 'Conectores Básicos (et, mais, ou, alors, donc, parce que)' },
-  { id: 'fr-sup-conf-29', language: 'fr', level: 'A1', grammarFocus: 'Confusão: En ce moment VS À ce moment-là' },
-  { id: 'fr-a1-50', language: 'fr', level: 'A1', grammarFocus: 'Membros da Família (les membres de la famille)' },
-  { id: 'fr-sup-conf-30', language: 'fr', level: 'A1', grammarFocus: 'Confusão: Grand VS Gros VS Gras' },
-  { id: 'fr-a1-51', language: 'fr', level: 'A1', grammarFocus: 'Clima e Estações (la météo et les saisons)' },
-  { id: 'fr-sup-conf-31', language: 'fr', level: 'A1', grammarFocus: 'Confusão: Déménager VS Emménager VS Aménager' },
-  { id: 'fr-a1-52', language: 'fr', level: 'A1', grammarFocus: 'Vocabulário de Comida — Refeições e Conceitos Básicos' },
-  { id: 'fr-sup-conf-32', language: 'fr', level: 'A1', grammarFocus: 'Confusão: Devoir VS Falloir' },
-  { id: 'fr-a1-53', language: 'fr', level: 'A1', grammarFocus: 'Vocabulário de Comida — Frutas e Vegetais' },
-  { id: 'fr-sup-conf-33', language: 'fr', level: 'A1', grammarFocus: 'Confusão: Ici VS Là VS Là-bas' },
-  { id: 'fr-a1-54', language: 'fr', level: 'A1', grammarFocus: 'Expressões de sobrevivência do dia a dia: S\'il vous plaît, Pardon, Je ne comprends pas, Pouvez-vous répéter ?, C\'est combien ?, Où sont les toilettes ?, Je voudrais..., Excusez-moi, Je suis désolé(e), Merci beaucoup' },
-  { id: 'fr-sup-conf-34', language: 'fr', level: 'A1', grammarFocus: 'Confusão: Apporter VS Emporter VS Amener VS Emmener' },
-
-  // ── A2: Elementary ──────────────────────────────────────────────────
-  { id: 'fr-a2-55', language: 'fr', level: 'A2', grammarFocus: 'Verbos regulares terminados em -ir no presente' },
-  { id: 'fr-sup-conf-35', language: 'fr', level: 'A2', grammarFocus: 'Confusão: Rentrer VS Revenir VS Retourner VS Rendre (se rendre)' },
-  { id: 'fr-a2-56', language: 'fr', level: 'A2', grammarFocus: 'Verbos regulares terminados em -re no presente' },
-  { id: 'fr-sup-conf-36', language: 'fr', level: 'A2', grammarFocus: 'Confusão: Souligner VS Surligner' },
-  { id: 'fr-a2-57', language: 'fr', level: 'A2', grammarFocus: 'Verbos irregulares principais: Vouloir (querer)' },
-  { id: 'fr-sup-conf-37', language: 'fr', level: 'A2', grammarFocus: 'Confusão: Tard VS En retard' },
-  { id: 'fr-a2-58', language: 'fr', level: 'A2', grammarFocus: 'Verbos irregulares principais: Pouvoir (poder / conseguir)' },
-  { id: 'fr-sup-conf-38', language: 'fr', level: 'A2', grammarFocus: 'Confusão: Savoir VS Connaître' },
-  { id: 'fr-a2-59', language: 'fr', level: 'A2', grammarFocus: 'Verbos irregulares principais: Devoir (ter que / dever)' },
-  { id: 'fr-sup-conf-39', language: 'fr', level: 'A2', grammarFocus: 'Confusão: Tu VS Vous (Tratamento informal vs. formal)' },
-  { id: 'fr-a2-60', language: 'fr', level: 'A2', grammarFocus: 'Expressando obrigação com il faut' },
-  { id: 'fr-sup-conf-40', language: 'fr', level: 'A2', grammarFocus: 'Confusão: On VS Nous' },
-  { id: 'fr-a2-61', language: 'fr', level: 'A2', grammarFocus: 'Artigos Partitivos (du, de la, de l\', des) — Introdução' },
-  { id: 'fr-sup-conf-41', language: 'fr', level: 'A2', grammarFocus: 'Confusão: Dans VS En (Preposições de lugar e tempo)' },
-  { id: 'fr-a2-62', language: 'fr', level: 'A2', grammarFocus: 'Artigos Partitivos na negativa (pas de)' },
-  { id: 'fr-sup-conf-42', language: 'fr', level: 'A2', grammarFocus: 'Confusão: De VS Du' },
-  { id: 'fr-a2-63', language: 'fr', level: 'A2', grammarFocus: 'Verbos Pronominais (Reflexivos) — Mecânica dos sujeitos e formação' },
-  { id: 'fr-sup-conf-43', language: 'fr', level: 'A2', grammarFocus: 'Confusão: Jouer à VS Jouer de' },
-  { id: 'fr-a2-64', language: 'fr', level: 'A2', grammarFocus: 'Vocabulário de Rotina Diária (usando verbos reflexivos)' },
-  { id: 'fr-sup-conf-44', language: 'fr', level: 'A2', grammarFocus: 'Confusão: Rester VS Se reposer' },
-  { id: 'fr-a2-65', language: 'fr', level: 'A2', grammarFocus: 'Pronomes Demonstrativos (ce, ça, ceci, cela)' },
-  { id: 'fr-sup-conf-45', language: 'fr', level: 'A2', grammarFocus: 'Confusão: Vite VS Rapide' },
-  { id: 'fr-a2-66', language: 'fr', level: 'A2', grammarFocus: 'Pronomes Tônicos (Pronoms toniques: moi, toi, lui, elle, nous, vous, eux, elles)' },
-  { id: 'fr-sup-conf-46', language: 'fr', level: 'A2', grammarFocus: 'Confusão: Très VS Trop' },
-  { id: 'fr-a2-67', language: 'fr', level: 'A2', grammarFocus: 'Pronomes de Objeto Direto (le, la, l\', les) — Conceito e uso com 1 verbo' },
-  { id: 'fr-sup-conf-47', language: 'fr', level: 'A2', grammarFocus: 'Confusão: An VS Année' },
-  { id: 'fr-a2-68', language: 'fr', level: 'A2', grammarFocus: 'Pronomes de Objeto Direto — Posição com infinitivos e negação' },
-  { id: 'fr-sup-conf-48', language: 'fr', level: 'A2', grammarFocus: 'Confusão: Prêter VS Emprunter' },
-  { id: 'fr-a2-69', language: 'fr', level: 'A2', grammarFocus: 'Pronomes de Objeto Indireto (lui, leur) — Conceito e uso com 1 verbo' },
-  { id: 'fr-sup-conf-49', language: 'fr', level: 'A2', grammarFocus: 'Confusão: Y VS En (Comparação de pronomes)' },
-  { id: 'fr-a2-70', language: 'fr', level: 'A2', grammarFocus: 'Pronomes de Objeto Indireto — Posição com infinitivos e negação' },
-  { id: 'fr-sup-conf-50', language: 'fr', level: 'A2', grammarFocus: 'Confusão: Merci de VS Merci pour' },
-  { id: 'fr-a2-71', language: 'fr', level: 'A2', grammarFocus: 'Pronomes Possessivos (le mien, le tien, le sien, le nôtre, le vôtre, le leur)' },
-  { id: 'fr-sup-conf-51', language: 'fr', level: 'A2', grammarFocus: 'Confusão: Avoir mal à VS Avoir du mal à / avec' },
-  { id: 'fr-a2-72', language: 'fr', level: 'A2', grammarFocus: 'Comparativo dos adjetivos (plus... que, moins... que, aussi... que)' },
-  { id: 'fr-sup-conf-52', language: 'fr', level: 'A2', grammarFocus: 'Confusão: Faire mal à VS Faire du mal' },
-  { id: 'fr-a2-73', language: 'fr', level: 'A2', grammarFocus: 'Superlativo dos adjetivos (le plus..., le moins...)' },
-  { id: 'fr-sup-conf-53', language: 'fr', level: 'A2', grammarFocus: 'Confusão: En plus VS De plus' },
-  { id: 'fr-a2-74', language: 'fr', level: 'A2', grammarFocus: 'Modo Imperativo — Verbos regulares (Tu, Nous, Vous)' },
-  { id: 'fr-sup-conf-54', language: 'fr', level: 'A2', grammarFocus: 'Confusão: Manger VS Cuisiner' },
-  { id: 'fr-a2-75', language: 'fr', level: 'A2', grammarFocus: 'Modo Imperativo — Comandos irregulares (Être, Avoir, Savoir, Vouloir)' },
-  { id: 'fr-sup-conf-55', language: 'fr', level: 'A2', grammarFocus: 'Confusão: Ailleurs VS D\'ailleurs' },
-  { id: 'fr-a2-76', language: 'fr', level: 'A2', grammarFocus: 'Advérbios de frequência (toujours, souvent, parfois, rarement, jamais, etc.)' },
-  { id: 'fr-sup-conf-56', language: 'fr', level: 'A2', grammarFocus: 'Confusão: Douter VS Se douter VS Sans doute VS S\'en douter' },
-  { id: 'fr-a2-77', language: 'fr', level: 'A2', grammarFocus: 'Formação de advérbios com terminação em -ment' },
-  { id: 'fr-sup-conf-57', language: 'fr', level: 'A2', grammarFocus: 'Confusão: C\'est VS Il est (Comparação estendida)' },
-  { id: 'fr-a2-78', language: 'fr', level: 'A2', grammarFocus: 'Advérbios irregulares (bien, mal, mieux)' },
-  { id: 'fr-sup-conf-58', language: 'fr', level: 'A2', grammarFocus: 'Confusão: Rappeler VS Se rappeler VS Se souvenir' },
-  { id: 'fr-a2-79', language: 'fr', level: 'A2', grammarFocus: 'Introdução ao Passé Composé (com avoir)' },
-  { id: 'fr-sup-homo-01', language: 'fr', level: 'A2', grammarFocus: 'Homófonos: accro — accroc' },
-  { id: 'fr-a2-80', language: 'fr', level: 'A2', grammarFocus: 'Passé Composé com verbos regulares' },
-  { id: 'fr-sup-homo-02', language: 'fr', level: 'A2', grammarFocus: 'Homófonos: amande — amende' },
-  { id: 'fr-a2-81', language: 'fr', level: 'A2', grammarFocus: 'Passé Composé com particípios passados irregulares' },
-  { id: 'fr-sup-homo-03', language: 'fr', level: 'A2', grammarFocus: 'Homófonos: autel — hôtel' },
-  { id: 'fr-a2-82', language: 'fr', level: 'A2', grammarFocus: 'Passé Composé com Être — Os 4 Principais (Aller, Venir, Arriver, Partir)' },
-  { id: 'fr-sup-homo-04', language: 'fr', level: 'A2', grammarFocus: 'Homófonos: auteur — hauteur' },
-  { id: 'fr-a2-83', language: 'fr', level: 'A2', grammarFocus: 'Passé Composé com Être — O Restante dos verbos "Vandertramp"' },
-  { id: 'fr-sup-homo-05', language: 'fr', level: 'A2', grammarFocus: 'Homófonos: avocat — avocat (homônimo)' },
-  { id: 'fr-a2-84', language: 'fr', level: 'A2', grammarFocus: 'Passé Composé com verbos reflexivos' },
-  { id: 'fr-sup-homo-06', language: 'fr', level: 'A2', grammarFocus: 'Homófonos: bar — barre' },
-  { id: 'fr-a2-85', language: 'fr', level: 'A2', grammarFocus: 'Negação estendida — Ne... jamais e Ne... plus' },
-  { id: 'fr-sup-homo-07', language: 'fr', level: 'A2', grammarFocus: 'Homófonos: celle — sel — selle' },
-  { id: 'fr-a2-86', language: 'fr', level: 'A2', grammarFocus: 'Negação estendida — Ne... rien e Ne... personne' },
-  { id: 'fr-sup-idiom-01', language: 'fr', level: 'A2', grammarFocus: 'Expressões Idiomáticas: Tomber dans les pommes (Desmaiar)' },
-  { id: 'fr-a2-87', language: 'fr', level: 'A2', grammarFocus: 'O pronome Y (Lugares e objetos com \'à\')' },
-  { id: 'fr-sup-idiom-02', language: 'fr', level: 'A2', grammarFocus: 'Expressões Idiomáticas: Connaître quelque chose comme sa poche (Conhecer algo como a palma da mão)' },
-  { id: 'fr-a2-88', language: 'fr', level: 'A2', grammarFocus: 'O pronome En (Quantidades e objetos com \'de\')' },
-  { id: 'fr-sup-idiom-03', language: 'fr', level: 'A2', grammarFocus: 'Expressões Idiomáticas: En faire tout un fromage (Fazer tempestade em copo d\'água)' },
-  { id: 'fr-a2-89', language: 'fr', level: 'A2', grammarFocus: 'Preposições de tempo (pendant, depuis, dans)' },
-  { id: 'fr-sup-idiom-04', language: 'fr', level: 'A2', grammarFocus: 'Expressões Idiomáticas: Avoir une faim de loup (Estar morto de fome)' },
-  { id: 'fr-a2-90', language: 'fr', level: 'A2', grammarFocus: 'Fazendo perguntas com Inversão — Tu/Vous' },
-  { id: 'fr-sup-idiom-05', language: 'fr', level: 'A2', grammarFocus: 'Expressões Idiomáticas: Faire la grasse matinée (Dormir até tarde)' },
-  { id: 'fr-a2-91', language: 'fr', level: 'A2', grammarFocus: 'Fazendo perguntas com Inversão — Il/Elle/Ils/Elles (adicionando -t-)' },
-  { id: 'fr-sup-idiom-06', language: 'fr', level: 'A2', grammarFocus: 'Expressões Idiomáticas: Chouette ! (Ótimo! / Incrível!)' },
-  { id: 'fr-a2-92', language: 'fr', level: 'A2', grammarFocus: 'Negação restritiva (ne... que)' },
-  { id: 'fr-sup-idiom-07', language: 'fr', level: 'A2', grammarFocus: 'Expressões Idiomáticas: Raconter des salades (Contar mentiras / Inventar histórias)' },
-  { id: 'fr-a2-93', language: 'fr', level: 'A2', grammarFocus: 'Respondendo com Si a uma pergunta negativa' },
-  { id: 'fr-sup-vocab-01', language: 'fr', level: 'A2', grammarFocus: 'Vocabulário: Les animaux de compagnie (Animais de estimação)' },
-  { id: 'fr-a2-94', language: 'fr', level: 'A2', grammarFocus: 'Distinguindo verbos: Connaître vs. Savoir' },
-  { id: 'fr-sup-vocab-02', language: 'fr', level: 'A2', grammarFocus: 'Vocabulário: Les animaux de la forêt (Animais da floresta)' },
-  { id: 'fr-a2-95', language: 'fr', level: 'A2', grammarFocus: 'Distinguindo verbos: Entendre vs. Écouter / Voir vs. Regarder' },
-  { id: 'fr-sup-vocab-03', language: 'fr', level: 'A2', grammarFocus: 'Vocabulário: Les animaux de la ferme (Animais da fazenda)' },
-  { id: 'fr-a2-96', language: 'fr', level: 'A2', grammarFocus: 'Formas plurais de substantivos terminados em -ou, -al, -eau, -x, -s, -z' },
-  { id: 'fr-sup-vocab-04', language: 'fr', level: 'A2', grammarFocus: 'Vocabulário: Les instruments de musique (Instrumentos musicais)' },
-  { id: 'fr-a2-97', language: 'fr', level: 'A2', grammarFocus: 'Adjetivo interrogativo Quel (quelle, quels, quelles)' },
-  { id: 'fr-sup-vocab-05', language: 'fr', level: 'A2', grammarFocus: 'Vocabulário: La cuisine (Itens de cozinha e vocabulário de culinária)' },
-  { id: 'fr-a2-98', language: 'fr', level: 'A2', grammarFocus: 'Números de 100 a 1.000.000.000' },
-  { id: 'fr-sup-vocab-06', language: 'fr', level: 'A2', grammarFocus: 'Vocabulário: La chambre (Vocabulário do quarto)' },
-  { id: 'fr-a2-99', language: 'fr', level: 'A2', grammarFocus: 'Números Ordinais (1er, 2ème, 3ème...)' },
-  { id: 'fr-sup-vocab-07', language: 'fr', level: 'A2', grammarFocus: 'Vocabulário: Le salon (Vocabulário da sala de estar)' },
-  { id: 'fr-a2-100', language: 'fr', level: 'A2', grammarFocus: 'Esportes e Hobbies (les sports et les loisirs)' },
-  { id: 'fr-sup-expr-01', language: 'fr', level: 'A2', grammarFocus: 'Expressões: 10 Expressões com Être: Expressões cotidianas que usam o verbo être além de ser/estar (Ex: Être en train de, Être à l\'heure, Être d\'accord, Être dans la lune...)' },
-  { id: 'fr-a2-101', language: 'fr', level: 'A2', grammarFocus: 'Roupas e Moda (les vêtements)' },
-  { id: 'fr-sup-expr-02', language: 'fr', level: 'A2', grammarFocus: 'Expressões: 10 Expressões com Avoir: Expressões idiomáticas com avoir que não expressam posse simples (Ex: Avoir faim, Avoir du mal à, Avoir l\'air, Avoir beau, Avoir lieu...)' },
-  { id: 'fr-a2-102', language: 'fr', level: 'A2', grammarFocus: 'Animais (les animaux)' },
-  { id: 'fr-sup-expr-03', language: 'fr', level: 'A2', grammarFocus: 'Expressões: 10 Expressões com Aller: Usos idiomáticos de aller para saúde, cumprimentos e intenção (Ex: Comment ça va ?, Allons-y !, Ça va pas ?, Aller de soi, Aller chercher...)' },
-  { id: 'fr-a2-103', language: 'fr', level: 'A2', grammarFocus: 'Empregos e Profissões (les métiers)' },
-  { id: 'fr-sup-expr-04', language: 'fr', level: 'A2', grammarFocus: 'Expressões: 10 Expressões com Prendre: Usos idiomáticos de prendre em situações cotidianas (Ex: Prendre le temps, Prendre une décision, Prendre froid, Prendre feu, Prendre quelqu\'un en faute...)' },
-  { id: 'fr-a2-104', language: 'fr', level: 'A2', grammarFocus: 'Meios de Transporte (les moyens de transport)' },
-  { id: 'fr-sup-expr-05', language: 'fr', level: 'A2', grammarFocus: 'Expressões: 10 Expressões com Faire: Expressões com faire que vão além do sentido literal de \'fazer\' (Ex: Faire la sieste, Faire le plein, Faire confiance, Faire la fête, Faire le point...)' },
-  { id: 'fr-a2-105', language: 'fr', level: 'A2', grammarFocus: 'Expressões de opinião e reação cotidiana: À mon avis, Je pense que, C\'est dommage, Tant mieux !, Ça m\'est égal, Il paraît que, J\'en ai marre, Ça dépend, Pas du tout, Sans blague !' },
-  { id: 'fr-sup-expr-06', language: 'fr', level: 'A2', grammarFocus: 'Expressões: 10 Expressões com Tomber: Frases idiomáticas com tomber para descrever situações e coincidências (Ex: Tomber amoureux, Tomber dans les pommes, Tomber à pic, Tomber malade, Tomber bien...)' },
-
-  // ── B1: Intermediate ─────────────────────────────────────────────────
-  { id: 'fr-b1-106', language: 'fr', level: 'B1', grammarFocus: 'Introdução ao Imparfait (Pretérito Imperfeito)' },
-  { id: 'fr-sup-expr-07', language: 'fr', level: 'B1', grammarFocus: 'Expressões: 10 Expressões com Mettre: Usos de mettre em expressões cotidianas e profissionais (Ex: Mettre fin à, Mettre en place, Mettre les pieds dans le plat, Mettre au courant, Mettre de l\'ordre...)' },
-  { id: 'fr-b1-107', language: 'fr', level: 'B1', grammarFocus: 'Imparfait para descrições e hábitos no passado' },
-  { id: 'fr-sup-expr-08', language: 'fr', level: 'B1', grammarFocus: 'Expressões: 10 Expressões com Y: O pronome Y em expressões idiomáticas fixas do francês falado (Ex: Il y a, Il n\'y a pas de quoi, Ça y est !, Je n\'y suis pour rien, Il faut s\'y faire...)' },
-  { id: 'fr-b1-108', language: 'fr', level: 'B1', grammarFocus: 'Imparfait vs. Passé Composé — Conceitos e gatilhos (soudain vs d\'habitude)' },
-  { id: 'fr-sup-expr-09', language: 'fr', level: 'B1', grammarFocus: 'Expressões: 10 Expressões com En: O pronome En em expressões fixas e situações reais de uso (Ex: En avoir marre, En vouloir à quelqu\'un, S\'en aller, En profiter, En avoir plein le dos...)' },
-  { id: 'fr-b1-109', language: 'fr', level: 'B1', grammarFocus: 'Imparfait vs. Passé Composé — Estrutura narrativa (Plano de Fundo vs Interrupção)' },
-  { id: 'fr-sup-expr-10', language: 'fr', level: 'B1', grammarFocus: 'Expressões: 10 Expressões sobre Comida (la nourriture): Expressões idiomáticas e ditos populares que usam vocabulário gastronômico (Ex: Avoir d\'autres chats à fouetter, Mettre de l\'eau dans son vin, Garder la pêche, Se noyer dans un verre d\'eau...)' },
-  { id: 'fr-b1-110', language: 'fr', level: 'B1', grammarFocus: 'Pronome Relativo Qui (Sujeito)' },
-  { id: 'fr-sup-expr-11', language: 'fr', level: 'B1', grammarFocus: 'Expressões: 10 Expressões sobre Bebidas (les boissons): Metafóricas usando bebidas e o contexto do café e bistrô franceses (Ex: Un café allongé, Prendre un verre, Être soif de, Mettre de l\'eau dans son vin...)' },
-  { id: 'fr-b1-111', language: 'fr', level: 'B1', grammarFocus: 'Pronome Relativo Que/Qu\' (Objeto)' },
-  { id: 'fr-sup-expr-12', language: 'fr', level: 'B1', grammarFocus: 'Expressões: 10 Expressões sobre Amor (l\'amour): Expressões e clichês românticos típicos do francês (Ex: Avoir le coup de foudre, Filer le parfait amour, Être aux anges, Ne faire qu\'un...)' },
-  { id: 'fr-b1-112', language: 'fr', level: 'B1', grammarFocus: 'Pronome Relativo Où (Lugar/Tempo)' },
-  { id: 'fr-sup-expr-13', language: 'fr', level: 'B1', grammarFocus: 'Expressões: 10 Expressões sobre O Tempo (la météo): Metafóricas inspiradas em fenômenos meteorológicos (Ex: Avoir le soleil dans la peau, Pleuvoir des cordes, Faire grise mine, Être dans les nuages...)' },
-  { id: 'fr-b1-113', language: 'fr', level: 'B1', grammarFocus: 'Pronome Relativo Dont — Posse (cujo)' },
-  { id: 'fr-sup-expr-14', language: 'fr', level: 'B1', grammarFocus: 'Expressões: 10 Expressões sobre Dinheiro (l\'argent): Gemas do francês sobre finanças pessoais e gastos (Ex: Jeter l\'argent par les fenêtres, Avoir les yeux plus grands que le ventre, Couter les yeux de la tête...)' },
-  { id: 'fr-b1-114', language: 'fr', level: 'B1', grammarFocus: 'Pronome Relativo Dont — Verbos que exigem \'de\' (parler de, avoir besoin de)' },
-  { id: 'fr-sup-expr-15', language: 'fr', level: 'B1', grammarFocus: 'Expressões: 10 Expressões sobre Trabalho (le travail): Idioms usados em contexto profissional e corporativo (Ex: Mettre les bouchées doubles, Ne pas chômer, Avoir du pain sur la planche, Travailler d\'arrache-pied...)' },
-  { id: 'fr-b1-115', language: 'fr', level: 'B1', grammarFocus: 'Futuro Simples (Futur simple) — Verbos regulares' },
-  { id: 'fr-sup-expr-16', language: 'fr', level: 'B1', grammarFocus: 'Expressões: 10 Expressões sobre O Tempo (le temps): Idioms e frases sobre tempo, prazo e rotinas (Ex: Avoir le temps, De temps en temps, Tôt ou tard, Il était temps !, Prendre son temps...)' },
-  { id: 'fr-b1-116', language: 'fr', level: 'B1', grammarFocus: 'Futuro Simples — Radicais irregulares' },
-  { id: 'fr-sup-expr-17', language: 'fr', level: 'B1', grammarFocus: 'Expressões: 10 Expressões sobre Sono (le sommeil): Expressões sobre descanso, cansaço e vigilância (Ex: Avoir le sommeil léger, Dormir à poings fermés, Faire la grasse matinée, Tomber de sommeil...)' },
-  { id: 'fr-b1-117', language: 'fr', level: 'B1', grammarFocus: 'Orações temporais com Quand / Lorsque + Futuro' },
-  { id: 'fr-sup-expr-18', language: 'fr', level: 'B1', grammarFocus: 'Expressões: 10 Expressões sobre Saúde (la santé): Idioms relacionados ao bem-estar e doenças (Ex: Avoir la santé, Péter la forme, Avoir le coeur au bord des lèvres, Être dans son assiette...)' },
-  { id: 'fr-b1-118', language: 'fr', level: 'B1', grammarFocus: 'Modo Condicional (Conditionnel présent) — Pedidos educados' },
-  { id: 'fr-sup-expr-19', language: 'fr', level: 'B1', grammarFocus: 'Expressões: 10 Expressões sobre Partes do Corpo (le corps): Idioms que usam partes do corpo para criar significados figurados (Ex: Avoir la tête sur les épaules, Donner un coup de main, Couter la peau des fesses...)' },
-  { id: 'fr-b1-119', language: 'fr', level: 'B1', grammarFocus: '1ª Condicional (Si + Presente = Futuro)' },
-  { id: 'fr-sup-expr-20', language: 'fr', level: 'B1', grammarFocus: 'Expressões: 10 Expressões sobre Cores (les couleurs): Idioms francêses com uso metafórico de cores (Ex: Voir la vie en rose, Être vert de jalousie, Avoir carte blanche, Rire jaune...)' },
-  { id: 'fr-b1-120', language: 'fr', level: 'B1', grammarFocus: '2ª Condicional (Si + Imperfeito = Condicional)' },
-  { id: 'fr-sup-expr-21', language: 'fr', level: 'B1', grammarFocus: 'Expressões: 10 Expressões sobre Animais (les animaux): Provérbios e expressões idiomáticas com animais em francês (Ex: Avoir le cafard, Poser un lapin, Donner sa langue au chat, Être comme un poisson dans l\'eau...)' },
-  { id: 'fr-b1-121', language: 'fr', level: 'B1', grammarFocus: 'Posição dos pronomes em frases negativas' },
-  { id: 'fr-sup-prompt-01', language: 'fr', level: 'B1', grammarFocus: 'Sugestão de Escrita: Décrivez un endroit paisible où vous aimez vous détendre.' },
-  { id: 'fr-b1-122', language: 'fr', level: 'B1', grammarFocus: 'Pronomes de Objeto Duplo — Ordem de me/te/se/nous/vous vs le/la/les' },
-  { id: 'fr-sup-prompt-02', language: 'fr', level: 'B1', grammarFocus: 'Sugestão de Escrita: Quels sont les avantages et les inconvénients des réseaux sociaux ?' },
-  { id: 'fr-b1-123', language: 'fr', level: 'B1', grammarFocus: 'Pronomes de Objeto Duplo — Ordem de le/la/les vs lui/leur (+ y/en)' },
-  { id: 'fr-sup-prompt-03', language: 'fr', level: 'B1', grammarFocus: 'Sugestão de Escrita: Imaginez que vous puissiez voyager dans le temps. Où iriez-vous et pourquoi ?' },
-  { id: 'fr-b1-124', language: 'fr', level: 'B1', grammarFocus: 'Concordância do particípio passado — Com Objetos Diretos anteriores (Avoir)' },
-  { id: 'fr-sup-prompt-04', language: 'fr', level: 'B1', grammarFocus: 'Sugestão de Escrita: Comment voyez-vous votre vie dans dix ans ?' },
-  { id: 'fr-b1-125', language: 'fr', level: 'B1', grammarFocus: 'Concordância do particípio passado — Com pronomes relativos Que' },
-  { id: 'fr-sup-prompt-05', language: 'fr', level: 'B1', grammarFocus: 'Sugestão de Escrita: Racontez une expérience où vous avez dû surmonter un défi important.' },
-  { id: 'fr-b1-126', language: 'fr', level: 'B1', grammarFocus: 'Partitivos avançados (de l\', generalizações vs. quantidades)' },
-  { id: 'fr-sup-prompt-06', language: 'fr', level: 'B1', grammarFocus: 'Sugestão de Escrita: Décrivez votre meilleur(e) ami(e) et les moments spéciaux que vous avez partagés.' },
-  { id: 'fr-b1-127', language: 'fr', level: 'B1', grammarFocus: 'Adjetivos Indefinidos (chaque, certain, plusieurs, quelque)' },
-  { id: 'fr-sup-prompt-07', language: 'fr', level: 'B1', grammarFocus: 'Sugestão de Escrita: Racontez une expérience où vous avez appris une leçon importante.' },
-  { id: 'fr-b1-128', language: 'fr', level: 'B1', grammarFocus: 'Adjetivos que mudam de significado antes/depois do substantivo (ancien, propre, même, dernier)' },
-  { id: 'fr-b1-129', language: 'fr', level: 'B1', grammarFocus: 'Concordância de cores compostas (bleu clair, vert foncé)' },
-  { id: 'fr-b1-130', language: 'fr', level: 'B1', grammarFocus: 'Pronomes Demonstrativos (celui, celle, ceux, celles)' },
-  { id: 'fr-b1-131', language: 'fr', level: 'B1', grammarFocus: 'O Gerúndio (en + participe présent) — Formação e "fazendo algo"' },
-  { id: 'fr-b1-132', language: 'fr', level: 'B1', grammarFocus: 'O Gerúndio — Ações simultâneas (Tout en faisant)' },
-  { id: 'fr-b1-133', language: 'fr', level: 'B1', grammarFocus: 'Estruturas com infinitivo (avant de, au lieu de, sans + infinitivo)' },
-  { id: 'fr-b1-134', language: 'fr', level: 'B1', grammarFocus: 'Pronomes relativos compostos (lequel, laquelle, lesquels, lesquelles)' },
-  { id: 'fr-b1-135', language: 'fr', level: 'B1', grammarFocus: 'Voz Passiva — Formação no Presente e Passado' },
-  { id: 'fr-b1-136', language: 'fr', level: 'B1', grammarFocus: 'Voz Passiva — Quando usar Par vs De' },
-  { id: 'fr-b1-137', language: 'fr', level: 'B1', grammarFocus: 'Conjunções coordenativas (mais, ou, et, donc, or, ni, car)' },
-  { id: 'fr-b1-138', language: 'fr', level: 'B1', grammarFocus: 'Conjunções subordinativas (parce que, quand, si, comme, puisque...)' },
-  { id: 'fr-b1-139', language: 'fr', level: 'B1', grammarFocus: 'Conjunções temporais (dès que, aussitôt que, avant que, après que, jusqu\'à ce que)' },
-  { id: 'fr-b1-140', language: 'fr', level: 'B1', grammarFocus: 'Discurso Indireto no presente (Il dit que...)' },
-  { id: 'fr-b1-141', language: 'fr', level: 'B1', grammarFocus: 'Preposições compostas (à cause de, grâce à, au lieu de, à côté de, en face de)' },
-  { id: 'fr-b1-142', language: 'fr', level: 'B1', grammarFocus: 'Preposições com verbos — Verbos seguidos de À (hésiter à, réussir à)' },
-  { id: 'fr-b1-143', language: 'fr', level: 'B1', grammarFocus: 'Preposições com verbos — Verbos seguidos de De (essayer de, arrêter de)' },
-  { id: 'fr-b1-144', language: 'fr', level: 'B1', grammarFocus: 'Pronomes Indefinidos (quelqu\'un, quelque chose, personne, rien, tout, chacun)' },
-  { id: 'fr-b1-145', language: 'fr', level: 'B1', grammarFocus: 'Verbos Impessoais (falloir, pleuvoir, neiger, valoir, s\'agir de, etc.)' },
-  { id: 'fr-b1-146', language: 'fr', level: 'B1', grammarFocus: 'Uso de Tout (tout, toute, tous, toutes) como adjetivo, pronome e advérbio' },
-  { id: 'fr-b1-147', language: 'fr', level: 'B1', grammarFocus: 'Pronomes Enfáticos com Même (moi-même, toi-même, lui-même, etc.)' },
-  { id: 'fr-b1-148', language: 'fr', level: 'B1', grammarFocus: 'Nominalização (Transformando verbos/adjetivos em substantivos)' },
-  { id: 'fr-b1-149', language: 'fr', level: 'B1', grammarFocus: 'Falsos Cognatos (les faux amis)' },
-  { id: 'fr-b1-150', language: 'fr', level: 'B1', grammarFocus: 'Orações Independentes, Principais e Subordinadas — Estrutura de Sentença' },
-  { id: 'fr-b1-151', language: 'fr', level: 'B1', grammarFocus: 'Expressões idiomáticas intermediárias do francês quotidiano: Avoir le cafard, Prendre son temps, Mettre les points sur les i, Ça saute aux yeux, S\'en sortir, Faire la tête, Avoir du mal à, Tomber à pic, Mettre de l\'eau dans son vin, En avoir assez' },
-
-  // ── B2: Upper-Intermediate ──────────────────────────────────────────
-  { id: 'fr-b2-152', language: 'fr', level: 'B2', grammarFocus: 'O Modo Subjuntivo (Subjonctif présent) — Verbos regulares (formação a partir de ILS)' },
-  { id: 'fr-b2-153', language: 'fr', level: 'B2', grammarFocus: 'O Modo Subjuntivo — Verbos irregulares (Être, Avoir, Faire, Aller, Pouvoir, Savoir, Vouloir)' },
-  { id: 'fr-b2-154', language: 'fr', level: 'B2', grammarFocus: 'Subjuntivo para necessidade e obrigação (Il faut que...)' },
-  { id: 'fr-b2-155', language: 'fr', level: 'B2', grammarFocus: 'Subjuntivo para desejos, vontades e reações emocionais' },
-  { id: 'fr-b2-156', language: 'fr', level: 'B2', grammarFocus: 'Subjuntivo para dúvida e incerteza' },
-  { id: 'fr-b2-157', language: 'fr', level: 'B2', grammarFocus: 'Orações subordinadas com o subjuntivo (Concessivas: bien que, quoique)' },
-  { id: 'fr-b2-158', language: 'fr', level: 'B2', grammarFocus: 'Orações subordinadas com o subjuntivo (Finalidade: pour que, afin que)' },
-  { id: 'fr-b2-159', language: 'fr', level: 'B2', grammarFocus: 'Conjunções negativas (sans que, à moins que)' },
-  { id: 'fr-b2-160', language: 'fr', level: 'B2', grammarFocus: 'Verbos de opinião: Indicativo vs. Subjuntivo (croire que, penser que)' },
-  { id: 'fr-b2-161', language: 'fr', level: 'B2', grammarFocus: 'Pretérito Mais-Que-Perfeito (Plus-que-parfait)' },
-  { id: 'fr-b2-162', language: 'fr', level: 'B2', grammarFocus: 'Condicional Passado (Conditionnel passé) — Formação e arrependimentos' },
-  { id: 'fr-b2-163', language: 'fr', level: 'B2', grammarFocus: '3ª Condicional (Si + Mais-Que-Perfeito = Condicional Passado)' },
-  { id: 'fr-b2-164', language: 'fr', level: 'B2', grammarFocus: 'Futuro Perfeito (Futur antérieur)' },
-  { id: 'fr-b2-165', language: 'fr', level: 'B2', grammarFocus: 'Discurso Indireto no passado — Presente para Imparfait / Futuro para Condicional' },
-  { id: 'fr-b2-166', language: 'fr', level: 'B2', grammarFocus: 'Discurso Indireto no passado — Passé Composé para Plus-que-parfait' },
-  { id: 'fr-b2-167', language: 'fr', level: 'B2', grammarFocus: 'Construções Causativas (faire + infinitivo)' },
-  { id: 'fr-b2-168', language: 'fr', level: 'B2', grammarFocus: 'Causativa Avançada: se faire + infinitivo' },
-  { id: 'fr-b2-169', language: 'fr', level: 'B2', grammarFocus: 'Causativa Avançada: se laisser + infinitivo' },
-  { id: 'fr-b2-170', language: 'fr', level: 'B2', grammarFocus: 'Ordem dupla dos pronomes no imperativo — Comandos afirmativos' },
-  { id: 'fr-b2-171', language: 'fr', level: 'B2', grammarFocus: 'Ordem dupla dos pronomes no imperativo — Comandos negativos' },
-  { id: 'fr-b2-172', language: 'fr', level: 'B2', grammarFocus: 'Expressões avançadas de necessidade (avoir besoin de vs. falloir)' },
-  { id: 'fr-b2-173', language: 'fr', level: 'B2', grammarFocus: 'Infinitivo Passado (après avoir/être + particípio passado)' },
-  { id: 'fr-b2-174', language: 'fr', level: 'B2', grammarFocus: 'O "ne" Pleonástico (ne explétif)' },
-  { id: 'fr-b2-175', language: 'fr', level: 'B2', grammarFocus: 'Verbos de opinião: Indicativo vs. Subjuntivo (revisão e extensão)' },
-  { id: 'fr-b2-176', language: 'fr', level: 'B2', grammarFocus: 'Pronome Relativo Auquel (contração de à + lequel)' },
-  { id: 'fr-b2-177', language: 'fr', level: 'B2', grammarFocus: 'Pronome Relativo Duquel (contração de de + lequel)' },
-  { id: 'fr-b2-178', language: 'fr', level: 'B2', grammarFocus: 'Prefixos — Formação de palavras e significados' },
-  { id: 'fr-b2-179', language: 'fr', level: 'B2', grammarFocus: 'Sufixos — Formação de palavras e significados' },
-  { id: 'fr-b2-180', language: 'fr', level: 'B2', grammarFocus: 'Plurais Irregulares (revisão abrangente)' },
-  { id: 'fr-b2-181', language: 'fr', level: 'B2', grammarFocus: 'Marcadores Discursivos — Adição e estruturação (tout d\'abord, en outre)' },
-  { id: 'fr-b2-182', language: 'fr', level: 'B2', grammarFocus: 'Marcadores Discursivos — Concessão e oposição (néanmoins, en revanche)' },
-  { id: 'fr-b2-183', language: 'fr', level: 'B2', grammarFocus: 'C\'est VS Il est — Usos e diferenças' },
-  { id: 'fr-b2-184', language: 'fr', level: 'B2', grammarFocus: 'On VS L\'on — Variação estilística' },
-  { id: 'fr-b2-185', language: 'fr', level: 'B2', grammarFocus: 'Verbos com S\'en (s\'en aller, s\'en sortir, s\'en vouloir, s\'en prendre à, etc.)' },
-  { id: 'fr-b2-186', language: 'fr', level: 'B2', grammarFocus: 'Pontuação em Francês (guillemets, tirets, points de suspension, deux-points, etc.)' },
-  { id: 'fr-b2-187', language: 'fr', level: 'B2', grammarFocus: 'Superlativos Complexos' },
-  { id: 'fr-b2-188', language: 'fr', level: 'B2', grammarFocus: 'O Passado Simples (Passé simple) Literário — Reconhecimento Parte 1 (Regulares)' },
-  { id: 'fr-b2-189', language: 'fr', level: 'B2', grammarFocus: 'O Passado Simples (Passé simple) Literário — Reconhecimento Parte 2 (Irregulares)' },
-  { id: 'fr-b2-190', language: 'fr', level: 'B2', grammarFocus: 'Particípio presente vs. Adjetivo verbal' },
-  { id: 'fr-b2-191', language: 'fr', level: 'B2', grammarFocus: 'Pronomes Demonstrativos Indefinidos (ceci, cela, ça, ce, ceux-ci, ceux-là) — Uso avançado' },
-  { id: 'fr-b2-192', language: 'fr', level: 'B2', grammarFocus: 'Números, frações e unidades de medida' },
-  { id: 'fr-b2-193', language: 'fr', level: 'B2', grammarFocus: 'Revisão de todos os Pronomes Relativos (qui, que, où, dont, lequel, auquel, duquel, ce qui, ce que, ce dont)' },
-  { id: 'fr-b2-194', language: 'fr', level: 'B2', grammarFocus: 'Revisão de todos os Artigos (Definidos, Indefinidos, Partitivos — Comparação completa)' },
-  { id: 'fr-b2-195', language: 'fr', level: 'B2', grammarFocus: 'Expressões idiomáticas de registro elevado e expressividade: Il ne faut pas pousser mémé dans les orties, Avoir le beurre et l\'argent du beurre, Pédaler dans la choucroute, Avoir d\'autres chats à fouetter, Noyer le poisson, Casser les pieds, Prendre la tangente, Faire l\'impasse sur, Faire chou blanc, Jeter de la poudre aux yeux' },
-
-  // ── C1: Advanced ────────────────────────────────────────────────────
-  { id: 'fr-c1-196', language: 'fr', level: 'C1', grammarFocus: 'Inversão estilística para perguntas e ênfase' },
-  { id: 'fr-c1-197', language: 'fr', level: 'C1', grammarFocus: 'Orações clivadas para destaque — C\'est... qui/que' },
-  { id: 'fr-c1-198', language: 'fr', level: 'C1', grammarFocus: 'Orações clivadas para destaque — Ce qui / Ce que / Ce dont' },
-  { id: 'fr-c1-199', language: 'fr', level: 'C1', grammarFocus: 'Entonação vs. inversão em fala formal' },
-  { id: 'fr-c1-200', language: 'fr', level: 'C1', grammarFocus: 'Construções causais avançadas (parce que, puisque, vu que, étant donné que, du fait que)' },
-  { id: 'fr-c1-201', language: 'fr', level: 'C1', grammarFocus: 'Estruturas concessivas avançadas (malgré, en dépit de, encore que, quitte à, avoir beau)' },
-  { id: 'fr-c1-202', language: 'fr', level: 'C1', grammarFocus: 'Preposições estilísticas e formações adverbiais elaboradas' },
-  { id: 'fr-c1-203', language: 'fr', level: 'C1', grammarFocus: 'O Subjuntivo Passado (Subjonctif passé)' },
-  { id: 'fr-c1-204', language: 'fr', level: 'C1', grammarFocus: 'Usos avançados do subjuntivo com ne explétif' },
-  { id: 'fr-c1-205', language: 'fr', level: 'C1', grammarFocus: 'O Passado Anterior (Passé antérieur) — Reconhecimento' },
-  { id: 'fr-c1-206', language: 'fr', level: 'C1', grammarFocus: 'Formas verbais arcaicas encontradas na literatura' },
-  { id: 'fr-c1-207', language: 'fr', level: 'C1', grammarFocus: 'Nuances nas escolhas estruturais (ex: omissão de artigo)' },
-  { id: 'fr-c1-208', language: 'fr', level: 'C1', grammarFocus: 'Marcadores Discursivos Avançados para argumentação e debate' },
-  { id: 'fr-c1-209', language: 'fr', level: 'C1', grammarFocus: 'Apócope e Truncamento no francês falado (le ciné, la fac, un frigo, la météo...)' },
-  { id: 'fr-c1-210', language: 'fr', level: 'C1', grammarFocus: 'Verbos Pronominais — Usos avançados (recíprocos, passivos, idiomáticos)' },
-  { id: 'fr-c1-211', language: 'fr', level: 'C1', grammarFocus: 'Contrastes rígidos de registro: Negação e perguntas (ne... pas vs. pas, inversão vs. est-ce que)' },
-  { id: 'fr-c1-212', language: 'fr', level: 'C1', grammarFocus: 'Expressões avançadas de causa, consequência e oposição' },
-  { id: 'fr-c1-213', language: 'fr', level: 'C1', grammarFocus: 'Expressões sofisticadas de argumentação e posicionamento: Toutes choses égales par ailleurs, Dans une certaine mesure, Il convient de souligner que, Force est de constater que, Quoi qu\'il en soit, À cet égard, En tout état de cause, Il va de soi que, Dans la mesure du possible, Nonobstant' },
-
-  // ── C2: Mastery ─────────────────────────────────────────────────────
-  { id: 'fr-c2-214', language: 'fr', level: 'C2', grammarFocus: 'Subjuntivo Imperfeito (Imparfait du subjonctif) — Reconhecimento' },
-  { id: 'fr-c2-215', language: 'fr', level: 'C2', grammarFocus: 'Subjuntivo Mais-Que-Perfeito (Plus-que-parfait du subjonctif)' },
-  { id: 'fr-c2-216', language: 'fr', level: 'C2', grammarFocus: 'Mais-Que-Perfeito Literário / Segunda forma do condicional passado (Seconde forme du conditionnel passé)' },
-  { id: 'fr-c2-217', language: 'fr', level: 'C2', grammarFocus: 'Diferenças de registro: Escrita formal (soutenu) vs. Fala padrão (courant)' },
-  { id: 'fr-c2-218', language: 'fr', level: 'C2', grammarFocus: 'Diferenças de registro: Informal (familier) e Gíria (argot / verlan)' },
-  { id: 'fr-c2-219', language: 'fr', level: 'C2', grammarFocus: 'Formas literárias de negação' },
-  { id: 'fr-c2-220', language: 'fr', level: 'C2', grammarFocus: 'Reescritas estruturais complexas para aprimoramento estilístico' },
-  { id: 'fr-c2-221', language: 'fr', level: 'C2', grammarFocus: 'A Arte da Argumentação — Conectando ideias no nível C2' },
-  { id: 'fr-c2-222', language: 'fr', level: 'C2', grammarFocus: 'Elipse e Redução Sintática no francês literário' },
-  { id: 'fr-c2-223', language: 'fr', level: 'C2', grammarFocus: 'Escolhas estilísticas na estrutura de frases (ativa vs. passiva, nominalização, inversão)' },
-  { id: 'fr-c2-224', language: 'fr', level: 'C2', grammarFocus: 'La Mise en Relief — Deslocamento estilístico avançado e ênfase' },
-  { id: 'fr-c2-225', language: 'fr', level: 'C2', grammarFocus: 'Decodificando textos autênticos e complexos (literários, jornalísticos, legais)' },
-  { id: 'fr-c2-226', language: 'fr', level: 'C2', grammarFocus: 'Mistura avançada de registros — Quando e como mudar de registro' },
-  { id: 'fr-c2-227', language: 'fr', level: 'C2', grammarFocus: 'Domínio de estruturas idiomáticas do Francês' },
-  { id: 'fr-c2-228', language: 'fr', level: 'C2', grammarFocus: 'Revisão Geral de Todos os Sistemas Gramaticais' },
-  { id: 'fr-c2-229', language: 'fr', level: 'C2', grammarFocus: 'Expressões literárias e de alta eloquência em francês: Il sied de, À l\'instar de, Nonobstant les difficultés, Il appert que, Moyennant quoi, Si tant est que, Quand bien même, À tout le moins, En dépit du bon sens, Mutatis mutandis' },
+  {
+    "id": "fr-a1-001",
+    "language": "fr",
+    "level": "A1",
+    "tag": "DIAL",
+    "uiTitle": "Chegando no Aeroporto",
+    "grammarFocus": "5 Maneiras de Dizer Bonjour",
+    "theme": "Tema 1: A Bordo do Avião e Aeroporto"
+  },
+  {
+    "id": "fr-a1-002",
+    "language": "fr",
+    "level": "A1",
+    "tag": "GRAM",
+    "uiTitle": "Lendo as Placas de Voo",
+    "grammarFocus": "Pronomes Sujeitos (Singular)",
+    "theme": "Tema 1: A Bordo do Avião e Aeroporto"
+  },
+  {
+    "id": "fr-a1-003",
+    "language": "fr",
+    "level": "A1",
+    "tag": "DIAL",
+    "uiTitle": "Despachando a Bagagem",
+    "grammarFocus": "5 Maneiras de Dizer Merci",
+    "theme": "Tema 1: A Bordo do Avião e Aeroporto"
+  },
+  {
+    "id": "fr-a1-004",
+    "language": "fr",
+    "level": "A1",
+    "tag": "DIAL",
+    "uiTitle": "A Sala de Embarque",
+    "grammarFocus": "5 Maneiras de Dizer De Rien",
+    "theme": "Tema 1: A Bordo do Avião e Aeroporto"
+  },
+  {
+    "id": "fr-a1-005",
+    "language": "fr",
+    "level": "A1",
+    "tag": "PRON",
+    "uiTitle": "O Portão Correto",
+    "grammarFocus": "Combinações de Vogais: AI, EI, OU",
+    "theme": "Tema 1: A Bordo do Avião e Aeroporto"
+  },
+  {
+    "id": "fr-a1-006",
+    "language": "fr",
+    "level": "A1",
+    "tag": "DIAL",
+    "uiTitle": "A Caminho da Aeronave",
+    "grammarFocus": "5 Maneiras de Dizer Comment ça va",
+    "theme": "Tema 1: A Bordo do Avião e Aeroporto"
+  },
+  {
+    "id": "fr-a1-007",
+    "language": "fr",
+    "level": "A1",
+    "tag": "PRON",
+    "uiTitle": "Entrada e Recepção",
+    "grammarFocus": "Combinações de Vogais: AU, EAU",
+    "theme": "Tema 1: A Bordo do Avião e Aeroporto"
+  },
+  {
+    "id": "fr-a1-008",
+    "language": "fr",
+    "level": "A1",
+    "tag": "DIAL",
+    "uiTitle": "Cumprimentando os Comissários",
+    "grammarFocus": "5 Maneiras de Dizer Ça va bem",
+    "theme": "Tema 1: A Bordo do Avião e Aeroporto"
+  },
+  {
+    "id": "fr-a1-009",
+    "language": "fr",
+    "level": "A1",
+    "tag": "PRON",
+    "uiTitle": "Guardando a Bagagem de Mão",
+    "grammarFocus": "Sons Nasais: AN, EN, IN",
+    "theme": "Tema 1: A Bordo do Avião e Aeroporto"
+  },
+  {
+    "id": "fr-a1-010",
+    "language": "fr",
+    "level": "A1",
+    "tag": "DIAL",
+    "uiTitle": "Avisos do Capitão no Rádio",
+    "grammarFocus": "5 Maneiras de Dizer Au revoir",
+    "theme": "Tema 1: A Bordo do Avião e Aeroporto"
+  },
+  {
+    "id": "fr-a1-011",
+    "language": "fr",
+    "level": "A1",
+    "tag": "PRON",
+    "uiTitle": "Pousando em Paris",
+    "grammarFocus": "Sons Nasais: ON, UN",
+    "theme": "Tema 1: A Bordo do Avião e Aeroporto"
+  },
+  {
+    "id": "fr-a1-012",
+    "language": "fr",
+    "level": "A1",
+    "tag": "PRON",
+    "uiTitle": "Saindo da Aeronave",
+    "grammarFocus": "Letras Mudas e Liaison",
+    "theme": "Tema 1: A Bordo do Avião e Aeroporto"
+  },
+  {
+    "id": "fr-a1-013",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VERB",
+    "uiTitle": "O Sagüão de Desembarque",
+    "grammarFocus": "Conjugação: Être (ser/estar) — Presente",
+    "theme": "Tema 2: Rumo ao Hostel"
+  },
+  {
+    "id": "fr-a1-014",
+    "language": "fr",
+    "level": "A1",
+    "tag": "GRAM",
+    "uiTitle": "Puxando as Malas",
+    "grammarFocus": "Pronomes Sujeitos (Plural)",
+    "theme": "Tema 2: Rumo ao Hostel"
+  },
+  {
+    "id": "fr-a1-015",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VOC",
+    "uiTitle": "Achando a Saída",
+    "grammarFocus": "Números de 0 a 10",
+    "theme": "Tema 2: Rumo ao Hostel"
+  },
+  {
+    "id": "fr-a1-016",
+    "language": "fr",
+    "level": "A1",
+    "tag": "MISS",
+    "uiTitle": "Na Fila do Táxi",
+    "grammarFocus": "Prática: Quem sou eu e o que faço?",
+    "theme": "Tema 2: Rumo ao Hostel"
+  },
+  {
+    "id": "fr-a1-017",
+    "language": "fr",
+    "level": "A1",
+    "tag": "DIAL",
+    "uiTitle": "Conversando com o Motorista",
+    "grammarFocus": "Est-ce que e Entonação",
+    "theme": "Tema 2: Rumo ao Hostel"
+  },
+  {
+    "id": "fr-a1-018",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VERB",
+    "uiTitle": "Dando a Direção do Bairro",
+    "grammarFocus": "Conjugação: Avoir (ter) — Presente",
+    "theme": "Tema 2: Rumo ao Hostel"
+  },
+  {
+    "id": "fr-a1-019",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VOC",
+    "uiTitle": "Cortando as Avenidas",
+    "grammarFocus": "Números de 11 a 20",
+    "theme": "Tema 2: Rumo ao Hostel"
+  },
+  {
+    "id": "fr-a1-020",
+    "language": "fr",
+    "level": "A1",
+    "tag": "DIAL",
+    "uiTitle": "Lendo Placas de Trânsito",
+    "grammarFocus": "Interrogativa de Lugar: Où",
+    "theme": "Tema 2: Rumo ao Hostel"
+  },
+  {
+    "id": "fr-a1-021",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VERB",
+    "uiTitle": "Aproximando do Edifício",
+    "grammarFocus": "Conjugação: Aller (ir) — Deslocamento",
+    "theme": "Tema 2: Rumo ao Hostel"
+  },
+  {
+    "id": "fr-a1-022",
+    "language": "fr",
+    "level": "A1",
+    "tag": "DIAL",
+    "uiTitle": "A Corrida Chegou ao Fim",
+    "grammarFocus": "Interrogativa de Tempo: Quand",
+    "theme": "Tema 2: Rumo ao Hostel"
+  },
+  {
+    "id": "fr-a1-023",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VERB",
+    "uiTitle": "Pagando a Tarifa",
+    "grammarFocus": "Conjugação: Faire (fazer) — Atividades",
+    "theme": "Tema 2: Rumo ao Hostel"
+  },
+  {
+    "id": "fr-a1-024",
+    "language": "fr",
+    "level": "A1",
+    "tag": "DIAL",
+    "uiTitle": "Tirando as Malas do Porta-Malas",
+    "grammarFocus": "Interrogativa de Modo: Comment",
+    "theme": "Tema 2: Rumo ao Hostel"
+  },
+  {
+    "id": "fr-a1-025",
+    "language": "fr",
+    "level": "A1",
+    "tag": "DIAL",
+    "uiTitle": "Parado na Calçada",
+    "grammarFocus": "Interrogativa de Causa: Pourquoi",
+    "theme": "Tema 2: Rumo ao Hostel"
+  },
+  {
+    "id": "fr-a1-026",
+    "language": "fr",
+    "level": "A1",
+    "tag": "DIAL",
+    "uiTitle": "Suspirando Fundo",
+    "grammarFocus": "Interrogativas de Identidade: Qui e Que",
+    "theme": "Tema 2: Rumo ao Hostel"
+  },
+  {
+    "id": "fr-a1-027",
+    "language": "fr",
+    "level": "A1",
+    "tag": "DIAL",
+    "uiTitle": "Em Frente",
+    "grammarFocus": "Interrogativa de Quantidade: Combien",
+    "theme": "Tema 2: Rumo ao Hostel"
+  },
+  {
+    "id": "fr-a1-028",
+    "language": "fr",
+    "level": "A1",
+    "tag": "CULT",
+    "uiTitle": "Admirando a Fachada do Hostel",
+    "grammarFocus": "Prática: A Arte da Pergunta Básica",
+    "theme": "Tema 3: Check-in e Apresentações"
+  },
+  {
+    "id": "fr-a1-029",
+    "language": "fr",
+    "level": "A1",
+    "tag": "GRAM",
+    "uiTitle": "Entrando no Lobby",
+    "grammarFocus": "Gênero dos Substantivos: Masculino vs Feminino",
+    "theme": "Tema 3: Check-in e Apresentações"
+  },
+  {
+    "id": "fr-a1-030",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VOC",
+    "uiTitle": "Encontrando a Recepção",
+    "grammarFocus": "Cores Primárias (Les couleurs)",
+    "theme": "Tema 3: Check-in e Apresentações"
+  },
+  {
+    "id": "fr-a1-031",
+    "language": "fr",
+    "level": "A1",
+    "tag": "MISS",
+    "uiTitle": "Aguardando sua Vez",
+    "grammarFocus": "Prática: Descrevendo seu estilo",
+    "theme": "Tema 3: Check-in e Apresentações"
+  },
+  {
+    "id": "fr-a1-032",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VOC",
+    "uiTitle": "O Cumprimento Formal",
+    "grammarFocus": "Cores e Tons Avançados",
+    "theme": "Tema 3: Check-in e Apresentações"
+  },
+  {
+    "id": "fr-a1-033",
+    "language": "fr",
+    "level": "A1",
+    "tag": "GRAM",
+    "uiTitle": "Apresentando seu Documento",
+    "grammarFocus": "Artigos Definidos Singulares: le, la, l'",
+    "theme": "Tema 3: Check-in e Apresentações"
+  },
+  {
+    "id": "fr-a1-034",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VOC",
+    "uiTitle": "Detalhes da Reserva",
+    "grammarFocus": "Vocabulário: Roupas de Cima",
+    "theme": "Tema 3: Check-in e Apresentações"
+  },
+  {
+    "id": "fr-a1-035",
+    "language": "fr",
+    "level": "A1",
+    "tag": "GRAM",
+    "uiTitle": "Confirmando Identidade",
+    "grammarFocus": "Artigo Definido Plural: les",
+    "theme": "Tema 3: Check-in e Apresentações"
+  },
+  {
+    "id": "fr-a1-036",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VOC",
+    "uiTitle": "Recebendo Orientações",
+    "grammarFocus": "Vocabulário: Roupas de Baixo e Acessórios",
+    "theme": "Tema 3: Check-in e Apresentações"
+  },
+  {
+    "id": "fr-a1-037",
+    "language": "fr",
+    "level": "A1",
+    "tag": "GRAM",
+    "uiTitle": "A Arte da Boa Vizinhança",
+    "grammarFocus": "Artigos Indefinidos: un, une, des",
+    "theme": "Tema 3: Check-in e Apresentações"
+  },
+  {
+    "id": "fr-a1-038",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VOC",
+    "uiTitle": "Pegando a Chave",
+    "grammarFocus": "Vocabulário: Bon",
+    "theme": "Tema 3: Check-in e Apresentações"
+  },
+  {
+    "id": "fr-a1-039",
+    "language": "fr",
+    "level": "A1",
+    "tag": "GRAM",
+    "uiTitle": "Procurando o Número do Quarto",
+    "grammarFocus": "Concordância dos Adjetivos",
+    "theme": "Tema 3: Check-in e Apresentações"
+  },
+  {
+    "id": "fr-a1-040",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VOC",
+    "uiTitle": "Abrindo a Porta do Dormitório",
+    "grammarFocus": "Vocabulário: Bien",
+    "theme": "Tema 3: Check-in e Apresentações"
+  },
+  {
+    "id": "fr-a1-041",
+    "language": "fr",
+    "level": "A1",
+    "tag": "GRAM",
+    "uiTitle": "Conhecendo o Colega de Quarto",
+    "grammarFocus": "Posição dos Adjetivos: A Regra BANGS",
+    "theme": "Tema 3: Check-in e Apresentações"
+  },
+  {
+    "id": "fr-a1-042",
+    "language": "fr",
+    "level": "A1",
+    "tag": "GRAM",
+    "uiTitle": "Uma Manhã de Sol",
+    "grammarFocus": "Par de Confusão: Bon VS Bien",
+    "theme": "Tema 4: O Primeiro Café da Manhã"
+  },
+  {
+    "id": "fr-a1-043",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VOC",
+    "uiTitle": "Passeando pela Calçada",
+    "grammarFocus": "Vocabulário: Muito (Très)",
+    "theme": "Tema 4: O Primeiro Café da Manhã"
+  },
+  {
+    "id": "fr-a1-044",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VERB",
+    "uiTitle": "Sentindo o Cheiro de Pão",
+    "grammarFocus": "Conjugação: Aimer",
+    "theme": "Tema 4: O Primeiro Café da Manhã"
+  },
+  {
+    "id": "fr-a1-045",
+    "language": "fr",
+    "level": "A1",
+    "tag": "MISS",
+    "uiTitle": "A Vitrine da Padaria",
+    "grammarFocus": "Prática: Minha vida em casa e no trabalho",
+    "theme": "Tema 4: O Primeiro Café da Manhã"
+  },
+  {
+    "id": "fr-a1-046",
+    "language": "fr",
+    "level": "A1",
+    "tag": "DIAL",
+    "uiTitle": "A Escolha Difícil",
+    "grammarFocus": "5 Maneiras de Dizer Oui (Afirmação)",
+    "theme": "Tema 4: O Primeiro Café da Manhã"
+  },
+  {
+    "id": "fr-a1-047",
+    "language": "fr",
+    "level": "A1",
+    "tag": "GRAM",
+    "uiTitle": "Entrando no Bistrôzinho",
+    "grammarFocus": "Par de Confusão: Très VS Trop",
+    "theme": "Tema 4: O Primeiro Café da Manhã"
+  },
+  {
+    "id": "fr-a1-048",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VOC",
+    "uiTitle": "Sentando na Mesa",
+    "grammarFocus": "Vocabulário: Excesso (Trop)",
+    "theme": "Tema 4: O Primeiro Café da Manhã"
+  },
+  {
+    "id": "fr-a1-049",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VERB",
+    "uiTitle": "Lendo as Opções Matinais",
+    "grammarFocus": "Conjugação: Habiter",
+    "theme": "Tema 4: O Primeiro Café da Manhã"
+  },
+  {
+    "id": "fr-a1-050",
+    "language": "fr",
+    "level": "A1",
+    "tag": "GRAM",
+    "uiTitle": "Chamando a Atendente",
+    "grammarFocus": "Mecânica dos Verbos em -er",
+    "theme": "Tema 4: O Primeiro Café da Manhã"
+  },
+  {
+    "id": "fr-a1-051",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VOC",
+    "uiTitle": "A Bebida Quente e o Suco",
+    "grammarFocus": "Vocabulário: Cuisiner",
+    "theme": "Tema 4: O Primeiro Café da Manhã"
+  },
+  {
+    "id": "fr-a1-052",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VERB",
+    "uiTitle": "A Primeira Mordida",
+    "grammarFocus": "Conjugação: Parler",
+    "theme": "Tema 4: O Primeiro Café da Manhã"
+  },
+  {
+    "id": "fr-a1-053",
+    "language": "fr",
+    "level": "A1",
+    "tag": "GRAM",
+    "uiTitle": "Elogiando a Qualidade",
+    "grammarFocus": "Par de Confusão: Manger VS Cuisiner",
+    "theme": "Tema 4: O Primeiro Café da Manhã"
+  },
+  {
+    "id": "fr-a1-054",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VERB",
+    "uiTitle": "Mais Açúcar",
+    "grammarFocus": "Conjugação: Travailler",
+    "theme": "Tema 4: O Primeiro Café da Manhã"
+  },
+  {
+    "id": "fr-a1-055",
+    "language": "fr",
+    "level": "A1",
+    "tag": "GRAM",
+    "uiTitle": "A Conta por Favor",
+    "grammarFocus": "Negação Básica: Ne... pas",
+    "theme": "Tema 4: O Primeiro Café da Manhã"
+  },
+  {
+    "id": "fr-a1-056",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VERB",
+    "uiTitle": "Começo Forte",
+    "grammarFocus": "Conjugação: Manger",
+    "theme": "Tema 4: O Primeiro Café da Manhã"
+  },
+  {
+    "id": "fr-a1-057",
+    "language": "fr",
+    "level": "A1",
+    "tag": "DIAL",
+    "uiTitle": "A Grande Vitrine",
+    "grammarFocus": "5 Maneiras de Dizer Non (Negação)",
+    "theme": "Tema 5: Compras na Galeries Lafayette"
+  },
+  {
+    "id": "fr-a1-058",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VOC",
+    "uiTitle": "Atravessando as Portas Giratórias",
+    "grammarFocus": "Números de 21 a 50",
+    "theme": "Tema 5: Compras na Galeries Lafayette"
+  },
+  {
+    "id": "fr-a1-059",
+    "language": "fr",
+    "level": "A1",
+    "tag": "GRAM",
+    "uiTitle": "O Setor de Descontos",
+    "grammarFocus": "Il y a: Expressando Existência",
+    "theme": "Tema 5: Compras na Galeries Lafayette"
+  },
+  {
+    "id": "fr-a1-060",
+    "language": "fr",
+    "level": "A1",
+    "tag": "DIAL",
+    "uiTitle": "Encontrando Sua Cor",
+    "grammarFocus": "5 Maneiras de Dizer Désolé (Desculpas)",
+    "theme": "Tema 5: Compras na Galeries Lafayette"
+  },
+  {
+    "id": "fr-a1-061",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VOC",
+    "uiTitle": "Buscando as Peças Clássicas",
+    "grammarFocus": "Números de 51 a 100",
+    "theme": "Tema 5: Compras na Galeries Lafayette"
+  },
+  {
+    "id": "fr-a1-062",
+    "language": "fr",
+    "level": "A1",
+    "tag": "DIAL",
+    "uiTitle": "Os Provadores",
+    "grammarFocus": "5 Maneiras de Dizer Pardon e Excusez-moi",
+    "theme": "Tema 5: Compras na Galeries Lafayette"
+  },
+  {
+    "id": "fr-a1-063",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VOC",
+    "uiTitle": "Avaliando o Ajuste",
+    "grammarFocus": "Conectores de Tempo: Hoje, amanhã, ontem",
+    "theme": "Tema 5: Compras na Galeries Lafayette"
+  },
+  {
+    "id": "fr-a1-064",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VOC",
+    "uiTitle": "Qual o Tamanho?",
+    "grammarFocus": "Dias da Semana",
+    "theme": "Tema 5: Compras na Galeries Lafayette"
+  },
+  {
+    "id": "fr-a1-065",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VOC",
+    "uiTitle": "Trocando de Manequim",
+    "grammarFocus": "Meses do Ano",
+    "theme": "Tema 5: Compras na Galeries Lafayette"
+  },
+  {
+    "id": "fr-a1-066",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VOC",
+    "uiTitle": "Verificando os Valores",
+    "grammarFocus": "Estações do Ano",
+    "theme": "Tema 5: Compras na Galeries Lafayette"
+  },
+  {
+    "id": "fr-a1-067",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VOC",
+    "uiTitle": "Comparando os Preços",
+    "grammarFocus": "Horas: Pergunta Principal e Horas Cheias",
+    "theme": "Tema 5: Compras na Galeries Lafayette"
+  },
+  {
+    "id": "fr-a1-068",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VOC",
+    "uiTitle": "Indo Direto ao Caixa",
+    "grammarFocus": "Horas: Minutos e Frações de Tempo",
+    "theme": "Tema 5: Compras na Galeries Lafayette"
+  },
+  {
+    "id": "fr-a1-069",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VOC",
+    "uiTitle": "A Arte de Pagar",
+    "grammarFocus": "Preposições: Dans, Sur e Sous",
+    "theme": "Tema 5: Compras na Galeries Lafayette"
+  },
+  {
+    "id": "fr-a1-070",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VOC",
+    "uiTitle": "As Sacolas Pesadas",
+    "grammarFocus": "Preposições: Devant, Derrière e Entre",
+    "theme": "Tema 5: Compras na Galeries Lafayette"
+  },
+  {
+    "id": "fr-a1-071",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VOC",
+    "uiTitle": "Missão Cumprida",
+    "grammarFocus": "Preposições: Près de e Loin de",
+    "theme": "Tema 5: Compras na Galeries Lafayette"
+  },
+  {
+    "id": "fr-a1-072",
+    "language": "fr",
+    "level": "A1",
+    "tag": "GRAM",
+    "uiTitle": "Analisando o Mapa da Cidade",
+    "grammarFocus": "Par de Confusão: Près de VS Proche de",
+    "theme": "Tema 6: Passeando e Explorando"
+  },
+  {
+    "id": "fr-a1-073",
+    "language": "fr",
+    "level": "A1",
+    "tag": "MISS",
+    "uiTitle": "Onde Estamos?",
+    "grammarFocus": "Prática: Localizando-se no espaço",
+    "theme": "Tema 6: Passeando e Explorando"
+  },
+  {
+    "id": "fr-a1-074",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VOC",
+    "uiTitle": "Marcando no Relógio",
+    "grammarFocus": "Família Imediata",
+    "theme": "Tema 6: Passeando e Explorando"
+  },
+  {
+    "id": "fr-a1-075",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VERB",
+    "uiTitle": "Calculando a Distância",
+    "grammarFocus": "Conjugação: Venir",
+    "theme": "Tema 6: Passeando e Explorando"
+  },
+  {
+    "id": "fr-a1-076",
+    "language": "fr",
+    "level": "A1",
+    "tag": "GRAM",
+    "uiTitle": "Pelas Calçadas Antigas",
+    "grammarFocus": "Par de Confusão: Dans VS En",
+    "theme": "Tema 6: Passeando e Explorando"
+  },
+  {
+    "id": "fr-a1-077",
+    "language": "fr",
+    "level": "A1",
+    "tag": "MISS",
+    "uiTitle": "Qual é a Direção?",
+    "grammarFocus": "Prática: Minha árvore genealógica",
+    "theme": "Tema 6: Passeando e Explorando"
+  },
+  {
+    "id": "fr-a1-078",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VOC",
+    "uiTitle": "Andando em Círculos",
+    "grammarFocus": "Parentes e Família Estendida",
+    "theme": "Tema 6: Passeando e Explorando"
+  },
+  {
+    "id": "fr-a1-079",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VERB",
+    "uiTitle": "Paragem para um Respiro",
+    "grammarFocus": "Passado Recente: Venir de",
+    "theme": "Tema 6: Passeando e Explorando"
+  },
+  {
+    "id": "fr-a1-080",
+    "language": "fr",
+    "level": "A1",
+    "tag": "GRAM",
+    "uiTitle": "O Monumento de Longe",
+    "grammarFocus": "Posse Singular: Mon, Ma, Mes",
+    "theme": "Tema 6: Passeando e Explorando"
+  },
+  {
+    "id": "fr-a1-081",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VOC",
+    "uiTitle": "Mais Perto do Alvo",
+    "grammarFocus": "Frutas e Vegetais",
+    "theme": "Tema 6: Passeando e Explorando"
+  },
+  {
+    "id": "fr-a1-082",
+    "language": "fr",
+    "level": "A1",
+    "tag": "GRAM",
+    "uiTitle": "Observando as Visitas",
+    "grammarFocus": "Posse Singular: Ton, Ta, Tes",
+    "theme": "Tema 6: Passeando e Explorando"
+  },
+  {
+    "id": "fr-a1-083",
+    "language": "fr",
+    "level": "A1",
+    "tag": "GRAM",
+    "uiTitle": "A Luz do Fim de Tarde",
+    "grammarFocus": "Posse Singular: Son, Sa, Ses",
+    "theme": "Tema 6: Passeando e Explorando"
+  },
+  {
+    "id": "fr-a1-084",
+    "language": "fr",
+    "level": "A1",
+    "tag": "GRAM",
+    "uiTitle": "Nas Praças de Paris",
+    "grammarFocus": "Posse Plural: Notre e Nos",
+    "theme": "Tema 6: Passeando e Explorando"
+  },
+  {
+    "id": "fr-a1-085",
+    "language": "fr",
+    "level": "A1",
+    "tag": "GRAM",
+    "uiTitle": "Retorno Marcado",
+    "grammarFocus": "Posse Plural: Votre e Vos",
+    "theme": "Tema 6: Passeando e Explorando"
+  },
+  {
+    "id": "fr-a1-086",
+    "language": "fr",
+    "level": "A1",
+    "tag": "GRAM",
+    "uiTitle": "Próximo Ponto",
+    "grammarFocus": "Posse Plural: Leur e Leurs",
+    "theme": "Tema 6: Passeando e Explorando"
+  },
+  {
+    "id": "fr-a1-087",
+    "language": "fr",
+    "level": "A1",
+    "tag": "DIAL",
+    "uiTitle": "Uma Pausa no Parque",
+    "grammarFocus": "5 Frases para Pedidos em Lojas",
+    "theme": "Tema 7: Novas Amizades e A Família"
+  },
+  {
+    "id": "fr-a1-088",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VOC",
+    "uiTitle": "Sentando no Banco",
+    "grammarFocus": "Vocabulário: Ici e Là",
+    "theme": "Tema 7: Novas Amizades e A Família"
+  },
+  {
+    "id": "fr-a1-089",
+    "language": "fr",
+    "level": "A1",
+    "tag": "GRAM",
+    "uiTitle": "Uma Conversa Casual",
+    "grammarFocus": "Par de Confusão: Ici VS Là VS Là-bas",
+    "theme": "Tema 7: Novas Amizades e A Família"
+  },
+  {
+    "id": "fr-a1-090",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VERB",
+    "uiTitle": "De Onde Você Vem?",
+    "grammarFocus": "Conjugação: Jouer",
+    "theme": "Tema 7: Novas Amizades e A Família"
+  },
+  {
+    "id": "fr-a1-091",
+    "language": "fr",
+    "level": "A1",
+    "tag": "DIAL",
+    "uiTitle": "Contando Suas Origens",
+    "grammarFocus": "5 Frases para Pedidos em Cafés",
+    "theme": "Tema 7: Novas Amizades e A Família"
+  },
+  {
+    "id": "fr-a1-092",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VOC",
+    "uiTitle": "Mostrando Fotos no Celular",
+    "grammarFocus": "Vocabulário: Là-bas",
+    "theme": "Tema 7: Novas Amizades e A Família"
+  },
+  {
+    "id": "fr-a1-093",
+    "language": "fr",
+    "level": "A1",
+    "tag": "GRAM",
+    "uiTitle": "As Histórias dos Pais",
+    "grammarFocus": "Par de Confusão: Tu VS Vous",
+    "theme": "Tema 7: Novas Amizades e A Família"
+  },
+  {
+    "id": "fr-a1-094",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VERB",
+    "uiTitle": "Fatos da Juventude",
+    "grammarFocus": "Conjugação: Penser",
+    "theme": "Tema 7: Novas Amizades e A Família"
+  },
+  {
+    "id": "fr-a1-095",
+    "language": "fr",
+    "level": "A1",
+    "tag": "DIAL",
+    "uiTitle": "Curiosidade Mútua",
+    "grammarFocus": "5 Frases de Recepção e Boas-Vindas",
+    "theme": "Tema 7: Novas Amizades e A Família"
+  },
+  {
+    "id": "fr-a1-096",
+    "language": "fr",
+    "level": "A1",
+    "tag": "GRAM",
+    "uiTitle": "Perguntas Educadas",
+    "grammarFocus": "Par de Confusão: On VS Nous",
+    "theme": "Tema 7: Novas Amizades e A Família"
+  },
+  {
+    "id": "fr-a1-097",
+    "language": "fr",
+    "level": "A1",
+    "tag": "DIAL",
+    "uiTitle": "Sorrisos",
+    "grammarFocus": "5 Frases de Gentileza e Agradecimento",
+    "theme": "Tema 7: Novas Amizades e A Família"
+  },
+  {
+    "id": "fr-a1-098",
+    "language": "fr",
+    "level": "A1",
+    "tag": "GRAM",
+    "uiTitle": "O Tempo Passa Rápido",
+    "grammarFocus": "Par de Confusão: Tard VS En retard",
+    "theme": "Tema 7: Novas Amizades e A Família"
+  },
+  {
+    "id": "fr-a1-099",
+    "language": "fr",
+    "level": "A1",
+    "tag": "DIAL",
+    "uiTitle": "Trocando Contatos",
+    "grammarFocus": "5 Maneiras de Dizer Je ne sais pas",
+    "theme": "Tema 7: Novas Amizades e A Família"
+  },
+  {
+    "id": "fr-a1-100",
+    "language": "fr",
+    "level": "A1",
+    "tag": "GRAM",
+    "uiTitle": "A Despedida Rápida",
+    "grammarFocus": "Par de Confusão: Merci de VS Merci pour",
+    "theme": "Tema 7: Novas Amizades e A Família"
+  },
+  {
+    "id": "fr-a1-101",
+    "language": "fr",
+    "level": "A1",
+    "tag": "DIAL",
+    "uiTitle": "Laços Formados",
+    "grammarFocus": "5 Maneiras de Dizer Félicitations",
+    "theme": "Tema 7: Novas Amizades e A Família"
+  },
+  {
+    "id": "fr-a1-102",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VERB",
+    "uiTitle": "Um Erro de Orientação",
+    "grammarFocus": "Conjugação: Donner",
+    "theme": "Tema 8: Emergências e Resolução de Problemas"
+  },
+  {
+    "id": "fr-a1-103",
+    "language": "fr",
+    "level": "A1",
+    "tag": "MISS",
+    "uiTitle": "O Pedido de Desculpas",
+    "grammarFocus": "Ponte A1 > A2: Preparando o Infinitivo",
+    "theme": "Tema 8: Emergências e Resolução de Problemas"
+  },
+  {
+    "id": "fr-a1-104",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VERB",
+    "uiTitle": "Retomando o Rumo",
+    "grammarFocus": "Conjugação: Montrer",
+    "theme": "Tema 8: Emergências e Resolução de Problemas"
+  },
+  {
+    "id": "fr-a1-105",
+    "language": "fr",
+    "level": "A1",
+    "tag": "MISS",
+    "uiTitle": "Explicando o Mal Entendido",
+    "grammarFocus": "O Grande Evento de Apresentação Final",
+    "theme": "Tema 8: Emergências e Resolução de Problemas"
+  },
+  {
+    "id": "fr-a1-106",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VERB",
+    "uiTitle": "Esclarecendo Posições",
+    "grammarFocus": "Conjugação: Acheter",
+    "theme": "Tema 8: Emergências e Resolução de Problemas"
+  },
+  {
+    "id": "fr-a1-107",
+    "language": "fr",
+    "level": "A1",
+    "tag": "MISS",
+    "uiTitle": "Uma Dúvida Persistente",
+    "grammarFocus": "Revisão Geral A1",
+    "theme": "Tema 8: Emergências e Resolução de Problemas"
+  },
+  {
+    "id": "fr-a1-108",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VERB",
+    "uiTitle": "Solicitação Simples",
+    "grammarFocus": "Conjugação: Payer",
+    "theme": "Tema 8: Emergências e Resolução de Problemas"
+  },
+  {
+    "id": "fr-a2-109",
+    "language": "fr",
+    "level": "A2",
+    "tag": "VERB",
+    "uiTitle": "O Despertador Toca",
+    "grammarFocus": "Conjugação: Finir (Grupo -ir)",
+    "theme": "Tema 9: Minha Casa, Minha Rotina"
+  },
+  {
+    "id": "fr-a2-110",
+    "language": "fr",
+    "level": "A2",
+    "tag": "GRAM",
+    "uiTitle": "Levantando da Cama",
+    "grammarFocus": "Obrigação Geral: Il faut",
+    "theme": "Tema 9: Minha Casa, Minha Rotina"
+  },
+  {
+    "id": "fr-a2-111",
+    "language": "fr",
+    "level": "A2",
+    "tag": "MISS",
+    "uiTitle": "A Janela da Manhã",
+    "grammarFocus": "Prática: Na Cozinha e no Supermercado",
+    "theme": "Tema 9: Minha Casa, Minha Rotina"
+  },
+  {
+    "id": "fr-a2-112",
+    "language": "fr",
+    "level": "A2",
+    "tag": "VERB",
+    "uiTitle": "Preparativos no Banheiro",
+    "grammarFocus": "Conjugação: Choisir",
+    "theme": "Tema 9: Minha Casa, Minha Rotina"
+  },
+  {
+    "id": "fr-a2-113",
+    "language": "fr",
+    "level": "A2",
+    "tag": "GRAM",
+    "uiTitle": "Organizando as Coisas",
+    "grammarFocus": "Par de Confusão: Devoir VS Falloir",
+    "theme": "Tema 9: Minha Casa, Minha Rotina"
+  },
+  {
+    "id": "fr-a2-114",
+    "language": "fr",
+    "level": "A2",
+    "tag": "VERB",
+    "uiTitle": "Passando pela Sala",
+    "grammarFocus": "Conjugação: Réussir",
+    "theme": "Tema 9: Minha Casa, Minha Rotina"
+  },
+  {
+    "id": "fr-a2-115",
+    "language": "fr",
+    "level": "A2",
+    "tag": "GRAM",
+    "uiTitle": "Hábitos Intocáveis",
+    "grammarFocus": "Partitivos Singulares: Du e De la",
+    "theme": "Tema 9: Minha Casa, Minha Rotina"
+  },
+  {
+    "id": "fr-a2-116",
+    "language": "fr",
+    "level": "A2",
+    "tag": "VERB",
+    "uiTitle": "Cuidados Matinais",
+    "grammarFocus": "Conjugação: Vendre (Grupo -re)",
+    "theme": "Tema 9: Minha Casa, Minha Rotina"
+  },
+  {
+    "id": "fr-a2-117",
+    "language": "fr",
+    "level": "A2",
+    "tag": "GRAM",
+    "uiTitle": "Vestiário e Prontidão",
+    "grammarFocus": "Partitivos Plurais e Negativa (Pas de)",
+    "theme": "Tema 9: Minha Casa, Minha Rotina"
+  },
+  {
+    "id": "fr-a2-118",
+    "language": "fr",
+    "level": "A2",
+    "tag": "VERB",
+    "uiTitle": "A Chave na Porta",
+    "grammarFocus": "Conjugação: Attendre",
+    "theme": "Tema 9: Minha Casa, Minha Rotina"
+  },
+  {
+    "id": "fr-a2-119",
+    "language": "fr",
+    "level": "A2",
+    "tag": "GRAM",
+    "uiTitle": "Começando a Rotina",
+    "grammarFocus": "O pronome En (Substituição de Coisas)",
+    "theme": "Tema 9: Minha Casa, Minha Rotina"
+  },
+  {
+    "id": "fr-a2-120",
+    "language": "fr",
+    "level": "A2",
+    "tag": "VERB",
+    "uiTitle": "Passos da Vida",
+    "grammarFocus": "Conjugação: Répondre",
+    "theme": "Tema 9: Minha Casa, Minha Rotina"
+  },
+  {
+    "id": "fr-a2-121",
+    "language": "fr",
+    "level": "A2",
+    "tag": "VERB",
+    "uiTitle": "O Tempo Voa",
+    "grammarFocus": "Conjugação: Vouloir (Desejo)",
+    "theme": "Tema 9: Minha Casa, Minha Rotina"
+  },
+  {
+    "id": "fr-a2-122",
+    "language": "fr",
+    "level": "A2",
+    "tag": "VERB",
+    "uiTitle": "O Espaço Físico",
+    "grammarFocus": "Conjugação: Pouvoir (Possibilidade)",
+    "theme": "Tema 9: Minha Casa, Minha Rotina"
+  },
+  {
+    "id": "fr-a2-123",
+    "language": "fr",
+    "level": "A2",
+    "tag": "VERB",
+    "uiTitle": "Indo à Luta",
+    "grammarFocus": "Conjugação: Devoir (Dever)",
+    "theme": "Tema 9: Minha Casa, Minha Rotina"
+  },
+  {
+    "id": "fr-a2-124",
+    "language": "fr",
+    "level": "A2",
+    "tag": "VERB",
+    "uiTitle": "A Necessidade Bate",
+    "grammarFocus": "Verbos Reflexivos: Rotina Diária",
+    "theme": "Tema 10: O Mercado e a Cozinha"
+  },
+  {
+    "id": "fr-a2-125",
+    "language": "fr",
+    "level": "A2",
+    "tag": "MISS",
+    "uiTitle": "Buscando Nutrientes",
+    "grammarFocus": "Prática: Narrando a história de um objeto",
+    "theme": "Tema 10: O Mercado e a Cozinha"
+  },
+  {
+    "id": "fr-a2-126",
+    "language": "fr",
+    "level": "A2",
+    "tag": "VERB",
+    "uiTitle": "O Corredor de Frescos",
+    "grammarFocus": "Verbos Reflexivos: Higiene Pessoal",
+    "theme": "Tema 10: O Mercado e a Cozinha"
+  },
+  {
+    "id": "fr-a2-127",
+    "language": "fr",
+    "level": "A2",
+    "tag": "GRAM",
+    "uiTitle": "Pesando as Porções",
+    "grammarFocus": "Pronomes Tônicos: Moi, toi, lui, etc.",
+    "theme": "Tema 10: O Mercado e a Cozinha"
+  },
+  {
+    "id": "fr-a2-128",
+    "language": "fr",
+    "level": "A2",
+    "tag": "GRAM",
+    "uiTitle": "Lendo Rótulos",
+    "grammarFocus": "COD: O pronome Le (Objeto Direto)",
+    "theme": "Tema 10: O Mercado e a Cozinha"
+  },
+  {
+    "id": "fr-a2-129",
+    "language": "fr",
+    "level": "A2",
+    "tag": "GRAM",
+    "uiTitle": "Buscando Medidas",
+    "grammarFocus": "COD: Os pronomes La e Les",
+    "theme": "Tema 10: O Mercado e a Cozinha"
+  },
+  {
+    "id": "fr-a2-130",
+    "language": "fr",
+    "level": "A2",
+    "tag": "GRAM",
+    "uiTitle": "Estoque Semanal",
+    "grammarFocus": "COI: O pronome Lui (Objeto Indireto)",
+    "theme": "Tema 10: O Mercado e a Cozinha"
+  },
+  {
+    "id": "fr-a2-131",
+    "language": "fr",
+    "level": "A2",
+    "tag": "GRAM",
+    "uiTitle": "A Passagem do Caixa",
+    "grammarFocus": "COI: O pronome Leur (Objeto Indireto Plural)",
+    "theme": "Tema 10: O Mercado e a Cozinha"
+  },
+  {
+    "id": "fr-a2-132",
+    "language": "fr",
+    "level": "A2",
+    "tag": "GRAM",
+    "uiTitle": "Sacos Cheios",
+    "grammarFocus": "Comparativo de Superioridade e Inferioridade",
+    "theme": "Tema 10: O Mercado e a Cozinha"
+  },
+  {
+    "id": "fr-a2-133",
+    "language": "fr",
+    "level": "A2",
+    "tag": "GRAM",
+    "uiTitle": "A Volta Redonda",
+    "grammarFocus": "Comparativo de Igualdade: Aussi... que",
+    "theme": "Tema 10: O Mercado e a Cozinha"
+  },
+  {
+    "id": "fr-a2-134",
+    "language": "fr",
+    "level": "A2",
+    "tag": "GRAM",
+    "uiTitle": "Guardando na Dispensa",
+    "grammarFocus": "Superlativo: O mais e o menos",
+    "theme": "Tema 10: O Mercado e a Cozinha"
+  },
+  {
+    "id": "fr-a2-135",
+    "language": "fr",
+    "level": "A2",
+    "tag": "GRAM",
+    "uiTitle": "A Arte de Escolher",
+    "grammarFocus": "Modo Imperativo: Ordens e Instruções",
+    "theme": "Tema 10: O Mercado e a Cozinha"
+  },
+  {
+    "id": "fr-a2-136",
+    "language": "fr",
+    "level": "A2",
+    "tag": "GRAM",
+    "uiTitle": "Organização",
+    "grammarFocus": "Par de Confusão: Vite VS Rapide",
+    "theme": "Tema 10: O Mercado e a Cozinha"
+  },
+  {
+    "id": "fr-a2-137",
+    "language": "fr",
+    "level": "A2",
+    "tag": "MISS",
+    "uiTitle": "A Pergunta da Segunda",
+    "grammarFocus": "Prática: Criando um ranking de favoritos",
+    "theme": "Tema 11: Contando o Final de Semana"
+  },
+  {
+    "id": "fr-a2-138",
+    "language": "fr",
+    "level": "A2",
+    "tag": "VERB",
+    "uiTitle": "Rebobinando as Férias",
+    "grammarFocus": "O Auxiliar Avoir no Passado",
+    "theme": "Tema 11: Contando o Final de Semana"
+  },
+  {
+    "id": "fr-a2-139",
+    "language": "fr",
+    "level": "A2",
+    "tag": "GRAM",
+    "uiTitle": "Sábado a Noite",
+    "grammarFocus": "Par de Confusão: Passé Composé VS Passé Récent",
+    "theme": "Tema 11: Contando o Final de Semana"
+  },
+  {
+    "id": "fr-a2-140",
+    "language": "fr",
+    "level": "A2",
+    "tag": "VOC",
+    "uiTitle": "Eventos Recentes",
+    "grammarFocus": "Vocabulário de Tempo: Pendant",
+    "theme": "Tema 11: Contando o Final de Semana"
+  },
+  {
+    "id": "fr-a2-141",
+    "language": "fr",
+    "level": "A2",
+    "tag": "DIAL",
+    "uiTitle": "Histórias do Chuveiro",
+    "grammarFocus": "Respondendo com Si a Perguntas Negativas",
+    "theme": "Tema 11: Contando o Final de Semana"
+  },
+  {
+    "id": "fr-a2-142",
+    "language": "fr",
+    "level": "A2",
+    "tag": "MISS",
+    "uiTitle": "Fatos Divertidos",
+    "grammarFocus": "Prática: Contando o que aconteceu no final de semana",
+    "theme": "Tema 11: Contando o Final de Semana"
+  },
+  {
+    "id": "fr-a2-143",
+    "language": "fr",
+    "level": "A2",
+    "tag": "VERB",
+    "uiTitle": "Um Breve Relato",
+    "grammarFocus": "Particípios Passados Regulares",
+    "theme": "Tema 11: Contando o Final de Semana"
+  },
+  {
+    "id": "fr-a2-144",
+    "language": "fr",
+    "level": "A2",
+    "tag": "GRAM",
+    "uiTitle": "Reações do Amigo",
+    "grammarFocus": "Par de Confusão: Pendant VS Desde (Depuis)",
+    "theme": "Tema 11: Contando o Final de Semana"
+  },
+  {
+    "id": "fr-a2-145",
+    "language": "fr",
+    "level": "A2",
+    "tag": "VOC",
+    "uiTitle": "As Risadas Mútuas",
+    "grammarFocus": "Vocabulário de Tempo: Desde (Depuis)",
+    "theme": "Tema 11: Contando o Final de Semana"
+  },
+  {
+    "id": "fr-a2-146",
+    "language": "fr",
+    "level": "A2",
+    "tag": "VERB",
+    "uiTitle": "Detalhes Escondidos",
+    "grammarFocus": "Particípios Passados Irregulares",
+    "theme": "Tema 11: Contando o Final de Semana"
+  },
+  {
+    "id": "fr-a2-147",
+    "language": "fr",
+    "level": "A2",
+    "tag": "GRAM",
+    "uiTitle": "O Clímax do Domingo",
+    "grammarFocus": "Negações: Jamais e Plus",
+    "theme": "Tema 11: Contando o Final de Semana"
+  },
+  {
+    "id": "fr-a2-148",
+    "language": "fr",
+    "level": "A2",
+    "tag": "VERB",
+    "uiTitle": "Memória Fresca",
+    "grammarFocus": "O Auxiliar Être no Passado (Vandertramp)",
+    "theme": "Tema 11: Contando o Final de Semana"
+  },
+  {
+    "id": "fr-a2-149",
+    "language": "fr",
+    "level": "A2",
+    "tag": "GRAM",
+    "uiTitle": "Fatos",
+    "grammarFocus": "Inversão Formal em Perguntas (A2)",
+    "theme": "Tema 11: Contando o Final de Semana"
+  },
+  {
+    "id": "fr-a2-150",
+    "language": "fr",
+    "level": "A2",
+    "tag": "VERB",
+    "uiTitle": "Lembranças",
+    "grammarFocus": "Verbos Reflexivos no passado",
+    "theme": "Tema 11: Contando o Final de Semana"
+  },
+  {
+    "id": "fr-a2-151",
+    "language": "fr",
+    "level": "A2",
+    "tag": "GRAM",
+    "uiTitle": "Fim da História",
+    "grammarFocus": "Negação Restritiva: Ne... que (Somente)",
+    "theme": "Tema 11: Contando o Final de Semana"
+  },
+  {
+    "id": "fr-a2-152",
+    "language": "fr",
+    "level": "A2",
+    "tag": "MISS",
+    "uiTitle": "A Diferença é Clara",
+    "grammarFocus": "Prática: Entrevista de Trajetória Pessoal",
+    "theme": "Tema 12: Expressando Opiniões e Comparações"
+  },
+  {
+    "id": "fr-a2-153",
+    "language": "fr",
+    "level": "A2",
+    "tag": "VOC",
+    "uiTitle": "O Meu Favorito",
+    "grammarFocus": "Vocabulário: Savoir",
+    "theme": "Tema 12: Expressando Opiniões e Comparações"
+  },
+  {
+    "id": "fr-a2-154",
+    "language": "fr",
+    "level": "A2",
+    "tag": "GRAM",
+    "uiTitle": "Avaliando o Custo",
+    "grammarFocus": "Par de Confusão: Savoir VS Connaître",
+    "theme": "Tema 12: Expressando Opiniões e Comparações"
+  },
+  {
+    "id": "fr-a2-155",
+    "language": "fr",
+    "level": "A2",
+    "tag": "EXPR",
+    "uiTitle": "O Critério Principal",
+    "grammarFocus": "5 Expressões com o verbo Être",
+    "theme": "Tema 12: Expressando Opiniões e Comparações"
+  },
+  {
+    "id": "fr-a2-156",
+    "language": "fr",
+    "level": "A2",
+    "tag": "VOC",
+    "uiTitle": "Não Tão Bom Assim",
+    "grammarFocus": "Vocabulário: Connaître",
+    "theme": "Tema 12: Expressando Opiniões e Comparações"
+  },
+  {
+    "id": "fr-a2-157",
+    "language": "fr",
+    "level": "A2",
+    "tag": "GRAM",
+    "uiTitle": "O Degrau Acima",
+    "grammarFocus": "Par de Confusão: Apporter VS Emporter",
+    "theme": "Tema 12: Expressando Opiniões e Comparações"
+  },
+  {
+    "id": "fr-a2-158",
+    "language": "fr",
+    "level": "A2",
+    "tag": "EXPR",
+    "uiTitle": "Veredito Pessoal",
+    "grammarFocus": "5 Expressões com o verbo Avoir",
+    "theme": "Tema 12: Expressando Opiniões e Comparações"
+  },
+  {
+    "id": "fr-a2-159",
+    "language": "fr",
+    "level": "A2",
+    "tag": "VOC",
+    "uiTitle": "O Crítico de Plantão",
+    "grammarFocus": "Vocabulário: Apporter e Emporter",
+    "theme": "Tema 12: Expressando Opiniões e Comparações"
+  },
+  {
+    "id": "fr-a2-160",
+    "language": "fr",
+    "level": "A2",
+    "tag": "GRAM",
+    "uiTitle": "Notas do Avaliador",
+    "grammarFocus": "Par de Confusão: Amener VS Emmener",
+    "theme": "Tema 12: Expressando Opiniões e Comparações"
+  },
+  {
+    "id": "fr-a2-161",
+    "language": "fr",
+    "level": "A2",
+    "tag": "VOC",
+    "uiTitle": "O Fim do Jogo",
+    "grammarFocus": "Vocabulário: Amener e Emmener",
+    "theme": "Tema 12: Expressando Opiniões e Comparações"
+  },
+  {
+    "id": "fr-a2-162",
+    "language": "fr",
+    "level": "A2",
+    "tag": "GRAM",
+    "uiTitle": "Bancando o Juíz",
+    "grammarFocus": "Par de Confusão: Rentrer VS Revenir VS Retourner",
+    "theme": "Tema 12: Expressando Opiniões e Comparações"
+  },
+  {
+    "id": "fr-a2-163",
+    "language": "fr",
+    "level": "A2",
+    "tag": "VOC",
+    "uiTitle": "Perspectiva",
+    "grammarFocus": "Vocabulário: Rentrer e Revenir",
+    "theme": "Tema 12: Expressando Opiniões e Comparações"
+  },
+  {
+    "id": "fr-a2-164",
+    "language": "fr",
+    "level": "A2",
+    "tag": "GRAM",
+    "uiTitle": "Fechamento",
+    "grammarFocus": "Par de Confusão: Entendre VS Écouter",
+    "theme": "Tema 12: Expressando Opiniões e Comparações"
+  },
+  {
+    "id": "fr-a2-165",
+    "language": "fr",
+    "level": "A2",
+    "tag": "VOC",
+    "uiTitle": "Resultado",
+    "grammarFocus": "Vocabulário: Retourner e Rendre",
+    "theme": "Tema 12: Expressando Opiniões e Comparações"
+  },
+  {
+    "id": "fr-a2-166",
+    "language": "fr",
+    "level": "A2",
+    "tag": "GRAM",
+    "uiTitle": "Tudo Certo",
+    "grammarFocus": "Par de Confusão: Voir VS Regarder",
+    "theme": "Tema 12: Expressando Opiniões e Comparações"
+  },
+  {
+    "id": "fr-a2-167",
+    "language": "fr",
+    "level": "A2",
+    "tag": "EXPR",
+    "uiTitle": "Céu Aberto",
+    "grammarFocus": "5 Expressões com Aller e Faire",
+    "theme": "Tema 13: Clima, Natureza e Passeios"
+  },
+  {
+    "id": "fr-a2-168",
+    "language": "fr",
+    "level": "A2",
+    "tag": "DIAL",
+    "uiTitle": "Os Pássaros da Manhã",
+    "grammarFocus": "5 Maneiras de Dizer Je suis fatigué(e)",
+    "theme": "Tema 13: Clima, Natureza e Passeios"
+  },
+  {
+    "id": "fr-a2-169",
+    "language": "fr",
+    "level": "A2",
+    "tag": "GRAM",
+    "uiTitle": "Um Acorde Distante",
+    "grammarFocus": "Par de Confusão: Avoir mal à VS Avoir du mal à",
+    "theme": "Tema 13: Clima, Natureza e Passeios"
+  },
+  {
+    "id": "fr-a2-170",
+    "language": "fr",
+    "level": "A2",
+    "tag": "MISS",
+    "uiTitle": "A Vida Selvagem",
+    "grammarFocus": "No Restaurante (Reservas e Pedidos)",
+    "theme": "Tema 13: Clima, Natureza e Passeios"
+  },
+  {
+    "id": "fr-a2-171",
+    "language": "fr",
+    "level": "A2",
+    "tag": "DIAL",
+    "uiTitle": "Sol e Respiro",
+    "grammarFocus": "5 Maneiras de se desculpar em francês",
+    "theme": "Tema 13: Clima, Natureza e Passeios"
+  },
+  {
+    "id": "fr-a2-172",
+    "language": "fr",
+    "level": "A2",
+    "tag": "VOC",
+    "uiTitle": "A Caminhada no Verde",
+    "grammarFocus": "Números Ordinais e Rankings",
+    "theme": "Tema 13: Clima, Natureza e Passeios"
+  },
+  {
+    "id": "fr-a2-173",
+    "language": "fr",
+    "level": "A2",
+    "tag": "MISS",
+    "uiTitle": "Os Relógios do Sol",
+    "grammarFocus": "Na Estação de Trem e Aeroporto",
+    "theme": "Tema 13: Clima, Natureza e Passeios"
+  },
+  {
+    "id": "fr-a2-174",
+    "language": "fr",
+    "level": "A2",
+    "tag": "DIAL",
+    "uiTitle": "O Som da Natureza",
+    "grammarFocus": "5 Maneiras de expressar sentimentos e afeto",
+    "theme": "Tema 13: Clima, Natureza e Passeios"
+  },
+  {
+    "id": "fr-a2-175",
+    "language": "fr",
+    "level": "A2",
+    "tag": "VOC",
+    "uiTitle": "Os Parques da Metrópole",
+    "grammarFocus": "Animais da Floresta",
+    "theme": "Tema 13: Clima, Natureza e Passeios"
+  },
+  {
+    "id": "fr-a2-176",
+    "language": "fr",
+    "level": "A2",
+    "tag": "VOC",
+    "uiTitle": "Desconectando",
+    "grammarFocus": "Instrumentos Musicais",
+    "theme": "Tema 13: Clima, Natureza e Passeios"
+  },
+  {
+    "id": "fr-a2-177",
+    "language": "fr",
+    "level": "A2",
+    "tag": "VOC",
+    "uiTitle": "Folhas Caindo",
+    "grammarFocus": "Vocabulário de Casa: Cozinha e Quarto",
+    "theme": "Tema 13: Clima, Natureza e Passeios"
+  },
+  {
+    "id": "fr-a2-178",
+    "language": "fr",
+    "level": "A2",
+    "tag": "VOC",
+    "uiTitle": "Respirando",
+    "grammarFocus": "Vocabulário de Casa: Sala e Banheiro",
+    "theme": "Tema 13: Clima, Natureza e Passeios"
+  },
+  {
+    "id": "fr-a2-179",
+    "language": "fr",
+    "level": "A2",
+    "tag": "VOC",
+    "uiTitle": "O Descanso",
+    "grammarFocus": "Empregos e Profissões",
+    "theme": "Tema 13: Clima, Natureza e Passeios"
+  },
+  {
+    "id": "fr-a2-180",
+    "language": "fr",
+    "level": "A2",
+    "tag": "VOC",
+    "uiTitle": "Voltando",
+    "grammarFocus": "Saúde e Corpo: Avoir mal à",
+    "theme": "Tema 13: Clima, Natureza e Passeios"
+  },
+  {
+    "id": "fr-a2-181",
+    "language": "fr",
+    "level": "A2",
+    "tag": "MISS",
+    "uiTitle": "O Alarme do Chefe",
+    "grammarFocus": "Orientação Urbana e Mapas",
+    "theme": "Tema 14: Vida Profissional Básica"
+  },
+  {
+    "id": "fr-a2-182",
+    "language": "fr",
+    "level": "A2",
+    "tag": "GRAM",
+    "uiTitle": "O Refúgio do Café",
+    "grammarFocus": "Par de Confusão: Encore VS Toujours",
+    "theme": "Tema 14: Vida Profissional Básica"
+  },
+  {
+    "id": "fr-a2-183",
+    "language": "fr",
+    "level": "A2",
+    "tag": "PRON",
+    "uiTitle": "As Metas do Dia",
+    "grammarFocus": "Homófonos: Accro/accroc e Amande/amende",
+    "theme": "Tema 14: Vida Profissional Básica"
+  },
+  {
+    "id": "fr-a2-184",
+    "language": "fr",
+    "level": "A2",
+    "tag": "MISS",
+    "uiTitle": "A Tarefa Essencial",
+    "grammarFocus": "Farmácia e Emergência Médica",
+    "theme": "Tema 14: Vida Profissional Básica"
+  },
+  {
+    "id": "fr-a2-185",
+    "language": "fr",
+    "level": "A2",
+    "tag": "GRAM",
+    "uiTitle": "Conversa no Corredor",
+    "grammarFocus": "Par de Confusão: Déjà VS Jamais",
+    "theme": "Tema 14: Vida Profissional Básica"
+  },
+  {
+    "id": "fr-a2-186",
+    "language": "fr",
+    "level": "A2",
+    "tag": "PRON",
+    "uiTitle": "O E-mail Atrasado",
+    "grammarFocus": "Homófonos: Autel/hôtel e Auteur/hauteur",
+    "theme": "Tema 14: Vida Profissional Básica"
+  },
+  {
+    "id": "fr-a2-187",
+    "language": "fr",
+    "level": "A2",
+    "tag": "GRAM",
+    "uiTitle": "A Reunião do Projeto",
+    "grammarFocus": "Par de Confusão: Tant pis VS Tant mieux",
+    "theme": "Tema 14: Vida Profissional Básica"
+  },
+  {
+    "id": "fr-a2-188",
+    "language": "fr",
+    "level": "A2",
+    "tag": "GRAM",
+    "uiTitle": "Responsabilidade Diária",
+    "grammarFocus": "Par de Confusão: Visiter VS Rendre visite à",
+    "theme": "Tema 14: Vida Profissional Básica"
+  },
+  {
+    "id": "fr-a2-189",
+    "language": "fr",
+    "level": "A2",
+    "tag": "GRAM",
+    "uiTitle": "O Ponto G final",
+    "grammarFocus": "Par de Confusão: Leur VS Leurs",
+    "theme": "Tema 14: Vida Profissional Básica"
+  },
+  {
+    "id": "fr-a2-190",
+    "language": "fr",
+    "level": "A2",
+    "tag": "GRAM",
+    "uiTitle": "Deslogando",
+    "grammarFocus": "Plurais Irregulares: -ou, -al e -eau",
+    "theme": "Tema 14: Vida Profissional Básica"
+  },
+  {
+    "id": "fr-a2-191",
+    "language": "fr",
+    "level": "A2",
+    "tag": "VERB",
+    "uiTitle": "A Dor Oculta",
+    "grammarFocus": "Conjugação: Mettre",
+    "theme": "Tema 15: Saúde e Farmácia"
+  },
+  {
+    "id": "fr-a2-192",
+    "language": "fr",
+    "level": "A2",
+    "tag": "MISS",
+    "uiTitle": "Um Mal Estar Repentino",
+    "grammarFocus": "Ponte A2 > B1: O tempo das descrições",
+    "theme": "Tema 15: Saúde e Farmácia"
+  },
+  {
+    "id": "fr-a2-193",
+    "language": "fr",
+    "level": "A2",
+    "tag": "VERB",
+    "uiTitle": "A Busca pelo Alívio",
+    "grammarFocus": "Conjugação: Prendre",
+    "theme": "Tema 15: Saúde e Farmácia"
+  },
+  {
+    "id": "fr-a2-194",
+    "language": "fr",
+    "level": "A2",
+    "tag": "MISS",
+    "uiTitle": "Medicamentos Genéricos",
+    "grammarFocus": "Planejando uma viagem inesquecível (Synthesis)",
+    "theme": "Tema 15: Saúde e Farmácia"
+  },
+  {
+    "id": "fr-a2-195",
+    "language": "fr",
+    "level": "A2",
+    "tag": "VERB",
+    "uiTitle": "O Remédio Necessário",
+    "grammarFocus": "Conjugação: Lire",
+    "theme": "Tema 15: Saúde e Farmácia"
+  },
+  {
+    "id": "fr-a2-196",
+    "language": "fr",
+    "level": "A2",
+    "tag": "MISS",
+    "uiTitle": "A Prescrição",
+    "grammarFocus": "Revisão Geral A2",
+    "theme": "Tema 15: Saúde e Farmácia"
+  },
+  {
+    "id": "fr-a2-197",
+    "language": "fr",
+    "level": "A2",
+    "tag": "VERB",
+    "uiTitle": "A Cura Gradual",
+    "grammarFocus": "Conjugação: Écrire",
+    "theme": "Tema 15: Saúde e Farmácia"
+  },
+  {
+    "id": "fr-a2-198",
+    "language": "fr",
+    "level": "A2",
+    "tag": "VERB",
+    "uiTitle": "Saúde e Corpo",
+    "grammarFocus": "Conjugação: Dire",
+    "theme": "Tema 15: Saúde e Farmácia"
+  },
+  {
+    "id": "fr-a2-199",
+    "language": "fr",
+    "level": "A2",
+    "tag": "VERB",
+    "uiTitle": "Recuperação",
+    "grammarFocus": "Conjugação: Croire",
+    "theme": "Tema 15: Saúde e Farmácia"
+  },
+  {
+    "id": "fr-a2-200",
+    "language": "fr",
+    "level": "A2",
+    "tag": "VERB",
+    "uiTitle": "Força Restabelecida",
+    "grammarFocus": "Formação do Imparfait",
+    "theme": "Tema 15: Saúde e Farmácia"
+  },
+  {
+    "id": "fr-b1-201",
+    "language": "fr",
+    "level": "B1",
+    "tag": "VERB",
+    "uiTitle": "Brinquedos Antigos",
+    "grammarFocus": "Imparfait para Descrições e Hábitos",
+    "theme": "Tema 16: Relembrando a Infância"
+  },
+  {
+    "id": "fr-b1-202",
+    "language": "fr",
+    "level": "B1",
+    "tag": "GRAM",
+    "uiTitle": "Aquele Ano Longe",
+    "grammarFocus": "Narrativa: Imparfait VS Passé Composé (Gatilhos)",
+    "theme": "Tema 16: Relembrando a Infância"
+  },
+  {
+    "id": "fr-b1-203",
+    "language": "fr",
+    "level": "B1",
+    "tag": "VERB",
+    "uiTitle": "No Tempo da Escola",
+    "grammarFocus": "Futur Simple: Conjugação Regular",
+    "theme": "Tema 16: Relembrando a Infância"
+  },
+  {
+    "id": "fr-b1-204",
+    "language": "fr",
+    "level": "B1",
+    "tag": "GRAM",
+    "uiTitle": "As Regras de Ouro",
+    "grammarFocus": "Narrativa: Imparfait VS Passé Composé (Contextos)",
+    "theme": "Tema 16: Relembrando a Infância"
+  },
+  {
+    "id": "fr-b1-205",
+    "language": "fr",
+    "level": "B1",
+    "tag": "VERB",
+    "uiTitle": "Como as Coisas Funcionavam",
+    "grammarFocus": "Futur Simple: Conjugação Irregular",
+    "theme": "Tema 16: Relembrando a Infância"
+  },
+  {
+    "id": "fr-b1-206",
+    "language": "fr",
+    "level": "B1",
+    "tag": "GRAM",
+    "uiTitle": "Os Primeiros Amigos",
+    "grammarFocus": "Pronome Relativo: Qui (Sujeito)",
+    "theme": "Tema 16: Relembrando a Infância"
+  },
+  {
+    "id": "fr-b1-207",
+    "language": "fr",
+    "level": "B1",
+    "tag": "VERB",
+    "uiTitle": "Cores do Passado",
+    "grammarFocus": "Conditionnel Présent: Conjugação e Uso",
+    "theme": "Tema 16: Relembrando a Infância"
+  },
+  {
+    "id": "fr-b1-208",
+    "language": "fr",
+    "level": "B1",
+    "tag": "GRAM",
+    "uiTitle": "Fim de Tarde Imortal",
+    "grammarFocus": "Pronome Relativo: Que (Objeto)",
+    "theme": "Tema 16: Relembrando a Infância"
+  },
+  {
+    "id": "fr-b1-209",
+    "language": "fr",
+    "level": "B1",
+    "tag": "VERB",
+    "uiTitle": "Um Conto Rápido",
+    "grammarFocus": "Gerúndio: Ações Simultâneas (Tout en fazendo)",
+    "theme": "Tema 16: Relembrando a Infância"
+  },
+  {
+    "id": "fr-b1-210",
+    "language": "fr",
+    "level": "B1",
+    "tag": "GRAM",
+    "uiTitle": "Saudades Constantes",
+    "grammarFocus": "Pronome Relativo: Où (Lugar/Tempo)",
+    "theme": "Tema 16: Relembrando a Infância"
+  },
+  {
+    "id": "fr-b1-211",
+    "language": "fr",
+    "level": "B1",
+    "tag": "GRAM",
+    "uiTitle": "Evolução do Ser",
+    "grammarFocus": "Pronome Relativo: Dont (Posse)",
+    "theme": "Tema 16: Relembrando a Infância"
+  },
+  {
+    "id": "fr-b1-212",
+    "language": "fr",
+    "level": "B1",
+    "tag": "GRAM",
+    "uiTitle": "Lá e Cá",
+    "grammarFocus": "Par de Confusão: Qui VS Que (Relativos)",
+    "theme": "Tema 16: Relembrando a Infância"
+  },
+  {
+    "id": "fr-b1-213",
+    "language": "fr",
+    "level": "B1",
+    "tag": "GRAM",
+    "uiTitle": "Visão do Hoje",
+    "grammarFocus": "Par de Confusão: Lequel, Laquelle, Lesquels, Lesquelles",
+    "theme": "Tema 16: Relembrando a Infância"
+  },
+  {
+    "id": "fr-b1-214",
+    "language": "fr",
+    "level": "B1",
+    "tag": "GRAM",
+    "uiTitle": "Relato Final",
+    "grammarFocus": "Orações Temporais: Quand e Lorsque",
+    "theme": "Tema 16: Relembrando a Infância"
+  },
+  {
+    "id": "fr-b1-215",
+    "language": "fr",
+    "level": "B1",
+    "tag": "GRAM",
+    "uiTitle": "Passos da Vida",
+    "grammarFocus": "Estruturas Condicionais (1): Si + Presente",
+    "theme": "Tema 16: Relembrando a Infância"
+  },
+  {
+    "id": "fr-b1-216",
+    "language": "fr",
+    "level": "B1",
+    "tag": "GRAM",
+    "uiTitle": "Tchau",
+    "grammarFocus": "Estruturas Condicionais (2): Si + Imperfeito",
+    "theme": "Tema 16: Relembrando a Infância"
+  },
+  {
+    "id": "fr-b1-217",
+    "language": "fr",
+    "level": "B1",
+    "tag": "GRAM",
+    "uiTitle": "Tchau (Continuação)",
+    "grammarFocus": "Par de Confusão: Quand VS Lorsque",
+    "theme": "Tema 16: Relembrando a Infância"
+  },
+  {
+    "id": "fr-b1-218",
+    "language": "fr",
+    "level": "B1",
+    "tag": "GRAM",
+    "uiTitle": "Tchau (Continuação)",
+    "grammarFocus": "Ordem e Posição de Pronomes Duplos",
+    "theme": "Tema 16: Relembrando a Infância"
+  },
+  {
+    "id": "fr-b1-219",
+    "language": "fr",
+    "level": "B1",
+    "tag": "VERB",
+    "uiTitle": "A Preparação Inicial",
+    "grammarFocus": "Concordância do Particípio Passado (COD e Relativos)",
+    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+  },
+  {
+    "id": "fr-b1-220",
+    "language": "fr",
+    "level": "B1",
+    "tag": "GRAM",
+    "uiTitle": "Aquecendo a Voz",
+    "grammarFocus": "Voz Passiva: Uso de Par e De",
+    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+  },
+  {
+    "id": "fr-b1-221",
+    "language": "fr",
+    "level": "B1",
+    "tag": "MISS",
+    "uiTitle": "O Primeito Toque",
+    "grammarFocus": "Prática: Narrando eventos complexos em sequência",
+    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+  },
+  {
+    "id": "fr-b1-222",
+    "language": "fr",
+    "level": "B1",
+    "tag": "VOC",
+    "uiTitle": "Ganho de Ritmo",
+    "grammarFocus": "Conjunções: Mais, ou, et, donc, or, ni, car",
+    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+  },
+  {
+    "id": "fr-b1-223",
+    "language": "fr",
+    "level": "B1",
+    "tag": "EXPR",
+    "uiTitle": "Ponto Chave",
+    "grammarFocus": "5 Expressões com o verbo Prendre",
+    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+  },
+  {
+    "id": "fr-b1-224",
+    "language": "fr",
+    "level": "B1",
+    "tag": "VERB",
+    "uiTitle": "Subindo as Escadas",
+    "grammarFocus": "Verbos Impessoais: Falloir, neiger e valoir",
+    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+  },
+  {
+    "id": "fr-b1-225",
+    "language": "fr",
+    "level": "B1",
+    "tag": "GRAM",
+    "uiTitle": "Entrando no Detail",
+    "grammarFocus": "Discurso Indireto: Il dit que...",
+    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+  },
+  {
+    "id": "fr-b1-226",
+    "language": "fr",
+    "level": "B1",
+    "tag": "VOC",
+    "uiTitle": "Puxando Pela Memória",
+    "grammarFocus": "Conjunções: Parce que, quando, si, como, puisque",
+    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+  },
+  {
+    "id": "fr-b1-227",
+    "language": "fr",
+    "level": "B1",
+    "tag": "GRAM",
+    "uiTitle": "Momento do Xeque",
+    "grammarFocus": "Conjunções Temporais: Dès que e Aussitôt que",
+    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+  },
+  {
+    "id": "fr-b1-228",
+    "language": "fr",
+    "level": "B1",
+    "tag": "VOC",
+    "uiTitle": "O Grande Desafio",
+    "grammarFocus": "Falsos Amigos (Faux amis) e Erros Comuns",
+    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+  },
+  {
+    "id": "fr-b1-229",
+    "language": "fr",
+    "level": "B1",
+    "tag": "GRAM",
+    "uiTitle": "Fechamentos Lógicos",
+    "grammarFocus": "Par de Confusão: Parce que VS Car",
+    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+  },
+  {
+    "id": "fr-b1-230",
+    "language": "fr",
+    "level": "B1",
+    "tag": "VOC",
+    "uiTitle": "Quase Lá",
+    "grammarFocus": "Nominalização: Transformando verbos em substantivos",
+    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+  },
+  {
+    "id": "fr-b1-231",
+    "language": "fr",
+    "level": "B1",
+    "tag": "GRAM",
+    "uiTitle": "Fim do Ciclo",
+    "grammarFocus": "Par de Confusão: Puisque VS Comme",
+    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+  },
+  {
+    "id": "fr-b1-232",
+    "language": "fr",
+    "level": "B1",
+    "tag": "GRAM",
+    "uiTitle": "O Retorno Absoluto",
+    "grammarFocus": "Par de Confusão: Penser à VS Penser de",
+    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+  },
+  {
+    "id": "fr-b1-233",
+    "language": "fr",
+    "level": "B1",
+    "tag": "GRAM",
+    "uiTitle": "Conquista",
+    "grammarFocus": "Uso Global de Tout (Adjetivo e Pronome)",
+    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+  },
+  {
+    "id": "fr-b1-234",
+    "language": "fr",
+    "level": "B1",
+    "tag": "GRAM",
+    "uiTitle": "Etapa Avançada 16",
+    "grammarFocus": "Pronomes Enfáticos: Mesmo (Même)",
+    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+  },
+  {
+    "id": "fr-b1-235",
+    "language": "fr",
+    "level": "B1",
+    "tag": "GRAM",
+    "uiTitle": "Etapa Avançada 17",
+    "grammarFocus": "Adjetivos Indefinidos: Chaque, certain, plusieurs, quelque",
+    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+  },
+  {
+    "id": "fr-b1-236",
+    "language": "fr",
+    "level": "B1",
+    "tag": "GRAM",
+    "uiTitle": "Etapa Avançada 18",
+    "grammarFocus": "Adjetivos: Mudança de Sentido pela posição",
+    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+  },
+  {
+    "id": "fr-b1-237",
+    "language": "fr",
+    "level": "B1",
+    "tag": "EXPR",
+    "uiTitle": "O Horizonte Longínquo",
+    "grammarFocus": "5 Expressões com o verbo Mettre",
+    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
+  },
+  {
+    "id": "fr-b1-238",
+    "language": "fr",
+    "level": "B1",
+    "tag": "MISS",
+    "uiTitle": "A Promessa Abstrata",
+    "grammarFocus": "Redação: Descrição de um Lugar Especial",
+    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
+  },
+  {
+    "id": "fr-b1-239",
+    "language": "fr",
+    "level": "B1",
+    "tag": "CULT",
+    "uiTitle": "O E Se...",
+    "grammarFocus": "Redação: Redes Sociais e Sociedade",
+    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
+  },
+  {
+    "id": "fr-b1-240",
+    "language": "fr",
+    "level": "B1",
+    "tag": "VOC",
+    "uiTitle": "Gatilhos da Imaginação",
+    "grammarFocus": "Vocabulário: Lieu, Endroit e Place",
+    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
+  },
+  {
+    "id": "fr-b1-241",
+    "language": "fr",
+    "level": "B1",
+    "tag": "GRAM",
+    "uiTitle": "Teorizando a Vida",
+    "grammarFocus": "Par de Confusão: Un lieu VS Un endroit VS Une place",
+    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
+  },
+  {
+    "id": "fr-b1-242",
+    "language": "fr",
+    "level": "B1",
+    "tag": "EXPR",
+    "uiTitle": "O Fato Condicional",
+    "grammarFocus": "5 Expressões de Amor e Cores",
+    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
+  },
+  {
+    "id": "fr-b1-243",
+    "language": "fr",
+    "level": "B1",
+    "tag": "MISS",
+    "uiTitle": "Imaginando Impossíveis",
+    "grammarFocus": "Redação: Planos para o Futuro",
+    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
+  },
+  {
+    "id": "fr-b1-244",
+    "language": "fr",
+    "level": "B1",
+    "tag": "VOC",
+    "uiTitle": "Possibilidades Várias",
+    "grammarFocus": "Vocabulário: Sortir, Partir, Quitter e Laisser",
+    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
+  },
+  {
+    "id": "fr-b1-245",
+    "language": "fr",
+    "level": "B1",
+    "tag": "GRAM",
+    "uiTitle": "Deixando Voar",
+    "grammarFocus": "Par de Confusão: Sortir VS Partir VS Quitter VS Laisser",
+    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
+  },
+  {
+    "id": "fr-b1-246",
+    "language": "fr",
+    "level": "B1",
+    "tag": "EXPR",
+    "uiTitle": "Contrato com o Futuro",
+    "grammarFocus": "5 Expressões de Trabalho e Dinheiro",
+    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
+  },
+  {
+    "id": "fr-b1-247",
+    "language": "fr",
+    "level": "B1",
+    "tag": "MISS",
+    "uiTitle": "As Asas Cortadas",
+    "grammarFocus": "Redação: Uma Lição de Vida Importante",
+    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
+  },
+  {
+    "id": "fr-b1-248",
+    "language": "fr",
+    "level": "B1",
+    "tag": "VOC",
+    "uiTitle": "O Resgate",
+    "grammarFocus": "Vocabulário: Avoir mal à e Avoir du mal à",
+    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
+  },
+  {
+    "id": "fr-b1-249",
+    "language": "fr",
+    "level": "B1",
+    "tag": "EXPR",
+    "uiTitle": "Tudo em Paz",
+    "grammarFocus": "5 Expressões sobre Clima (Météo)",
+    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
+  },
+  {
+    "id": "fr-b1-250",
+    "language": "fr",
+    "level": "B1",
+    "tag": "MISS",
+    "uiTitle": "Sonhar não Custa",
+    "grammarFocus": "Redação: Uma Viagem Marcante",
+    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
+  },
+  {
+    "id": "fr-b1-251",
+    "language": "fr",
+    "level": "B1",
+    "tag": "EXPR",
+    "uiTitle": "Luz Longe",
+    "grammarFocus": "5 Expressões com En: En ter marre, S'en aller",
+    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
+  },
+  {
+    "id": "fr-b1-252",
+    "language": "fr",
+    "level": "B1",
+    "tag": "MISS",
+    "uiTitle": "Destino",
+    "grammarFocus": "Redação: Desafios Pessoais",
+    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
+  },
+  {
+    "id": "fr-b1-253",
+    "language": "fr",
+    "level": "B1",
+    "tag": "EXPR",
+    "uiTitle": "Destino (Continuação)",
+    "grammarFocus": "5 Expressões com Y: Ça y est, Il y a",
+    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
+  },
+  {
+    "id": "fr-b1-254",
+    "language": "fr",
+    "level": "B1",
+    "tag": "MISS",
+    "uiTitle": "Destino (Continuação)",
+    "grammarFocus": "Redação: Uma Pessoa Inspiradora",
+    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
+  },
+  {
+    "id": "fr-b1-255",
+    "language": "fr",
+    "level": "B1",
+    "tag": "GRAM",
+    "uiTitle": "A Preparação Inicial",
+    "grammarFocus": "Par de Confusão: Faire mal à VS Faire du mal",
+    "theme": "Tema 19: Vida Profissional e Entrevistas"
+  },
+  {
+    "id": "fr-b1-256",
+    "language": "fr",
+    "level": "B1",
+    "tag": "DIAL",
+    "uiTitle": "Aquecendo a Voz",
+    "grammarFocus": "5 Maneiras de Dizer Félicitations (B1)",
+    "theme": "Tema 19: Vida Profissional e Entrevistas"
+  },
+  {
+    "id": "fr-b1-257",
+    "language": "fr",
+    "level": "B1",
+    "tag": "VERB",
+    "uiTitle": "O Primeito Toque",
+    "grammarFocus": "Conjugação: Dire",
+    "theme": "Tema 19: Vida Profissional e Entrevistas"
+  },
+  {
+    "id": "fr-b1-258",
+    "language": "fr",
+    "level": "B1",
+    "tag": "GRAM",
+    "uiTitle": "Ganho de Ritmo",
+    "grammarFocus": "Par de Confusão: Souligner VS Surligner",
+    "theme": "Tema 19: Vida Profissional e Entrevistas"
+  },
+  {
+    "id": "fr-b1-259",
+    "language": "fr",
+    "level": "B1",
+    "tag": "DIAL",
+    "uiTitle": "Ponto Chave",
+    "grammarFocus": "5 Maneiras de Dizer Au revoir (B1)",
+    "theme": "Tema 19: Vida Profissional e Entrevistas"
+  },
+  {
+    "id": "fr-b1-260",
+    "language": "fr",
+    "level": "B1",
+    "tag": "VERB",
+    "uiTitle": "Subindo as Escadas",
+    "grammarFocus": "Conjugação: Écrire",
+    "theme": "Tema 19: Vida Profissional e Entrevistas"
+  },
+  {
+    "id": "fr-b1-261",
+    "language": "fr",
+    "level": "B1",
+    "tag": "GRAM",
+    "uiTitle": "Entrando no Detail",
+    "grammarFocus": "Par de Confusão: Prêter VS Emprunter",
+    "theme": "Tema 19: Vida Profissional e Entrevistas"
+  },
+  {
+    "id": "fr-b1-262",
+    "language": "fr",
+    "level": "B1",
+    "tag": "VERB",
+    "uiTitle": "Puxando Pela Memória",
+    "grammarFocus": "Conjugação: Lire",
+    "theme": "Tema 19: Vida Profissional e Entrevistas"
+  },
+  {
+    "id": "fr-b1-263",
+    "language": "fr",
+    "level": "B1",
+    "tag": "GRAM",
+    "uiTitle": "Momento do Xeque",
+    "grammarFocus": "Par de Confusão: Rappeler VS Se rappeler VS Se souvenir",
+    "theme": "Tema 19: Vida Profissional e Entrevistas"
+  },
+  {
+    "id": "fr-b1-264",
+    "language": "fr",
+    "level": "B1",
+    "tag": "VERB",
+    "uiTitle": "O Grande Desafio",
+    "grammarFocus": "Conjugação: Répondre",
+    "theme": "Tema 19: Vida Profissional e Entrevistas"
+  },
+  {
+    "id": "fr-b1-265",
+    "language": "fr",
+    "level": "B1",
+    "tag": "VERB",
+    "uiTitle": "Fechamentos Lógicos",
+    "grammarFocus": "Conjugação: Faire",
+    "theme": "Tema 19: Vida Profissional e Entrevistas"
+  },
+  {
+    "id": "fr-b1-266",
+    "language": "fr",
+    "level": "B1",
+    "tag": "VERB",
+    "uiTitle": "Quase Lá",
+    "grammarFocus": "Conjugação: Prendre",
+    "theme": "Tema 19: Vida Profissional e Entrevistas"
+  },
+  {
+    "id": "fr-b1-267",
+    "language": "fr",
+    "level": "B1",
+    "tag": "VERB",
+    "uiTitle": "Fim do Ciclo",
+    "grammarFocus": "Conjugação: Mettre",
+    "theme": "Tema 19: Vida Profissional e Entrevistas"
+  },
+  {
+    "id": "fr-b1-268",
+    "language": "fr",
+    "level": "B1",
+    "tag": "VERB",
+    "uiTitle": "O Retorno Absoluto",
+    "grammarFocus": "Conjugação: Construire",
+    "theme": "Tema 19: Vida Profissional e Entrevistas"
+  },
+  {
+    "id": "fr-b1-269",
+    "language": "fr",
+    "level": "B1",
+    "tag": "VERB",
+    "uiTitle": "Conquista",
+    "grammarFocus": "Conjugação: Vouloir",
+    "theme": "Tema 19: Vida Profissional e Entrevistas"
+  },
+  {
+    "id": "fr-b1-270",
+    "language": "fr",
+    "level": "B1",
+    "tag": "VERB",
+    "uiTitle": "Etapa Avançada 16",
+    "grammarFocus": "Conjugação: Pouvoir",
+    "theme": "Tema 19: Vida Profissional e Entrevistas"
+  },
+  {
+    "id": "fr-b1-271",
+    "language": "fr",
+    "level": "B1",
+    "tag": "VERB",
+    "uiTitle": "Etapa Avançada 17",
+    "grammarFocus": "Conjugação: Devoir",
+    "theme": "Tema 19: Vida Profissional e Entrevistas"
+  },
+  {
+    "id": "fr-b1-272",
+    "language": "fr",
+    "level": "B1",
+    "tag": "VERB",
+    "uiTitle": "Etapa Avançada 18",
+    "grammarFocus": "Conjugação: Falloir",
+    "theme": "Tema 19: Vida Profissional e Entrevistas"
+  },
+  {
+    "id": "fr-b1-273",
+    "language": "fr",
+    "level": "B1",
+    "tag": "VERB",
+    "uiTitle": "A Preparação Inicial",
+    "grammarFocus": "Conjugação: Savoir",
+    "theme": "Tema 20: Expressões e Redes Sociais"
+  },
+  {
+    "id": "fr-b1-274",
+    "language": "fr",
+    "level": "B1",
+    "tag": "GRAM",
+    "uiTitle": "Aquecendo a Voz",
+    "grammarFocus": "Par de Confusão: Tout à coup VS Tout d'un coup",
+    "theme": "Tema 20: Expressões e Redes Sociais"
+  },
+  {
+    "id": "fr-b1-275",
+    "language": "fr",
+    "level": "B1",
+    "tag": "MISS",
+    "uiTitle": "O Primeito Toque",
+    "grammarFocus": "Ponte B1 > B2: Introdução ao Subjonctif",
+    "theme": "Tema 20: Expressões e Redes Sociais"
+  },
+  {
+    "id": "fr-b1-276",
+    "language": "fr",
+    "level": "B1",
+    "tag": "VERB",
+    "uiTitle": "Ganho de Ritmo",
+    "grammarFocus": "Conjugação: Croire",
+    "theme": "Tema 20: Expressões e Redes Sociais"
+  },
+  {
+    "id": "fr-b1-277",
+    "language": "fr",
+    "level": "B1",
+    "tag": "GRAM",
+    "uiTitle": "Ponto Chave",
+    "grammarFocus": "Par de Confusão: Uma tarefa VS Uma mancha",
+    "theme": "Tema 20: Expressões e Redes Sociais"
+  },
+  {
+    "id": "fr-b1-278",
+    "language": "fr",
+    "level": "B1",
+    "tag": "MISS",
+    "uiTitle": "Subindo as Escadas",
+    "grammarFocus": "Revisão Geral B1",
+    "theme": "Tema 20: Expressões e Redes Sociais"
+  },
+  {
+    "id": "fr-b1-279",
+    "language": "fr",
+    "level": "B1",
+    "tag": "VERB",
+    "uiTitle": "Entrando no Detail",
+    "grammarFocus": "Conjugação: Connaître",
+    "theme": "Tema 20: Expressões e Redes Sociais"
+  },
+  {
+    "id": "fr-b1-280",
+    "language": "fr",
+    "level": "B1",
+    "tag": "GRAM",
+    "uiTitle": "Puxando Pela Memória",
+    "grammarFocus": "Par de Confusão: En plus VS De plus",
+    "theme": "Tema 20: Expressões e Redes Sociais"
+  },
+  {
+    "id": "fr-b1-281",
+    "language": "fr",
+    "level": "B1",
+    "tag": "VERB",
+    "uiTitle": "Momento do Xeque",
+    "grammarFocus": "Conjugação: Sentir",
+    "theme": "Tema 20: Expressões e Redes Sociais"
+  },
+  {
+    "id": "fr-b1-282",
+    "language": "fr",
+    "level": "B1",
+    "tag": "GRAM",
+    "uiTitle": "O Grande Desafio",
+    "grammarFocus": "Par de Confusão: Ailleurs VS D'ailleurs",
+    "theme": "Tema 20: Expressões e Redes Sociais"
+  },
+  {
+    "id": "fr-b1-283",
+    "language": "fr",
+    "level": "B1",
+    "tag": "VERB",
+    "uiTitle": "Fechamentos Lógicos",
+    "grammarFocus": "Conjugação: Servir",
+    "theme": "Tema 20: Expressões e Redes Sociais"
+  },
+  {
+    "id": "fr-b1-284",
+    "language": "fr",
+    "level": "B1",
+    "tag": "VERB",
+    "uiTitle": "Quase Lá",
+    "grammarFocus": "Conjugação: Plaire",
+    "theme": "Tema 20: Expressões e Redes Sociais"
+  },
+  {
+    "id": "fr-b1-285",
+    "language": "fr",
+    "level": "B1",
+    "tag": "VERB",
+    "uiTitle": "Fim do Ciclo",
+    "grammarFocus": "Conjugação: Rire",
+    "theme": "Tema 20: Expressões e Redes Sociais"
+  },
+  {
+    "id": "fr-b1-286",
+    "language": "fr",
+    "level": "B1",
+    "tag": "VERB",
+    "uiTitle": "O Retorno Absoluto",
+    "grammarFocus": "Conjugação: Venir",
+    "theme": "Tema 20: Expressões e Redes Sociais"
+  },
+  {
+    "id": "fr-b1-287",
+    "language": "fr",
+    "level": "B1",
+    "tag": "VERB",
+    "uiTitle": "Conquista",
+    "grammarFocus": "Conjugação: Partir",
+    "theme": "Tema 20: Expressões e Redes Sociais"
+  },
+  {
+    "id": "fr-b1-288",
+    "language": "fr",
+    "level": "B1",
+    "tag": "VERB",
+    "uiTitle": "Etapa Avançada 16",
+    "grammarFocus": "Conjugação: Sortir",
+    "theme": "Tema 20: Expressões e Redes Sociais"
+  },
+  {
+    "id": "fr-b1-289",
+    "language": "fr",
+    "level": "B1",
+    "tag": "VERB",
+    "uiTitle": "Etapa Avançada 17",
+    "grammarFocus": "Conjugação: Courir",
+    "theme": "Tema 20: Expressões e Redes Sociais"
+  },
+  {
+    "id": "fr-b1-290",
+    "language": "fr",
+    "level": "B1",
+    "tag": "VERB",
+    "uiTitle": "Etapa Avançada 18",
+    "grammarFocus": "Subjonctif Présent: Formação (Regulares)",
+    "theme": "Tema 20: Expressões e Redes Sociais"
+  },
+  {
+    "id": "fr-b2-291",
+    "language": "fr",
+    "level": "B2",
+    "tag": "VERB",
+    "uiTitle": "A Preparação Inicial",
+    "grammarFocus": "Subjonctif Présent: Verbos Irregulares (Être, Avoir)",
+    "theme": "Tema 21: O Mundo das Emoções"
+  },
+  {
+    "id": "fr-b2-292",
+    "language": "fr",
+    "level": "B2",
+    "tag": "GRAM",
+    "uiTitle": "Aquecendo a Voz",
+    "grammarFocus": "O uso do ne pleonástico (ne explétif)",
+    "theme": "Tema 21: O Mundo das Emoções"
+  },
+  {
+    "id": "fr-b2-293",
+    "language": "fr",
+    "level": "B2",
+    "tag": "VERB",
+    "uiTitle": "O Primeito Toque",
+    "grammarFocus": "Subjonctif Présent: Verbos Irregulares (Faire, Aller, Savoir)",
+    "theme": "Tema 21: O Mundo das Emoções"
+  },
+  {
+    "id": "fr-b2-294",
+    "language": "fr",
+    "level": "B2",
+    "tag": "GRAM",
+    "uiTitle": "Ganho de Ritmo",
+    "grammarFocus": "Indicativo VS Subjuntivo: Verbos de Opinião",
+    "theme": "Tema 21: O Mundo das Emoções"
+  },
+  {
+    "id": "fr-b2-295",
+    "language": "fr",
+    "level": "B2",
+    "tag": "VERB",
+    "uiTitle": "Ponto Chave",
+    "grammarFocus": "Subjonctif: Necessidade e Vontade",
+    "theme": "Tema 21: O Mundo das Emoções"
+  },
+  {
+    "id": "fr-b2-296",
+    "language": "fr",
+    "level": "B2",
+    "tag": "GRAM",
+    "uiTitle": "Subindo as Escadas",
+    "grammarFocus": "Formação do Plus-que-parfait",
+    "theme": "Tema 21: O Mundo das Emoções"
+  },
+  {
+    "id": "fr-b2-297",
+    "language": "fr",
+    "level": "B2",
+    "tag": "VERB",
+    "uiTitle": "Entrando no Detail",
+    "grammarFocus": "Subjonctif: Dúvida e Incerteza",
+    "theme": "Tema 21: O Mundo das Emoções"
+  },
+  {
+    "id": "fr-b2-298",
+    "language": "fr",
+    "level": "B2",
+    "tag": "VERB",
+    "uiTitle": "Puxando Pela Memória",
+    "grammarFocus": "Subjonctif: Emoção e Julgamento",
+    "theme": "Tema 21: O Mundo das Emoções"
+  },
+  {
+    "id": "fr-b2-299",
+    "language": "fr",
+    "level": "B2",
+    "tag": "VERB",
+    "uiTitle": "Momento do Xeque",
+    "grammarFocus": "Subjonctif: Orações Concessivas",
+    "theme": "Tema 21: O Mundo das Emoções"
+  },
+  {
+    "id": "fr-b2-300",
+    "language": "fr",
+    "level": "B2",
+    "tag": "VERB",
+    "uiTitle": "O Grande Desafio",
+    "grammarFocus": "Subjonctif: Finalidade e Negativa (Sans que)",
+    "theme": "Tema 21: O Mundo das Emoções"
+  },
+  {
+    "id": "fr-b2-301",
+    "language": "fr",
+    "level": "B2",
+    "tag": "VERB",
+    "uiTitle": "Fechamentos Lógicos",
+    "grammarFocus": "Formação do Conditionnel Passé",
+    "theme": "Tema 21: O Mundo das Emoções"
+  },
+  {
+    "id": "fr-b2-302",
+    "language": "fr",
+    "level": "B2",
+    "tag": "VERB",
+    "uiTitle": "Quase Lá",
+    "grammarFocus": "Hipóteses sobre o Passado (3ª Condicional)",
+    "theme": "Tema 21: O Mundo das Emoções"
+  },
+  {
+    "id": "fr-b2-303",
+    "language": "fr",
+    "level": "B2",
+    "tag": "VERB",
+    "uiTitle": "Fim do Ciclo",
+    "grammarFocus": "Futur Antérieur: Formação e Uso",
+    "theme": "Tema 21: O Mundo das Emoções"
+  },
+  {
+    "id": "fr-b2-304",
+    "language": "fr",
+    "level": "B2",
+    "tag": "VERB",
+    "uiTitle": "O Retorno Absoluto",
+    "grammarFocus": "Discurso Indireto no Passado (B2)",
+    "theme": "Tema 21: O Mundo das Emoções"
+  },
+  {
+    "id": "fr-b2-305",
+    "language": "fr",
+    "level": "B2",
+    "tag": "VERB",
+    "uiTitle": "Conquista",
+    "grammarFocus": "Construções Causativas: Faire e infinitivo",
+    "theme": "Tema 21: O Mundo das Emoções"
+  },
+  {
+    "id": "fr-b2-306",
+    "language": "fr",
+    "level": "B2",
+    "tag": "GRAM",
+    "uiTitle": "A Preparação Inicial",
+    "grammarFocus": "Causativas Reflexivas: Se fazer e Se deixar",
+    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+  },
+  {
+    "id": "fr-b2-307",
+    "language": "fr",
+    "level": "B2",
+    "tag": "VERB",
+    "uiTitle": "Aquecendo a Voz",
+    "grammarFocus": "O uso do Infinitivo Passado",
+    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+  },
+  {
+    "id": "fr-b2-308",
+    "language": "fr",
+    "level": "B2",
+    "tag": "GRAM",
+    "uiTitle": "O Primeito Toque",
+    "grammarFocus": "Imperativo com Pronomes Duplos",
+    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+  },
+  {
+    "id": "fr-b2-309",
+    "language": "fr",
+    "level": "B2",
+    "tag": "VOC",
+    "uiTitle": "Ganho de Ritmo",
+    "grammarFocus": "Marcadores Discursivos: Adição e Estruturação",
+    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+  },
+  {
+    "id": "fr-b2-310",
+    "language": "fr",
+    "level": "B2",
+    "tag": "GRAM",
+    "uiTitle": "Ponto Chave",
+    "grammarFocus": "Relativos Compostos: Auquel e Duquel",
+    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+  },
+  {
+    "id": "fr-b2-311",
+    "language": "fr",
+    "level": "B2",
+    "tag": "GRAM",
+    "uiTitle": "Subindo as Escadas",
+    "grammarFocus": "Par de Confusão: Douter VS Se douter",
+    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+  },
+  {
+    "id": "fr-b2-312",
+    "language": "fr",
+    "level": "B2",
+    "tag": "GRAM",
+    "uiTitle": "Entrando no Detail",
+    "grammarFocus": "Par de Confusão: Si VS Tellement VS Tant",
+    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+  },
+  {
+    "id": "fr-b2-313",
+    "language": "fr",
+    "level": "B2",
+    "tag": "GRAM",
+    "uiTitle": "Puxando Pela Memória",
+    "grammarFocus": "Par de Confusão: Décider de VS Se decidir à",
+    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+  },
+  {
+    "id": "fr-b2-314",
+    "language": "fr",
+    "level": "B2",
+    "tag": "GRAM",
+    "uiTitle": "Momento do Xeque",
+    "grammarFocus": "Par de Confusão: Déménager VS Aménager",
+    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+  },
+  {
+    "id": "fr-b2-315",
+    "language": "fr",
+    "level": "B2",
+    "tag": "GRAM",
+    "uiTitle": "O Grande Desafio",
+    "grammarFocus": "Par de Confusão: En fait VS Au fait (B2)",
+    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+  },
+  {
+    "id": "fr-b2-316",
+    "language": "fr",
+    "level": "B2",
+    "tag": "GRAM",
+    "uiTitle": "Fechamentos Lógicos",
+    "grammarFocus": "Par de Confusão: Y VS En (B2)",
+    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+  },
+  {
+    "id": "fr-b2-317",
+    "language": "fr",
+    "level": "B2",
+    "tag": "GRAM",
+    "uiTitle": "Quase Lá",
+    "grammarFocus": "Plurais Irregulares: Revisão Abrangente",
+    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+  },
+  {
+    "id": "fr-b2-318",
+    "language": "fr",
+    "level": "B2",
+    "tag": "GRAM",
+    "uiTitle": "Fim do Ciclo",
+    "grammarFocus": "Superlativos Complexos e Destaque",
+    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+  },
+  {
+    "id": "fr-b2-319",
+    "language": "fr",
+    "level": "B2",
+    "tag": "GRAM",
+    "uiTitle": "A Preparação Inicial",
+    "grammarFocus": "Particípio Presente vs Adjetivo Verbal",
+    "theme": "Tema 23: Literatura e Situações Hipotéticas"
+  },
+  {
+    "id": "fr-b2-320",
+    "language": "fr",
+    "level": "B2",
+    "tag": "VOC",
+    "uiTitle": "Aquecendo a Voz",
+    "grammarFocus": "Medidas e Frações (Avançado)",
+    "theme": "Tema 23: Literatura e Situações Hipotéticas"
+  },
+  {
+    "id": "fr-b2-321",
+    "language": "fr",
+    "level": "B2",
+    "tag": "EXPR",
+    "uiTitle": "O Primeito Toque",
+    "grammarFocus": "5 Expressões avançadas com Y",
+    "theme": "Tema 23: Literatura e Situações Hipotéticas"
+  },
+  {
+    "id": "fr-b2-322",
+    "language": "fr",
+    "level": "B2",
+    "tag": "MISS",
+    "uiTitle": "Ganho de Ritmo",
+    "grammarFocus": "Redação: Prós e Contras das Redes Sociais",
+    "theme": "Tema 23: Literatura e Situações Hipotéticas"
+  },
+  {
+    "id": "fr-b2-323",
+    "language": "fr",
+    "level": "B2",
+    "tag": "CULT",
+    "uiTitle": "Ponto Chave",
+    "grammarFocus": "Redação: Educação Moderna e Sociedade",
+    "theme": "Tema 23: Literatura e Situações Hipotéticas"
+  },
+  {
+    "id": "fr-b2-324",
+    "language": "fr",
+    "level": "B2",
+    "tag": "EXPR",
+    "uiTitle": "Subindo as Escadas",
+    "grammarFocus": "5 Expressões avançadas com En",
+    "theme": "Tema 23: Literatura e Situações Hipotéticas"
+  },
+  {
+    "id": "fr-b2-325",
+    "language": "fr",
+    "level": "B2",
+    "tag": "MISS",
+    "uiTitle": "Entrando no Detail",
+    "grammarFocus": "Redação: Inteligência Artificial e Futuro",
+    "theme": "Tema 23: Literatura e Situações Hipotéticas"
+  },
+  {
+    "id": "fr-b2-326",
+    "language": "fr",
+    "level": "B2",
+    "tag": "CULT",
+    "uiTitle": "Puxando Pela Memória",
+    "grammarFocus": "Redação: Ética e Sociedade",
+    "theme": "Tema 23: Literatura e Situações Hipotéticas"
+  },
+  {
+    "id": "fr-b2-327",
+    "language": "fr",
+    "level": "B2",
+    "tag": "EXPR",
+    "uiTitle": "Momento do Xeque",
+    "grammarFocus": "5 Expressões sobre Dinheiro e Gastos",
+    "theme": "Tema 23: Literatura e Situações Hipotéticas"
+  },
+  {
+    "id": "fr-b2-328",
+    "language": "fr",
+    "level": "B2",
+    "tag": "MISS",
+    "uiTitle": "O Grande Desafio",
+    "grammarFocus": "Redação: Preservação Ambiental",
+    "theme": "Tema 23: Literatura e Situações Hipotéticas"
+  },
+  {
+    "id": "fr-b2-329",
+    "language": "fr",
+    "level": "B2",
+    "tag": "EXPR",
+    "uiTitle": "Fechamentos Lógicos",
+    "grammarFocus": "5 Expressões sobre Trabalho e Carreira",
+    "theme": "Tema 23: Literatura e Situações Hipotéticas"
+  },
+  {
+    "id": "fr-b2-330",
+    "language": "fr",
+    "level": "B2",
+    "tag": "EXPR",
+    "uiTitle": "Quase Lá",
+    "grammarFocus": "5 Expressões sobre Animais e Natureza",
+    "theme": "Tema 23: Literatura e Situações Hipotéticas"
+  },
+  {
+    "id": "fr-b2-331",
+    "language": "fr",
+    "level": "B2",
+    "tag": "EXPR",
+    "uiTitle": "Fim do Ciclo",
+    "grammarFocus": "5 Expressões de Alta Eloquência",
+    "theme": "Tema 23: Literatura e Situações Hipotéticas"
+  },
+  {
+    "id": "fr-b2-332",
+    "language": "fr",
+    "level": "B2",
+    "tag": "MISS",
+    "uiTitle": "A Preparação Inicial",
+    "grammarFocus": "Redação: Carta de Motivação Formal",
+    "theme": "Tema 24: Debates Culturais e Cívicos"
+  },
+  {
+    "id": "fr-b2-333",
+    "language": "fr",
+    "level": "B2",
+    "tag": "DIAL",
+    "uiTitle": "Aquecendo a Voz",
+    "grammarFocus": "Avoir o beurre et o argento do beurre",
+    "theme": "Tema 24: Debates Culturais e Cívicos"
+  },
+  {
+    "id": "fr-b2-334",
+    "language": "fr",
+    "level": "B2",
+    "tag": "EXPR",
+    "uiTitle": "O Primeito Toque",
+    "grammarFocus": "Pédaler dans a choucroute (Expressões Idiomáticas)",
+    "theme": "Tema 24: Debates Culturais e Cívicos"
+  },
+  {
+    "id": "fr-b2-335",
+    "language": "fr",
+    "level": "B2",
+    "tag": "PRON",
+    "uiTitle": "Ganho de Ritmo",
+    "grammarFocus": "Homófonos B2: Bar/barre, Celle/sel/selle",
+    "theme": "Tema 24: Debates Culturais e Cívicos"
+  },
+  {
+    "id": "fr-b2-336",
+    "language": "fr",
+    "level": "B2",
+    "tag": "GRAM",
+    "uiTitle": "Ponto Chave",
+    "grammarFocus": "C'est VS Il est (Refino B2)",
+    "theme": "Tema 24: Debates Culturais e Cívicos"
+  },
+  {
+    "id": "fr-b2-337",
+    "language": "fr",
+    "level": "B2",
+    "tag": "MISS",
+    "uiTitle": "Subindo as Escadas",
+    "grammarFocus": "Ponte B2 > C1: Inversão Estilística",
+    "theme": "Tema 24: Debates Culturais e Cívicos"
+  },
+  {
+    "id": "fr-b2-338",
+    "language": "fr",
+    "level": "B2",
+    "tag": "DIAL",
+    "uiTitle": "Entrando no Detail",
+    "grammarFocus": "Noyer o peixe e Registro Padrão",
+    "theme": "Tema 24: Debates Culturais e Cívicos"
+  },
+  {
+    "id": "fr-b2-339",
+    "language": "fr",
+    "level": "B2",
+    "tag": "PRON",
+    "uiTitle": "Puxando Pela Memória",
+    "grammarFocus": "Homófonos B2: Conte/compte, Maire/mer/mère",
+    "theme": "Tema 24: Debates Culturais e Cívicos"
+  },
+  {
+    "id": "fr-b2-340",
+    "language": "fr",
+    "level": "B2",
+    "tag": "GRAM",
+    "uiTitle": "Momento do Xeque",
+    "grammarFocus": "On VS L'on (Variação Estilística)",
+    "theme": "Tema 24: Debates Culturais e Cívicos"
+  },
+  {
+    "id": "fr-b2-341",
+    "language": "fr",
+    "level": "B2",
+    "tag": "MISS",
+    "uiTitle": "O Grande Desafio",
+    "grammarFocus": "Revisão Geral B2",
+    "theme": "Tema 24: Debates Culturais e Cívicos"
+  },
+  {
+    "id": "fr-b2-342",
+    "language": "fr",
+    "level": "B2",
+    "tag": "DIAL",
+    "uiTitle": "Fechamentos Lógicos",
+    "grammarFocus": "5 Maneiras de Dizer Je suis fatigué (Registro Soutenu)",
+    "theme": "Tema 24: Debates Culturais e Cívicos"
+  },
+  {
+    "id": "fr-b2-343",
+    "language": "fr",
+    "level": "B2",
+    "tag": "GRAM",
+    "uiTitle": "Quase Lá",
+    "grammarFocus": "Verbos com S'en (s'en sortir, s'en vouloir)",
+    "theme": "Tema 24: Debates Culturais e Cívicos"
+  },
+  {
+    "id": "fr-b2-344",
+    "language": "fr",
+    "level": "B2",
+    "tag": "GRAM",
+    "uiTitle": "Fim do Ciclo",
+    "grammarFocus": "Inversão Estilística para Ênfase e Foco",
+    "theme": "Tema 24: Debates Culturais e Cívicos"
+  },
+  {
+    "id": "fr-b2-345",
+    "language": "fr",
+    "level": "B2",
+    "tag": "GRAM",
+    "uiTitle": "O Retorno Absoluto",
+    "grammarFocus": "Orações Clivadas: C'est... qui/que",
+    "theme": "Tema 24: Debates Culturais e Cívicos"
+  },
+  {
+    "id": "fr-b2-346",
+    "language": "fr",
+    "level": "B2",
+    "tag": "GRAM",
+    "uiTitle": "Conquista",
+    "grammarFocus": "Orações Clivadas: Ce qui / Ce que / Ce dont",
+    "theme": "Tema 24: Debates Culturais e Cívicos"
+  },
+  {
+    "id": "fr-c1-347",
+    "language": "fr",
+    "level": "C1",
+    "tag": "DIAL",
+    "uiTitle": "A Preparação Inicial",
+    "grammarFocus": "Entonação vs Inversão em Fala Formal",
+    "theme": "Tema 25: Oratória e Expressões Elevadas"
+  },
+  {
+    "id": "fr-c1-348",
+    "language": "fr",
+    "level": "C1",
+    "tag": "GRAM",
+    "uiTitle": "Aquecendo a Voz",
+    "grammarFocus": "Estruturas Causais Avançadas",
+    "theme": "Tema 25: Oratória e Expressões Elevadas"
+  },
+  {
+    "id": "fr-c1-349",
+    "language": "fr",
+    "level": "C1",
+    "tag": "VERB",
+    "uiTitle": "O Primeito Toque",
+    "grammarFocus": "O Subjonctif Passé",
+    "theme": "Tema 25: Oratória e Expressões Elevadas"
+  },
+  {
+    "id": "fr-c1-350",
+    "language": "fr",
+    "level": "C1",
+    "tag": "VOC",
+    "uiTitle": "Ganho de Ritmo",
+    "grammarFocus": "Marcadores Discursivos para Debate Oral",
+    "theme": "Tema 25: Oratória e Expressões Elevadas"
+  },
+  {
+    "id": "fr-c1-351",
+    "language": "fr",
+    "level": "C1",
+    "tag": "EXPR",
+    "uiTitle": "Ponto Chave",
+    "grammarFocus": "Expressões de Causa e Consequência Complexas",
+    "theme": "Tema 25: Oratória e Expressões Elevadas"
+  },
+  {
+    "id": "fr-c1-352",
+    "language": "fr",
+    "level": "C1",
+    "tag": "DIAL",
+    "uiTitle": "Subindo as Escadas",
+    "grammarFocus": "Contrastes de Registro: Escrito vs Falado",
+    "theme": "Tema 25: Oratória e Expressões Elevadas"
+  },
+  {
+    "id": "fr-c1-353",
+    "language": "fr",
+    "level": "C1",
+    "tag": "GRAM",
+    "uiTitle": "Entrando no Detail",
+    "grammarFocus": "Estruturas Concessivas Avançadas",
+    "theme": "Tema 25: Oratória e Expressões Elevadas"
+  },
+  {
+    "id": "fr-c1-354",
+    "language": "fr",
+    "level": "C1",
+    "tag": "VERB",
+    "uiTitle": "Puxando Pela Memória",
+    "grammarFocus": "Subjonctif com ne explétif avançado",
+    "theme": "Tema 25: Oratória e Expressões Elevadas"
+  },
+  {
+    "id": "fr-c1-355",
+    "language": "fr",
+    "level": "C1",
+    "tag": "VOC",
+    "uiTitle": "Momento do Xeque",
+    "grammarFocus": "Apócope e Truncamento no Francês Falado",
+    "theme": "Tema 25: Oratória e Expressões Elevadas"
+  },
+  {
+    "id": "fr-c1-356",
+    "language": "fr",
+    "level": "C1",
+    "tag": "EXPR",
+    "uiTitle": "O Grande Desafio",
+    "grammarFocus": "5 Expressões sobre Comida e Bebida (Metafóricas)",
+    "theme": "Tema 25: Oratória e Expressões Elevadas"
+  },
+  {
+    "id": "fr-c1-357",
+    "language": "fr",
+    "level": "C1",
+    "tag": "GRAM",
+    "uiTitle": "Fechamentos Lógicos",
+    "grammarFocus": "Preposições Estilísticas e Adverbiais",
+    "theme": "Tema 25: Oratória e Expressões Elevadas"
+  },
+  {
+    "id": "fr-c1-358",
+    "language": "fr",
+    "level": "C1",
+    "tag": "VERB",
+    "uiTitle": "Quase Lá",
+    "grammarFocus": "O Passé Antérieur (Reconhecimento)",
+    "theme": "Tema 25: Oratória e Expressões Elevadas"
+  },
+  {
+    "id": "fr-c1-359",
+    "language": "fr",
+    "level": "C1",
+    "tag": "GRAM",
+    "uiTitle": "Fim do Ciclo",
+    "grammarFocus": "Formas Verbais Arcaicas e Clássicas",
+    "theme": "Tema 25: Oratória e Expressões Elevadas"
+  },
+  {
+    "id": "fr-c1-360",
+    "language": "fr",
+    "level": "C1",
+    "tag": "VERB",
+    "uiTitle": "O Retorno Absoluto",
+    "grammarFocus": "Verbos Pronominais: Usos Recíprocos e Passivos",
+    "theme": "Tema 25: Oratória e Expressões Elevadas"
+  },
+  {
+    "id": "fr-c1-361",
+    "language": "fr",
+    "level": "C1",
+    "tag": "GRAM",
+    "uiTitle": "A Preparação Inicial",
+    "grammarFocus": "Quand VS Quant (Refinement Final)",
+    "theme": "Tema 26: O Francês das Ruas e o Formal"
+  },
+  {
+    "id": "fr-c1-362",
+    "language": "fr",
+    "level": "C1",
+    "tag": "VOC",
+    "uiTitle": "Aquecendo a Voz",
+    "grammarFocus": "Marcadores de Posicionamento e Crítica de Alto Nível",
+    "theme": "Tema 26: O Francês das Ruas e o Formal"
+  },
+  {
+    "id": "fr-c1-363",
+    "language": "fr",
+    "level": "C1",
+    "tag": "CULT",
+    "uiTitle": "O Primeito Toque",
+    "grammarFocus": "Redação: Viagem no Tempo (Hipotético Literário)",
+    "theme": "Tema 26: O Francês das Ruas e o Formal"
+  },
+  {
+    "id": "fr-c1-364",
+    "language": "fr",
+    "level": "C1",
+    "tag": "MISS",
+    "uiTitle": "Ganho de Ritmo",
+    "grammarFocus": "Revisão Geral C1",
+    "theme": "Tema 26: O Francês das Ruas e o Formal"
+  },
+  {
+    "id": "fr-c1-365",
+    "language": "fr",
+    "level": "C1",
+    "tag": "VERB",
+    "uiTitle": "Ponto Chave",
+    "grammarFocus": "Imparfait du subjonctif (Reconhecimento)",
+    "theme": "Tema 26: O Francês das Ruas e o Formal"
+  },
+  {
+    "id": "fr-c1-366",
+    "language": "fr",
+    "level": "C1",
+    "tag": "DIAL",
+    "uiTitle": "Subindo as Escadas",
+    "grammarFocus": "Registro Soutenu vs Registro Courant (Contraste)",
+    "theme": "Tema 26: O Francês das Ruas e o Formal"
+  },
+  {
+    "id": "fr-c1-367",
+    "language": "fr",
+    "level": "C1",
+    "tag": "GRAM",
+    "uiTitle": "Entrando no Detail",
+    "grammarFocus": "Par de Confusão: Mesmo VS Si",
+    "theme": "Tema 26: O Francês das Ruas e o Formal"
+  },
+  {
+    "id": "fr-c1-368",
+    "language": "fr",
+    "level": "C1",
+    "tag": "CULT",
+    "uiTitle": "Puxando Pela Memória",
+    "grammarFocus": "Análise de Texto Filosófico e Crítico",
+    "theme": "Tema 26: O Francês das Ruas e o Formal"
+  },
+  {
+    "id": "fr-c1-369",
+    "language": "fr",
+    "level": "C1",
+    "tag": "MISS",
+    "uiTitle": "Momento do Xeque",
+    "grammarFocus": "Reescrita Estrutural para Aprimoramento Estilístico",
+    "theme": "Tema 26: O Francês das Ruas e o Formal"
+  },
+  {
+    "id": "fr-c1-370",
+    "language": "fr",
+    "level": "C1",
+    "tag": "VERB",
+    "uiTitle": "O Grande Desafio",
+    "grammarFocus": "Plus-que-parfait du subjonctif",
+    "theme": "Tema 26: O Francês das Ruas e o Formal"
+  },
+  {
+    "id": "fr-c1-371",
+    "language": "fr",
+    "level": "C1",
+    "tag": "GRAM",
+    "uiTitle": "Fechamentos Lógicos",
+    "grammarFocus": "Negação Literária e Formas de Elipse",
+    "theme": "Tema 26: O Francês das Ruas e o Formal"
+  },
+  {
+    "id": "fr-c1-372",
+    "language": "fr",
+    "level": "C1",
+    "tag": "CULT",
+    "uiTitle": "Quase Lá",
+    "grammarFocus": "Decodificação de Textos Jornalísticos e Legais",
+    "theme": "Tema 26: O Francês das Ruas e o Formal"
+  },
+  {
+    "id": "fr-c1-373",
+    "language": "fr",
+    "level": "C1",
+    "tag": "VERB",
+    "uiTitle": "Fim do Ciclo",
+    "grammarFocus": "Seconde forme du conditionnel passado",
+    "theme": "Tema 26: O Francês das Ruas e o Formal"
+  },
+  {
+    "id": "fr-c1-374",
+    "language": "fr",
+    "level": "C1",
+    "tag": "CULT",
+    "uiTitle": "O Retorno Absoluto",
+    "grammarFocus": "Francês Informal, Argot e Verlan (Gírias Modernas)",
+    "theme": "Tema 26: O Francês das Ruas e o Formal"
+  },
+  {
+    "id": "fr-c1-375",
+    "language": "fr",
+    "level": "C1",
+    "tag": "CULT",
+    "uiTitle": "Conquista",
+    "grammarFocus": "A Arte da Argumentação Superior: Conexão e Lógica",
+    "theme": "Tema 26: O Francês das Ruas e o Formal"
+  },
+  {
+    "id": "fr-c1-376",
+    "language": "fr",
+    "level": "C1",
+    "tag": "GRAM",
+    "uiTitle": "A Preparação Inicial",
+    "grammarFocus": "Redução Sintática no Francês Literário",
+    "theme": "Tema 27: Geopolítica e Filosofia"
+  },
+  {
+    "id": "fr-c1-377",
+    "language": "fr",
+    "level": "C1",
+    "tag": "DIAL",
+    "uiTitle": "Aquecendo a Voz",
+    "grammarFocus": "Mudança Consciente de Registro e Harmonia Estilística",
+    "theme": "Tema 27: Geopolítica e Filosofia"
+  },
+  {
+    "id": "fr-c1-378",
+    "language": "fr",
+    "level": "C1",
+    "tag": "EXPR",
+    "uiTitle": "O Primeito Toque",
+    "grammarFocus": "Domínio de Estruturas Idiomáticas Arcaicas",
+    "theme": "Tema 27: Geopolítica e Filosofia"
+  },
+  {
+    "id": "fr-c1-379",
+    "language": "fr",
+    "level": "C1",
+    "tag": "VOC",
+    "uiTitle": "Ganho de Ritmo",
+    "grammarFocus": "Il sied de, À l'instar de e Expressões de Alta Classe",
+    "theme": "Tema 27: Geopolítica e Filosofia"
+  },
+  {
+    "id": "fr-c1-380",
+    "language": "fr",
+    "level": "C1",
+    "tag": "CULT",
+    "uiTitle": "Ponto Chave",
+    "grammarFocus": "Argumentação sobre Geopolítica e Cultura",
+    "theme": "Tema 27: Geopolítica e Filosofia"
+  },
+  {
+    "id": "fr-c1-381",
+    "language": "fr",
+    "level": "C1",
+    "tag": "GRAM",
+    "uiTitle": "Subindo as Escadas",
+    "grammarFocus": "Estrutura de Frase: Voz Ativa vs Passiva (B2/C1)",
+    "theme": "Tema 27: Geopolítica e Filosofia"
+  },
+  {
+    "id": "fr-c1-382",
+    "language": "fr",
+    "level": "C1",
+    "tag": "VOC",
+    "uiTitle": "Entrando no Detail",
+    "grammarFocus": "O Francês no Mundo: Variações Regionais e Dialetos",
+    "theme": "Tema 27: Geopolítica e Filosofia"
+  },
+  {
+    "id": "fr-c1-383",
+    "language": "fr",
+    "level": "C1",
+    "tag": "MISS",
+    "uiTitle": "Puxando Pela Memória",
+    "grammarFocus": "Escrita Criativa: Estilo e Fluidez Superior",
+    "theme": "Tema 27: Geopolítica e Filosofia"
+  },
+  {
+    "id": "fr-c1-384",
+    "language": "fr",
+    "level": "C1",
+    "tag": "CULT",
+    "uiTitle": "Momento do Xeque",
+    "grammarFocus": "Ensaio Literário e Persuasão C2",
+    "theme": "Tema 27: Geopolítica e Filosofia"
+  },
+  {
+    "id": "fr-c1-385",
+    "language": "fr",
+    "level": "C1",
+    "tag": "GRAM",
+    "uiTitle": "O Grande Desafio",
+    "grammarFocus": "La Mise en Relief e Deslocamento Estilístico Superior",
+    "theme": "Tema 27: Geopolítica e Filosofia"
+  },
+  {
+    "id": "fr-c1-386",
+    "language": "fr",
+    "level": "C1",
+    "tag": "MISS",
+    "uiTitle": "Fechamentos Lógicos",
+    "grammarFocus": "Revisão de Sistemas de Relativos e Artigos Final",
+    "theme": "Tema 27: Geopolítica e Filosofia"
+  },
+  {
+    "id": "fr-c1-387",
+    "language": "fr",
+    "level": "C1",
+    "tag": "MISS",
+    "uiTitle": "Quase Lá",
+    "grammarFocus": "Técnicas de Oratória e Debate Final C2",
+    "theme": "Tema 27: Geopolítica e Filosofia"
+  }
 ];

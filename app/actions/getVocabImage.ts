@@ -46,7 +46,7 @@ Rules:
 - Output ONLY the search query string in English (e.g., "coffee cup isolated white background").
 - No explanation, no punctuation, just the keyword string.`;
 
-      keyword = (await callGemini(keywordPrompt, undefined, 100)).trim();
+      keyword = (await callGemini(keywordPrompt, undefined, 150, 4, 0)).trim();
     }
 
     // ── 3. Fetch from Pexels, trying pages 1-3 to avoid duplicate images ─────

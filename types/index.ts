@@ -113,7 +113,7 @@ export interface PregeneratedLessonDocument {
 
 // ─── Lesson ───────────────────────────────────────────────────────────────────
 
-export type LessonStage = 'vocabulary' | 'hook' | 'grammar' | 'practice' | 'review';
+export type LessonStage = 'intro' | 'vocabulary' | 'hook' | 'phonetics' | 'mission' | 'grammar' | 'practice' | 'review';
 
 export type SupportedLanguage = 'fr' | 'en';
 
@@ -139,6 +139,19 @@ export interface TranslateWordResult {
   example: string;
 }
 
+export interface PhoneticsTipResult {
+  title: string;
+  explanation: string;
+  examples: Array<{ word: string; soundsLike: string; tip: string }>;
+  brazilianTrap: string;
+}
+
+export interface MissionBriefingResult {
+  scenario: string;
+  objectives: string[];
+  keyPhrases: string[];
+}
+
 export interface HookResult {
   dialogue: string;
   dialogueTranslations?: string[]; // pt-BR translations, one per dialogue line
@@ -150,6 +163,9 @@ export interface HookResult {
   imageKeywords?: Record<string, string>;            // word → Pexels search term
   vocabTranslations?: Record<string, TranslateWordResult>; // word → translation data
   dialogueVerbs?: string[];                          // all verbs (infinitives) used in the dialogue
+  curiosidade?: string;                              // engaging fun fact in casual PT-BR, every lesson
+  phoneticsTip?: PhoneticsTipResult;                 // PRON only
+  missionBriefing?: MissionBriefingResult;           // MISS only
 }
 
 export interface GrammarBridgeResult {
@@ -188,11 +204,16 @@ export interface VocabImageResult {
 
 // ─── Curriculum & Lesson Engine ───────────────────────────────────────────────
 
+export type LessonTag = 'GRAM' | 'VOC' | 'DIAL' | 'MISS' | 'PRON' | 'VERB' | 'EXPR' | 'CULT';
+
 export interface LessonDefinition {
   id: string;
   language: SupportedLanguage;
   level: ProficiencyLevel;
+  tag: LessonTag;
+  uiTitle?: string;
   grammarFocus: string;
+  theme: string;
 }
 
 // ─── Exercise Data Types ──────────────────────────────────────────────────────

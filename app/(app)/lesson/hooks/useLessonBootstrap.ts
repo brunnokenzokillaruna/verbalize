@@ -1,10 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { useLessonStore } from '@/store/lessonStore';
 import { getNextLesson, getLessonById } from '@/lib/curriculum';
+import { getInitialPhase } from './useLessonFlow';
 import { generateHook } from '@/app/actions/generateHook';
 import { generateGrammarBridge } from '@/app/actions/generateGrammarBridge';
+import { generatePhoneticsTip } from '@/app/actions/generatePhoneticsTip';
+import { generateMissionBriefing } from '@/app/actions/generateMissionBriefing';
 import { getVocabImage } from '@/app/actions/getVocabImage';
 import { translateWord } from '@/app/actions/translateWord';
 import { getPregeneratedLesson, deletePregeneratedLesson, getUserVocabulary, upsertVocabularyItem } from '@/services/firestore';
@@ -32,6 +35,7 @@ export function useLessonBootstrap({
   const store = useLessonStore();
   
   const [hookError, setHookError] = useState(false);
+  const prefetchFiredRef = useRef(false);
 
   useEffect(() => {
     if (!profile) return;
@@ -71,7 +75,10 @@ export function useLessonBootstrap({
           hook = await generateHook({
             language: lesson.language,
             level: lesson.level,
+            tag: lesson.tag,
             interests: profile.interests ?? [],
+            theme: lesson.theme,
+            uiTitle: lesson.uiTitle,
             grammarFocus: lesson.grammarFocus,
             knownVocabulary,
           });
@@ -79,7 +86,37 @@ export function useLessonBootstrap({
 
         if (hook) {
           store.setHook(hook);
-          store.setPhase('vocabulary');
+          const initialPhase = getInitialPhase(lesson.tag);
+          store.setPhase(initialPhase);
+
+          // Fire secondary AI calls in parallel — each merges into store as it resolves.
+          // Skip when the pregen cache already supplied the field.
+          const lang = lesson.language;
+          const tag = lesson.tag;
+          const focus = lesson.grammarFocus;
+          const dialogue = hook.dialogue;
+
+          if (tag === 'PRON' && !hook.phoneticsTip) {
+            generatePhoneticsTip({ dialogue, grammarFocus: focus, language: lang })
+              .then((phoneticsTip) => {
+                if (phoneticsTip) useLessonStore.getState().mergeHook({ phoneticsTip });
+              })
+              .catch(console.error);
+          }
+
+          if (tag === 'MISS' && !hook.missionBriefing) {
+            generateMissionBriefing({ 
+              grammarFocus: focus, 
+              theme: lesson.theme,
+              uiTitle: lesson.uiTitle,
+              language: lang, 
+              dialogue 
+            })
+              .then((missionBriefing) => {
+                if (missionBriefing) useLessonStore.getState().mergeHook({ missionBriefing });
+              })
+              .catch(console.error);
+          }
         } else {
           store.setIsLoading(false);
           setHookError(true);
@@ -124,17 +161,17 @@ export function useLessonBootstrap({
   }, [user, store.hook, store.lesson]);
 
   useEffect(() => {
-    if ((store.phase !== 'hook' && store.phase !== 'vocabulary') || !store.hook || !store.lesson) return;
+    if ((store.phase !== 'hook' && store.phase !== 'vocabulary' && store.phase !== 'intro') || !store.hook || !store.lesson) return;
+    // Only fire once per lesson regardless of how many times phase/hook change
+    if (prefetchFiredRef.current) return;
+    prefetchFiredRef.current = true;
     const { hook, lesson } = store;
 
-    if (hook.grammarBridge) {
-      grammarBridgePrefetchRef.current = Promise.resolve(hook.grammarBridge);
-    } else {
-      grammarBridgePrefetchRef.current = generateGrammarBridge({
-        dialogue: hook.dialogue,
-        grammarFocus: hook.grammarFocus,
-        language: lesson.language,
-      });
+    // Grammar bridge is only needed for GRAM lessons
+    if (lesson.tag === 'GRAM') {
+      if (hook.grammarBridge) {
+        grammarBridgePrefetchRef.current = Promise.resolve(hook.grammarBridge);
+      }
     }
 
     const words = hook.newVocabulary;
@@ -186,12 +223,13 @@ export function useLessonBootstrap({
         );
       }
     })();
+  // store.hook added so the effect re-fires when hook arrives while still on 'intro' phase
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [store.phase]);
+  }, [store.phase, store.hook]);
+
 
   useEffect(() => {
-    if (store.phase !== 'grammar' || !store.hook || !store.lesson) return;
-    exercisesPrefetchRef.current = fetchAiExercises();
+    if (store.phase === 'idle') prefetchFiredRef.current = false;
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [store.phase]);
 

@@ -27,8 +27,11 @@ export function buildMistakeContext(exercise: Exercise): string {
 
 export function phaseToStage(phase: string): LessonStage {
   switch (phase) {
+    case 'intro':      return 'intro';
+    case 'mission':    return 'mission';
     case 'vocabulary': return 'vocabulary';
     case 'hook':       return 'hook';
+    case 'phonetics':  return 'phonetics';
     case 'grammar':    return 'grammar';
     case 'practice':   return 'practice';
     case 'review':     return 'review';

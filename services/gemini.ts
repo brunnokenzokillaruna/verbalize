@@ -2,7 +2,7 @@ import { getGeminiKey } from '@/lib/env';
 
 // Latest free-tier Gemini model as specified in CLAUDE.md
 // Latest free-tier Gemini model as selected by the user
-const GEMINI_MODEL = 'gemini-2.5-flash';
+const GEMINI_MODEL = 'gemini-3.1-flash-lite-preview';
 
 interface GeminiResponse {
   candidates?: Array<{
@@ -20,20 +20,28 @@ const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
  * Runs server-side only (uses GEMINI_API_KEY).
  */
 export async function callGemini(
-  prompt: string, 
-  systemPrompt?: string, 
+  prompt: string,
+  systemPrompt?: string,
   maxOutputTokens = 1024,
-  retries = 3
+  retries = 4,
+  thinkingBudget?: number,
 ): Promise<string> {
   const apiKey = getGeminiKey();
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
 
+  const generationConfig: Record<string, unknown> = {
+    temperature: 0.7,
+    maxOutputTokens,
+  };
+  // Gemini 2.5 Flash has thinking enabled by default; pass thinkingBudget=0
+  // to disable it for speed-critical calls like the minimal hook.
+  if (thinkingBudget !== undefined) {
+    generationConfig.thinkingConfig = { thinkingBudget };
+  }
+
   const body: Record<string, unknown> = {
     contents: [{ role: 'user', parts: [{ text: prompt }] }],
-    generationConfig: {
-      temperature: 0.7,
-      maxOutputTokens,
-    },
+    generationConfig,
   };
 
   if (systemPrompt) {
@@ -53,10 +61,15 @@ export async function callGemini(
       const data: GeminiResponse = await res.json();
 
       if (!res.ok) {
-        // Retry on 503 (Service Unavailable/High Demand) or 429 (Rate Limit)
+        // Retry on 503 (Service Unavailable) or 429 (Rate Limit)
         if ((res.status === 503 || res.status === 429) && attempt < retries) {
-          const delay = Math.pow(2, attempt) * 1000 + Math.random() * 500;
-          console.warn(`[Gemini] Attempt ${attempt + 1} failed with ${res.status}. Retrying in ${Math.round(delay)}ms...`);
+          // For 429, honour the "retry in Xs" hint from the error message
+          let delay = Math.pow(2, attempt) * 1000 + Math.random() * 500;
+          if (res.status === 429) {
+            const match = (data.error?.message ?? '').match(/retry in ([\d.]+)s/i);
+            if (match) delay = (parseFloat(match[1]) + 1) * 1000; // add 1s buffer
+          }
+          console.warn(`[Gemini] Attempt ${attempt + 1} failed with ${res.status}. Retrying in ${Math.round(delay / 1000)}s...`);
           await wait(delay);
           continue;
         }
@@ -88,8 +101,13 @@ export async function callGemini(
  * Robustly extracts the first complete JSON object/array even when Gemini
  * adds surrounding text or markdown fences.
  */
-export async function callGeminiJSON<T>(prompt: string, systemPrompt?: string, maxOutputTokens = 1024): Promise<T> {
-  const raw = await callGemini(prompt, systemPrompt, maxOutputTokens);
+export async function callGeminiJSON<T>(
+  prompt: string,
+  systemPrompt?: string,
+  maxOutputTokens = 1024,
+  thinkingBudget?: number,
+): Promise<T> {
+  const raw = await callGemini(prompt, systemPrompt, maxOutputTokens, 4, thinkingBudget);
 
   // 1. Strip markdown code fences
   let cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim();

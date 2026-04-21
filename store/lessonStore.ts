@@ -11,8 +11,11 @@ import type {
 export type LessonPhase =
   | 'idle'
   | 'loading'
+  | 'intro'      // shown while AI generates in background
   | 'vocabulary'
   | 'hook'
+  | 'phonetics'  // PRON only — after hook
+  | 'mission'    // MISS only — before vocabulary
   | 'grammar'
   | 'practice'
   | 'review'     // mistake review — after practice, before complete
@@ -57,6 +60,7 @@ interface LessonState {
   setPhase: (phase: LessonPhase) => void;
   setKnownVocabulary: (words: string[]) => void;
   setHook: (hook: HookResult) => void;
+  mergeHook: (partial: Partial<HookResult>) => void;
   setGrammarBridge: (bridge: GrammarBridgeResult) => void;
   setVocabImage: (word: string, image: VocabImageResult | null) => void;
   setVocabTranslation: (word: string, translation: string) => void;
@@ -142,6 +146,11 @@ export const useLessonStore = create<LessonState>((set, get) => ({
     hook: { ...hook, newVocabulary: [...new Set(hook.newVocabulary)] },
     isLoading: false,
   }),
+
+  mergeHook: (partial) =>
+    set((state) => ({
+      hook: state.hook ? { ...state.hook, ...partial } : state.hook,
+    })),
 
   setDiscoveredVerbs: (verbs: string[]) => set({ discoveredVerbs: verbs }),
 

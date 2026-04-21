@@ -14,7 +14,7 @@ export function LessonCompleteScreen({
   newVocabulary,
   onExit,
 }: LessonCompleteScreenProps) {
-  const pct = totalExercises > 0 ? Math.round((correctExercises / totalExercises) * 100) : 100;
+  const pct = totalExercises > 0 ? Math.min(Math.round((correctExercises / totalExercises) * 100), 100) : 100;
   const isPerfect = pct === 100;
 
   return (
@@ -71,7 +71,7 @@ export function LessonCompleteScreen({
           <span className="text-lg font-medium" style={{ color: 'var(--color-text-muted)' }}>de acerto</span>
         </div>
         <p className="mt-1 text-sm" style={{ color: 'var(--color-text-muted)' }}>
-          {correctExercises} de {totalExercises} exercícios corretos
+          {Math.min(correctExercises, totalExercises)} de {totalExercises} exercícios corretos
         </p>
         {pct >= 80 && (
           <div
