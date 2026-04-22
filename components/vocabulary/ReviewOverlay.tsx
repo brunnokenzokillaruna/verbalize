@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Loader2, X, CheckCircle2, XCircle, ChevronRight } from 'lucide-react';
 import { AudioPlayerButton } from '@/components/lesson/AudioPlayerButton';
@@ -45,6 +45,12 @@ export function ReviewOverlay({
 }: ReviewOverlayProps) {
   const total = items.length;
   const currentItem = state === 'running' ? items[currentIdx] : null;
+  const [isExerciseReady, setIsExerciseReady] = useState(false);
+  const [submitTrigger, setSubmitTrigger] = useState(0);
+
+  useEffect(() => {
+    setIsExerciseReady(false);
+  }, [currentIdx]);
 
   // ── Done screen ──────────────────────────────────────────────────────────────
   if (state === 'done') {
@@ -272,6 +278,8 @@ export function ReviewOverlay({
             data={exercise.data}
             onAnswer={onAnswer}
             answered={answered}
+            setIsExerciseReady={setIsExerciseReady}
+            submitTrigger={submitTrigger}
           />
         )}
 
@@ -281,6 +289,8 @@ export function ReviewOverlay({
             language={language}
             onAnswer={onAnswer}
             answered={answered}
+            setIsExerciseReady={setIsExerciseReady}
+            submitTrigger={submitTrigger}
           />
         )}
       </div>
@@ -313,30 +323,36 @@ export function ReviewOverlay({
           </div>
         )}
 
-        {/* Continue button */}
+        {/* Check / Continue button */}
         <div
           className="px-5 pt-3"
           style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}
         >
           <button
             type="button"
-            disabled={!answered}
-            onClick={onContinue}
+            disabled={!answered && !isExerciseReady}
+            onClick={answered ? onContinue : () => setSubmitTrigger((t) => t + 1)}
             className="flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-4 text-base font-semibold transition-all duration-150 active:scale-[0.98]"
             style={{
               backgroundColor: !answered
-                ? 'var(--color-surface-raised)'
+                ? isExerciseReady
+                  ? 'var(--color-primary)'
+                  : 'var(--color-surface-raised)'
                 : lastCorrect
                   ? 'var(--color-success)'
                   : 'var(--color-error)',
-              color: !answered ? 'var(--color-text-muted)' : 'var(--color-text-inverse)',
+              color: !answered && !isExerciseReady ? 'var(--color-text-muted)' : 'var(--color-text-inverse)',
               boxShadow: answered
                 ? `0 4px 16px ${lastCorrect ? 'rgba(5,150,105,0.3)' : 'rgba(220,38,38,0.3)'}`
-                : 'none',
-              cursor: answered ? 'pointer' : 'not-allowed',
+                : isExerciseReady
+                  ? '0 4px 16px rgba(0,0,0,0.15)'
+                  : 'none',
+              cursor: (answered || isExerciseReady) ? 'pointer' : 'not-allowed',
             }}
           >
-            {currentIdx + 1 < total ? (
+            {!answered ? (
+              'Verificar'
+            ) : currentIdx + 1 < total ? (
               <>
                 Continuar
                 <ChevronRight size={20} />

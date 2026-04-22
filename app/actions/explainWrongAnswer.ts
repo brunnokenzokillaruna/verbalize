@@ -45,12 +45,6 @@ Frase correta: "${text}"
 Explique em 1-2 frases em português um ponto de atenção gramatical ou ortográfico importante nesta frase.`;
       break;
     }
-    case 'verb-conjugation-drill': {
-      const { verb, tense } = exercise.data;
-      prompt = `Um aluno errou um exercício de conjugação do verbo "${verb}" em ${lang} (tempo verbal: ${tense}).
-Explique em 1-2 frases em português a regra de conjugação relevante para este tempo verbal.`;
-      break;
-    }
     default:
       return null;
   }

@@ -17,6 +17,9 @@ const LESSON_FLOW: Record<LessonTag, LessonPhase[]> = {
   PRON: ['vocabulary', 'hook', 'phonetics', 'practice', 'complete'],
   DIAL: ['vocabulary', 'hook',               'practice', 'complete'],
   MISS: ['mission',    'vocabulary', 'hook', 'practice', 'complete'],
+  VERB: ['vocabulary', 'hook', 'grammar',   'practice', 'complete'],
+  EXPR: ['vocabulary', 'hook',               'practice', 'complete'],
+  CULT: ['vocabulary', 'hook', 'grammar',   'practice', 'complete'],
 };
 
 export function getInitialPhase(tag: LessonTag): LessonPhase {

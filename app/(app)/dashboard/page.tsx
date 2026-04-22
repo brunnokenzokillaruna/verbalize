@@ -338,7 +338,7 @@ export default function DashboardPage() {
   }, [themes.length]);
 
   return (
-    <div className="min-h-dvh overflow-x-hidden" style={{ backgroundColor: 'var(--color-bg)' }}>
+    <div className="min-h-dvh" style={{ backgroundColor: 'var(--color-bg)' }}>
       <div className="relative w-full max-w-lg mx-auto md:max-w-2xl lg:max-w-4xl px-0 sm:px-4">
 
         {/* ═══════════════════ TOP BAR ═══════════════════ */}
@@ -422,7 +422,7 @@ export default function DashboardPage() {
         </header>
 
         {/* ═══════════════════ STICKY SECTION BANNER & LEVELS ═══════════════════ */}
-        <div className="sticky top-[61px] z-10 px-4 pt-2 pb-4" style={{ backgroundColor: 'var(--color-bg)' }}>
+        <div className="sticky top-[61px] z-20 px-0 sm:px-4 pt-2 pb-4" style={{ backgroundColor: 'var(--color-bg)' }}>
           <div
             className="rounded-2xl p-4 shadow-xl transition-all duration-500"
             style={{

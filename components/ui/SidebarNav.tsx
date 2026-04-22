@@ -2,13 +2,15 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, BookOpen, BookMarked, User } from 'lucide-react';
+import { Home, BookOpen, BookMarked, User, Beaker } from 'lucide-react';
+import { useAuthStore } from '@/store/authStore';
 
 const NAV_ITEMS = [
   { href: '/dashboard',           label: 'Início',      Icon: Home       },
   { href: '/vocabulary', label: 'Vocabulário',  Icon: BookOpen   },
   { href: '/verbs',      label: 'Verbos',       Icon: BookMarked },
   { href: '/profile',    label: 'Perfil',       Icon: User       },
+  { href: '/test-ui',    label: 'Lab UI',       Icon: Beaker,     adminOnly: true },
 ] as const;
 
 // Hide on lesson page — focused experience, no nav distractions
@@ -16,8 +18,12 @@ const HIDDEN_ON = ['/lesson'];
 
 export function SidebarNav() {
   const pathname = usePathname();
+  const { user } = useAuthStore();
+  const isAdmin = user?.email === 'admin@gmail.com';
 
   if (HIDDEN_ON.some((p) => pathname.startsWith(p))) return null;
+
+  const visibleItems = NAV_ITEMS.filter(item => !('adminOnly' in item) || isAdmin);
 
   return (
     <aside
@@ -39,7 +45,7 @@ export function SidebarNav() {
 
       {/* Nav items */}
       <nav className="flex-1 px-3 flex flex-col gap-0.5">
-        {NAV_ITEMS.map(({ href, label, Icon }) => {
+        {visibleItems.map(({ href, label, Icon }) => {
           const isActive = pathname === href;
           return (
             <Link

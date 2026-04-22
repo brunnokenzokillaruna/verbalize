@@ -70,7 +70,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "level": "A1",
     "tag": "DIAL",
     "uiTitle": "Cumprimentando os Comissários",
-    "grammarFocus": "5 Maneiras de Dizer Ça va bem",
+    "grammarFocus": "5 Maneiras de Dizer Ça va bien",
     "theme": "Tema 1: A Bordo do Avião e Aeroporto"
   },
   {
@@ -114,7 +114,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "A1",
     "tag": "VERB",
-    "uiTitle": "O Sagüão de Desembarque",
+    "uiTitle": "O Saguão de Desembarque",
     "grammarFocus": "Conjugação: Être (ser/estar) — Presente",
     "theme": "Tema 2: Rumo ao Hostel"
   },
@@ -914,13 +914,40 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "id": "fr-a1-102",
     "language": "fr",
     "level": "A1",
+    "tag": "VOC",
+    "uiTitle": "Um Mal Estar Súbito",
+    "grammarFocus": "Vocabulário: Corpo Humano Essencial",
+    "theme": "Tema 8: Emergências e Resolução de Problemas"
+  },
+  {
+    "id": "fr-a1-103",
+    "language": "fr",
+    "level": "A1",
+    "tag": "DIAL",
+    "uiTitle": "Chamando por Ajuda",
+    "grammarFocus": "5 Frases de Emergência: Au secours!",
+    "theme": "Tema 8: Emergências e Resolução de Problemas"
+  },
+  {
+    "id": "fr-a1-104",
+    "language": "fr",
+    "level": "A1",
     "tag": "VERB",
     "uiTitle": "Um Erro de Orientação",
     "grammarFocus": "Conjugação: Donner",
     "theme": "Tema 8: Emergências e Resolução de Problemas"
   },
   {
-    "id": "fr-a1-103",
+    "id": "fr-a1-105",
+    "language": "fr",
+    "level": "A1",
+    "tag": "DIAL",
+    "uiTitle": "A Carteira Perdida",
+    "grammarFocus": "Na Delegacia: Reportando Objetos Perdidos",
+    "theme": "Tema 8: Emergências e Resolução de Problemas"
+  },
+  {
+    "id": "fr-a1-106",
     "language": "fr",
     "level": "A1",
     "tag": "MISS",
@@ -929,7 +956,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 8: Emergências e Resolução de Problemas"
   },
   {
-    "id": "fr-a1-104",
+    "id": "fr-a1-107",
     "language": "fr",
     "level": "A1",
     "tag": "VERB",
@@ -938,7 +965,16 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 8: Emergências e Resolução de Problemas"
   },
   {
-    "id": "fr-a1-105",
+    "id": "fr-a1-108",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VOC",
+    "uiTitle": "Documentos e Alfândega",
+    "grammarFocus": "Vocabulário: Passaporte, Visto e Aduana",
+    "theme": "Tema 8: Emergências e Resolução de Problemas"
+  },
+  {
+    "id": "fr-a1-109",
     "language": "fr",
     "level": "A1",
     "tag": "MISS",
@@ -947,7 +983,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 8: Emergências e Resolução de Problemas"
   },
   {
-    "id": "fr-a1-106",
+    "id": "fr-a1-110",
     "language": "fr",
     "level": "A1",
     "tag": "VERB",
@@ -956,7 +992,16 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 8: Emergências e Resolução de Problemas"
   },
   {
-    "id": "fr-a1-107",
+    "id": "fr-a1-111",
+    "language": "fr",
+    "level": "A1",
+    "tag": "DIAL",
+    "uiTitle": "Na Farmácia Noturna",
+    "grammarFocus": "5 Frases para Relatar Sintomas Básicos",
+    "theme": "Tema 8: Emergências e Resolução de Problemas"
+  },
+  {
+    "id": "fr-a1-112",
     "language": "fr",
     "level": "A1",
     "tag": "MISS",
@@ -965,7 +1010,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 8: Emergências e Resolução de Problemas"
   },
   {
-    "id": "fr-a1-108",
+    "id": "fr-a1-113",
     "language": "fr",
     "level": "A1",
     "tag": "VERB",
@@ -974,7 +1019,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 8: Emergências e Resolução de Problemas"
   },
   {
-    "id": "fr-a2-109",
+    "id": "fr-a2-114",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -983,7 +1028,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "fr-a2-110",
+    "id": "fr-a2-115",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -992,7 +1037,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "fr-a2-111",
+    "id": "fr-a2-116",
     "language": "fr",
     "level": "A2",
     "tag": "MISS",
@@ -1001,7 +1046,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "fr-a2-112",
+    "id": "fr-a2-117",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1010,7 +1055,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "fr-a2-113",
+    "id": "fr-a2-118",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1019,7 +1064,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "fr-a2-114",
+    "id": "fr-a2-119",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1028,7 +1073,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "fr-a2-115",
+    "id": "fr-a2-120",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1037,7 +1082,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "fr-a2-116",
+    "id": "fr-a2-121",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1046,7 +1091,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "fr-a2-117",
+    "id": "fr-a2-122",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1055,7 +1100,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "fr-a2-118",
+    "id": "fr-a2-123",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1064,7 +1109,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "fr-a2-119",
+    "id": "fr-a2-124",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1073,7 +1118,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "fr-a2-120",
+    "id": "fr-a2-125",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1082,7 +1127,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "fr-a2-121",
+    "id": "fr-a2-126",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1091,7 +1136,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "fr-a2-122",
+    "id": "fr-a2-127",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1100,7 +1145,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "fr-a2-123",
+    "id": "fr-a2-128",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1109,7 +1154,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "fr-a2-124",
+    "id": "fr-a2-129",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1118,7 +1163,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
-    "id": "fr-a2-125",
+    "id": "fr-a2-130",
     "language": "fr",
     "level": "A2",
     "tag": "MISS",
@@ -1127,7 +1172,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
-    "id": "fr-a2-126",
+    "id": "fr-a2-131",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1136,7 +1181,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
-    "id": "fr-a2-127",
+    "id": "fr-a2-132",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1145,7 +1190,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
-    "id": "fr-a2-128",
+    "id": "fr-a2-133",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1154,7 +1199,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
-    "id": "fr-a2-129",
+    "id": "fr-a2-134",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1163,7 +1208,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
-    "id": "fr-a2-130",
+    "id": "fr-a2-135",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1172,7 +1217,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
-    "id": "fr-a2-131",
+    "id": "fr-a2-136",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1181,7 +1226,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
-    "id": "fr-a2-132",
+    "id": "fr-a2-137",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1190,7 +1235,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
-    "id": "fr-a2-133",
+    "id": "fr-a2-138",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1199,7 +1244,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
-    "id": "fr-a2-134",
+    "id": "fr-a2-139",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1208,7 +1253,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
-    "id": "fr-a2-135",
+    "id": "fr-a2-140",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1217,7 +1262,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
-    "id": "fr-a2-136",
+    "id": "fr-a2-141",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1226,7 +1271,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
-    "id": "fr-a2-137",
+    "id": "fr-a2-142",
     "language": "fr",
     "level": "A2",
     "tag": "MISS",
@@ -1235,7 +1280,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "fr-a2-138",
+    "id": "fr-a2-143",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1244,16 +1289,16 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "fr-a2-139",
+    "id": "fr-a2-144",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
-    "uiTitle": "Sábado a Noite",
+    "uiTitle": "Sábado à Noite",
     "grammarFocus": "Par de Confusão: Passé Composé VS Passé Récent",
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "fr-a2-140",
+    "id": "fr-a2-145",
     "language": "fr",
     "level": "A2",
     "tag": "VOC",
@@ -1262,7 +1307,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "fr-a2-141",
+    "id": "fr-a2-146",
     "language": "fr",
     "level": "A2",
     "tag": "DIAL",
@@ -1271,7 +1316,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "fr-a2-142",
+    "id": "fr-a2-147",
     "language": "fr",
     "level": "A2",
     "tag": "MISS",
@@ -1280,7 +1325,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "fr-a2-143",
+    "id": "fr-a2-148",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1289,7 +1334,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "fr-a2-144",
+    "id": "fr-a2-149",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1298,7 +1343,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "fr-a2-145",
+    "id": "fr-a2-150",
     "language": "fr",
     "level": "A2",
     "tag": "VOC",
@@ -1307,7 +1352,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "fr-a2-146",
+    "id": "fr-a2-151",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1316,7 +1361,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "fr-a2-147",
+    "id": "fr-a2-152",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1325,7 +1370,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "fr-a2-148",
+    "id": "fr-a2-153",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1334,7 +1379,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "fr-a2-149",
+    "id": "fr-a2-154",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1343,7 +1388,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "fr-a2-150",
+    "id": "fr-a2-155",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1352,7 +1397,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "fr-a2-151",
+    "id": "fr-a2-156",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1361,7 +1406,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "fr-a2-152",
+    "id": "fr-a2-157",
     "language": "fr",
     "level": "A2",
     "tag": "MISS",
@@ -1370,7 +1415,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "fr-a2-153",
+    "id": "fr-a2-158",
     "language": "fr",
     "level": "A2",
     "tag": "VOC",
@@ -1379,7 +1424,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "fr-a2-154",
+    "id": "fr-a2-159",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1388,7 +1433,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "fr-a2-155",
+    "id": "fr-a2-160",
     "language": "fr",
     "level": "A2",
     "tag": "EXPR",
@@ -1397,7 +1442,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "fr-a2-156",
+    "id": "fr-a2-161",
     "language": "fr",
     "level": "A2",
     "tag": "VOC",
@@ -1406,7 +1451,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "fr-a2-157",
+    "id": "fr-a2-162",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1415,7 +1460,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "fr-a2-158",
+    "id": "fr-a2-163",
     "language": "fr",
     "level": "A2",
     "tag": "EXPR",
@@ -1424,7 +1469,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "fr-a2-159",
+    "id": "fr-a2-164",
     "language": "fr",
     "level": "A2",
     "tag": "VOC",
@@ -1433,7 +1478,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "fr-a2-160",
+    "id": "fr-a2-165",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1442,7 +1487,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "fr-a2-161",
+    "id": "fr-a2-166",
     "language": "fr",
     "level": "A2",
     "tag": "VOC",
@@ -1451,7 +1496,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "fr-a2-162",
+    "id": "fr-a2-167",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1460,7 +1505,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "fr-a2-163",
+    "id": "fr-a2-168",
     "language": "fr",
     "level": "A2",
     "tag": "VOC",
@@ -1469,7 +1514,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "fr-a2-164",
+    "id": "fr-a2-169",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1478,7 +1523,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "fr-a2-165",
+    "id": "fr-a2-170",
     "language": "fr",
     "level": "A2",
     "tag": "VOC",
@@ -1487,7 +1532,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "fr-a2-166",
+    "id": "fr-a2-171",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1496,7 +1541,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "fr-a2-167",
+    "id": "fr-a2-172",
     "language": "fr",
     "level": "A2",
     "tag": "EXPR",
@@ -1505,7 +1550,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
-    "id": "fr-a2-168",
+    "id": "fr-a2-173",
     "language": "fr",
     "level": "A2",
     "tag": "DIAL",
@@ -1514,7 +1559,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
-    "id": "fr-a2-169",
+    "id": "fr-a2-174",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1523,7 +1568,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
-    "id": "fr-a2-170",
+    "id": "fr-a2-175",
     "language": "fr",
     "level": "A2",
     "tag": "MISS",
@@ -1532,7 +1577,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
-    "id": "fr-a2-171",
+    "id": "fr-a2-176",
     "language": "fr",
     "level": "A2",
     "tag": "DIAL",
@@ -1541,7 +1586,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
-    "id": "fr-a2-172",
+    "id": "fr-a2-177",
     "language": "fr",
     "level": "A2",
     "tag": "VOC",
@@ -1550,7 +1595,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
-    "id": "fr-a2-173",
+    "id": "fr-a2-178",
     "language": "fr",
     "level": "A2",
     "tag": "MISS",
@@ -1559,7 +1604,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
-    "id": "fr-a2-174",
+    "id": "fr-a2-179",
     "language": "fr",
     "level": "A2",
     "tag": "DIAL",
@@ -1568,7 +1613,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
-    "id": "fr-a2-175",
+    "id": "fr-a2-180",
     "language": "fr",
     "level": "A2",
     "tag": "VOC",
@@ -1577,7 +1622,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
-    "id": "fr-a2-176",
+    "id": "fr-a2-181",
     "language": "fr",
     "level": "A2",
     "tag": "VOC",
@@ -1586,7 +1631,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
-    "id": "fr-a2-177",
+    "id": "fr-a2-182",
     "language": "fr",
     "level": "A2",
     "tag": "VOC",
@@ -1595,7 +1640,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
-    "id": "fr-a2-178",
+    "id": "fr-a2-183",
     "language": "fr",
     "level": "A2",
     "tag": "VOC",
@@ -1604,7 +1649,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
-    "id": "fr-a2-179",
+    "id": "fr-a2-184",
     "language": "fr",
     "level": "A2",
     "tag": "VOC",
@@ -1613,7 +1658,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
-    "id": "fr-a2-180",
+    "id": "fr-a2-185",
     "language": "fr",
     "level": "A2",
     "tag": "VOC",
@@ -1622,97 +1667,97 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
-    "id": "fr-a2-181",
+    "id": "fr-a2-186",
     "language": "fr",
     "level": "A2",
     "tag": "MISS",
     "uiTitle": "O Alarme do Chefe",
     "grammarFocus": "Orientação Urbana e Mapas",
-    "theme": "Tema 14: Vida Profissional Básica"
-  },
-  {
-    "id": "fr-a2-182",
-    "language": "fr",
-    "level": "A2",
-    "tag": "GRAM",
-    "uiTitle": "O Refúgio do Café",
-    "grammarFocus": "Par de Confusão: Encore VS Toujours",
-    "theme": "Tema 14: Vida Profissional Básica"
-  },
-  {
-    "id": "fr-a2-183",
-    "language": "fr",
-    "level": "A2",
-    "tag": "PRON",
-    "uiTitle": "As Metas do Dia",
-    "grammarFocus": "Homófonos: Accro/accroc e Amande/amende",
-    "theme": "Tema 14: Vida Profissional Básica"
-  },
-  {
-    "id": "fr-a2-184",
-    "language": "fr",
-    "level": "A2",
-    "tag": "MISS",
-    "uiTitle": "A Tarefa Essencial",
-    "grammarFocus": "Farmácia e Emergência Médica",
-    "theme": "Tema 14: Vida Profissional Básica"
-  },
-  {
-    "id": "fr-a2-185",
-    "language": "fr",
-    "level": "A2",
-    "tag": "GRAM",
-    "uiTitle": "Conversa no Corredor",
-    "grammarFocus": "Par de Confusão: Déjà VS Jamais",
-    "theme": "Tema 14: Vida Profissional Básica"
-  },
-  {
-    "id": "fr-a2-186",
-    "language": "fr",
-    "level": "A2",
-    "tag": "PRON",
-    "uiTitle": "O E-mail Atrasado",
-    "grammarFocus": "Homófonos: Autel/hôtel e Auteur/hauteur",
-    "theme": "Tema 14: Vida Profissional Básica"
+    "theme": "Tema 14: Rotina do Escritório e da Cidade"
   },
   {
     "id": "fr-a2-187",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
-    "uiTitle": "A Reunião do Projeto",
-    "grammarFocus": "Par de Confusão: Tant pis VS Tant mieux",
-    "theme": "Tema 14: Vida Profissional Básica"
+    "uiTitle": "O Refúgio do Café",
+    "grammarFocus": "Par de Confusão: Encore VS Toujours",
+    "theme": "Tema 14: Rotina do Escritório e da Cidade"
   },
   {
     "id": "fr-a2-188",
     "language": "fr",
     "level": "A2",
-    "tag": "GRAM",
-    "uiTitle": "Responsabilidade Diária",
-    "grammarFocus": "Par de Confusão: Visiter VS Rendre visite à",
-    "theme": "Tema 14: Vida Profissional Básica"
+    "tag": "PRON",
+    "uiTitle": "As Metas do Dia",
+    "grammarFocus": "Homófonos: Accro/accroc e Amande/amende",
+    "theme": "Tema 14: Rotina do Escritório e da Cidade"
   },
   {
     "id": "fr-a2-189",
     "language": "fr",
     "level": "A2",
-    "tag": "GRAM",
-    "uiTitle": "O Ponto G final",
-    "grammarFocus": "Par de Confusão: Leur VS Leurs",
-    "theme": "Tema 14: Vida Profissional Básica"
+    "tag": "MISS",
+    "uiTitle": "A Tarefa Essencial",
+    "grammarFocus": "Farmácia e Emergência Médica",
+    "theme": "Tema 14: Rotina do Escritório e da Cidade"
   },
   {
     "id": "fr-a2-190",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
-    "uiTitle": "Deslogando",
-    "grammarFocus": "Plurais Irregulares: -ou, -al e -eau",
-    "theme": "Tema 14: Vida Profissional Básica"
+    "uiTitle": "Conversa no Corredor",
+    "grammarFocus": "Par de Confusão: Déjà VS Jamais",
+    "theme": "Tema 14: Rotina do Escritório e da Cidade"
   },
   {
     "id": "fr-a2-191",
+    "language": "fr",
+    "level": "A2",
+    "tag": "PRON",
+    "uiTitle": "O E-mail Atrasado",
+    "grammarFocus": "Homófonos: Autel/hôtel e Auteur/hauteur",
+    "theme": "Tema 14: Rotina do Escritório e da Cidade"
+  },
+  {
+    "id": "fr-a2-192",
+    "language": "fr",
+    "level": "A2",
+    "tag": "GRAM",
+    "uiTitle": "A Reunião do Projeto",
+    "grammarFocus": "Par de Confusão: Tant pis VS Tant mieux",
+    "theme": "Tema 14: Rotina do Escritório e da Cidade"
+  },
+  {
+    "id": "fr-a2-193",
+    "language": "fr",
+    "level": "A2",
+    "tag": "GRAM",
+    "uiTitle": "Responsabilidade Diária",
+    "grammarFocus": "Par de Confusão: Visiter VS Rendre visite à",
+    "theme": "Tema 14: Rotina do Escritório e da Cidade"
+  },
+  {
+    "id": "fr-a2-194",
+    "language": "fr",
+    "level": "A2",
+    "tag": "GRAM",
+    "uiTitle": "O Ponto Final",
+    "grammarFocus": "Par de Confusão: Leur VS Leurs",
+    "theme": "Tema 14: Rotina do Escritório e da Cidade"
+  },
+  {
+    "id": "fr-a2-195",
+    "language": "fr",
+    "level": "A2",
+    "tag": "GRAM",
+    "uiTitle": "Deslogando",
+    "grammarFocus": "Plurais Irregulares: -ou, -al e -eau",
+    "theme": "Tema 14: Rotina do Escritório e da Cidade"
+  },
+  {
+    "id": "fr-a2-196",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1721,7 +1766,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 15: Saúde e Farmácia"
   },
   {
-    "id": "fr-a2-192",
+    "id": "fr-a2-197",
     "language": "fr",
     "level": "A2",
     "tag": "MISS",
@@ -1730,7 +1775,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 15: Saúde e Farmácia"
   },
   {
-    "id": "fr-a2-193",
+    "id": "fr-a2-198",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1739,16 +1784,16 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 15: Saúde e Farmácia"
   },
   {
-    "id": "fr-a2-194",
+    "id": "fr-a2-199",
     "language": "fr",
     "level": "A2",
     "tag": "MISS",
     "uiTitle": "Medicamentos Genéricos",
-    "grammarFocus": "Planejando uma viagem inesquecível (Synthesis)",
+    "grammarFocus": "Planejando uma viagem inesquecível (Síntese)",
     "theme": "Tema 15: Saúde e Farmácia"
   },
   {
-    "id": "fr-a2-195",
+    "id": "fr-a2-200",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1757,7 +1802,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 15: Saúde e Farmácia"
   },
   {
-    "id": "fr-a2-196",
+    "id": "fr-a2-201",
     "language": "fr",
     "level": "A2",
     "tag": "MISS",
@@ -1766,7 +1811,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 15: Saúde e Farmácia"
   },
   {
-    "id": "fr-a2-197",
+    "id": "fr-a2-202",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1775,7 +1820,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 15: Saúde e Farmácia"
   },
   {
-    "id": "fr-a2-198",
+    "id": "fr-a2-203",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1784,7 +1829,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 15: Saúde e Farmácia"
   },
   {
-    "id": "fr-a2-199",
+    "id": "fr-a2-204",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1793,7 +1838,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 15: Saúde e Farmácia"
   },
   {
-    "id": "fr-a2-200",
+    "id": "fr-a2-205",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1802,7 +1847,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 15: Saúde e Farmácia"
   },
   {
-    "id": "fr-b1-201",
+    "id": "fr-b1-206",
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
@@ -1811,7 +1856,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "fr-b1-202",
+    "id": "fr-b1-207",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -1820,7 +1865,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "fr-b1-203",
+    "id": "fr-b1-208",
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
@@ -1829,7 +1874,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "fr-b1-204",
+    "id": "fr-b1-209",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -1838,7 +1883,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "fr-b1-205",
+    "id": "fr-b1-210",
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
@@ -1847,7 +1892,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "fr-b1-206",
+    "id": "fr-b1-211",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -1856,7 +1901,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "fr-b1-207",
+    "id": "fr-b1-212",
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
@@ -1865,7 +1910,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "fr-b1-208",
+    "id": "fr-b1-213",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -1874,16 +1919,16 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "fr-b1-209",
+    "id": "fr-b1-214",
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
     "uiTitle": "Um Conto Rápido",
-    "grammarFocus": "Gerúndio: Ações Simultâneas (Tout en fazendo)",
+    "grammarFocus": "Gerúndio: Ações Simultâneas (Tout en + gerúndio)",
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "fr-b1-210",
+    "id": "fr-b1-215",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -1892,7 +1937,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "fr-b1-211",
+    "id": "fr-b1-216",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -1901,7 +1946,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "fr-b1-212",
+    "id": "fr-b1-217",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -1910,7 +1955,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "fr-b1-213",
+    "id": "fr-b1-218",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -1919,7 +1964,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "fr-b1-214",
+    "id": "fr-b1-219",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -1928,7 +1973,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "fr-b1-215",
+    "id": "fr-b1-220",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -1937,84 +1982,39 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "fr-b1-216",
-    "language": "fr",
-    "level": "B1",
-    "tag": "GRAM",
-    "uiTitle": "Tchau",
-    "grammarFocus": "Estruturas Condicionais (2): Si + Imperfeito",
-    "theme": "Tema 16: Relembrando a Infância"
-  },
-  {
-    "id": "fr-b1-217",
-    "language": "fr",
-    "level": "B1",
-    "tag": "GRAM",
-    "uiTitle": "Tchau (Continuação)",
-    "grammarFocus": "Par de Confusão: Quand VS Lorsque",
-    "theme": "Tema 16: Relembrando a Infância"
-  },
-  {
-    "id": "fr-b1-218",
-    "language": "fr",
-    "level": "B1",
-    "tag": "GRAM",
-    "uiTitle": "Tchau (Continuação)",
-    "grammarFocus": "Ordem e Posição de Pronomes Duplos",
-    "theme": "Tema 16: Relembrando a Infância"
-  },
-  {
-    "id": "fr-b1-219",
-    "language": "fr",
-    "level": "B1",
-    "tag": "VERB",
-    "uiTitle": "A Preparação Inicial",
-    "grammarFocus": "Concordância do Particípio Passado (COD e Relativos)",
-    "theme": "Tema 17: Fofocas e Histórias Indiretas"
-  },
-  {
-    "id": "fr-b1-220",
-    "language": "fr",
-    "level": "B1",
-    "tag": "GRAM",
-    "uiTitle": "Aquecendo a Voz",
-    "grammarFocus": "Voz Passiva: Uso de Par e De",
-    "theme": "Tema 17: Fofocas e Histórias Indiretas"
-  },
-  {
     "id": "fr-b1-221",
     "language": "fr",
     "level": "B1",
-    "tag": "MISS",
-    "uiTitle": "O Primeito Toque",
-    "grammarFocus": "Prática: Narrando eventos complexos em sequência",
-    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+    "tag": "GRAM",
+    "uiTitle": "O Último Verão de Criança",
+    "grammarFocus": "Estruturas Condicionais (2): Si + Imperfeito",
+    "theme": "Tema 16: Relembrando a Infância"
   },
   {
     "id": "fr-b1-222",
     "language": "fr",
     "level": "B1",
-    "tag": "VOC",
-    "uiTitle": "Ganho de Ritmo",
-    "grammarFocus": "Conjunções: Mais, ou, et, donc, or, ni, car",
-    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+    "tag": "GRAM",
+    "uiTitle": "A Caixa de Fotografias",
+    "grammarFocus": "Par de Confusão: Quand VS Lorsque",
+    "theme": "Tema 16: Relembrando a Infância"
   },
   {
     "id": "fr-b1-223",
     "language": "fr",
     "level": "B1",
-    "tag": "EXPR",
-    "uiTitle": "Ponto Chave",
-    "grammarFocus": "5 Expressões com o verbo Prendre",
-    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+    "tag": "GRAM",
+    "uiTitle": "Crescendo Aos Poucos",
+    "grammarFocus": "Ordem e Posição de Pronomes Duplos",
+    "theme": "Tema 16: Relembrando a Infância"
   },
   {
     "id": "fr-b1-224",
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
-    "uiTitle": "Subindo as Escadas",
-    "grammarFocus": "Verbos Impessoais: Falloir, neiger e valoir",
+    "uiTitle": "Na Fila da Boulangerie",
+    "grammarFocus": "Concordância do Particípio Passado (COD e Relativos)",
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
@@ -2022,62 +2022,62 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
-    "uiTitle": "Entrando no Detail",
-    "grammarFocus": "Discurso Indireto: Il dit que...",
+    "uiTitle": "O Balcão Começa a Conversar",
+    "grammarFocus": "Voz Passiva: Uso de Par e De",
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
     "id": "fr-b1-226",
     "language": "fr",
     "level": "B1",
-    "tag": "VOC",
-    "uiTitle": "Puxando Pela Memória",
-    "grammarFocus": "Conjunções: Parce que, quando, si, como, puisque",
+    "tag": "MISS",
+    "uiTitle": "O Rádio Ligado na Cozinha",
+    "grammarFocus": "Prática: Narrando eventos complexos em sequência",
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
     "id": "fr-b1-227",
     "language": "fr",
     "level": "B1",
-    "tag": "GRAM",
-    "uiTitle": "Momento do Xeque",
-    "grammarFocus": "Conjunções Temporais: Dès que e Aussitôt que",
+    "tag": "VOC",
+    "uiTitle": "Trocando Recados no Portão",
+    "grammarFocus": "Conjunções: Mais, ou, et, donc, or, ni, car",
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
     "id": "fr-b1-228",
     "language": "fr",
     "level": "B1",
-    "tag": "VOC",
-    "uiTitle": "O Grande Desafio",
-    "grammarFocus": "Falsos Amigos (Faux amis) e Erros Comuns",
+    "tag": "EXPR",
+    "uiTitle": "A Panela Fervendo",
+    "grammarFocus": "5 Expressões com o verbo Prendre",
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
     "id": "fr-b1-229",
     "language": "fr",
     "level": "B1",
-    "tag": "GRAM",
-    "uiTitle": "Fechamentos Lógicos",
-    "grammarFocus": "Par de Confusão: Parce que VS Car",
+    "tag": "VERB",
+    "uiTitle": "Entrando na Sala de Estar",
+    "grammarFocus": "Verbos Impessoais: Falloir, neiger e valoir",
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
     "id": "fr-b1-230",
     "language": "fr",
     "level": "B1",
-    "tag": "VOC",
-    "uiTitle": "Quase Lá",
-    "grammarFocus": "Nominalização: Transformando verbos em substantivos",
+    "tag": "GRAM",
+    "uiTitle": "O Recado da Zeladora",
+    "grammarFocus": "Discurso Indireto: Il dit que...",
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
     "id": "fr-b1-231",
     "language": "fr",
     "level": "B1",
-    "tag": "GRAM",
-    "uiTitle": "Fim do Ciclo",
-    "grammarFocus": "Par de Confusão: Puisque VS Comme",
+    "tag": "VOC",
+    "uiTitle": "Lembrando do que Ouviu",
+    "grammarFocus": "Conjunções: Parce que, quand, si, comme, puisque",
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
@@ -2085,17 +2085,17 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
-    "uiTitle": "O Retorno Absoluto",
-    "grammarFocus": "Par de Confusão: Penser à VS Penser de",
+    "uiTitle": "A Mesa de Domingo",
+    "grammarFocus": "Conjunções Temporais: Dès que e Aussitôt que",
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
     "id": "fr-b1-233",
     "language": "fr",
     "level": "B1",
-    "tag": "GRAM",
-    "uiTitle": "Conquista",
-    "grammarFocus": "Uso Global de Tout (Adjetivo e Pronome)",
+    "tag": "VOC",
+    "uiTitle": "Palavras que Enganam",
+    "grammarFocus": "Falsos Amigos (Faux amis) e Erros Comuns",
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
@@ -2103,17 +2103,17 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
-    "uiTitle": "Etapa Avançada 16",
-    "grammarFocus": "Pronomes Enfáticos: Mesmo (Même)",
+    "uiTitle": "Concluindo a Fofoca",
+    "grammarFocus": "Par de Confusão: Parce que VS Car",
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
     "id": "fr-b1-235",
     "language": "fr",
     "level": "B1",
-    "tag": "GRAM",
-    "uiTitle": "Etapa Avançada 17",
-    "grammarFocus": "Adjetivos Indefinidos: Chaque, certain, plusieurs, quelque",
+    "tag": "VOC",
+    "uiTitle": "Transformando Verbos em Substantivos",
+    "grammarFocus": "Nominalização: Do verbo ao substantivo",
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
@@ -2121,12 +2121,75 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
-    "uiTitle": "Etapa Avançada 18",
-    "grammarFocus": "Adjetivos: Mudança de Sentido pela posição",
+    "uiTitle": "A Escolha Certa",
+    "grammarFocus": "Pronomes Demonstrativos: Celui, Celle, Ceux, Celles",
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
     "id": "fr-b1-237",
+    "language": "fr",
+    "level": "B1",
+    "tag": "GRAM",
+    "uiTitle": "Este ou Aquele",
+    "grammarFocus": "Demonstrativos Compostos: Celui-ci VS Celui-là",
+    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+  },
+  {
+    "id": "fr-b1-238",
+    "language": "fr",
+    "level": "B1",
+    "tag": "GRAM",
+    "uiTitle": "Encerrando a Manhã",
+    "grammarFocus": "Par de Confusão: Puisque VS Comme",
+    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+  },
+  {
+    "id": "fr-b1-239",
+    "language": "fr",
+    "level": "B1",
+    "tag": "GRAM",
+    "uiTitle": "Voltando ao Tópico",
+    "grammarFocus": "Par de Confusão: Penser à VS Penser de",
+    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+  },
+  {
+    "id": "fr-b1-240",
+    "language": "fr",
+    "level": "B1",
+    "tag": "GRAM",
+    "uiTitle": "O Detalhe que Fechou a História",
+    "grammarFocus": "Uso Global de Tout (Adjetivo e Pronome)",
+    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+  },
+  {
+    "id": "fr-b1-241",
+    "language": "fr",
+    "level": "B1",
+    "tag": "GRAM",
+    "uiTitle": "Enfatizando Culpados",
+    "grammarFocus": "Pronomes Enfáticos: Mesmo (Même)",
+    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+  },
+  {
+    "id": "fr-b1-242",
+    "language": "fr",
+    "level": "B1",
+    "tag": "GRAM",
+    "uiTitle": "Palavras Indefinidas",
+    "grammarFocus": "Adjetivos Indefinidos: Chaque, certain, plusieurs, quelque",
+    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+  },
+  {
+    "id": "fr-b1-243",
+    "language": "fr",
+    "level": "B1",
+    "tag": "GRAM",
+    "uiTitle": "Antes ou Depois do Substantivo",
+    "grammarFocus": "Adjetivos: Mudança de Sentido pela posição",
+    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+  },
+  {
+    "id": "fr-b1-244",
     "language": "fr",
     "level": "B1",
     "tag": "EXPR",
@@ -2135,7 +2198,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "fr-b1-238",
+    "id": "fr-b1-245",
     "language": "fr",
     "level": "B1",
     "tag": "MISS",
@@ -2144,7 +2207,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "fr-b1-239",
+    "id": "fr-b1-246",
     "language": "fr",
     "level": "B1",
     "tag": "CULT",
@@ -2153,7 +2216,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "fr-b1-240",
+    "id": "fr-b1-247",
     "language": "fr",
     "level": "B1",
     "tag": "VOC",
@@ -2162,7 +2225,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "fr-b1-241",
+    "id": "fr-b1-248",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -2171,7 +2234,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "fr-b1-242",
+    "id": "fr-b1-249",
     "language": "fr",
     "level": "B1",
     "tag": "EXPR",
@@ -2180,7 +2243,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "fr-b1-243",
+    "id": "fr-b1-250",
     "language": "fr",
     "level": "B1",
     "tag": "MISS",
@@ -2189,7 +2252,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "fr-b1-244",
+    "id": "fr-b1-251",
     "language": "fr",
     "level": "B1",
     "tag": "VOC",
@@ -2198,7 +2261,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "fr-b1-245",
+    "id": "fr-b1-252",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -2207,7 +2270,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "fr-b1-246",
+    "id": "fr-b1-253",
     "language": "fr",
     "level": "B1",
     "tag": "EXPR",
@@ -2216,7 +2279,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "fr-b1-247",
+    "id": "fr-b1-254",
     "language": "fr",
     "level": "B1",
     "tag": "MISS",
@@ -2225,7 +2288,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "fr-b1-248",
+    "id": "fr-b1-255",
     "language": "fr",
     "level": "B1",
     "tag": "VOC",
@@ -2234,7 +2297,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "fr-b1-249",
+    "id": "fr-b1-256",
     "language": "fr",
     "level": "B1",
     "tag": "EXPR",
@@ -2243,7 +2306,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "fr-b1-250",
+    "id": "fr-b1-257",
     "language": "fr",
     "level": "B1",
     "tag": "MISS",
@@ -2252,16 +2315,16 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "fr-b1-251",
+    "id": "fr-b1-258",
     "language": "fr",
     "level": "B1",
     "tag": "EXPR",
     "uiTitle": "Luz Longe",
-    "grammarFocus": "5 Expressões com En: En ter marre, S'en aller",
+    "grammarFocus": "5 Expressões com En: En avoir marre, S'en aller",
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "fr-b1-252",
+    "id": "fr-b1-259",
     "language": "fr",
     "level": "B1",
     "tag": "MISS",
@@ -2270,102 +2333,39 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "fr-b1-253",
-    "language": "fr",
-    "level": "B1",
-    "tag": "EXPR",
-    "uiTitle": "Destino (Continuação)",
-    "grammarFocus": "5 Expressões com Y: Ça y est, Il y a",
-    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
-  },
-  {
-    "id": "fr-b1-254",
-    "language": "fr",
-    "level": "B1",
-    "tag": "MISS",
-    "uiTitle": "Destino (Continuação)",
-    "grammarFocus": "Redação: Uma Pessoa Inspiradora",
-    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
-  },
-  {
-    "id": "fr-b1-255",
-    "language": "fr",
-    "level": "B1",
-    "tag": "GRAM",
-    "uiTitle": "A Preparação Inicial",
-    "grammarFocus": "Par de Confusão: Faire mal à VS Faire du mal",
-    "theme": "Tema 19: Vida Profissional e Entrevistas"
-  },
-  {
-    "id": "fr-b1-256",
-    "language": "fr",
-    "level": "B1",
-    "tag": "DIAL",
-    "uiTitle": "Aquecendo a Voz",
-    "grammarFocus": "5 Maneiras de Dizer Félicitations (B1)",
-    "theme": "Tema 19: Vida Profissional e Entrevistas"
-  },
-  {
-    "id": "fr-b1-257",
-    "language": "fr",
-    "level": "B1",
-    "tag": "VERB",
-    "uiTitle": "O Primeito Toque",
-    "grammarFocus": "Conjugação: Dire",
-    "theme": "Tema 19: Vida Profissional e Entrevistas"
-  },
-  {
-    "id": "fr-b1-258",
-    "language": "fr",
-    "level": "B1",
-    "tag": "GRAM",
-    "uiTitle": "Ganho de Ritmo",
-    "grammarFocus": "Par de Confusão: Souligner VS Surligner",
-    "theme": "Tema 19: Vida Profissional e Entrevistas"
-  },
-  {
-    "id": "fr-b1-259",
-    "language": "fr",
-    "level": "B1",
-    "tag": "DIAL",
-    "uiTitle": "Ponto Chave",
-    "grammarFocus": "5 Maneiras de Dizer Au revoir (B1)",
-    "theme": "Tema 19: Vida Profissional e Entrevistas"
-  },
-  {
     "id": "fr-b1-260",
     "language": "fr",
     "level": "B1",
-    "tag": "VERB",
-    "uiTitle": "Subindo as Escadas",
-    "grammarFocus": "Conjugação: Écrire",
-    "theme": "Tema 19: Vida Profissional e Entrevistas"
+    "tag": "EXPR",
+    "uiTitle": "O Eco do Destino",
+    "grammarFocus": "5 Expressões com Y: Ça y est, Il y a",
+    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
     "id": "fr-b1-261",
     "language": "fr",
     "level": "B1",
-    "tag": "GRAM",
-    "uiTitle": "Entrando no Detail",
-    "grammarFocus": "Par de Confusão: Prêter VS Emprunter",
-    "theme": "Tema 19: Vida Profissional e Entrevistas"
+    "tag": "MISS",
+    "uiTitle": "Destino Traçado",
+    "grammarFocus": "Redação: Uma Pessoa Inspiradora",
+    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
     "id": "fr-b1-262",
     "language": "fr",
     "level": "B1",
-    "tag": "VERB",
-    "uiTitle": "Puxando Pela Memória",
-    "grammarFocus": "Conjugação: Lire",
+    "tag": "GRAM",
+    "uiTitle": "Revisando o Currículo",
+    "grammarFocus": "Par de Confusão: Faire mal à VS Faire du mal",
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
     "id": "fr-b1-263",
     "language": "fr",
     "level": "B1",
-    "tag": "GRAM",
-    "uiTitle": "Momento do Xeque",
-    "grammarFocus": "Par de Confusão: Rappeler VS Se rappeler VS Se souvenir",
+    "tag": "DIAL",
+    "uiTitle": "A Chamada de Vídeo",
+    "grammarFocus": "5 Maneiras de Dizer Félicitations (B1)",
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
@@ -2373,26 +2373,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
-    "uiTitle": "O Grande Desafio",
-    "grammarFocus": "Conjugação: Répondre",
+    "uiTitle": "O Aperto de Mão",
+    "grammarFocus": "Conjugação: Dire",
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
     "id": "fr-b1-265",
     "language": "fr",
     "level": "B1",
-    "tag": "VERB",
-    "uiTitle": "Fechamentos Lógicos",
-    "grammarFocus": "Conjugação: Faire",
+    "tag": "GRAM",
+    "uiTitle": "Apresentando a Trajetória",
+    "grammarFocus": "Par de Confusão: Souligner VS Surligner",
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
     "id": "fr-b1-266",
     "language": "fr",
     "level": "B1",
-    "tag": "VERB",
-    "uiTitle": "Quase Lá",
-    "grammarFocus": "Conjugação: Prendre",
+    "tag": "DIAL",
+    "uiTitle": "As Perguntas do Recrutador",
+    "grammarFocus": "5 Maneiras de Dizer Au revoir (B1)",
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
@@ -2400,17 +2400,17 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
-    "uiTitle": "Fim do Ciclo",
-    "grammarFocus": "Conjugação: Mettre",
+    "uiTitle": "Escrevendo um E-mail de Follow-up",
+    "grammarFocus": "Conjugação: Écrire",
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
     "id": "fr-b1-268",
     "language": "fr",
     "level": "B1",
-    "tag": "VERB",
-    "uiTitle": "O Retorno Absoluto",
-    "grammarFocus": "Conjugação: Construire",
+    "tag": "GRAM",
+    "uiTitle": "Negociando Salário",
+    "grammarFocus": "Par de Confusão: Prêter VS Emprunter",
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
@@ -2418,17 +2418,17 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
-    "uiTitle": "Conquista",
-    "grammarFocus": "Conjugação: Vouloir",
+    "uiTitle": "O Teste Técnico",
+    "grammarFocus": "Conjugação: Lire",
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
     "id": "fr-b1-270",
     "language": "fr",
     "level": "B1",
-    "tag": "VERB",
-    "uiTitle": "Etapa Avançada 16",
-    "grammarFocus": "Conjugação: Pouvoir",
+    "tag": "GRAM",
+    "uiTitle": "A Pergunta Difícil",
+    "grammarFocus": "Par de Confusão: Rappeler VS Se rappeler VS Se souvenir",
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
@@ -2436,8 +2436,8 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
-    "uiTitle": "Etapa Avançada 17",
-    "grammarFocus": "Conjugação: Devoir",
+    "uiTitle": "O Desafio Final",
+    "grammarFocus": "Conjugação: Répondre",
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
@@ -2445,8 +2445,8 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
-    "uiTitle": "Etapa Avançada 18",
-    "grammarFocus": "Conjugação: Falloir",
+    "uiTitle": "A Decisão do Comitê",
+    "grammarFocus": "Conjugação: Faire",
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
@@ -2454,89 +2454,89 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
-    "uiTitle": "A Preparação Inicial",
-    "grammarFocus": "Conjugação: Savoir",
-    "theme": "Tema 20: Expressões e Redes Sociais"
+    "uiTitle": "A Segunda Rodada",
+    "grammarFocus": "Conjugação: Prendre",
+    "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
     "id": "fr-b1-274",
     "language": "fr",
     "level": "B1",
-    "tag": "GRAM",
-    "uiTitle": "Aquecendo a Voz",
-    "grammarFocus": "Par de Confusão: Tout à coup VS Tout d'un coup",
-    "theme": "Tema 20: Expressões e Redes Sociais"
+    "tag": "VERB",
+    "uiTitle": "A Oferta Chega",
+    "grammarFocus": "Conjugação: Mettre",
+    "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
     "id": "fr-b1-275",
     "language": "fr",
     "level": "B1",
-    "tag": "MISS",
-    "uiTitle": "O Primeito Toque",
-    "grammarFocus": "Ponte B1 > B2: Introdução ao Subjonctif",
-    "theme": "Tema 20: Expressões e Redes Sociais"
+    "tag": "VERB",
+    "uiTitle": "Aceitando a Proposta",
+    "grammarFocus": "Conjugação: Construire",
+    "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
     "id": "fr-b1-276",
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
-    "uiTitle": "Ganho de Ritmo",
-    "grammarFocus": "Conjugação: Croire",
-    "theme": "Tema 20: Expressões e Redes Sociais"
+    "uiTitle": "O Primeiro Dia",
+    "grammarFocus": "Conjugação: Vouloir",
+    "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
     "id": "fr-b1-277",
     "language": "fr",
     "level": "B1",
-    "tag": "GRAM",
-    "uiTitle": "Ponto Chave",
-    "grammarFocus": "Par de Confusão: Uma tarefa VS Uma mancha",
-    "theme": "Tema 20: Expressões e Redes Sociais"
+    "tag": "VERB",
+    "uiTitle": "A Reunião de Equipe",
+    "grammarFocus": "Conjugação: Pouvoir",
+    "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
     "id": "fr-b1-278",
     "language": "fr",
     "level": "B1",
-    "tag": "MISS",
-    "uiTitle": "Subindo as Escadas",
-    "grammarFocus": "Revisão Geral B1",
-    "theme": "Tema 20: Expressões e Redes Sociais"
+    "tag": "VERB",
+    "uiTitle": "Responsabilidades Assumidas",
+    "grammarFocus": "Conjugação: Devoir",
+    "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
     "id": "fr-b1-279",
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
-    "uiTitle": "Entrando no Detail",
-    "grammarFocus": "Conjugação: Connaître",
-    "theme": "Tema 20: Expressões e Redes Sociais"
+    "uiTitle": "A Obrigação Irredutível",
+    "grammarFocus": "Conjugação: Falloir",
+    "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
     "id": "fr-b1-280",
     "language": "fr",
     "level": "B1",
-    "tag": "GRAM",
-    "uiTitle": "Puxando Pela Memória",
-    "grammarFocus": "Par de Confusão: En plus VS De plus",
+    "tag": "VERB",
+    "uiTitle": "Abrindo o Feed",
+    "grammarFocus": "Conjugação: Savoir",
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
     "id": "fr-b1-281",
     "language": "fr",
     "level": "B1",
-    "tag": "VERB",
-    "uiTitle": "Momento do Xeque",
-    "grammarFocus": "Conjugação: Sentir",
+    "tag": "GRAM",
+    "uiTitle": "O Post Viral",
+    "grammarFocus": "Par de Confusão: Tout à coup VS Tout d'un coup",
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
     "id": "fr-b1-282",
     "language": "fr",
     "level": "B1",
-    "tag": "GRAM",
-    "uiTitle": "O Grande Desafio",
-    "grammarFocus": "Par de Confusão: Ailleurs VS D'ailleurs",
+    "tag": "MISS",
+    "uiTitle": "A Ponte para o Subjuntivo",
+    "grammarFocus": "Ponte B1 > B2: Introdução ao Subjonctif",
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
@@ -2544,26 +2544,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
-    "uiTitle": "Fechamentos Lógicos",
-    "grammarFocus": "Conjugação: Servir",
+    "uiTitle": "Comentários nas Stories",
+    "grammarFocus": "Conjugação: Croire",
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
     "id": "fr-b1-284",
     "language": "fr",
     "level": "B1",
-    "tag": "VERB",
-    "uiTitle": "Quase Lá",
-    "grammarFocus": "Conjugação: Plaire",
+    "tag": "GRAM",
+    "uiTitle": "Tache ou Tâche?",
+    "grammarFocus": "Par de Confusão: Une tâche VS Une tache",
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
     "id": "fr-b1-285",
     "language": "fr",
     "level": "B1",
-    "tag": "VERB",
-    "uiTitle": "Fim do Ciclo",
-    "grammarFocus": "Conjugação: Rire",
+    "tag": "MISS",
+    "uiTitle": "A Revisão da Jornada B1",
+    "grammarFocus": "Revisão Geral B1",
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
@@ -2571,17 +2571,17 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
-    "uiTitle": "O Retorno Absoluto",
-    "grammarFocus": "Conjugação: Venir",
+    "uiTitle": "Conhecendo Influencers",
+    "grammarFocus": "Conjugação: Connaître",
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
     "id": "fr-b1-287",
     "language": "fr",
     "level": "B1",
-    "tag": "VERB",
-    "uiTitle": "Conquista",
-    "grammarFocus": "Conjugação: Partir",
+    "tag": "GRAM",
+    "uiTitle": "A Diferença é Fundamental",
+    "grammarFocus": "Par de Confusão: En plus VS De plus",
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
@@ -2589,17 +2589,17 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
-    "uiTitle": "Etapa Avançada 16",
-    "grammarFocus": "Conjugação: Sortir",
+    "uiTitle": "Sentindo a Audiência",
+    "grammarFocus": "Conjugação: Sentir",
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
     "id": "fr-b1-289",
     "language": "fr",
     "level": "B1",
-    "tag": "VERB",
-    "uiTitle": "Etapa Avançada 17",
-    "grammarFocus": "Conjugação: Courir",
+    "tag": "GRAM",
+    "uiTitle": "O Comentário Ambíguo",
+    "grammarFocus": "Par de Confusão: Ailleurs VS D'ailleurs",
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
@@ -2607,89 +2607,89 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
-    "uiTitle": "Etapa Avançada 18",
-    "grammarFocus": "Subjonctif Présent: Formação (Regulares)",
+    "uiTitle": "Servindo Conteúdo",
+    "grammarFocus": "Conjugação: Servir",
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
-    "id": "fr-b2-291",
+    "id": "fr-b1-291",
     "language": "fr",
-    "level": "B2",
+    "level": "B1",
     "tag": "VERB",
-    "uiTitle": "A Preparação Inicial",
-    "grammarFocus": "Subjonctif Présent: Verbos Irregulares (Être, Avoir)",
-    "theme": "Tema 21: O Mundo das Emoções"
+    "uiTitle": "O Que Agrada o Algoritmo",
+    "grammarFocus": "Conjugação: Plaire",
+    "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
-    "id": "fr-b2-292",
+    "id": "fr-b1-292",
     "language": "fr",
-    "level": "B2",
-    "tag": "GRAM",
-    "uiTitle": "Aquecendo a Voz",
-    "grammarFocus": "O uso do ne pleonástico (ne explétif)",
-    "theme": "Tema 21: O Mundo das Emoções"
-  },
-  {
-    "id": "fr-b2-293",
-    "language": "fr",
-    "level": "B2",
+    "level": "B1",
     "tag": "VERB",
-    "uiTitle": "O Primeito Toque",
-    "grammarFocus": "Subjonctif Présent: Verbos Irregulares (Faire, Aller, Savoir)",
-    "theme": "Tema 21: O Mundo das Emoções"
+    "uiTitle": "Rindo com a Comunidade",
+    "grammarFocus": "Conjugação: Rire",
+    "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
-    "id": "fr-b2-294",
+    "id": "fr-b1-293",
     "language": "fr",
-    "level": "B2",
-    "tag": "GRAM",
-    "uiTitle": "Ganho de Ritmo",
-    "grammarFocus": "Indicativo VS Subjuntivo: Verbos de Opinião",
-    "theme": "Tema 21: O Mundo das Emoções"
-  },
-  {
-    "id": "fr-b2-295",
-    "language": "fr",
-    "level": "B2",
+    "level": "B1",
     "tag": "VERB",
-    "uiTitle": "Ponto Chave",
-    "grammarFocus": "Subjonctif: Necessidade e Vontade",
-    "theme": "Tema 21: O Mundo das Emoções"
+    "uiTitle": "De Onde Vem a Ideia",
+    "grammarFocus": "Conjugação: Venir",
+    "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
-    "id": "fr-b2-296",
+    "id": "fr-b1-294",
     "language": "fr",
-    "level": "B2",
-    "tag": "GRAM",
-    "uiTitle": "Subindo as Escadas",
-    "grammarFocus": "Formação do Plus-que-parfait",
-    "theme": "Tema 21: O Mundo das Emoções"
-  },
-  {
-    "id": "fr-b2-297",
-    "language": "fr",
-    "level": "B2",
+    "level": "B1",
     "tag": "VERB",
-    "uiTitle": "Entrando no Detail",
-    "grammarFocus": "Subjonctif: Dúvida e Incerteza",
-    "theme": "Tema 21: O Mundo das Emoções"
+    "uiTitle": "Partindo para a Próxima",
+    "grammarFocus": "Conjugação: Partir",
+    "theme": "Tema 20: Expressões e Redes Sociais"
+  },
+  {
+    "id": "fr-b1-295",
+    "language": "fr",
+    "level": "B1",
+    "tag": "VERB",
+    "uiTitle": "Saindo do Aplicativo",
+    "grammarFocus": "Conjugação: Sortir",
+    "theme": "Tema 20: Expressões e Redes Sociais"
+  },
+  {
+    "id": "fr-b1-296",
+    "language": "fr",
+    "level": "B1",
+    "tag": "VERB",
+    "uiTitle": "Correndo Contra o Tempo",
+    "grammarFocus": "Conjugação: Courir",
+    "theme": "Tema 20: Expressões e Redes Sociais"
+  },
+  {
+    "id": "fr-b1-297",
+    "language": "fr",
+    "level": "B1",
+    "tag": "VERB",
+    "uiTitle": "Inscrevendo-se no Subjuntivo",
+    "grammarFocus": "Subjonctif Présent: Formação (Regulares)",
+    "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
     "id": "fr-b2-298",
     "language": "fr",
     "level": "B2",
     "tag": "VERB",
-    "uiTitle": "Puxando Pela Memória",
-    "grammarFocus": "Subjonctif: Emoção e Julgamento",
+    "uiTitle": "O Peso do Silêncio",
+    "grammarFocus": "Subjonctif Présent: Verbos Irregulares (Être, Avoir)",
     "theme": "Tema 21: O Mundo das Emoções"
   },
   {
     "id": "fr-b2-299",
     "language": "fr",
     "level": "B2",
-    "tag": "VERB",
-    "uiTitle": "Momento do Xeque",
-    "grammarFocus": "Subjonctif: Orações Concessivas",
+    "tag": "GRAM",
+    "uiTitle": "O Medo Não Dito",
+    "grammarFocus": "O uso do ne pleonástico (ne explétif)",
     "theme": "Tema 21: O Mundo das Emoções"
   },
   {
@@ -2697,17 +2697,17 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "B2",
     "tag": "VERB",
-    "uiTitle": "O Grande Desafio",
-    "grammarFocus": "Subjonctif: Finalidade e Negativa (Sans que)",
+    "uiTitle": "A Surpresa no Olhar",
+    "grammarFocus": "Subjonctif Présent: Verbos Irregulares (Faire, Aller, Savoir)",
     "theme": "Tema 21: O Mundo das Emoções"
   },
   {
     "id": "fr-b2-301",
     "language": "fr",
     "level": "B2",
-    "tag": "VERB",
-    "uiTitle": "Fechamentos Lógicos",
-    "grammarFocus": "Formação do Conditionnel Passé",
+    "tag": "GRAM",
+    "uiTitle": "Opiniões em Conflito",
+    "grammarFocus": "Indicativo VS Subjuntivo: Verbos de Opinião",
     "theme": "Tema 21: O Mundo das Emoções"
   },
   {
@@ -2715,17 +2715,17 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "B2",
     "tag": "VERB",
-    "uiTitle": "Quase Lá",
-    "grammarFocus": "Hipóteses sobre o Passado (3ª Condicional)",
+    "uiTitle": "Vontades Profundas",
+    "grammarFocus": "Subjonctif: Necessidade e Vontade",
     "theme": "Tema 21: O Mundo das Emoções"
   },
   {
     "id": "fr-b2-303",
     "language": "fr",
     "level": "B2",
-    "tag": "VERB",
-    "uiTitle": "Fim do Ciclo",
-    "grammarFocus": "Futur Antérieur: Formação e Uso",
+    "tag": "GRAM",
+    "uiTitle": "Memórias Passadas",
+    "grammarFocus": "Formação do Plus-que-parfait",
     "theme": "Tema 21: O Mundo das Emoções"
   },
   {
@@ -2733,8 +2733,8 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "B2",
     "tag": "VERB",
-    "uiTitle": "O Retorno Absoluto",
-    "grammarFocus": "Discurso Indireto no Passado (B2)",
+    "uiTitle": "Dúvidas Corrosivas",
+    "grammarFocus": "Subjonctif: Dúvida e Incerteza",
     "theme": "Tema 21: O Mundo das Emoções"
   },
   {
@@ -2742,89 +2742,89 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "B2",
     "tag": "VERB",
-    "uiTitle": "Conquista",
-    "grammarFocus": "Construções Causativas: Faire e infinitivo",
+    "uiTitle": "Alegrias Compartilhadas",
+    "grammarFocus": "Subjonctif: Emoção e Julgamento",
     "theme": "Tema 21: O Mundo das Emoções"
   },
   {
     "id": "fr-b2-306",
     "language": "fr",
     "level": "B2",
-    "tag": "GRAM",
-    "uiTitle": "A Preparação Inicial",
-    "grammarFocus": "Causativas Reflexivas: Se fazer e Se deixar",
-    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+    "tag": "VERB",
+    "uiTitle": "Aceitando Concessões",
+    "grammarFocus": "Subjonctif: Orações Concessivas",
+    "theme": "Tema 21: O Mundo das Emoções"
   },
   {
     "id": "fr-b2-307",
     "language": "fr",
     "level": "B2",
     "tag": "VERB",
-    "uiTitle": "Aquecendo a Voz",
-    "grammarFocus": "O uso do Infinitivo Passado",
-    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+    "uiTitle": "Propósitos Secretos",
+    "grammarFocus": "Subjonctif: Finalidade e Negativa (Sans que)",
+    "theme": "Tema 21: O Mundo das Emoções"
   },
   {
     "id": "fr-b2-308",
     "language": "fr",
     "level": "B2",
-    "tag": "GRAM",
-    "uiTitle": "O Primeito Toque",
-    "grammarFocus": "Imperativo com Pronomes Duplos",
-    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+    "tag": "VERB",
+    "uiTitle": "Arrependimentos",
+    "grammarFocus": "Formação do Conditionnel Passé",
+    "theme": "Tema 21: O Mundo das Emoções"
   },
   {
     "id": "fr-b2-309",
     "language": "fr",
     "level": "B2",
-    "tag": "VOC",
-    "uiTitle": "Ganho de Ritmo",
-    "grammarFocus": "Marcadores Discursivos: Adição e Estruturação",
-    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+    "tag": "VERB",
+    "uiTitle": "E Se a História Fosse Outra",
+    "grammarFocus": "Hipóteses sobre o Passado (3ª Condicional)",
+    "theme": "Tema 21: O Mundo das Emoções"
   },
   {
     "id": "fr-b2-310",
     "language": "fr",
     "level": "B2",
-    "tag": "GRAM",
-    "uiTitle": "Ponto Chave",
-    "grammarFocus": "Relativos Compostos: Auquel e Duquel",
-    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+    "tag": "VERB",
+    "uiTitle": "O Futuro Já Terminou",
+    "grammarFocus": "Futur Antérieur: Formação e Uso",
+    "theme": "Tema 21: O Mundo das Emoções"
   },
   {
     "id": "fr-b2-311",
     "language": "fr",
     "level": "B2",
-    "tag": "GRAM",
-    "uiTitle": "Subindo as Escadas",
-    "grammarFocus": "Par de Confusão: Douter VS Se douter",
-    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+    "tag": "VERB",
+    "uiTitle": "Contando o que Disseram",
+    "grammarFocus": "Discurso Indireto no Passado (B2)",
+    "theme": "Tema 21: O Mundo das Emoções"
   },
   {
     "id": "fr-b2-312",
     "language": "fr",
     "level": "B2",
-    "tag": "GRAM",
-    "uiTitle": "Entrando no Detail",
-    "grammarFocus": "Par de Confusão: Si VS Tellement VS Tant",
-    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+    "tag": "VERB",
+    "uiTitle": "Fazendo Outro Fazer",
+    "grammarFocus": "Construções Causativas: Faire e infinitivo",
+    "theme": "Tema 21: O Mundo das Emoções"
   },
   {
     "id": "fr-b2-313",
     "language": "fr",
     "level": "B2",
     "tag": "GRAM",
-    "uiTitle": "Puxando Pela Memória",
-    "grammarFocus": "Par de Confusão: Décider de VS Se decidir à",
+    "uiTitle": "O Primeiro Dia como Chefe",
+    "grammarFocus": "Causativas Reflexivas: Se fazer e Se deixar",
     "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
     "id": "fr-b2-314",
     "language": "fr",
     "level": "B2",
-    "tag": "GRAM",
-    "uiTitle": "Momento do Xeque",
-    "grammarFocus": "Par de Confusão: Déménager VS Aménager",
+    "tag": "VERB",
+    "uiTitle": "Delegando com Clareza",
+    "grammarFocus": "O uso do Infinitivo Passado",
     "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
@@ -2832,17 +2832,17 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "B2",
     "tag": "GRAM",
-    "uiTitle": "O Grande Desafio",
-    "grammarFocus": "Par de Confusão: En fait VS Au fait (B2)",
+    "uiTitle": "Ordens Firmes",
+    "grammarFocus": "Imperativo com Pronomes Duplos",
     "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
     "id": "fr-b2-316",
     "language": "fr",
     "level": "B2",
-    "tag": "GRAM",
-    "uiTitle": "Fechamentos Lógicos",
-    "grammarFocus": "Par de Confusão: Y VS En (B2)",
+    "tag": "VOC",
+    "uiTitle": "Estruturando a Fala",
+    "grammarFocus": "Marcadores Discursivos: Adição e Estruturação",
     "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
@@ -2850,8 +2850,8 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "B2",
     "tag": "GRAM",
-    "uiTitle": "Quase Lá",
-    "grammarFocus": "Plurais Irregulares: Revisão Abrangente",
+    "uiTitle": "Qual Documento?",
+    "grammarFocus": "Relativos Compostos: Auquel e Duquel",
     "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
@@ -2859,8 +2859,8 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "B2",
     "tag": "GRAM",
-    "uiTitle": "Fim do Ciclo",
-    "grammarFocus": "Superlativos Complexos e Destaque",
+    "uiTitle": "Suspeitas Fundadas",
+    "grammarFocus": "Par de Confusão: Douter VS Se douter",
     "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
@@ -2868,107 +2868,107 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "B2",
     "tag": "GRAM",
-    "uiTitle": "A Preparação Inicial",
-    "grammarFocus": "Particípio Presente vs Adjetivo Verbal",
-    "theme": "Tema 23: Literatura e Situações Hipotéticas"
+    "uiTitle": "Enfatizando a Urgência",
+    "grammarFocus": "Par de Confusão: Si VS Tellement VS Tant",
+    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
     "id": "fr-b2-320",
     "language": "fr",
     "level": "B2",
-    "tag": "VOC",
-    "uiTitle": "Aquecendo a Voz",
-    "grammarFocus": "Medidas e Frações (Avançado)",
-    "theme": "Tema 23: Literatura e Situações Hipotéticas"
+    "tag": "GRAM",
+    "uiTitle": "Decidindo com Firmeza",
+    "grammarFocus": "Par de Confusão: Décider de VS Se decidir à",
+    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
     "id": "fr-b2-321",
     "language": "fr",
     "level": "B2",
-    "tag": "EXPR",
-    "uiTitle": "O Primeito Toque",
-    "grammarFocus": "5 Expressões avançadas com Y",
-    "theme": "Tema 23: Literatura e Situações Hipotéticas"
+    "tag": "GRAM",
+    "uiTitle": "Mudança de Rumo",
+    "grammarFocus": "Par de Confusão: Déménager VS Aménager",
+    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
     "id": "fr-b2-322",
     "language": "fr",
     "level": "B2",
-    "tag": "MISS",
-    "uiTitle": "Ganho de Ritmo",
-    "grammarFocus": "Redação: Prós e Contras das Redes Sociais",
-    "theme": "Tema 23: Literatura e Situações Hipotéticas"
+    "tag": "GRAM",
+    "uiTitle": "Fatos Reais vs Aparentes",
+    "grammarFocus": "Par de Confusão: En fait VS Au fait (B2)",
+    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
     "id": "fr-b2-323",
     "language": "fr",
     "level": "B2",
-    "tag": "CULT",
-    "uiTitle": "Ponto Chave",
-    "grammarFocus": "Redação: Educação Moderna e Sociedade",
-    "theme": "Tema 23: Literatura e Situações Hipotéticas"
+    "tag": "GRAM",
+    "uiTitle": "Apontando com Precisão",
+    "grammarFocus": "Par de Confusão: Y VS En (B2)",
+    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
     "id": "fr-b2-324",
     "language": "fr",
     "level": "B2",
-    "tag": "EXPR",
-    "uiTitle": "Subindo as Escadas",
-    "grammarFocus": "5 Expressões avançadas com En",
-    "theme": "Tema 23: Literatura e Situações Hipotéticas"
+    "tag": "VERB",
+    "uiTitle": "O Relatório de Performance",
+    "grammarFocus": "Voz Passiva Avançada e Passiva Pronominal",
+    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
     "id": "fr-b2-325",
     "language": "fr",
     "level": "B2",
-    "tag": "MISS",
-    "uiTitle": "Entrando no Detail",
-    "grammarFocus": "Redação: Inteligência Artificial e Futuro",
-    "theme": "Tema 23: Literatura e Situações Hipotéticas"
+    "tag": "GRAM",
+    "uiTitle": "A Reunião de Crise",
+    "grammarFocus": "Frases Condicionais Mistas (Condition Mixte)",
+    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
     "id": "fr-b2-326",
     "language": "fr",
     "level": "B2",
-    "tag": "CULT",
-    "uiTitle": "Puxando Pela Memória",
-    "grammarFocus": "Redação: Ética e Sociedade",
-    "theme": "Tema 23: Literatura e Situações Hipotéticas"
+    "tag": "MISS",
+    "uiTitle": "O Discurso de Fim de Ano",
+    "grammarFocus": "Redação: Carta Aberta a Colaboradores",
+    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
     "id": "fr-b2-327",
     "language": "fr",
     "level": "B2",
-    "tag": "EXPR",
-    "uiTitle": "Momento do Xeque",
-    "grammarFocus": "5 Expressões sobre Dinheiro e Gastos",
-    "theme": "Tema 23: Literatura e Situações Hipotéticas"
+    "tag": "GRAM",
+    "uiTitle": "Plurais que Confundem",
+    "grammarFocus": "Plurais Irregulares: Revisão Abrangente",
+    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
     "id": "fr-b2-328",
     "language": "fr",
     "level": "B2",
-    "tag": "MISS",
-    "uiTitle": "O Grande Desafio",
-    "grammarFocus": "Redação: Preservação Ambiental",
-    "theme": "Tema 23: Literatura e Situações Hipotéticas"
+    "tag": "GRAM",
+    "uiTitle": "Destaque nos Resultados",
+    "grammarFocus": "Superlativos Complexos e Destaque",
+    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
     "id": "fr-b2-329",
     "language": "fr",
     "level": "B2",
-    "tag": "EXPR",
-    "uiTitle": "Fechamentos Lógicos",
-    "grammarFocus": "5 Expressões sobre Trabalho e Carreira",
+    "tag": "GRAM",
+    "uiTitle": "A Primeira Página",
+    "grammarFocus": "Particípio Presente vs Adjetivo Verbal",
     "theme": "Tema 23: Literatura e Situações Hipotéticas"
   },
   {
     "id": "fr-b2-330",
     "language": "fr",
     "level": "B2",
-    "tag": "EXPR",
-    "uiTitle": "Quase Lá",
-    "grammarFocus": "5 Expressões sobre Animais e Natureza",
+    "tag": "VOC",
+    "uiTitle": "Medidas Precisas",
+    "grammarFocus": "Medidas e Frações (Avançado)",
     "theme": "Tema 23: Literatura e Situações Hipotéticas"
   },
   {
@@ -2976,8 +2976,8 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "B2",
     "tag": "EXPR",
-    "uiTitle": "Fim do Ciclo",
-    "grammarFocus": "5 Expressões de Alta Eloquência",
+    "uiTitle": "O Capítulo Misterioso",
+    "grammarFocus": "5 Expressões avançadas com Y",
     "theme": "Tema 23: Literatura e Situações Hipotéticas"
   },
   {
@@ -2985,125 +2985,125 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "B2",
     "tag": "MISS",
-    "uiTitle": "A Preparação Inicial",
-    "grammarFocus": "Redação: Carta de Motivação Formal",
-    "theme": "Tema 24: Debates Culturais e Cívicos"
+    "uiTitle": "A Rede Traz Ganhos?",
+    "grammarFocus": "Redação: Prós e Contras das Redes Sociais",
+    "theme": "Tema 23: Literatura e Situações Hipotéticas"
   },
   {
     "id": "fr-b2-333",
     "language": "fr",
     "level": "B2",
-    "tag": "DIAL",
-    "uiTitle": "Aquecendo a Voz",
-    "grammarFocus": "Avoir o beurre et o argento do beurre",
-    "theme": "Tema 24: Debates Culturais e Cívicos"
+    "tag": "CULT",
+    "uiTitle": "A Escola em Questão",
+    "grammarFocus": "Redação: Educação Moderna e Sociedade",
+    "theme": "Tema 23: Literatura e Situações Hipotéticas"
   },
   {
     "id": "fr-b2-334",
     "language": "fr",
     "level": "B2",
     "tag": "EXPR",
-    "uiTitle": "O Primeito Toque",
-    "grammarFocus": "Pédaler dans a choucroute (Expressões Idiomáticas)",
-    "theme": "Tema 24: Debates Culturais e Cívicos"
+    "uiTitle": "No Salão de Leitura",
+    "grammarFocus": "5 Expressões avançadas com En",
+    "theme": "Tema 23: Literatura e Situações Hipotéticas"
   },
   {
     "id": "fr-b2-335",
     "language": "fr",
     "level": "B2",
-    "tag": "PRON",
-    "uiTitle": "Ganho de Ritmo",
-    "grammarFocus": "Homófonos B2: Bar/barre, Celle/sel/selle",
-    "theme": "Tema 24: Debates Culturais e Cívicos"
+    "tag": "MISS",
+    "uiTitle": "A Ameaça Invisível",
+    "grammarFocus": "Redação: Inteligência Artificial e Futuro",
+    "theme": "Tema 23: Literatura e Situações Hipotéticas"
   },
   {
     "id": "fr-b2-336",
     "language": "fr",
     "level": "B2",
-    "tag": "GRAM",
-    "uiTitle": "Ponto Chave",
-    "grammarFocus": "C'est VS Il est (Refino B2)",
-    "theme": "Tema 24: Debates Culturais e Cívicos"
+    "tag": "CULT",
+    "uiTitle": "Os Limites do Justo",
+    "grammarFocus": "Redação: Ética e Sociedade",
+    "theme": "Tema 23: Literatura e Situações Hipotéticas"
   },
   {
     "id": "fr-b2-337",
     "language": "fr",
     "level": "B2",
-    "tag": "MISS",
-    "uiTitle": "Subindo as Escadas",
-    "grammarFocus": "Ponte B2 > C1: Inversão Estilística",
-    "theme": "Tema 24: Debates Culturais e Cívicos"
+    "tag": "EXPR",
+    "uiTitle": "O Preço da Página",
+    "grammarFocus": "5 Expressões sobre Dinheiro e Gastos",
+    "theme": "Tema 23: Literatura e Situações Hipotéticas"
   },
   {
     "id": "fr-b2-338",
     "language": "fr",
     "level": "B2",
-    "tag": "DIAL",
-    "uiTitle": "Entrando no Detail",
-    "grammarFocus": "Noyer o peixe e Registro Padrão",
-    "theme": "Tema 24: Debates Culturais e Cívicos"
+    "tag": "MISS",
+    "uiTitle": "O Chamado Verde",
+    "grammarFocus": "Redação: Preservação Ambiental",
+    "theme": "Tema 23: Literatura e Situações Hipotéticas"
   },
   {
     "id": "fr-b2-339",
     "language": "fr",
     "level": "B2",
-    "tag": "PRON",
-    "uiTitle": "Puxando Pela Memória",
-    "grammarFocus": "Homófonos B2: Conte/compte, Maire/mer/mère",
-    "theme": "Tema 24: Debates Culturais e Cívicos"
+    "tag": "EXPR",
+    "uiTitle": "O Ofício Escrito",
+    "grammarFocus": "5 Expressões sobre Trabalho e Carreira",
+    "theme": "Tema 23: Literatura e Situações Hipotéticas"
   },
   {
     "id": "fr-b2-340",
     "language": "fr",
     "level": "B2",
-    "tag": "GRAM",
-    "uiTitle": "Momento do Xeque",
-    "grammarFocus": "On VS L'on (Variação Estilística)",
-    "theme": "Tema 24: Debates Culturais e Cívicos"
+    "tag": "EXPR",
+    "uiTitle": "Fábulas Contemporâneas",
+    "grammarFocus": "5 Expressões sobre Animais e Natureza",
+    "theme": "Tema 23: Literatura e Situações Hipotéticas"
   },
   {
     "id": "fr-b2-341",
     "language": "fr",
     "level": "B2",
-    "tag": "MISS",
-    "uiTitle": "O Grande Desafio",
-    "grammarFocus": "Revisão Geral B2",
-    "theme": "Tema 24: Debates Culturais e Cívicos"
+    "tag": "EXPR",
+    "uiTitle": "O Último Verso",
+    "grammarFocus": "5 Expressões de Alta Eloquência",
+    "theme": "Tema 23: Literatura e Situações Hipotéticas"
   },
   {
     "id": "fr-b2-342",
     "language": "fr",
     "level": "B2",
-    "tag": "DIAL",
-    "uiTitle": "Fechamentos Lógicos",
-    "grammarFocus": "5 Maneiras de Dizer Je suis fatigué (Registro Soutenu)",
+    "tag": "MISS",
+    "uiTitle": "Escrevendo a Carta",
+    "grammarFocus": "Redação: Carta de Motivação Formal",
     "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
     "id": "fr-b2-343",
     "language": "fr",
     "level": "B2",
-    "tag": "GRAM",
-    "uiTitle": "Quase Lá",
-    "grammarFocus": "Verbos com S'en (s'en sortir, s'en vouloir)",
+    "tag": "DIAL",
+    "uiTitle": "O Beurre e o Argent",
+    "grammarFocus": "Avoir le beurre et l'argent du beurre",
     "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
     "id": "fr-b2-344",
     "language": "fr",
     "level": "B2",
-    "tag": "GRAM",
-    "uiTitle": "Fim do Ciclo",
-    "grammarFocus": "Inversão Estilística para Ênfase e Foco",
+    "tag": "EXPR",
+    "uiTitle": "Pedalando na Choucroute",
+    "grammarFocus": "Pédaler dans la choucroute (Expressões Idiomáticas)",
     "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
     "id": "fr-b2-345",
     "language": "fr",
     "level": "B2",
-    "tag": "GRAM",
-    "uiTitle": "O Retorno Absoluto",
-    "grammarFocus": "Orações Clivadas: C'est... qui/que",
+    "tag": "PRON",
+    "uiTitle": "Palavras que Soam Igual",
+    "grammarFocus": "Homófonos B2: Bar/barre, Celle/sel/selle",
     "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
@@ -3111,377 +3111,656 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "B2",
     "tag": "GRAM",
-    "uiTitle": "Conquista",
-    "grammarFocus": "Orações Clivadas: Ce qui / Ce que / Ce dont",
+    "uiTitle": "C'est ou Il est?",
+    "grammarFocus": "C'est VS Il est (Refino B2)",
     "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
-    "id": "fr-c1-347",
+    "id": "fr-b2-347",
     "language": "fr",
-    "level": "C1",
+    "level": "B2",
+    "tag": "MISS",
+    "uiTitle": "A Ponte para o C1",
+    "grammarFocus": "Ponte B2 > C1: Inversão Estilística",
+    "theme": "Tema 24: Debates Culturais e Cívicos"
+  },
+  {
+    "id": "fr-b2-348",
+    "language": "fr",
+    "level": "B2",
     "tag": "DIAL",
-    "uiTitle": "A Preparação Inicial",
-    "grammarFocus": "Entonação vs Inversão em Fala Formal",
-    "theme": "Tema 25: Oratória e Expressões Elevadas"
+    "uiTitle": "Afogando o Peixe",
+    "grammarFocus": "Noyer le poisson e Registro Padrão",
+    "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
-    "id": "fr-c1-348",
+    "id": "fr-b2-349",
     "language": "fr",
-    "level": "C1",
+    "level": "B2",
+    "tag": "PRON",
+    "uiTitle": "Mais Homófonos da Polêmica",
+    "grammarFocus": "Homófonos B2: Conte/compte, Maire/mer/mère",
+    "theme": "Tema 24: Debates Culturais e Cívicos"
+  },
+  {
+    "id": "fr-b2-350",
+    "language": "fr",
+    "level": "B2",
     "tag": "GRAM",
-    "uiTitle": "Aquecendo a Voz",
-    "grammarFocus": "Estruturas Causais Avançadas",
-    "theme": "Tema 25: Oratória e Expressões Elevadas"
+    "uiTitle": "On ou L'on?",
+    "grammarFocus": "On VS L'on (Variação Estilística)",
+    "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
-    "id": "fr-c1-349",
+    "id": "fr-b2-351",
     "language": "fr",
-    "level": "C1",
-    "tag": "VERB",
-    "uiTitle": "O Primeito Toque",
-    "grammarFocus": "O Subjonctif Passé",
-    "theme": "Tema 25: Oratória e Expressões Elevadas"
+    "level": "B2",
+    "tag": "MISS",
+    "uiTitle": "Revisão Geral B2",
+    "grammarFocus": "Revisão Geral B2",
+    "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
-    "id": "fr-c1-350",
+    "id": "fr-b2-352",
     "language": "fr",
-    "level": "C1",
-    "tag": "VOC",
-    "uiTitle": "Ganho de Ritmo",
-    "grammarFocus": "Marcadores Discursivos para Debate Oral",
-    "theme": "Tema 25: Oratória e Expressões Elevadas"
-  },
-  {
-    "id": "fr-c1-351",
-    "language": "fr",
-    "level": "C1",
-    "tag": "EXPR",
-    "uiTitle": "Ponto Chave",
-    "grammarFocus": "Expressões de Causa e Consequência Complexas",
-    "theme": "Tema 25: Oratória e Expressões Elevadas"
-  },
-  {
-    "id": "fr-c1-352",
-    "language": "fr",
-    "level": "C1",
+    "level": "B2",
     "tag": "DIAL",
-    "uiTitle": "Subindo as Escadas",
-    "grammarFocus": "Contrastes de Registro: Escrito vs Falado",
-    "theme": "Tema 25: Oratória e Expressões Elevadas"
+    "uiTitle": "O Cansaço Elevado",
+    "grammarFocus": "5 Maneiras de Dizer Je suis fatigué (Registro Soutenu)",
+    "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
-    "id": "fr-c1-353",
+    "id": "fr-b2-353",
     "language": "fr",
-    "level": "C1",
+    "level": "B2",
     "tag": "GRAM",
-    "uiTitle": "Entrando no Detail",
-    "grammarFocus": "Estruturas Concessivas Avançadas",
-    "theme": "Tema 25: Oratória e Expressões Elevadas"
+    "uiTitle": "Os Verbos com S'en",
+    "grammarFocus": "Verbos com S'en (s'en sortir, s'en vouloir)",
+    "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
-    "id": "fr-c1-354",
+    "id": "fr-b2-354",
     "language": "fr",
-    "level": "C1",
-    "tag": "VERB",
-    "uiTitle": "Puxando Pela Memória",
-    "grammarFocus": "Subjonctif com ne explétif avançado",
-    "theme": "Tema 25: Oratória e Expressões Elevadas"
+    "level": "B2",
+    "tag": "GRAM",
+    "uiTitle": "Inversão com Ênfase",
+    "grammarFocus": "Inversão Estilística para Ênfase e Foco",
+    "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
-    "id": "fr-c1-355",
+    "id": "fr-b2-355",
     "language": "fr",
-    "level": "C1",
-    "tag": "VOC",
-    "uiTitle": "Momento do Xeque",
-    "grammarFocus": "Apócope e Truncamento no Francês Falado",
-    "theme": "Tema 25: Oratória e Expressões Elevadas"
+    "level": "B2",
+    "tag": "GRAM",
+    "uiTitle": "C'est... qui/que",
+    "grammarFocus": "Orações Clivadas: C'est... qui/que",
+    "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
-    "id": "fr-c1-356",
+    "id": "fr-b2-356",
     "language": "fr",
-    "level": "C1",
-    "tag": "EXPR",
-    "uiTitle": "O Grande Desafio",
-    "grammarFocus": "5 Expressões sobre Comida e Bebida (Metafóricas)",
-    "theme": "Tema 25: Oratória e Expressões Elevadas"
+    "level": "B2",
+    "tag": "GRAM",
+    "uiTitle": "Ce qui, Ce que, Ce dont",
+    "grammarFocus": "Orações Clivadas: Ce qui / Ce que / Ce dont",
+    "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
     "id": "fr-c1-357",
     "language": "fr",
     "level": "C1",
-    "tag": "GRAM",
-    "uiTitle": "Fechamentos Lógicos",
-    "grammarFocus": "Preposições Estilísticas e Adverbiais",
+    "tag": "DIAL",
+    "uiTitle": "Subindo ao Pódio",
+    "grammarFocus": "Entonação vs Inversão em Fala Formal",
     "theme": "Tema 25: Oratória e Expressões Elevadas"
   },
   {
     "id": "fr-c1-358",
     "language": "fr",
     "level": "C1",
-    "tag": "VERB",
-    "uiTitle": "Quase Lá",
-    "grammarFocus": "O Passé Antérieur (Reconhecimento)",
+    "tag": "GRAM",
+    "uiTitle": "A Causa por Trás da Causa",
+    "grammarFocus": "Estruturas Causais Avançadas",
     "theme": "Tema 25: Oratória e Expressões Elevadas"
   },
   {
     "id": "fr-c1-359",
     "language": "fr",
     "level": "C1",
-    "tag": "GRAM",
-    "uiTitle": "Fim do Ciclo",
-    "grammarFocus": "Formas Verbais Arcaicas e Clássicas",
+    "tag": "VERB",
+    "uiTitle": "O Subjuntivo do Passado",
+    "grammarFocus": "O Subjonctif Passé",
     "theme": "Tema 25: Oratória e Expressões Elevadas"
   },
   {
     "id": "fr-c1-360",
     "language": "fr",
     "level": "C1",
-    "tag": "VERB",
-    "uiTitle": "O Retorno Absoluto",
-    "grammarFocus": "Verbos Pronominais: Usos Recíprocos e Passivos",
+    "tag": "VOC",
+    "uiTitle": "Estruturando o Debate",
+    "grammarFocus": "Marcadores Discursivos para Debate Oral",
     "theme": "Tema 25: Oratória e Expressões Elevadas"
   },
   {
     "id": "fr-c1-361",
     "language": "fr",
     "level": "C1",
-    "tag": "GRAM",
-    "uiTitle": "A Preparação Inicial",
-    "grammarFocus": "Quand VS Quant (Refinement Final)",
-    "theme": "Tema 26: O Francês das Ruas e o Formal"
+    "tag": "EXPR",
+    "uiTitle": "Da Causa à Consequência",
+    "grammarFocus": "Expressões de Causa e Consequência Complexas",
+    "theme": "Tema 25: Oratória e Expressões Elevadas"
   },
   {
     "id": "fr-c1-362",
     "language": "fr",
     "level": "C1",
-    "tag": "VOC",
-    "uiTitle": "Aquecendo a Voz",
-    "grammarFocus": "Marcadores de Posicionamento e Crítica de Alto Nível",
-    "theme": "Tema 26: O Francês das Ruas e o Formal"
+    "tag": "DIAL",
+    "uiTitle": "A Voz do Papel e da Rua",
+    "grammarFocus": "Contrastes de Registro: Escrito vs Falado",
+    "theme": "Tema 25: Oratória e Expressões Elevadas"
   },
   {
     "id": "fr-c1-363",
     "language": "fr",
     "level": "C1",
-    "tag": "CULT",
-    "uiTitle": "O Primeito Toque",
-    "grammarFocus": "Redação: Viagem no Tempo (Hipotético Literário)",
-    "theme": "Tema 26: O Francês das Ruas e o Formal"
+    "tag": "GRAM",
+    "uiTitle": "Concessões Eloquentes",
+    "grammarFocus": "Estruturas Concessivas Avançadas",
+    "theme": "Tema 25: Oratória e Expressões Elevadas"
   },
   {
     "id": "fr-c1-364",
     "language": "fr",
     "level": "C1",
-    "tag": "MISS",
-    "uiTitle": "Ganho de Ritmo",
-    "grammarFocus": "Revisão Geral C1",
-    "theme": "Tema 26: O Francês das Ruas e o Formal"
+    "tag": "VERB",
+    "uiTitle": "O Ne Explétif Avançado",
+    "grammarFocus": "Subjonctif com ne explétif avançado",
+    "theme": "Tema 25: Oratória e Expressões Elevadas"
   },
   {
     "id": "fr-c1-365",
     "language": "fr",
     "level": "C1",
-    "tag": "VERB",
-    "uiTitle": "Ponto Chave",
-    "grammarFocus": "Imparfait du subjonctif (Reconhecimento)",
-    "theme": "Tema 26: O Francês das Ruas e o Formal"
+    "tag": "VOC",
+    "uiTitle": "O Francês Truncado",
+    "grammarFocus": "Apócope e Truncamento no Francês Falado",
+    "theme": "Tema 25: Oratória e Expressões Elevadas"
   },
   {
     "id": "fr-c1-366",
     "language": "fr",
     "level": "C1",
-    "tag": "DIAL",
-    "uiTitle": "Subindo as Escadas",
-    "grammarFocus": "Registro Soutenu vs Registro Courant (Contraste)",
-    "theme": "Tema 26: O Francês das Ruas e o Formal"
+    "tag": "EXPR",
+    "uiTitle": "A Mesa Metafórica",
+    "grammarFocus": "5 Expressões sobre Comida e Bebida (Metafóricas)",
+    "theme": "Tema 25: Oratória e Expressões Elevadas"
   },
   {
     "id": "fr-c1-367",
     "language": "fr",
     "level": "C1",
     "tag": "GRAM",
-    "uiTitle": "Entrando no Detail",
-    "grammarFocus": "Par de Confusão: Mesmo VS Si",
-    "theme": "Tema 26: O Francês das Ruas e o Formal"
+    "uiTitle": "Preposições de Estilo",
+    "grammarFocus": "Preposições Estilísticas e Adverbiais",
+    "theme": "Tema 25: Oratória e Expressões Elevadas"
   },
   {
     "id": "fr-c1-368",
     "language": "fr",
     "level": "C1",
-    "tag": "CULT",
-    "uiTitle": "Puxando Pela Memória",
-    "grammarFocus": "Análise de Texto Filosófico e Crítico",
-    "theme": "Tema 26: O Francês das Ruas e o Formal"
+    "tag": "VERB",
+    "uiTitle": "O Passé Antérieur",
+    "grammarFocus": "O Passé Antérieur (Reconhecimento)",
+    "theme": "Tema 25: Oratória e Expressões Elevadas"
   },
   {
     "id": "fr-c1-369",
     "language": "fr",
     "level": "C1",
-    "tag": "MISS",
-    "uiTitle": "Momento do Xeque",
-    "grammarFocus": "Reescrita Estrutural para Aprimoramento Estilístico",
-    "theme": "Tema 26: O Francês das Ruas e o Formal"
+    "tag": "GRAM",
+    "uiTitle": "Formas Arcaicas",
+    "grammarFocus": "Formas Verbais Arcaicas e Clássicas",
+    "theme": "Tema 25: Oratória e Expressões Elevadas"
   },
   {
     "id": "fr-c1-370",
     "language": "fr",
     "level": "C1",
     "tag": "VERB",
-    "uiTitle": "O Grande Desafio",
-    "grammarFocus": "Plus-que-parfait du subjonctif",
-    "theme": "Tema 26: O Francês das Ruas e o Formal"
+    "uiTitle": "Pronominais Recíprocos",
+    "grammarFocus": "Verbos Pronominais: Usos Recíprocos e Passivos",
+    "theme": "Tema 25: Oratória e Expressões Elevadas"
   },
   {
     "id": "fr-c1-371",
     "language": "fr",
     "level": "C1",
     "tag": "GRAM",
-    "uiTitle": "Fechamentos Lógicos",
-    "grammarFocus": "Negação Literária e Formas de Elipse",
+    "uiTitle": "Quand ou Quant?",
+    "grammarFocus": "Quand VS Quant (Refinamento Final)",
     "theme": "Tema 26: O Francês das Ruas e o Formal"
   },
   {
     "id": "fr-c1-372",
     "language": "fr",
     "level": "C1",
-    "tag": "CULT",
-    "uiTitle": "Quase Lá",
-    "grammarFocus": "Decodificação de Textos Jornalísticos e Legais",
+    "tag": "VOC",
+    "uiTitle": "A Crítica de Alto Nível",
+    "grammarFocus": "Marcadores de Posicionamento e Crítica de Alto Nível",
     "theme": "Tema 26: O Francês das Ruas e o Formal"
   },
   {
     "id": "fr-c1-373",
     "language": "fr",
     "level": "C1",
-    "tag": "VERB",
-    "uiTitle": "Fim do Ciclo",
-    "grammarFocus": "Seconde forme du conditionnel passado",
+    "tag": "CULT",
+    "uiTitle": "Uma Viagem no Tempo",
+    "grammarFocus": "Redação: Viagem no Tempo (Hipotético Literário)",
     "theme": "Tema 26: O Francês das Ruas e o Formal"
   },
   {
     "id": "fr-c1-374",
     "language": "fr",
     "level": "C1",
-    "tag": "CULT",
-    "uiTitle": "O Retorno Absoluto",
-    "grammarFocus": "Francês Informal, Argot e Verlan (Gírias Modernas)",
+    "tag": "MISS",
+    "uiTitle": "Revisão Geral C1",
+    "grammarFocus": "Revisão Geral C1",
     "theme": "Tema 26: O Francês das Ruas e o Formal"
   },
   {
     "id": "fr-c1-375",
     "language": "fr",
     "level": "C1",
-    "tag": "CULT",
-    "uiTitle": "Conquista",
-    "grammarFocus": "A Arte da Argumentação Superior: Conexão e Lógica",
+    "tag": "VERB",
+    "uiTitle": "O Subjuntivo Clássico",
+    "grammarFocus": "Imparfait du subjonctif (Reconhecimento)",
     "theme": "Tema 26: O Francês das Ruas e o Formal"
   },
   {
     "id": "fr-c1-376",
     "language": "fr",
     "level": "C1",
-    "tag": "GRAM",
-    "uiTitle": "A Preparação Inicial",
-    "grammarFocus": "Redução Sintática no Francês Literário",
-    "theme": "Tema 27: Geopolítica e Filosofia"
+    "tag": "DIAL",
+    "uiTitle": "Soutenu ou Courant?",
+    "grammarFocus": "Registro Soutenu vs Registro Courant (Contraste)",
+    "theme": "Tema 26: O Francês das Ruas e o Formal"
   },
   {
     "id": "fr-c1-377",
     "language": "fr",
     "level": "C1",
-    "tag": "DIAL",
-    "uiTitle": "Aquecendo a Voz",
-    "grammarFocus": "Mudança Consciente de Registro e Harmonia Estilística",
-    "theme": "Tema 27: Geopolítica e Filosofia"
+    "tag": "GRAM",
+    "uiTitle": "Même ou Si",
+    "grammarFocus": "Par de Confusão: Même VS Si",
+    "theme": "Tema 26: O Francês das Ruas e o Formal"
   },
   {
     "id": "fr-c1-378",
     "language": "fr",
     "level": "C1",
-    "tag": "EXPR",
-    "uiTitle": "O Primeito Toque",
-    "grammarFocus": "Domínio de Estruturas Idiomáticas Arcaicas",
-    "theme": "Tema 27: Geopolítica e Filosofia"
+    "tag": "CULT",
+    "uiTitle": "Análise Filosófica",
+    "grammarFocus": "Análise de Texto Filosófico e Crítico",
+    "theme": "Tema 26: O Francês das Ruas e o Formal"
   },
   {
     "id": "fr-c1-379",
     "language": "fr",
     "level": "C1",
-    "tag": "VOC",
-    "uiTitle": "Ganho de Ritmo",
-    "grammarFocus": "Il sied de, À l'instar de e Expressões de Alta Classe",
-    "theme": "Tema 27: Geopolítica e Filosofia"
+    "tag": "MISS",
+    "uiTitle": "Reescrita Elegante",
+    "grammarFocus": "Reescrita Estrutural para Aprimoramento Estilístico",
+    "theme": "Tema 26: O Francês das Ruas e o Formal"
   },
   {
     "id": "fr-c1-380",
     "language": "fr",
     "level": "C1",
-    "tag": "CULT",
-    "uiTitle": "Ponto Chave",
-    "grammarFocus": "Argumentação sobre Geopolítica e Cultura",
-    "theme": "Tema 27: Geopolítica e Filosofia"
+    "tag": "VERB",
+    "uiTitle": "O Plus-que-parfait Subjuntivo",
+    "grammarFocus": "Plus-que-parfait du subjonctif",
+    "theme": "Tema 26: O Francês das Ruas e o Formal"
   },
   {
     "id": "fr-c1-381",
     "language": "fr",
     "level": "C1",
     "tag": "GRAM",
-    "uiTitle": "Subindo as Escadas",
-    "grammarFocus": "Estrutura de Frase: Voz Ativa vs Passiva (B2/C1)",
-    "theme": "Tema 27: Geopolítica e Filosofia"
+    "uiTitle": "Negações Literárias",
+    "grammarFocus": "Negação Literária e Formas de Elipse",
+    "theme": "Tema 26: O Francês das Ruas e o Formal"
   },
   {
     "id": "fr-c1-382",
     "language": "fr",
     "level": "C1",
-    "tag": "VOC",
-    "uiTitle": "Entrando no Detail",
-    "grammarFocus": "O Francês no Mundo: Variações Regionais e Dialetos",
-    "theme": "Tema 27: Geopolítica e Filosofia"
+    "tag": "CULT",
+    "uiTitle": "Textos Jornalísticos",
+    "grammarFocus": "Decodificação de Textos Jornalísticos e Legais",
+    "theme": "Tema 26: O Francês das Ruas e o Formal"
   },
   {
     "id": "fr-c1-383",
     "language": "fr",
     "level": "C1",
-    "tag": "MISS",
-    "uiTitle": "Puxando Pela Memória",
-    "grammarFocus": "Escrita Criativa: Estilo e Fluidez Superior",
-    "theme": "Tema 27: Geopolítica e Filosofia"
+    "tag": "VERB",
+    "uiTitle": "A Segunda Forma do Condicional",
+    "grammarFocus": "Seconde forme du conditionnel passé",
+    "theme": "Tema 26: O Francês das Ruas e o Formal"
   },
   {
     "id": "fr-c1-384",
     "language": "fr",
     "level": "C1",
     "tag": "CULT",
-    "uiTitle": "Momento do Xeque",
-    "grammarFocus": "Ensaio Literário e Persuasão C2",
-    "theme": "Tema 27: Geopolítica e Filosofia"
+    "uiTitle": "Argot e Verlan",
+    "grammarFocus": "Francês Informal, Argot e Verlan (Gírias Modernas)",
+    "theme": "Tema 26: O Francês das Ruas e o Formal"
   },
   {
     "id": "fr-c1-385",
     "language": "fr",
     "level": "C1",
+    "tag": "CULT",
+    "uiTitle": "A Arte da Argumentação",
+    "grammarFocus": "A Arte da Argumentação Superior: Conexão e Lógica",
+    "theme": "Tema 26: O Francês das Ruas e o Formal"
+  },
+  {
+    "id": "fr-c2-386",
+    "language": "fr",
+    "level": "C2",
     "tag": "GRAM",
-    "uiTitle": "O Grande Desafio",
+    "uiTitle": "O Mapa Geopolítico",
+    "grammarFocus": "Redução Sintática no Francês Literário",
+    "theme": "Tema 27: Geopolítica e Filosofia"
+  },
+  {
+    "id": "fr-c2-387",
+    "language": "fr",
+    "level": "C2",
+    "tag": "DIAL",
+    "uiTitle": "Mudando de Registro",
+    "grammarFocus": "Mudança Consciente de Registro e Harmonia Estilística",
+    "theme": "Tema 27: Geopolítica e Filosofia"
+  },
+  {
+    "id": "fr-c2-388",
+    "language": "fr",
+    "level": "C2",
+    "tag": "EXPR",
+    "uiTitle": "Idiomas Arcaicos",
+    "grammarFocus": "Domínio de Estruturas Idiomáticas Arcaicas",
+    "theme": "Tema 27: Geopolítica e Filosofia"
+  },
+  {
+    "id": "fr-c2-389",
+    "language": "fr",
+    "level": "C2",
+    "tag": "VOC",
+    "uiTitle": "À l'instar de...",
+    "grammarFocus": "Il sied de, À l'instar de e Expressões de Alta Classe",
+    "theme": "Tema 27: Geopolítica e Filosofia"
+  },
+  {
+    "id": "fr-c2-390",
+    "language": "fr",
+    "level": "C2",
+    "tag": "CULT",
+    "uiTitle": "O Debate Geopolítico",
+    "grammarFocus": "Argumentação sobre Geopolítica e Cultura",
+    "theme": "Tema 27: Geopolítica e Filosofia"
+  },
+  {
+    "id": "fr-c2-391",
+    "language": "fr",
+    "level": "C2",
+    "tag": "GRAM",
+    "uiTitle": "Ativa vs Passiva Literária",
+    "grammarFocus": "Estrutura de Frase: Voz Ativa vs Passiva (C1/C2)",
+    "theme": "Tema 27: Geopolítica e Filosofia"
+  },
+  {
+    "id": "fr-c2-392",
+    "language": "fr",
+    "level": "C2",
+    "tag": "VOC",
+    "uiTitle": "Dialetos Franceses no Mundo",
+    "grammarFocus": "O Francês no Mundo: Variações Regionais e Dialetos",
+    "theme": "Tema 27: Geopolítica e Filosofia"
+  },
+  {
+    "id": "fr-c2-393",
+    "language": "fr",
+    "level": "C2",
+    "tag": "MISS",
+    "uiTitle": "Escrita Criativa",
+    "grammarFocus": "Escrita Criativa: Estilo e Fluidez Superior",
+    "theme": "Tema 27: Geopolítica e Filosofia"
+  },
+  {
+    "id": "fr-c2-394",
+    "language": "fr",
+    "level": "C2",
+    "tag": "CULT",
+    "uiTitle": "O Ensaio Literário",
+    "grammarFocus": "Ensaio Literário e Persuasão C2",
+    "theme": "Tema 27: Geopolítica e Filosofia"
+  },
+  {
+    "id": "fr-c2-395",
+    "language": "fr",
+    "level": "C2",
+    "tag": "GRAM",
+    "uiTitle": "La Mise en Relief",
     "grammarFocus": "La Mise en Relief e Deslocamento Estilístico Superior",
     "theme": "Tema 27: Geopolítica e Filosofia"
   },
   {
-    "id": "fr-c1-386",
+    "id": "fr-c2-396",
     "language": "fr",
-    "level": "C1",
+    "level": "C2",
     "tag": "MISS",
-    "uiTitle": "Fechamentos Lógicos",
+    "uiTitle": "Sistema de Relativos Avançado",
     "grammarFocus": "Revisão de Sistemas de Relativos e Artigos Final",
     "theme": "Tema 27: Geopolítica e Filosofia"
   },
   {
-    "id": "fr-c1-387",
+    "id": "fr-c2-397",
     "language": "fr",
-    "level": "C1",
+    "level": "C2",
     "tag": "MISS",
-    "uiTitle": "Quase Lá",
+    "uiTitle": "Oratória Final C2",
     "grammarFocus": "Técnicas de Oratória e Debate Final C2",
     "theme": "Tema 27: Geopolítica e Filosofia"
+  },
+  {
+    "id": "fr-c2-398",
+    "language": "fr",
+    "level": "C2",
+    "tag": "CULT",
+    "uiTitle": "Folhas Amareladas de Proust",
+    "grammarFocus": "Leitura Analítica: Marcel Proust (Excerto comentado)",
+    "theme": "Tema 28: Literatura Clássica e Análise Textual"
+  },
+  {
+    "id": "fr-c2-399",
+    "language": "fr",
+    "level": "C2",
+    "tag": "GRAM",
+    "uiTitle": "A Arquitetura da Frase",
+    "grammarFocus": "Período Composto: Subordinadas Encaixadas e Hiperbaton",
+    "theme": "Tema 28: Literatura Clássica e Análise Textual"
+  },
+  {
+    "id": "fr-c2-400",
+    "language": "fr",
+    "level": "C2",
+    "tag": "VOC",
+    "uiTitle": "Vocabulário Culto",
+    "grammarFocus": "Campos Lexicais da Filosofia e da Ética",
+    "theme": "Tema 28: Literatura Clássica e Análise Textual"
+  },
+  {
+    "id": "fr-c2-401",
+    "language": "fr",
+    "level": "C2",
+    "tag": "CULT",
+    "uiTitle": "O Existencialismo no Café",
+    "grammarFocus": "Leitura Analítica: Jean-Paul Sartre e o Ser-para-si",
+    "theme": "Tema 28: Literatura Clássica e Análise Textual"
+  },
+  {
+    "id": "fr-c2-402",
+    "language": "fr",
+    "level": "C2",
+    "tag": "EXPR",
+    "uiTitle": "Figuras de Linguagem na Poesia",
+    "grammarFocus": "5 Figuras de Linguagem em Baudelaire e Rimbaud",
+    "theme": "Tema 28: Literatura Clássica e Análise Textual"
+  },
+  {
+    "id": "fr-c2-403",
+    "language": "fr",
+    "level": "C2",
+    "tag": "GRAM",
+    "uiTitle": "Densidade e Elipse",
+    "grammarFocus": "Omissão Poética e Densidade Semântica",
+    "theme": "Tema 28: Literatura Clássica e Análise Textual"
+  },
+  {
+    "id": "fr-c2-404",
+    "language": "fr",
+    "level": "C2",
+    "tag": "CULT",
+    "uiTitle": "A Nouvelle Vague",
+    "grammarFocus": "Leitura Analítica: Crítica Cinematográfica de François Truffaut",
+    "theme": "Tema 28: Literatura Clássica e Análise Textual"
+  },
+  {
+    "id": "fr-c2-405",
+    "language": "fr",
+    "level": "C2",
+    "tag": "MISS",
+    "uiTitle": "Dissertação Literária",
+    "grammarFocus": "Redação: Comentário Dissertativo (Style Bac de Français)",
+    "theme": "Tema 28: Literatura Clássica e Análise Textual"
+  },
+  {
+    "id": "fr-c2-406",
+    "language": "fr",
+    "level": "C2",
+    "tag": "CULT",
+    "uiTitle": "Camus e o Absurdo",
+    "grammarFocus": "Leitura Analítica: L'Étranger (Análise de Estilo)",
+    "theme": "Tema 28: Literatura Clássica e Análise Textual"
+  },
+  {
+    "id": "fr-c2-407",
+    "language": "fr",
+    "level": "C2",
+    "tag": "VERB",
+    "uiTitle": "Verbos Literários Raros",
+    "grammarFocus": "Verbos Arcaicos e de Uso Exclusivamente Literário",
+    "theme": "Tema 28: Literatura Clássica e Análise Textual"
+  },
+  {
+    "id": "fr-c2-408",
+    "language": "fr",
+    "level": "C2",
+    "tag": "CULT",
+    "uiTitle": "Ionesco e o Teatro do Absurdo",
+    "grammarFocus": "Leitura Analítica: Diálogo Surrealista",
+    "theme": "Tema 28: Literatura Clássica e Análise Textual"
+  },
+  {
+    "id": "fr-c2-409",
+    "language": "fr",
+    "level": "C2",
+    "tag": "MISS",
+    "uiTitle": "Ensaio Crítico",
+    "grammarFocus": "Redação: Análise Comparativa entre Duas Obras",
+    "theme": "Tema 28: Literatura Clássica e Análise Textual"
+  },
+  {
+    "id": "fr-c2-410",
+    "language": "fr",
+    "level": "C2",
+    "tag": "DIAL",
+    "uiTitle": "A Mesa de Negociação",
+    "grammarFocus": "Abrindo um Debate Formal e Protocolos",
+    "theme": "Tema 29: Debate Formal e Retórica"
+  },
+  {
+    "id": "fr-c2-411",
+    "language": "fr",
+    "level": "C2",
+    "tag": "EXPR",
+    "uiTitle": "Expressões da Retórica",
+    "grammarFocus": "Conectores de Alto Nível para Persuasão",
+    "theme": "Tema 29: Debate Formal e Retórica"
+  },
+  {
+    "id": "fr-c2-412",
+    "language": "fr",
+    "level": "C2",
+    "tag": "GRAM",
+    "uiTitle": "A Refutação Elegante",
+    "grammarFocus": "Estruturas Concessivas Avançadas (Bien que e Quoique)",
+    "theme": "Tema 29: Debate Formal e Retórica"
+  },
+  {
+    "id": "fr-c2-413",
+    "language": "fr",
+    "level": "C2",
+    "tag": "MISS",
+    "uiTitle": "Construindo o Argumento",
+    "grammarFocus": "Redação: Plano Dialético (Tese, Antítese, Síntese)",
+    "theme": "Tema 29: Debate Formal e Retórica"
+  },
+  {
+    "id": "fr-c2-414",
+    "language": "fr",
+    "level": "C2",
+    "tag": "CULT",
+    "uiTitle": "A Tradição Cartesiana",
+    "grammarFocus": "Argumentação Cartesiana no Debate Francês",
+    "theme": "Tema 29: Debate Formal e Retórica"
+  },
+  {
+    "id": "fr-c2-415",
+    "language": "fr",
+    "level": "C2",
+    "tag": "DIAL",
+    "uiTitle": "Sustentando Sua Tese",
+    "grammarFocus": "Transições e Sinalização Discursiva Formal",
+    "theme": "Tema 29: Debate Formal e Retórica"
+  },
+  {
+    "id": "fr-c2-416",
+    "language": "fr",
+    "level": "C2",
+    "tag": "EXPR",
+    "uiTitle": "Ironia e Sarcasmo",
+    "grammarFocus": "Subtexto e Crítica Velada no Francês Formal",
+    "theme": "Tema 29: Debate Formal e Retórica"
+  },
+  {
+    "id": "fr-c2-417",
+    "language": "fr",
+    "level": "C2",
+    "tag": "MISS",
+    "uiTitle": "A Conclusão Impecável",
+    "grammarFocus": "Redação: Fechamento Persuasivo e Apelo Final",
+    "theme": "Tema 29: Debate Formal e Retórica"
+  },
+  {
+    "id": "fr-c2-418",
+    "language": "fr",
+    "level": "C2",
+    "tag": "MISS",
+    "uiTitle": "O Último Estágio",
+    "grammarFocus": "Avaliação Final C2: Apresentação Oral e Defesa",
+    "theme": "Tema 29: Debate Formal e Retórica"
   }
 ];

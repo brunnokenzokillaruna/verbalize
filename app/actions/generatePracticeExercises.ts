@@ -17,6 +17,116 @@ const LEVEL_EXERCISE_DESCRIPTORS: Record<ProficiencyLevel, string> = {
   C2: 'C2 MASTERY: fully native-level. Any register, tense, or structure. Stylistic sophistication expected.',
 };
 
+type ExerciseTypeId =
+  | 'context-choice'
+  | 'error-correction'
+  | 'reverse-translation'
+  | 'audio-dictation'
+  | 'speak-repeat'
+  | 'sentence-builder'
+  | 'social-roleplay'
+  | 'scrambled-conversation'
+  | 'interactive-subtitles'
+  | 'logic-connectors';
+
+// Tiered progression: free-writing types (audio-dictation, reverse-translation) are
+// gated behind sufficient vocabulary so absolute beginners aren't asked to produce
+// full target-language sentences from scratch.
+const TIER_1_TYPES: ExerciseTypeId[] = [
+  'sentence-builder',
+  'context-choice',
+  'speak-repeat',
+  'interactive-subtitles',
+  'scrambled-conversation',
+];
+
+const TIER_2_ADDITIONS: ExerciseTypeId[] = [
+  'error-correction',
+  'social-roleplay',
+  'logic-connectors',
+];
+
+const TIER_3_ADDITIONS: ExerciseTypeId[] = [
+  'audio-dictation',
+  'reverse-translation',
+];
+
+function getAllowedExerciseTypes(level: ProficiencyLevel, knownVocabCount: number): ExerciseTypeId[] {
+  if (level === 'A1' && knownVocabCount < 30) {
+    return TIER_1_TYPES;
+  }
+  if (level === 'A1' || (level === 'A2' && knownVocabCount < 60)) {
+    return [...TIER_1_TYPES, ...TIER_2_ADDITIONS];
+  }
+  return [...TIER_1_TYPES, ...TIER_2_ADDITIONS, ...TIER_3_ADDITIONS];
+}
+
+function buildTypeDescriptions(langLabel: string): Record<ExerciseTypeId, string> {
+  return {
+    'context-choice': `type "context-choice":
+   - Write an ORIGINAL sentence with a blank (___) for a key vocabulary word or grammar item.
+   - "blankWord" is correct answer. "options" has 4 items (1 correct + 3 clearly wrong distractors).
+   - "translation" in PT-BR.`,
+    'error-correction': `type "error-correction":
+   - Write an ORIGINAL sentence with ONE deliberate error.
+   - "sentence_with_error", "error_word", "correct_word", "explanation" (PT-BR).
+   - "acceptable_answers" is an array of other valid options or empty.`,
+    'reverse-translation': `type "reverse-translation":
+   - "portuguese_sentence" (PT-BR) → "target_translation" (${langLabel}).
+   - "acceptable_variants" (2-4 alternative phrasings).
+   - "hint" (optional grammar tip in PT-BR).`,
+    'audio-dictation': `type "audio-dictation":
+   - Short ORIGINAL sentence. "text" (${langLabel}), "translation" (PT-BR).`,
+    'speak-repeat': `type "speak-repeat":
+   - Short ORIGINAL sentence. "text" (${langLabel}), "translation" (PT-BR).`,
+    'sentence-builder': `type "sentence-builder":
+   - Short ORIGINAL sentence (3-8 words).
+   - "words" (shuffled array), "correctOrder" (correct array), "translation" (PT-BR).`,
+    'social-roleplay': `type "social-roleplay":
+   - "context" (PT-BR) describing the situation.
+   - "promptLine" (${langLabel}) what the NPC says.
+   - "options" (3 possible natural responses in target language).
+   - "correctIndex" (0-2), "explanation" (PT-BR).`,
+    'scrambled-conversation': `type "scrambled-conversation":
+   - A short sequence of 3-4 dialogue lines.
+   - "lines" (correct order), "shuffledLines" (random order).`,
+    'interactive-subtitles': `type "interactive-subtitles":
+   - "correctText" (original sentence).
+   - "errorText" (copy of correctText but with 1-2 words swapped for wrong ones or misspelled).
+   - "wrongWords" (array of the words that are WRONG in errorText).
+   - "translations" (PT-BR).`,
+    'logic-connectors': `type "logic-connectors":
+    - "partA" (first half), "partB" (second half).
+    - "options" (3 connectors like 'but', 'because', 'so').
+    - "correctConnector", "translation" (PT-BR).`,
+  };
+}
+
+function buildTagGuidance(tag: LessonTag, allowed: Set<ExerciseTypeId>): string {
+  const pick = (candidates: ExerciseTypeId[]) => candidates.filter((t) => allowed.has(t));
+  const list = (items: ExerciseTypeId[]) => items.map((t) => `'${t}'`).join(', ');
+
+  if (tag === 'PRON') {
+    const types = pick(['speak-repeat', 'audio-dictation', 'interactive-subtitles']);
+    return types.length ? `- Focus heavily on ${list(types)} (at least 3 out of 5).` : '';
+  }
+  if (tag === 'GRAM') {
+    const types = pick(['error-correction', 'sentence-builder', 'context-choice']);
+    return types.length ? `- Focus on ${list(types)} to reinforce the grammar structure.` : '';
+  }
+  if (tag === 'VOC') {
+    const types = pick(['context-choice', 'reverse-translation', 'sentence-builder']);
+    return types.length ? `- Focus on ${list(types)} used in very simple sentences.` : '';
+  }
+  if (tag === 'DIAL' || tag === 'MISS') {
+    const types = pick(['social-roleplay', 'scrambled-conversation', 'interactive-subtitles']);
+    return types.length
+      ? `- Focus on ${list(types)} to simulate real-world usage. Use scenarios a Brazilian would realistically encounter: at a French restaurant, at a hotel in Lyon, on the Paris metro, at a French pharmacy, at an airport, in a Parisian shop.`
+      : '';
+  }
+  return '';
+}
+
 interface GeneratePracticeParams {
   dialogue: string;
   newVocabulary: string[];
@@ -42,8 +152,13 @@ export async function generatePracticeExercises(
 ): Promise<Exercise[] | null> {
   const { dialogue, newVocabulary, grammarFocus, tag, language, level, knownVocabulary, previousTopics } = params;
   const levelDesc = LEVEL_EXERCISE_DESCRIPTORS[level];
-  const isEarly = level === 'A1' || level === 'A2';
   const isEarlyLearner = knownVocabulary.length < 30;
+
+  const allowedTypes = getAllowedExerciseTypes(level, knownVocabulary.length);
+  const allowedSet = new Set(allowedTypes);
+  const typeDescriptions = buildTypeDescriptions(LANG_LABEL[language]);
+  const poolSection = allowedTypes.map((t, i) => `${i + 1}. ${typeDescriptions[t]}`).join('\n\n');
+  const tagGuidance = buildTagGuidance(tag, allowedSet);
 
   const vocabConstraint = isEarlyLearner
     ? `\nVOCABULARY CONSTRAINT: The learner is a beginner with very limited vocabulary. All exercise sentences must use ONLY: the key vocabulary words listed above, the words involved in the grammar focus ("${grammarFocus}"), basic function words (articles, prepositions, pronouns, conjunctions, auxiliary verbs), and simple A1-level everyday words. Do NOT use any advanced or uncommon content words.`
@@ -56,7 +171,7 @@ export async function generatePracticeExercises(
   try {
     const systemPrompt = `You are a language exercise generator for Brazilian Portuguese speakers learning ${LANG_LABEL[language]}. The student is Brazilian — use scenarios, cultural references, and situations that are engaging and relevant for a Brazilian learner (e.g., a Brazilian tourist in Paris, a Brazilian professional in a French meeting, a Brazilian student abroad, ordering food in Lyon, asking for directions in London). Respond with ONLY a valid JSON array, no markdown, no explanation.`;
 
-    const prompt = `The learner just studied a ${LANG_LABEL[language]} dialogue at ${level} level. 
+    const prompt = `The learner just studied a ${LANG_LABEL[language]} dialogue at ${level} level.
 
 GRAMMAR FOCUS: ${grammarFocus}
 THEME/CONTEXT (from dialogue):
@@ -66,65 +181,18 @@ Key vocabulary words from this lesson: ${newVocabulary.join(', ')}
 ${previousTopicsBlock}
 
 TAG-SPECIFIC EXERCISE BALANCE (follow this strictly):
-${tag === 'PRON' ? "- Focus heavily on 'speak-repeat' and 'audio-dictation' (at least 3 out of 5)." : ""}
-${tag === 'GRAM' ? "- Focus on 'error-correction', 'sentence-builder', and 'context-choice' to reinforce the grammar structure." : ""}
-${tag === 'VOC' ? "- Focus on 'context-choice', 'reverse-translation', and 'sentence-builder' used in very simple sentences." : ""}
-${tag === 'DIAL' || tag === 'MISS' ? "- Focus on 'social-roleplay', 'scrambled-conversation', and 'interactive-subtitles' to simulate real-world usage. Use scenarios a Brazilian would realistically encounter: at a French restaurant, at a hotel in Lyon, on the Paris metro, at a French pharmacy, at an airport, in a Parisian shop." : ""}
+${tagGuidance}
 
 CRITICAL RULE: Do NOT copy or reuse any sentence from the dialogue above. Every exercise sentence must be ORIGINAL — newly created by you. The sentences should be related to the lesson's theme and grammar focus, but must be completely different from the dialogue lines.
 
 LEVEL CONSTRAINTS — all sentences you write must follow these rules: ${levelDesc}
 ${vocabConstraint}
 
-Generate exactly 5 exercises as a JSON array. Choose varied types from the following pool for a balanced practice session:
+Generate exactly 5 exercises as a JSON array. Choose varied types from the following pool for a balanced practice session. You MUST use ONLY the types listed below — any other type is forbidden.
 
---- POOL OF EXERCISE TYPES ---
+--- POOL OF EXERCISE TYPES (the ONLY types you may use) ---
 
-1. type "context-choice":
-   - Write an ORIGINAL sentence with a blank (___) for a key vocabulary word or grammar item.
-   - "blankWord" is correct answer. "options" has 4 items (1 correct + 3 clearly wrong distractors).
-   - "translation" in PT-BR.
-
-2. type "error-correction":
-   - Write an ORIGINAL sentence with ONE deliberate error.
-   - "sentence_with_error", "error_word", "correct_word", "explanation" (PT-BR).
-   - "acceptable_answers" is an array of other valid options or empty.
-
-3. type "reverse-translation":
-   - "portuguese_sentence" (PT-BR) → "target_translation" (${LANG_LABEL[language]}).
-   - "acceptable_variants" (2-4 alternative phrasings).
-   - "hint" (optional grammar tip in PT-BR).
-
-4. type "audio-dictation":
-   - Short ORIGINAL sentence. "text" (${LANG_LABEL[language]}), "translation" (PT-BR).
-
-5. type "speak-repeat":
-   - Short ORIGINAL sentence. "text" (${LANG_LABEL[language]}), "translation" (PT-BR).
-
-6. type "sentence-builder":
-   - Short ORIGINAL sentence (3-8 words).
-   - "words" (shuffled array), "correctOrder" (correct array), "translation" (PT-BR).
-
-7. type "social-roleplay":
-   - "context" (PT-BR) describing the situation.
-   - "promptLine" (${LANG_LABEL[language]}) what the NPC says.
-   - "options" (3 possible natural responses in target language).
-   - "correctIndex" (0-2), "explanation" (PT-BR).
-
-8. type "scrambled-conversation":
-   - A short sequence of 3-4 dialogue lines.
-   - "lines" (correct order), "shuffledLines" (random order).
-
-9. type "interactive-subtitles":
-   - "correctText" (original sentence).
-   - "errorText" (copy of correctText but with 1-2 words swapped for wrong ones or misspelled).
-   - "wrongWords" (array of the words that are WRONG in errorText).
-   - "translations" (PT-BR).
-
-10. type "logic-connectors":
-    - "partA" (first half), "partB" (second half).
-    - "options" (3 connectors like 'but', 'because', 'so').
-    - "correctConnector", "translation" (PT-BR).
+${poolSection}
 
 --- OUTPUT FORMAT ---
 Return a JSON array of 5 objects, each with "type" and "data".
@@ -148,8 +216,12 @@ Example for social-roleplay:
       return null;
     }
 
-    // Structural validation: drop exercises that are clearly malformed
+    // Structural validation: drop exercises that are clearly malformed or use forbidden types
     const validated = exercises.filter((ex) => {
+      if (!allowedSet.has(ex.type as ExerciseTypeId)) {
+        console.warn(`[generatePracticeExercises] Dropped ${ex.type} — not allowed at this level/progress`);
+        return false;
+      }
       if (ex.type === 'error-correction') {
         const { sentence_with_error, error_word, correct_word } = ex.data as {
           sentence_with_error: string;

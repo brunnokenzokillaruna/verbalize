@@ -33,6 +33,8 @@ function ReviewContent() {
   const [correctCount, setCorrectCount] = useState(0);
   const [exerciseAnswer, setExerciseAnswer] = useState<boolean | null>(null);
   const [knownVocab, setKnownVocab] = useState<string[]>([]);
+  const [isExerciseReady, setIsExerciseReady] = useState(false);
+  const [submitTrigger, setSubmitTrigger] = useState(0);
 
   // Load mistake + generate exercises
   useEffect(() => {
@@ -90,6 +92,7 @@ function ReviewContent() {
     const isLast = currentIndex >= exercises.length - 1;
     if (!isLast) {
       setExerciseAnswer(null);
+      setIsExerciseReady(false);
       setCurrentIndex((i) => i + 1);
       return;
     }
@@ -98,8 +101,7 @@ function ReviewContent() {
   }
 
   function handleCheck() {
-    // Context-choice and error-correction call onAnswer directly;
-    // this is a no-op but required by CheckButton API
+    setSubmitTrigger((t) => t + 1);
   }
 
   async function handleComplete() {
@@ -117,6 +119,7 @@ function ReviewContent() {
     setCurrentIndex(0);
     setCorrectCount(0);
     setExerciseAnswer(null);
+    setIsExerciseReady(false);
 
     if (!mistake) return;
     const exs = await generateMistakeReview({
@@ -147,8 +150,10 @@ function ReviewContent() {
   })();
 
   const checkState = (() => {
-    if (exerciseAnswer === null) return 'disabled' as const;
-    return exerciseAnswer ? 'correct' as const : 'incorrect' as const;
+    if (exerciseAnswer !== null) {
+      return exerciseAnswer ? 'correct' as const : 'incorrect' as const;
+    }
+    return isExerciseReady ? 'idle' as const : 'disabled' as const;
   })();
 
   // ── Loading ────────────────────────────────────────────────────────────────
@@ -351,6 +356,8 @@ function ReviewContent() {
                 data={currentExercise.data}
                 onAnswer={handleAnswer}
                 answered={exerciseAnswer !== null}
+                setIsExerciseReady={setIsExerciseReady}
+                submitTrigger={submitTrigger}
               />
             )}
             {currentExercise.type === 'error-correction' && (
@@ -358,6 +365,8 @@ function ReviewContent() {
                 data={currentExercise.data}
                 onAnswer={handleAnswer}
                 answered={exerciseAnswer !== null}
+                setIsExerciseReady={setIsExerciseReady}
+                submitTrigger={submitTrigger}
               />
             )}
             {currentExercise.type === 'reverse-translation' && (
@@ -366,6 +375,8 @@ function ReviewContent() {
                 language={mistake?.language ?? 'fr'}
                 onAnswer={handleAnswer}
                 answered={exerciseAnswer !== null}
+                setIsExerciseReady={setIsExerciseReady}
+                submitTrigger={submitTrigger}
               />
             )}
           </div>

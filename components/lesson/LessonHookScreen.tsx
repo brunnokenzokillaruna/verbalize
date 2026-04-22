@@ -139,13 +139,6 @@ export function LessonHookScreen({
         })}
       </div>
 
-      <div className="mt-4 flex items-center justify-center gap-3 opacity-40">
-        <span className="h-px w-8 bg-[var(--color-border)]"></span>
-        <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
-          Toque para traduzir
-        </p>
-        <span className="h-px w-8 bg-[var(--color-border)]"></span>
-      </div>
     </div>
   );
 }

@@ -40,7 +40,6 @@ import { LessonVocabularyScreen } from '@/components/lesson/LessonVocabularyScre
 import { LessonHookScreen } from '@/components/lesson/LessonHookScreen';
 import { LessonGrammarScreen } from '@/components/lesson/LessonGrammarScreen';
 import { LessonPracticeScreen } from '@/components/lesson/LessonPracticeScreen';
-import { LessonReviewScreen } from '@/components/lesson/LessonReviewScreen';
 import { LessonMissionScreen } from '@/components/lesson/LessonMissionScreen';
 import { LessonPhoneticsScreen } from '@/components/lesson/LessonPhoneticsScreen';
 
@@ -346,7 +345,6 @@ export default function LessonPage() {
         currentStage={phaseToStage(phase)}
         tag={store.lesson?.tag}
         onExit={exitLesson}
-        onComplete={handleFastComplete}
       />
 
       <main className={`mx-auto max-w-lg md:max-w-2xl lg:max-w-4xl px-6 pt-10 ${

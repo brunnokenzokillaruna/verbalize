@@ -1,6 +1,6 @@
 'use client';
 
-import { Book, Zap, Mic, MessageSquare, Target, Loader2, CheckCircle2, ChevronRight } from 'lucide-react';
+import { Book, Zap, Mic, MessageSquare, Target, Loader2, CheckCircle2, ChevronRight, Repeat, Sparkles, BookOpen } from 'lucide-react';
 import type { LessonTag, SupportedLanguage } from '@/types';
 
 const TAG_CONFIG: Record<LessonTag, {
@@ -50,6 +50,30 @@ const TAG_CONFIG: Record<LessonTag, {
     gradient: 'linear-gradient(135deg, #f59e0b 0%, #b45309 100%)',
     accent: '#f59e0b',
     shadow: 'rgba(245, 158, 11, 0.25)',
+  },
+  VERB: {
+    icon: Repeat,
+    title: 'Treino de Verbos',
+    desc: 'Conjugações, tempos e modos — dominando a espinha dorsal da frase',
+    gradient: 'linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%)',
+    accent: '#0ea5e9',
+    shadow: 'rgba(3, 105, 161, 0.25)',
+  },
+  EXPR: {
+    icon: Sparkles,
+    title: 'Expressões Vivas',
+    desc: 'Idiomatismos e gírias que só quem mora lá conhece de verdade',
+    gradient: 'linear-gradient(135deg, #ec4899 0%, #be185d 100%)',
+    accent: '#ec4899',
+    shadow: 'rgba(190, 24, 93, 0.25)',
+  },
+  CULT: {
+    icon: BookOpen,
+    title: 'Imersão Cultural',
+    desc: 'Literatura, história e o modo de pensar do mundo francófono',
+    gradient: 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)',
+    accent: '#8b5cf6',
+    shadow: 'rgba(109, 40, 217, 0.25)',
   },
 };
 
