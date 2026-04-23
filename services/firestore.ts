@@ -433,21 +433,26 @@ function pregeneratedDocId(uid: string, lessonId: string) {
 }
 
 /**
- * Stores a pre-generated hook in the `lesson_pregen` collection so the next
- * lesson can start instantly without waiting for an AI call.
+ * Stores a pre-generated lesson payload (hook + optional grammar bridge and
+ * exercises) in the `lesson_pregen` collection so the next lesson can start
+ * instantly without any AI calls. Optional fields are only persisted when
+ * provided — Firestore rejects `undefined` values.
  */
 export async function savePregeneratedLesson(
   uid: string,
   lessonId: string,
-  hook: PregeneratedLessonDocument['hook'],
+  payload: Pick<PregeneratedLessonDocument, 'hook' | 'grammarBridge' | 'exercises'>,
 ): Promise<void> {
   const id = pregeneratedDocId(uid, lessonId);
-  await setDoc(doc(db, 'lesson_pregen', id), {
+  const data: Record<string, unknown> = {
     uid,
     lessonId,
-    hook,
+    hook: payload.hook,
     createdAt: serverTimestamp(),
-  });
+  };
+  if (payload.grammarBridge) data.grammarBridge = payload.grammarBridge;
+  if (payload.exercises) data.exercises = payload.exercises;
+  await setDoc(doc(db, 'lesson_pregen', id), data);
 }
 
 /**

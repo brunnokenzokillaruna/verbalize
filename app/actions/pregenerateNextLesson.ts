@@ -1,13 +1,21 @@
 'use server';
 
 import { generateHook } from './generateHook';
+import { generateGrammarBridge } from './generateGrammarBridge';
+import { generatePracticeExercises } from './generatePracticeExercises';
 import { savePregeneratedLesson, getUserVocabulary } from '@/services/firestore';
-import type { LessonDefinition } from '@/types';
+import { getPreviousTopics } from '@/lib/curriculum';
+import type { LessonDefinition, LessonTag, GrammarBridgeResult, Exercise } from '@/types';
+
+const TAGS_WITH_GRAMMAR_PHASE: ReadonlySet<LessonTag> = new Set(['GRAM', 'VERB', 'CULT']);
 
 /**
- * Generates the hook for `lesson` in the background and caches it in Firestore
- * so the next lesson can start instantly (zero perceived wait time).
- * Called fire-and-forget from finishLesson() in the lesson page.
+ * Generates the full content for `lesson` in the background (hook + grammar
+ * bridge + exercises) and caches everything in Firestore so the next lesson
+ * can start and transition instantly. Called fire-and-forget when the user
+ * enters the 'practice' phase of the current lesson — that gives ~60-180s
+ * of runway, enough for all three Gemini calls to finish before the user
+ * clicks "next lesson".
  */
 export async function pregenerateNextLesson(
   uid: string,
@@ -28,9 +36,44 @@ export async function pregenerateNextLesson(
       grammarFocus: lesson.grammarFocus,
       knownVocabulary,
     });
-    if (hook) {
-      await savePregeneratedLesson(uid, lesson.id, hook);
-    }
+    if (!hook) return;
+
+    const needsGrammarBridge = TAGS_WITH_GRAMMAR_PHASE.has(lesson.tag);
+
+    const bridgePromise: Promise<GrammarBridgeResult | null> = needsGrammarBridge
+      ? generateGrammarBridge({
+          dialogue: hook.dialogue,
+          grammarFocus: hook.grammarFocus,
+          language: lesson.language,
+          tag: lesson.tag,
+        }).catch((err) => {
+          console.error('[pregenerateNextLesson] grammar bridge error:', err);
+          return null;
+        })
+      : Promise.resolve(null);
+
+    const exercisesPromise: Promise<Exercise[] | null> = generatePracticeExercises({
+      dialogue: hook.dialogue,
+      newVocabulary: hook.newVocabulary,
+      verbWord: hook.verbWord ?? '',
+      grammarFocus: lesson.grammarFocus,
+      tag: lesson.tag,
+      language: lesson.language,
+      level: lesson.level,
+      knownVocabulary,
+      previousTopics: getPreviousTopics(lesson.language, lesson.id),
+    }).catch((err) => {
+      console.error('[pregenerateNextLesson] exercises error:', err);
+      return null;
+    });
+
+    const [grammarBridge, exercises] = await Promise.all([bridgePromise, exercisesPromise]);
+
+    await savePregeneratedLesson(uid, lesson.id, {
+      hook,
+      ...(grammarBridge ? { grammarBridge } : {}),
+      ...(exercises && exercises.length > 0 ? { exercises } : {}),
+    });
   } catch (err) {
     // Non-critical — lesson will just generate normally on next open
     console.error('[pregenerateNextLesson] Error:', err);

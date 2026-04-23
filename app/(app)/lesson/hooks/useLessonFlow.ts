@@ -2,11 +2,10 @@ import { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { useLessonStore } from '@/store/lessonStore';
-import { getNextLessonId, getLessonById, getPreviousTopics } from '@/lib/curriculum';
+import { getPreviousTopics } from '@/lib/curriculum';
 import { generateGrammarBridge } from '@/app/actions/generateGrammarBridge';
 import { generatePracticeExercises } from '@/app/actions/generatePracticeExercises';
 import { getVerbConjugation } from '@/app/actions/getVerbConjugation';
-import { pregenerateNextLesson } from '@/app/actions/pregenerateNextLesson';
 import { logLesson, updateLessonStats, upsertVocabularyItem } from '@/services/firestore';
 import type { GrammarBridgeResult, Exercise, LessonTag } from '@/types';
 import type { LessonPhase } from '@/store/lessonStore';
@@ -70,8 +69,11 @@ export function useLessonFlow({
     if (!store.lesson || !store.hook || store.isLoading) return;
     store.setIsLoading(true);
 
+    const tEx = performance.now();
+    const fromCache = !!exercisesPrefetchRef.current;
     const aiExercises = await (exercisesPrefetchRef.current ?? fetchAiExercises());
     exercisesPrefetchRef.current = null;
+    console.log(`[Timing] Exercícios (${fromCache ? 'do cache' : 'gerados agora'}): ${(performance.now() - tEx).toFixed(0)}ms (${aiExercises?.length ?? 0} exercícios)`);
     const clientExercises = buildClientExercises();
 
     store.setExercises([...(aiExercises ?? []), ...clientExercises]);
@@ -108,14 +110,18 @@ export function useLessonFlow({
 
     if (next === 'grammar') {
       store.setIsLoading(true);
+      const tBridge = performance.now();
+      const fromCache = !!grammarBridgePrefetchRef.current;
       const bridge = await (
         grammarBridgePrefetchRef.current ??
         generateGrammarBridge({
           dialogue: store.hook.dialogue,
           grammarFocus: store.hook.grammarFocus,
           language: store.lesson.language,
+          tag: store.lesson.tag,
         })
       );
+      console.log(`[Timing] Grammar bridge (${fromCache ? 'do cache' : 'gerado agora'}): ${(performance.now() - tBridge).toFixed(0)}ms`);
       grammarBridgePrefetchRef.current = null;
       if (bridge) store.setGrammarBridge(bridge);
       else store.setIsLoading(false);
@@ -161,14 +167,9 @@ export function useLessonFlow({
     if (store.hook.verbWord) {
       getVerbConjugation(store.hook.verbWord, language).catch(console.error);
     }
-
-    const nextLessonId = getNextLessonId(language, store.lesson.id);
-    if (nextLessonId && user) {
-      const nextLesson = getLessonById(nextLessonId);
-      if (nextLesson) {
-        pregenerateNextLesson(user.uid, nextLesson, profile?.interests ?? []).catch(console.error);
-      }
-    }
+    // Next-lesson pregen is triggered earlier from useLessonBootstrap when
+    // the user enters the 'practice' phase, giving the 3 background Gemini
+    // calls a ~60-180s head start over finishing the lesson.
   }, [user, profile, store, setProfile]);
 
   const skipLesson = useCallback(async () => {

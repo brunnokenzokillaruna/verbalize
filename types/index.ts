@@ -108,6 +108,8 @@ export interface PregeneratedLessonDocument {
   uid: string;
   lessonId: string;
   hook: HookResult;
+  grammarBridge?: GrammarBridgeResult;
+  exercises?: Exercise[];
   createdAt: Timestamp;
 }
 
@@ -187,9 +189,19 @@ export interface GrammarBridgeResult {
   usageContext?: string;      // O "Cenário de Uso": explica a vibe social (formal, casual, etc)
   patterns?: Array<{          // "Pattern Strips": mostra a regra em 2-3 variações rápidas
     label: string;            // ex: "Plural", "Negativa", "Pessoa"
-    target: string; 
-    portuguese: string; 
+    target: string;
+    portuguese: string;
   }>;
+
+  // ── Verb Spotlight (apenas para lições de tag VERB) ───────────────────────
+  verbSpotlight?: {
+    infinitive: string;          // ex: "être"
+    meaning: string;             // ex: "ser / estar"
+    personality: string;         // 1 frase: "jeito" do verbo em PT-BR, ≤15 palavras
+    frequencyNote?: string;      // ex: "3º verbo mais usado em francês", ≤12 palavras
+    idiomaticExpressions?: Array<{ target: string; portuguese: string }>; // 1-2 expressões fixas
+    conjugationPreview?: Array<{ pronoun: string; form: string }>; // 3-6 conjugações principais no presente
+  };
 
   // ── Campos legados (backward compat com lessons cacheadas no Firestore) ───
   rule?: string;
