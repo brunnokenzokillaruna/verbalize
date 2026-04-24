@@ -441,7 +441,7 @@ function pregeneratedDocId(uid: string, lessonId: string) {
 export async function savePregeneratedLesson(
   uid: string,
   lessonId: string,
-  payload: Pick<PregeneratedLessonDocument, 'hook' | 'grammarBridge' | 'exercises'>,
+  payload: Pick<PregeneratedLessonDocument, 'hook' | 'grammarBridge' | 'exercises' | 'missionBriefing'>,
 ): Promise<void> {
   const id = pregeneratedDocId(uid, lessonId);
   const data: Record<string, unknown> = {
@@ -452,6 +452,7 @@ export async function savePregeneratedLesson(
   };
   if (payload.grammarBridge) data.grammarBridge = payload.grammarBridge;
   if (payload.exercises) data.exercises = payload.exercises;
+  if (payload.missionBriefing) data.missionBriefing = payload.missionBriefing;
   await setDoc(doc(db, 'lesson_pregen', id), data);
 }
 

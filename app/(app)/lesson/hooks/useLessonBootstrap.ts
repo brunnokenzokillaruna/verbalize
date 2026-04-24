@@ -13,7 +13,7 @@ import { pregenerateNextLesson } from '@/app/actions/pregenerateNextLesson';
 import { getVocabImage } from '@/app/actions/getVocabImage';
 import { translateWord } from '@/app/actions/translateWord';
 import { getPregeneratedLesson, deletePregeneratedLesson, getUserVocabulary, upsertVocabularyItem } from '@/services/firestore';
-import type { GrammarBridgeResult, Exercise, LessonTag } from '@/types';
+import type { GrammarBridgeResult, Exercise, LessonTag, MissionBriefingResult } from '@/types';
 
 const TAGS_WITH_GRAMMAR_PHASE: ReadonlySet<LessonTag> = new Set(['GRAM', 'VERB', 'CULT']);
 
@@ -77,6 +77,10 @@ export function useLessonBootstrap({
                 exercisesPrefetchRef.current = Promise.resolve(pregenDoc.exercises);
                 parts.push(`exercises(${pregenDoc.exercises.length})`);
               }
+              if (pregenDoc.missionBriefing) {
+                store.setMissionBriefing(pregenDoc.missionBriefing);
+                parts.push('missionBriefing');
+              }
               console.log(`[Timing] Cache pregen: ${(performance.now() - tPregen).toFixed(0)}ms — HIT ✅ [${parts.join(', ')}]`);
               deletePregeneratedLesson(user.uid, lesson.id).catch(console.error);
             } else {
@@ -92,6 +96,37 @@ export function useLessonBootstrap({
         const knownVocabulary = vocabDocs.map((v) => v.word.toLowerCase());
         store.setKnownVocabulary(knownVocabulary);
         console.log(`[Timing] Vocabulário do usuário: ${(performance.now() - tVocab).toFixed(0)}ms (${knownVocabulary.length} palavras conhecidas)`);
+
+        // ── MISS fast-path: fire the briefing in parallel with the hook so the
+        // mission screen renders as soon as the (shorter) briefing arrives,
+        // without waiting for the full hook dialogue. Skip if the hook came
+        // from cache and already has the briefing bundled somehow.
+        let briefingPromise: Promise<MissionBriefingResult | null> | null = null;
+        if (lesson.tag === 'MISS' && !hook) {
+          const tBrief = performance.now();
+          console.log(`[Timing] 🚀 Prefetch mission briefing iniciado (em paralelo com hook)`);
+          briefingPromise = generateMissionBriefing({
+            grammarFocus: lesson.grammarFocus,
+            theme: lesson.theme,
+            uiTitle: lesson.uiTitle,
+            language: lesson.language,
+          })
+            .then((briefing) => {
+              console.log(`[Timing] ✅ Mission briefing pronto: ${(performance.now() - tBrief).toFixed(0)}ms`);
+              if (briefing) {
+                const s = useLessonStore.getState();
+                s.setMissionBriefing(briefing);
+                // Enter mission phase immediately if we're still in loading —
+                // the user sees the briefing while the hook keeps generating.
+                if (s.phase === 'loading') s.setPhase('mission');
+              }
+              return briefing;
+            })
+            .catch((err) => {
+              console.error('[useLessonBootstrap] mission briefing error:', err);
+              return null;
+            });
+        }
 
         if (!hook) {
           const tHook = performance.now();
@@ -111,9 +146,15 @@ export function useLessonBootstrap({
 
         if (hook) {
           store.setHook(hook);
-          const initialPhase = getInitialPhase(lesson.tag);
-          store.setPhase(initialPhase);
-          console.log(`[Timing] ✅ Bootstrap total: ${(performance.now() - t0).toFixed(0)}ms → fase '${initialPhase}'`);
+
+          // For MISS, the briefing may have already flipped the phase to
+          // 'mission' — only set initial phase if we're still in loading.
+          const currentPhase = useLessonStore.getState().phase;
+          if (currentPhase === 'loading') {
+            const initialPhase = getInitialPhase(lesson.tag);
+            store.setPhase(initialPhase);
+          }
+          console.log(`[Timing] ✅ Bootstrap total: ${(performance.now() - t0).toFixed(0)}ms → fase '${useLessonStore.getState().phase}'`);
 
           // Fire secondary AI calls in parallel — each merges into store as it resolves.
           // Skip when the pregen cache already supplied the field.
@@ -130,16 +171,18 @@ export function useLessonBootstrap({
               .catch(console.error);
           }
 
-          if (tag === 'MISS' && !hook.missionBriefing) {
-            generateMissionBriefing({ 
-              grammarFocus: focus, 
+          // Briefing fallback: hook came from pregen cache (so the parallel
+          // fast-path above didn't run) but the briefing wasn't cached.
+          if (tag === 'MISS' && !briefingPromise && !useLessonStore.getState().missionBriefing) {
+            generateMissionBriefing({
+              grammarFocus: focus,
               theme: lesson.theme,
               uiTitle: lesson.uiTitle,
-              language: lang, 
-              dialogue 
+              language: lang,
+              dialogue,
             })
-              .then((missionBriefing) => {
-                if (missionBriefing) useLessonStore.getState().mergeHook({ missionBriefing });
+              .then((briefing) => {
+                if (briefing) useLessonStore.getState().setMissionBriefing(briefing);
               })
               .catch(console.error);
           }
@@ -187,7 +230,7 @@ export function useLessonBootstrap({
   }, [user, store.hook, store.lesson]);
 
   useEffect(() => {
-    if ((store.phase !== 'hook' && store.phase !== 'vocabulary' && store.phase !== 'intro') || !store.hook || !store.lesson) return;
+    if ((store.phase !== 'hook' && store.phase !== 'role-play' && store.phase !== 'vocabulary' && store.phase !== 'intro') || !store.hook || !store.lesson) return;
     // Only fire once per lesson regardless of how many times phase/hook change
     if (prefetchFiredRef.current) return;
     prefetchFiredRef.current = true;

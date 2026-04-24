@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Mic, CheckCircle, XCircle, SkipForward, RefreshCw, Send } from 'lucide-react';
+import { Mic, Square, Loader2, CheckCircle, XCircle, SkipForward, RefreshCw, Send } from 'lucide-react';
 import { AudioPlayerButton } from './AudioPlayerButton';
+import { useVoiceRecorder } from '@/hooks/useVoiceRecorder';
+import { transcribeSpeech } from '@/app/actions/transcribeSpeech';
 import type { SpeakRepeatData, SupportedLanguage } from '@/types';
 
 interface SpeakRepeatExerciseProps {
@@ -31,7 +33,7 @@ function similarity(target: string, transcript: string): number {
   return matches / Math.max(tWords.length, 1);
 }
 
-type Phase = 'idle' | 'recording' | 'review' | 'answered';
+type Phase = 'idle' | 'requesting-mic' | 'recording' | 'transcribing' | 'review' | 'answered';
 
 export function SpeakRepeatExercise({
   data,
@@ -41,14 +43,12 @@ export function SpeakRepeatExercise({
   setIsExerciseReady,
   submitTrigger
 }: SpeakRepeatExerciseProps) {
-  const [hasSpeechAPI, setHasSpeechAPI] = useState(false);
+  const recorder = useVoiceRecorder();
+  const hasSpeechAPI = recorder.isSupported;
   const [phase, setPhase] = useState<Phase>(answered ? 'answered' : 'idle');
   const [transcript, setTranscript] = useState('');
   const [recordError, setRecordError] = useState('');
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const recogRef = useRef<any>(null);
 
-  const langCode = language === 'fr' ? 'fr-FR' : 'en-US';
   const isCorrect = transcript ? similarity(data.text, transcript) >= 0.85 : null;
 
   // Notify parent of readiness
@@ -60,68 +60,62 @@ export function SpeakRepeatExercise({
     }
   }, [phase, hasSpeechAPI, recordError, setIsExerciseReady]);
 
-  // Listen for global submit
+  // Listen for global submit. Ignore the trigger value present at mount —
+  // it may already be > 0 from a previously-submitted exercise on the same page,
+  // which would otherwise auto-submit this exercise before the user records.
+  const initialSubmitTriggerRef = useRef(submitTrigger);
   useEffect(() => {
-    if (submitTrigger > 0 && phase !== 'answered') {
+    if (submitTrigger === initialSubmitTriggerRef.current) return;
+    if (phase !== 'answered') {
       submit(isCorrect ?? true);
     }
-  }, [submitTrigger, isCorrect, phase]);
-
-  useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const w = window as any;
-    setHasSpeechAPI(!!(w.SpeechRecognition || w.webkitSpeechRecognition));
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [submitTrigger]);
 
   useEffect(() => {
     if (answered) setPhase('answered');
   }, [answered]);
 
-  function startRecording() {
-    if (phase === 'recording' || phase === 'answered') return;
+  async function startRecording() {
+    if (phase === 'recording' || phase === 'transcribing' || phase === 'answered') return;
     setRecordError('');
     setTranscript('');
-    setPhase('recording');
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const w = window as any;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const SR: new () => any = w.SpeechRecognition || w.webkitSpeechRecognition;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const rec: any = new SR();
-      rec.lang = langCode;
-      rec.continuous = false;
-      rec.interimResults = false;
-      let resultReceived = false;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      rec.onresult = (e: any) => {
-        resultReceived = true;
-        const result: string = e.results[0][0].transcript;
-        setTranscript(result);
-        setPhase('review');
-      };
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      rec.onerror = (e: any) => {
-        setPhase('idle');
-        if (e.error === 'not-allowed') {
-          setRecordError('Permissão de microfone negada.');
-        } else if (e.error === 'network') {
-          setRecordError('Serviço de voz bloqueado (extensão do navegador?).');
-        } else {
-          setRecordError('Gravação falhou. Use os botões abaixo.');
-        }
-      };
-      rec.onend = () => {
-        if (!resultReceived) {
-          setPhase('idle');
-          setRecordError('Nenhuma fala detectada. Tente novamente.');
-        }
-      };
-      recogRef.current = rec;
-      rec.start();
-    } catch {
+    setPhase('requesting-mic');
+    await recorder.start();
+    if (recorder.error) {
       setPhase('idle');
-      setRecordError('Gravação não disponível neste navegador.');
+      setRecordError(recorder.error);
+      return;
+    }
+    setPhase('recording');
+  }
+
+  async function stopRecording() {
+    if (phase !== 'recording') return;
+    setPhase('transcribing');
+    const blob = await recorder.stop();
+    if (!blob) {
+      setPhase('idle');
+      setRecordError(recorder.error || 'Nenhuma fala detectada. Tente de novo.');
+      return;
+    }
+    try {
+      const form = new FormData();
+      form.append('file', blob, 'utterance.webm');
+      form.append('language', language);
+      form.append('prompt', data.text);
+      const result = await transcribeSpeech(form);
+      if ('error' in result) {
+        setPhase('idle');
+        setRecordError(result.error);
+        return;
+      }
+      setTranscript(result.text.trim());
+      setPhase('review');
+    } catch (err) {
+      console.error('[SpeakRepeatExercise] transcription failed:', err);
+      setPhase('idle');
+      setRecordError('Erro ao transcrever. Tente de novo.');
     }
   }
 
@@ -156,29 +150,50 @@ export function SpeakRepeatExercise({
       <div className="flex items-center gap-4 px-1">
         <AudioPlayerButton text={data.text} language={language} size="md" />
 
-        {(phase === 'idle' || phase === 'recording') && hasSpeechAPI && !recordError && (
+        {phase === 'idle' && hasSpeechAPI && (
           <button
             type="button"
             onClick={startRecording}
-            disabled={phase === 'recording'}
-            className="flex items-center gap-2.5 rounded-xl px-5 py-2.5 text-sm font-bold transition-all duration-300 active:scale-95 disabled:opacity-60 shadow-sm"
-            style={{
-              backgroundColor: phase === 'recording' ? 'var(--color-error)' : 'var(--color-primary)',
-              color: '#fff',
-            }}
+            className="flex items-center gap-2.5 rounded-xl px-5 py-2.5 text-sm font-bold text-white transition-all duration-300 active:scale-95 shadow-sm"
+            style={{ backgroundColor: 'var(--color-primary)' }}
           >
-            {phase === 'recording' ? (
-              <>
-                <div className="h-2 w-2 rounded-full bg-white animate-pulse" />
-                <span>Gravando…</span>
-              </>
-            ) : (
-              <>
-                <Mic size={16} />
-                <span>Gravar Voz</span>
-              </>
-            )}
+            <Mic size={16} />
+            <span>Gravar Voz</span>
           </button>
+        )}
+
+        {phase === 'requesting-mic' && (
+          <div
+            className="flex items-center gap-2.5 rounded-xl px-5 py-2.5 text-sm font-semibold"
+            style={{ backgroundColor: 'var(--color-surface-raised)', color: 'var(--color-text-secondary)' }}
+          >
+            <Loader2 size={14} className="animate-spin" />
+            <span>Liberando microfone…</span>
+          </div>
+        )}
+
+        {phase === 'recording' && (
+          <button
+            type="button"
+            onClick={stopRecording}
+            className="flex items-center gap-2.5 rounded-xl px-5 py-2.5 text-sm font-bold text-white transition-all duration-300 active:scale-95 shadow-sm"
+            style={{ backgroundColor: 'var(--color-error)' }}
+          >
+            <span className="h-2 w-2 rounded-full bg-white animate-pulse" />
+            <span>Gravando</span>
+            <Square size={12} fill="currentColor" />
+            <span>Parar</span>
+          </button>
+        )}
+
+        {phase === 'transcribing' && (
+          <div
+            className="flex items-center gap-2.5 rounded-xl px-5 py-2.5 text-sm font-semibold"
+            style={{ backgroundColor: 'var(--color-surface-raised)', color: 'var(--color-text-secondary)' }}
+          >
+            <Loader2 size={14} className="animate-spin" />
+            <span>Analisando (Whisper)…</span>
+          </div>
         )}
       </div>
 
@@ -210,44 +225,48 @@ export function SpeakRepeatExercise({
           </div>
 
           {/* Action Row */}
-          <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={startRecording}
-              className="flex items-center gap-2 rounded-xl px-4 py-3 text-xs font-bold uppercase tracking-widest transition-all duration-300 active:scale-95 bg-[var(--color-surface-raised)] text-[var(--color-text-muted)] border border-[var(--color-border)] hover:bg-[var(--color-bg)]"
-            >
-              <RefreshCw size={14} />
-              Refazer
-            </button>
-
+          <div className="flex flex-col gap-2.5">
+            {/* Primary action — full width, no wrap */}
             <button
               type="button"
               onClick={() => submit(true)}
-              className="flex-1 flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition-all duration-300 active:scale-95 bg-[var(--color-primary)] text-white shadow-lg shadow-[var(--color-primary)]/20"
+              className="flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl py-3.5 text-sm font-bold tracking-wide transition-all duration-200 ease-out bg-[var(--color-primary)] text-white shadow-lg shadow-[var(--color-primary)]/30 hover:brightness-110 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-[var(--color-primary)]/40 active:scale-[0.98] active:translate-y-0"
             >
-              <Send size={15} />
+              <Send size={16} />
               Enviar Resposta
             </button>
 
-            <button
-              type="button"
-              onClick={() => submit(true)}
-              className="flex items-center gap-1.5 rounded-xl px-4 py-3 text-xs font-bold uppercase tracking-widest text-[var(--color-text-muted)] opacity-60 hover:opacity-100 transition-all active:scale-95"
-            >
-              Pular
-              <SkipForward size={14} />
-            </button>
+            {/* Secondary actions — equal weight, not muted */}
+            <div className="grid grid-cols-2 gap-2.5">
+              <button
+                type="button"
+                onClick={startRecording}
+                className="flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-xs font-bold uppercase tracking-widest transition-all duration-200 ease-out bg-[var(--color-surface-raised)] text-[var(--color-text-primary)] border border-[var(--color-border)] hover:bg-[var(--color-bg)] hover:border-[var(--color-primary)]/40 hover:-translate-y-0.5 active:scale-[0.98] active:translate-y-0"
+              >
+                <RefreshCw size={14} />
+                Refazer
+              </button>
+
+              <button
+                type="button"
+                onClick={() => submit(true)}
+                className="flex items-center justify-center gap-1.5 rounded-xl px-4 py-3 text-xs font-bold uppercase tracking-widest transition-all duration-200 ease-out bg-[var(--color-surface-raised)] text-[var(--color-text-primary)] border border-[var(--color-border)] hover:bg-[var(--color-bg)] hover:border-[var(--color-primary)]/40 hover:-translate-y-0.5 active:scale-[0.98] active:translate-y-0"
+              >
+                Pular
+                <SkipForward size={14} />
+              </button>
+            </div>
           </div>
         </div>
       )}
 
       {/* No Speech API or after error fallback */}
       {phase === 'idle' && (!hasSpeechAPI || !!recordError) && (
-        <div className="flex gap-4">
+        <div className="flex flex-col gap-2.5">
           <button
             type="button"
             onClick={() => submit(true)}
-            className="flex-1 flex items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-bold transition-all duration-300 active:scale-95 bg-[var(--color-primary)] text-white shadow-lg shadow-[var(--color-primary)]/20"
+            className="flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl py-3.5 text-sm font-bold tracking-wide transition-all duration-200 ease-out bg-[var(--color-primary)] text-white shadow-lg shadow-[var(--color-primary)]/30 hover:brightness-110 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-[var(--color-primary)]/40 active:scale-[0.98] active:translate-y-0"
           >
             <Send size={16} />
             Continuar sem áudio
@@ -256,9 +275,10 @@ export function SpeakRepeatExercise({
           <button
             type="button"
             onClick={() => submit(true)}
-            className="flex items-center gap-2 rounded-xl px-6 py-3.5 text-xs font-bold uppercase tracking-widest text-[var(--color-text-muted)] border border-[var(--color-border)] hover:bg-[var(--color-surface-raised)] transition-all active:scale-95"
+            className="flex w-full items-center justify-center gap-1.5 rounded-xl px-4 py-3 text-xs font-bold uppercase tracking-widest transition-all duration-200 ease-out bg-[var(--color-surface-raised)] text-[var(--color-text-primary)] border border-[var(--color-border)] hover:bg-[var(--color-bg)] hover:border-[var(--color-primary)]/40 hover:-translate-y-0.5 active:scale-[0.98] active:translate-y-0"
           >
             Pular
+            <SkipForward size={14} />
           </button>
         </div>
       )}

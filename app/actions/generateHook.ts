@@ -19,7 +19,13 @@ interface GenerateHookParams {
   knownVocabulary: string[];
 }
 
-function pickNames(language: SupportedLanguage) {
+function pickNames(language: SupportedLanguage, tag?: LessonTag) {
+  // MISS lessons use first-person immersion: the Brazilian learner ("Você")
+  // is one of the speakers. The second speaker is a local role chosen by
+  // the AI based on the scenario (Recepcionista, Garçom, Atendente, etc.).
+  if (tag === 'MISS') {
+    return { nameA: 'Você', nameB: '__LOCAL_ROLE__' };
+  }
   const femaleNames = language === 'fr'
     ? ['Marie', 'Sophie', 'Camille', 'Lea', 'Emma', 'Chloe', 'Manon', 'Ines', 'Sarah',
       'Jade', 'Louise', 'Alice', 'Lina', 'Julia', 'Eva', 'Clara', 'Lucie', 'Romane',
@@ -89,7 +95,7 @@ STRICT A1 BEGINNER rules — the learner knows almost nothing yet:
 - Vocabulary: use ONLY the 300–500 most common everyday words (e.g. hello, eat, drink, walk, look, house, water, go, have, be, name, like, today).
 - Grammar: present tense of être/avoir (FR) or to be/to have (EN) and basic -ER verbs (FR) or simple present (EN). Simple yes/no questions allowed. NO past, NO future (except futur proche with 'aller').
 - Sentence length: max 8 words per line.
-- Tone: Informal and friendly. Use "Salut !", "Ça va ?", "On + verb" (in FR), "Tiens !".
+- Tone: Informal and friendly. Use "Salut !", "Ça va ?", "On + verb" (in FR).
 - CONVERSATION EXAMPLE (French, prepositions topic — notice the human reaction):
   Marie: "Salut Hugo ! Ça va ?"
   Hugo: "Salut ! Oui, ça va très bien."
@@ -146,9 +152,28 @@ C2 MASTERY rules — the learner approaches native-speaker fluency:
 
 function fixDialogueLabels(dialogue: string, nameA: string, nameB: string): string {
   const lines = dialogue.split('\n').filter((l) => l.trim().length > 0);
+  // For MISS lessons the role label is picked by the AI per-scenario, so we
+  // only force "Você" on odd lines and leave even-line labels untouched.
+  if (nameA === 'Você' && nameB === '__LOCAL_ROLE__') {
+    const evenLineMatch = lines.find((line, i) => i % 2 !== 0 && /^[^:\n]{1,30}:/.test(line));
+    const detectedRole = evenLineMatch?.match(/^([^:\n]{1,30}):/)?.[1]?.trim() ?? 'Atendente';
+    return lines
+      .map((line, i) => {
+        if (/^[^:\n]{1,30}:/.test(line)) return line;
+        return `${i % 2 === 0 ? 'Você' : detectedRole}: ${line}`;
+      })
+      .join('\n');
+  }
   return lines
     .map((line, i) => (/^[^:\n]{1,25}:/.test(line) ? line : `${i % 2 === 0 ? nameA : nameB}: ${line}`))
     .join('\n');
+}
+
+function stripForbiddenFillers(dialogue: string): string {
+  return dialogue
+    .replace(/\bTiens\s*,\s*/gi, '')
+    .replace(/\bTiens\s*!\s*/gi, '')
+    .replace(/\bTiens\b\s*/gi, '');
 }
 
 /**
@@ -159,7 +184,7 @@ function fixDialogueLabels(dialogue: string, nameA: string, nameB: string): stri
  */
 export async function generateHook(params: GenerateHookParams): Promise<HookResult | null> {
   const { language, level, tag, interests, theme, uiTitle, grammarFocus, knownVocabulary } = params;
-  const { nameA, nameB } = pickNames(language);
+  const { nameA, nameB } = pickNames(language, tag);
   
   // NARRATIVE ANCHOR: Use the curated theme and uiTitle instead of random topics
   const themeContext = theme ? `Theme: ${theme}${uiTitle ? ` - Scenario: ${uiTitle}` : ''}` : `Topic: ${pickTopic(level, interests)}`;
@@ -182,9 +207,24 @@ export async function generateHook(params: GenerateHookParams): Promise<HookResu
     tagInstruction = `- CONVERSATIONAL FLOW: This is a "Ways to Say" or "Dialogue" lesson. Use extremely natural, idiomatic, and high-frequency expressions.
 - VARIETY: Ensure the speakers react naturally with the expressions mentioned in '${grammarFocus}'.`;
   } else if (tag === 'MISS') {
-    tagInstruction = `- MISSION MODE: This is a practical application lesson. The dialogue MUST simulate a specific real-world scenario relevant to a BRAZILIAN visiting a French-speaking country (or English-speaking country) for the first time.
-- SCENARIO IDEAS: checking in at a Parisian hotel, ordering food at a French brasserie, buying medicine at a French pharmacy, asking for directions in Paris, shopping at a French supermarket, reporting a lost item at an airport.
-- The scenario MUST match the grammarFocus and feel urgent/high-stakes. Make the Brazilian character need something and have to communicate to get it. Do NOT write a generic casual chat — this is a mission.`;
+    tagInstruction = `- MISSION MODE — FIRST-PERSON IMMERSION: This is a role-play lesson. The STUDENT IS the Brazilian traveler. The dialogue MUST be a direct 1-on-1 exchange between "Você" (the learner, speaking ${lang}) and a single local character.
+- SPEAKER A is literally labeled "Você" on every line they speak — NEVER a first name.
+- SPEAKER B is labeled with the LOCAL'S ROLE IN ${lang.toUpperCase()}, chosen to fit the scenario "${uiTitle ?? theme ?? grammarFocus}". Examples (French): "Réceptionniste", "Serveur", "Serveuse", "Caissier", "Pharmacien", "Policier", "Chauffeur", "Vendeur", "Agent". Examples (English): "Receptionist", "Waiter", "Cashier", "Pharmacist", "Officer", "Driver", "Clerk", "Agent". Pick ONE role that obviously matches the scene — do NOT invent names.
+- The role label MUST be identical on every line spoken by Speaker B (no variation, no switching).
+- "Você" speaks in ${lang} (even though the label is Portuguese) — this is the learner practicing. The other speaker also speaks ${lang}.
+- The scenario MUST feel urgent/high-stakes. The learner NEEDS something from the local and has to communicate to get it. Do NOT write a generic casual chat — this is a mission with a concrete goal tied to "${grammarFocus}".`;
+  } else if (tag === 'VERB') {
+    tagInstruction = `- VERB PROTAGONIST: The lesson's focus is a single verb mentioned in '${grammarFocus}'. That verb MUST be the PROTAGONIST of the dialogue — it has to appear at least 3 times across the lines.
+- CONJUGATION VARIETY: Show the target verb in AT LEAST 2 different persons (e.g. "je", "il", "on", "nous" / "I", "you", "she", "we") so the learner SEES the conjugation shift in context. If the level allows, add 1 different tense too (e.g. one present + one passé composé / simple past).
+- AVOID OTHER NEW VERBS: Every other verb in the dialogue should be a very basic verb the student already knows (être/avoir/aller/faire in FR; be/have/go/do in EN). The target verb is the only verb worth teaching here.
+- NATURAL DIALOGUE: Don't make it feel like a conjugation drill — the verb must appear organically inside a real human conversation.`;
+  } else if (tag === 'EXPR') {
+    tagInstruction = `- EXPRESSION SHOWCASE: The focus '${grammarFocus}' is a list of fixed expressions or idioms. The dialogue MUST naturally use AT LEAST 2 of these expressions verbatim.
+- CONTEXT IS KING: Each expression should be used in a situation that makes its meaning obvious from context, so the learner absorbs it without needing a translation.
+- NO GRAMMAR NOISE: Keep the surrounding grammar extremely simple so the fixed expressions stand out as the memorable part of each line.`;
+  } else if (tag === 'CULT') {
+    tagInstruction = `- CULTURAL ANCHOR: '${grammarFocus}' is a cultural topic. The dialogue MUST take place in a recognizably French/English-speaking cultural setting and naturally reveal a cultural detail (a habit, an unspoken rule, a food, a place, a social norm).
+- SHOW, DON'T TELL: Don't have characters explain culture like tourists. Let the cultural element emerge from what they do or react to naturally.`;
   }
 
   const systemPrompt = `You are an expert language teacher creating content for Brazilian Portuguese speakers learning ${lang}. Respond with ONLY valid JSON, no markdown, no explanation.`;
@@ -202,7 +242,15 @@ export async function generateHook(params: GenerateHookParams): Promise<HookResu
       ? `- VOCABULARY RECYCLING: The student already knows these words — use them naturally throughout the dialogue so they get repeated exposure: [${normalizedKnown.slice(-80).join(', ')}]. The 4 new vocab words are the ONLY truly new content words. Every other content word in the dialogue must come from the student's known list or be a very basic function word.`
       : '';
 
-  const prompt = `Write a 2-person dialogue in ${lang} between ${nameA} and ${nameB}.
+  const speakerIntro = tag === 'MISS'
+    ? `Write a 2-person dialogue in ${lang}. Speaker A is literally "Você" (the Brazilian learner, first-person immersion). Speaker B is a single local character whose label is the role in ${lang} (e.g. Réceptionniste/Receptionist, Serveur/Waiter, Pharmacien/Pharmacist) that best fits the scenario — pick ONE and keep it identical on every line they speak.`
+    : `Write a 2-person dialogue in ${lang} between ${nameA} and ${nameB}.`;
+
+  const jsonDialogueTemplate = tag === 'MISS'
+    ? `"Você: <line 1>\\n<LocalRole>: <line 2>\\n..."`
+    : `"${nameA}: <line 1>\\n${nameB}: <line 2>\\n..."`;
+
+  const prompt = `${speakerIntro}
 
 Requirements:
 - ${themeContext}
@@ -210,14 +258,16 @@ Requirements:
 ${tagInstruction}
 - Exactly ${lineCount} lines total, alternating speakers
 - Every line MUST begin with the speaker name and a colon
-- CRITICAL COHERENCE: The entire dialogue MUST take place within the specific ${themeContext} provided. Do NOT drift to other topics.
-- Every line must logically follow the previous one to create a realistic, single cohesive scene.
-- Each line must directly react to the previous speaker. Natural narrative arc — beginning, middle, natural conclusion.
-- AVOID REPETITION and QUESTION BARRAGE.
+- CRITICAL SCENE COHERENCE: Pick ONE specific physical location AND ONE specific moment in time for the whole dialogue (e.g. "inside the plane during the flight", "at the café table after ordering", "in front of the hotel reception desk"). The location and time MUST NOT CHANGE across lines. If the characters start on a plane, they stay on the plane for every line — do NOT teleport them to another room, building, or scene. If a transition is narratively needed, it must be explicit and realistic (e.g. "let's get off", "we arrived, let's go inside"), and the dialogue must END at the new place, not mix scenes.
+- LOGICAL CONTINUITY: Every line must be a direct, realistic reaction to the previous one — same conversation, same place, consistent timeline. No sudden topic jumps, no unexplained changes in setting, no contradictions.
+- REAL-WORLD USEFULNESS: The dialogue must sound like something two real people would actually say in that exact situation. A Brazilian learner should be able to reuse these exact lines if they found themselves in that scene.
+- NARRATIVE ARC: Clear beginning (who/where/what's happening), middle (small development or reaction), natural conclusion (a resolution, decision, or closing remark) — all inside the SAME scene.
+- The entire dialogue MUST stay within the ${themeContext} provided. Do NOT drift to other topics.
+- AVOID REPETITION and QUESTION BARRAGE. Do not start multiple lines with the same filler or interjection.
 - NO STILTED LANGUAGE: Use contractions, "On" instead of "Nous" in French (unless formal), sounds human.
 ${knownVocabInstruction}
 ${dialogueVocabGuard}
-- DIALOGUE FLOW: Use fillers (FR: "Eh bien", "Alors", "Tiens", "Bah"; EN: "Well", "So", "Actually", "Right").
+- DIALOGUE FLOW: Use fillers SPARINGLY and VARIED across lines (FR allowed: "Eh bien", "Alors", "Bah", "Oh", "Ah", "Bon", "Dis donc"; EN allowed: "Well", "So", "Actually", "Right", "Look", "You know"). FORBIDDEN word: "Tiens" — never use it, in any line, under any circumstance. Do NOT repeat the same filler twice in the same dialogue.
 - NATURAL TRANSLATIONS: 'dialogueTranslations' must be NATURAL Brazilian Portuguese — NO dictionary-style parentheticals. Just how a Brazilian would say it.
 
 LEVEL CONSTRAINTS (follow strictly):
@@ -225,7 +275,7 @@ ${levelDesc}
 
 Output ONLY this JSON object (no extra text):
 {
-  "dialogue": "${nameA}: <line 1>\\n${nameB}: <line 2>\\n...",
+  "dialogue": ${jsonDialogueTemplate},
   "dialogueTranslations": ["<pt-BR line 1>", "<pt-BR line 2>", ...],
   "newVocabulary": ["non_verb_word_1", "non_verb_word_2", "non_verb_word_3", "non_verb_word_4"],
   "dialogueVerbs": ["verb_infinitive_1", "verb_infinitive_2", ...],
@@ -237,7 +287,7 @@ Output ONLY this JSON object (no extra text):
     "<vocab word 4>": "..."
   },
   "vocabTranslations": {
-    "<vocab word 1>": { "translation": "pt-BR word/phrase", "explanation": "usage tip in PT-BR ≤15 words", "example": "one sentence in ${lang} using the word" },
+    "<vocab word 1>": { "translation": "pt-BR word/phrase", "explanation": "dica de uso em PT-BR SIMPLES, ≤15 palavras — linguagem de amigo, sem jargão gramatical (nada de 'substantivo feminino', 'locução adverbial', 'distinção semântica'). Prefira exemplos concretos a termos técnicos.", "example": "one sentence in ${lang} using the word" },
     "<vocab word 2>": { "translation": "...", "explanation": "...", "example": "..." },
     "<vocab word 3>": { "translation": "...", "explanation": "...", "example": "..." },
     "<vocab word 4>": { "translation": "...", "explanation": "...", "example": "..." }
@@ -262,6 +312,7 @@ Rules:
       return null;
     }
 
+    result.dialogue = stripForbiddenFillers(result.dialogue);
     result.dialogue = fixDialogueLabels(result.dialogue, nameA, nameB);
 
     result.newVocabulary = [...new Set(

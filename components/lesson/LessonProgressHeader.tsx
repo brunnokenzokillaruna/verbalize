@@ -29,7 +29,7 @@ const STAGES_BY_TAG: Record<LessonTag, { key: LessonStage; label: string }[]> = 
   MISS: [
     { key: 'mission',    label: 'Missão' },
     { key: 'vocabulary', label: 'Vocabulário' },
-    { key: 'hook',       label: 'Diálogo' },
+    { key: 'role-play',  label: 'Role-play' },
     { key: 'practice',   label: 'Prática' },
   ],
   VERB: [

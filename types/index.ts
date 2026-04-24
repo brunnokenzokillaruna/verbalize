@@ -110,12 +110,13 @@ export interface PregeneratedLessonDocument {
   hook: HookResult;
   grammarBridge?: GrammarBridgeResult;
   exercises?: Exercise[];
+  missionBriefing?: MissionBriefingResult; // MISS lessons only
   createdAt: Timestamp;
 }
 
 // ─── Lesson ───────────────────────────────────────────────────────────────────
 
-export type LessonStage = 'intro' | 'vocabulary' | 'hook' | 'phonetics' | 'mission' | 'grammar' | 'practice' | 'review';
+export type LessonStage = 'intro' | 'vocabulary' | 'hook' | 'role-play' | 'phonetics' | 'mission' | 'grammar' | 'practice' | 'review';
 
 export type SupportedLanguage = 'fr' | 'en';
 
@@ -152,6 +153,8 @@ export interface MissionBriefingResult {
   scenario: string;
   objectives: string[];
   keyPhrases: string[];
+  stakes?: string;       // 1 short PT-BR sentence: what's at risk if the mission fails
+  timePressure?: string; // short PT-BR label for the urgency badge (e.g., "Urgente", "Antes do trem sair")
 }
 
 export interface HookResult {

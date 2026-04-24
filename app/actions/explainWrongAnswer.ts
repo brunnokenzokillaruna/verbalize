@@ -20,6 +20,12 @@ export async function explainWrongAnswer(
   const lang = LANG_LABEL[language];
   let prompt = '';
 
+  const accessibilityRule = `
+LINGUAGEM: Escreva como se fosse um amigo explicando, NÃO como livro didático. O público inclui brasileiros com baixa escolaridade.
+- Frases curtas, palavras simples. Pode usar "você", "a gente", "tipo".
+- PROIBIDO usar jargão: "lexical", "semântico", "conjugação", "flexão", "locução", "substantivo/adjetivo/advérbio", "ortográfico", "estrutura sintática", "nuance", "distinção".
+- Prefira mostrar um exemplo ou dar a dica direta em vez de nomear a regra gramatical.`;
+
   switch (exercise.type) {
     case 'context-choice': {
       const { sentence, blankWord, translation } = exercise.data;
@@ -27,7 +33,8 @@ export async function explainWrongAnswer(
 Frase: "${sentence}"
 Tradução: "${translation}"
 Resposta correta: "${blankWord}"
-Explique em 1-2 frases diretas em português por que "${blankWord}" é a palavra correta neste contexto.`;
+Explique em 1-2 frases simples por que "${blankWord}" é a palavra certa aqui.
+${accessibilityRule}`;
       break;
     }
     case 'reverse-translation': {
@@ -35,14 +42,16 @@ Explique em 1-2 frases diretas em português por que "${blankWord}" é a palavra
       prompt = `Um aluno errou uma tradução do português para o ${lang}.
 Frase em português: "${portuguese_sentence}"
 Tradução correta: "${target_translation}"
-Explique em 1-2 frases em português o motivo gramatical ou lexical desta tradução estar correta.`;
+Explique em 1-2 frases simples por que essa é a forma certa de dizer em ${lang}.
+${accessibilityRule}`;
       break;
     }
     case 'audio-dictation': {
       const { text } = exercise.data;
       prompt = `Um aluno errou um ditado em ${lang}.
 Frase correta: "${text}"
-Explique em 1-2 frases em português um ponto de atenção gramatical ou ortográfico importante nesta frase.`;
+Dê em 1-2 frases simples uma dica de atenção (escrita ou pronúncia) nessa frase.
+${accessibilityRule}`;
       break;
     }
     default:

@@ -6,6 +6,7 @@ import type {
   VocabImageResult,
   Exercise,
   LessonMistakeDocument,
+  MissionBriefingResult,
 } from '@/types';
 
 export type LessonPhase =
@@ -14,6 +15,7 @@ export type LessonPhase =
   | 'intro'      // shown while AI generates in background
   | 'vocabulary'
   | 'hook'
+  | 'role-play'  // MISS only — replaces hook, user speaks their lines
   | 'phonetics'  // PRON only — after hook
   | 'mission'    // MISS only — before vocabulary
   | 'grammar'
@@ -29,6 +31,7 @@ interface LessonState {
 
   // Generated content
   hook: HookResult | null;
+  missionBriefing: MissionBriefingResult | null; // MISS only — fetched in parallel with hook so it renders first
   grammarBridge: GrammarBridgeResult | null;
   vocabImages: Record<string, VocabImageResult | null>; // keyed by word
   vocabTranslations: Record<string, string>; // keyed by word → PT-BR translation
@@ -49,6 +52,11 @@ interface LessonState {
   // Newly discovered verbs in this session (not yet in knownVocabulary at start)
   discoveredVerbs: string[];
 
+  // MISS role-play tracking (how many of the user's lines were actually spoken)
+  rolePlayLinesSpoken: number;
+  rolePlayTotalSpeakable: number;
+  rolePlayComplete: boolean;
+
   // Loading state
   isLoading: boolean;
 
@@ -61,6 +69,8 @@ interface LessonState {
   setKnownVocabulary: (words: string[]) => void;
   setHook: (hook: HookResult) => void;
   mergeHook: (partial: Partial<HookResult>) => void;
+  setMissionBriefing: (briefing: MissionBriefingResult) => void;
+  completeRolePlay: (spoken: number, totalSpeakable: number) => void;
   setGrammarBridge: (bridge: GrammarBridgeResult) => void;
   setVocabImage: (word: string, image: VocabImageResult | null) => void;
   setVocabTranslation: (word: string, translation: string) => void;
@@ -99,6 +109,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
   lesson: null,
   interests: [],
   hook: null,
+  missionBriefing: null,
   grammarBridge: null,
   vocabImages: {},
   vocabTranslations: {},
@@ -112,6 +123,9 @@ export const useLessonStore = create<LessonState>((set, get) => ({
   reviewIndex: 0,
   reviewCorrectCount: 0,
   mistakes: [],
+  rolePlayLinesSpoken: 0,
+  rolePlayTotalSpeakable: 0,
+  rolePlayComplete: false,
   isLoading: false,
 
   // ── Actions ────────────────────────────────────────────────────────────────
@@ -122,6 +136,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       interests,
       phase: 'loading',
       hook: null,
+      missionBriefing: null,
       grammarBridge: null,
       vocabImages: {},
       vocabTranslations: {},
@@ -135,6 +150,9 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       reviewIndex: 0,
       reviewCorrectCount: 0,
       mistakes: [],
+      rolePlayLinesSpoken: 0,
+      rolePlayTotalSpeakable: 0,
+      rolePlayComplete: false,
       isLoading: true,
     }),
 
@@ -151,6 +169,15 @@ export const useLessonStore = create<LessonState>((set, get) => ({
     set((state) => ({
       hook: state.hook ? { ...state.hook, ...partial } : state.hook,
     })),
+
+  setMissionBriefing: (missionBriefing) => set({ missionBriefing }),
+
+  completeRolePlay: (spoken, totalSpeakable) =>
+    set({
+      rolePlayLinesSpoken: spoken,
+      rolePlayTotalSpeakable: totalSpeakable,
+      rolePlayComplete: true,
+    }),
 
   setDiscoveredVerbs: (verbs: string[]) => set({ discoveredVerbs: verbs }),
 
@@ -201,6 +228,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       lesson: null,
       interests: [],
       hook: null,
+      missionBriefing: null,
       grammarBridge: null,
       vocabImages: {},
       vocabTranslations: {},
@@ -214,6 +242,9 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       reviewIndex: 0,
       reviewCorrectCount: 0,
       mistakes: [],
+      rolePlayLinesSpoken: 0,
+      rolePlayTotalSpeakable: 0,
+      rolePlayComplete: false,
       isLoading: false,
     }),
 }));

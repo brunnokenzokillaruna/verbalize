@@ -31,6 +31,7 @@ export function phaseToStage(phase: string): LessonStage {
     case 'mission':    return 'mission';
     case 'vocabulary': return 'vocabulary';
     case 'hook':       return 'hook';
+    case 'role-play':  return 'role-play';
     case 'phonetics':  return 'phonetics';
     case 'grammar':    return 'grammar';
     case 'practice':   return 'practice';

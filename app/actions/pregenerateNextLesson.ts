@@ -2,10 +2,11 @@
 
 import { generateHook } from './generateHook';
 import { generateGrammarBridge } from './generateGrammarBridge';
+import { generateMissionBriefing } from './generateMissionBriefing';
 import { generatePracticeExercises } from './generatePracticeExercises';
 import { savePregeneratedLesson, getUserVocabulary } from '@/services/firestore';
 import { getPreviousTopics } from '@/lib/curriculum';
-import type { LessonDefinition, LessonTag, GrammarBridgeResult, Exercise } from '@/types';
+import type { LessonDefinition, LessonTag, GrammarBridgeResult, Exercise, MissionBriefingResult } from '@/types';
 
 const TAGS_WITH_GRAMMAR_PHASE: ReadonlySet<LessonTag> = new Set(['GRAM', 'VERB', 'CULT']);
 
@@ -52,6 +53,19 @@ export async function pregenerateNextLesson(
         })
       : Promise.resolve(null);
 
+    const briefingPromise: Promise<MissionBriefingResult | null> = lesson.tag === 'MISS'
+      ? generateMissionBriefing({
+          grammarFocus: lesson.grammarFocus,
+          theme: lesson.theme,
+          uiTitle: lesson.uiTitle,
+          language: lesson.language,
+          dialogue: hook.dialogue,
+        }).catch((err) => {
+          console.error('[pregenerateNextLesson] mission briefing error:', err);
+          return null;
+        })
+      : Promise.resolve(null);
+
     const exercisesPromise: Promise<Exercise[] | null> = generatePracticeExercises({
       dialogue: hook.dialogue,
       newVocabulary: hook.newVocabulary,
@@ -67,11 +81,16 @@ export async function pregenerateNextLesson(
       return null;
     });
 
-    const [grammarBridge, exercises] = await Promise.all([bridgePromise, exercisesPromise]);
+    const [grammarBridge, missionBriefing, exercises] = await Promise.all([
+      bridgePromise,
+      briefingPromise,
+      exercisesPromise,
+    ]);
 
     await savePregeneratedLesson(uid, lesson.id, {
       hook,
       ...(grammarBridge ? { grammarBridge } : {}),
+      ...(missionBriefing ? { missionBriefing } : {}),
       ...(exercises && exercises.length > 0 ? { exercises } : {}),
     });
   } catch (err) {

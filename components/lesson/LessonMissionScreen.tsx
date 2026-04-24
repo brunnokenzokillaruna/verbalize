@@ -1,6 +1,6 @@
 'use client';
 
-import { Target, MapPin, CheckCircle2 } from 'lucide-react';
+import { Target, MapPin, CheckCircle2, AlertTriangle, Clock } from 'lucide-react';
 import { AudioPlayerButton } from '@/components/lesson/AudioPlayerButton';
 import type { MissionBriefingResult, SupportedLanguage } from '@/types';
 
@@ -11,24 +11,40 @@ interface LessonMissionScreenProps {
 
 export function LessonMissionScreen({ briefing, language }: LessonMissionScreenProps) {
   return (
-    <div className="flex flex-col gap-6 animate-fade-in">
+    <div className="flex flex-col gap-5 animate-fade-in">
 
       {/* Header */}
-      <div className="flex items-center gap-3">
-        <div
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl"
-          style={{ backgroundColor: 'var(--color-success-bg)', color: 'var(--color-success)' }}
-        >
-          <Target size={22} strokeWidth={2} />
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl"
+            style={{ backgroundColor: 'var(--color-success-bg)', color: 'var(--color-success)' }}
+          >
+            <Target size={22} strokeWidth={2} />
+          </div>
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'var(--color-success)' }}>
+              Missão Especial
+            </p>
+            <h2 className="text-xl font-black leading-tight" style={{ color: 'var(--color-text-primary)' }}>
+              Briefing da Missão
+            </h2>
+          </div>
         </div>
-        <div>
-          <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'var(--color-success)' }}>
-            Missão Especial
-          </p>
-          <h2 className="text-xl font-black leading-tight" style={{ color: 'var(--color-text-primary)' }}>
-            Briefing da Missão
-          </h2>
-        </div>
+
+        {briefing.timePressure && (
+          <div
+            className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[10px] font-black uppercase tracking-wider shrink-0"
+            style={{
+              backgroundColor: 'rgba(217,119,6,0.1)',
+              color: 'var(--color-vocab)',
+              border: '1.5px solid rgba(217,119,6,0.3)',
+            }}
+          >
+            <Clock size={11} strokeWidth={2.5} />
+            <span className="leading-none">{briefing.timePressure}</span>
+          </div>
+        )}
       </div>
 
       {/* Scenario */}
@@ -49,6 +65,30 @@ export function LessonMissionScreen({ briefing, language }: LessonMissionScreenP
           </p>
         </div>
       </div>
+
+      {/* Stakes — what's at risk if you fail */}
+      {briefing.stakes && (
+        <div
+          className="rounded-2xl p-3.5 flex gap-3 items-start"
+          style={{
+            backgroundColor: 'rgba(239,68,68,0.06)',
+            border: '1.5px dashed rgba(239,68,68,0.4)',
+          }}
+        >
+          <AlertTriangle size={18} className="shrink-0 mt-0.5" style={{ color: '#ef4444' }} />
+          <div>
+            <p
+              className="text-[10px] font-black uppercase tracking-wider mb-0.5"
+              style={{ color: '#ef4444' }}
+            >
+              Se você falhar
+            </p>
+            <p className="text-sm leading-snug" style={{ color: 'var(--color-text-primary)' }}>
+              {briefing.stakes}
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Objectives */}
       <div

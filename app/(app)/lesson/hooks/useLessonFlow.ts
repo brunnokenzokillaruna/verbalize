@@ -15,7 +15,7 @@ const LESSON_FLOW: Record<LessonTag, LessonPhase[]> = {
   VOC:  ['vocabulary', 'hook',               'practice', 'complete'],
   PRON: ['vocabulary', 'hook', 'phonetics', 'practice', 'complete'],
   DIAL: ['vocabulary', 'hook',               'practice', 'complete'],
-  MISS: ['mission',    'vocabulary', 'hook', 'practice', 'complete'],
+  MISS: ['mission',    'vocabulary', 'role-play', 'practice', 'complete'],
   VERB: ['vocabulary', 'hook', 'grammar',   'practice', 'complete'],
   EXPR: ['vocabulary', 'hook',               'practice', 'complete'],
   CULT: ['vocabulary', 'hook', 'grammar',   'practice', 'complete'],
@@ -100,6 +100,13 @@ export function useLessonFlow({
 
   const advanceFromPhonetics = useCallback(() => {
     if (!store.lesson) return;
+    advanceFromGrammar();
+  }, [store, advanceFromGrammar]);
+
+  const advanceFromRolePlay = useCallback(() => {
+    if (!store.lesson || !store.hook) return;
+    // Role-play closes the dialogue for MISS and hands off to practice,
+    // reusing the same exercise-fetch path as the hook phase.
     advanceFromGrammar();
   }, [store, advanceFromGrammar]);
 
@@ -210,6 +217,7 @@ export function useLessonFlow({
     advanceFromHook,
     advanceFromGrammar,
     advanceFromPhonetics,
+    advanceFromRolePlay,
     finishLesson,
     skipLesson,
     exitLesson,

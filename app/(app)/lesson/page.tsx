@@ -36,6 +36,8 @@ import { CheckButton } from '@/components/lesson/CheckButton';
 import { LessonLoadingScreen } from '@/components/lesson/LessonLoadingScreen';
 import { LessonErrorScreen } from '@/components/lesson/LessonErrorScreen';
 import { LessonCompleteScreen } from '@/components/lesson/LessonCompleteScreen';
+import { LessonMissionDebrief } from '@/components/lesson/LessonMissionDebrief';
+import { LessonMissionRolePlay } from '@/components/lesson/LessonMissionRolePlay';
 import { LessonVocabularyScreen } from '@/components/lesson/LessonVocabularyScreen';
 import { LessonHookScreen } from '@/components/lesson/LessonHookScreen';
 import { LessonGrammarScreen } from '@/components/lesson/LessonGrammarScreen';
@@ -119,6 +121,7 @@ export default function LessonPage() {
     advanceFromHook,
     advanceFromGrammar,
     advanceFromPhonetics,
+    advanceFromRolePlay,
     finishLesson,
     skipLesson,
     exitLesson,
@@ -327,6 +330,20 @@ export default function LessonPage() {
   // ── Complete screen ───────────────────────────────────────────────────────
 
   if (phase === 'complete') {
+    if (store.lesson?.tag === 'MISS' && store.missionBriefing && store.hook) {
+      return (
+        <LessonMissionDebrief
+          briefing={store.missionBriefing}
+          language={store.lesson.language}
+          totalExercises={store.exercises.length}
+          correctExercises={store.correctCount}
+          newVocabulary={store.hook.newVocabulary}
+          linesSpoken={store.rolePlayLinesSpoken}
+          totalSpeakable={store.rolePlayTotalSpeakable}
+          onExit={exitLesson}
+        />
+      );
+    }
     return (
       <LessonCompleteScreen
         totalExercises={store.exercises.length}
@@ -385,10 +402,20 @@ export default function LessonPage() {
         )}
 
         {/* ── Mission phase — MISS: before vocabulary ── */}
-        {phase === 'mission' && store.hook?.missionBriefing && store.lesson && (
+        {phase === 'mission' && store.missionBriefing && store.lesson && (
           <LessonMissionScreen
-            briefing={store.hook.missionBriefing}
+            briefing={store.missionBriefing}
             language={store.lesson.language}
+          />
+        )}
+
+        {/* ── Role-play phase — MISS: replaces hook, user speaks their lines ── */}
+        {phase === 'role-play' && store.hook && store.lesson && (
+          <LessonMissionRolePlay
+            dialogue={store.hook.dialogue}
+            dialogueTranslations={store.hook.dialogueTranslations}
+            language={store.lesson.language}
+            onComplete={(spoken, total) => store.completeRolePlay(spoken, total)}
           />
         )}
 
@@ -434,21 +461,28 @@ export default function LessonPage() {
           <div className="mt-10 animate-slide-up delay-300">
             <button
               type="button"
-              disabled={store.isLoading}
+              disabled={store.isLoading || (phase === 'role-play' && !store.rolePlayComplete)}
               onClick={
                 phase === 'vocabulary'  ? advanceFromVocabulary :
                 phase === 'hook'        ? advanceFromHook :
                 phase === 'mission'     ? advanceFromMission :
                 phase === 'phonetics'   ? advanceFromPhonetics :
+                phase === 'role-play'   ? advanceFromRolePlay :
                                           advanceFromGrammar
               }
               className="cta-shimmer relative flex w-full max-w-sm mx-auto items-center justify-center gap-2.5 overflow-hidden rounded-xl px-6 py-3.5 text-base font-bold transition-all active:scale-[0.98] disabled:cursor-not-allowed"
               style={{
-                background: store.isLoading
+                background: (store.isLoading || (phase === 'role-play' && !store.rolePlayComplete))
                   ? 'var(--color-surface-raised)'
-                  : 'linear-gradient(135deg, var(--color-primary) 0%, #2563eb 100%)',
-                color: store.isLoading ? 'var(--color-text-muted)' : '#fff',
-                boxShadow: store.isLoading ? 'none' : '0 8px 20px rgba(29,94,212,0.3)',
+                  : phase === 'role-play'
+                    ? 'linear-gradient(135deg, var(--color-success) 0%, #059669 100%)'
+                    : 'linear-gradient(135deg, var(--color-primary) 0%, #2563eb 100%)',
+                color: (store.isLoading || (phase === 'role-play' && !store.rolePlayComplete)) ? 'var(--color-text-muted)' : '#fff',
+                boxShadow: (store.isLoading || (phase === 'role-play' && !store.rolePlayComplete))
+                  ? 'none'
+                  : phase === 'role-play'
+                    ? '0 8px 20px rgba(16,185,129,0.35)'
+                    : '0 8px 20px rgba(29,94,212,0.3)',
               }}
             >
               {store.isLoading ? (
@@ -464,6 +498,10 @@ export default function LessonPage() {
                 <>Aceitar Missão 🚀</>
               ) : phase === 'phonetics' ? (
                 <>Entendido, vamos praticar!</>
+              ) : phase === 'role-play' ? (
+                store.rolePlayComplete
+                  ? <>Missão cumprida, ir à prática →</>
+                  : <>Finalize a conversa…</>
               ) : (
                 <>Avançar →</>
               )}
@@ -471,7 +509,7 @@ export default function LessonPage() {
             <p className="mt-3 text-center text-[10px] font-semibold text-[var(--color-text-muted)] uppercase tracking-[0.2em] opacity-50">
               Próximo:{' '}
               {phase === 'vocabulary'
-                ? 'Diálogo'
+                ? (store.lesson?.tag === 'MISS' ? 'Role-play' : 'Diálogo')
                 : phase === 'hook'
                   ? (store.lesson?.tag === 'GRAM' ? 'Gramática' : store.lesson?.tag === 'PRON' ? 'Fonética' : 'Prática')
                   : phase === 'mission'

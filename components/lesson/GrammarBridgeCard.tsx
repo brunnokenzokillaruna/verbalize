@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Sparkles } from 'lucide-react';
 import { AudioPlayerButton } from './AudioPlayerButton';
 import type { GrammarBridgeResult, SupportedLanguage } from '@/types';
 
@@ -28,6 +28,7 @@ function normalizeGrammarBridge(data: GrammarBridgeResult) {
       brazilianTrap: data.brazilianTrap ?? null,
       usageContext: data.usageContext ?? null,
       patterns: data.patterns ?? null,
+      verbSpotlight: data.verbSpotlight ?? null,
     };
   }
   // Legacy format...
@@ -44,6 +45,7 @@ function normalizeGrammarBridge(data: GrammarBridgeResult) {
     brazilianTrap: null,
     usageContext: null,
     patterns: null,
+    verbSpotlight: null,
   };
 }
 
@@ -66,6 +68,7 @@ function HighlightedText({ text, className }: { text: string; className: string 
 
 export function GrammarBridgeCard({ bridge, language }: GrammarBridgeCardProps) {
   const [showMore, setShowMore] = useState(false);
+  const [showConjugation, setShowConjugation] = useState(false);
   const normalized = normalizeGrammarBridge(bridge);
   const {
     insight,
@@ -77,6 +80,7 @@ export function GrammarBridgeCard({ bridge, language }: GrammarBridgeCardProps) 
     brazilianTrap,
     usageContext,
     patterns,
+    verbSpotlight,
   } = normalized;
 
   return (
@@ -140,11 +144,20 @@ export function GrammarBridgeCard({ bridge, language }: GrammarBridgeCardProps) 
 
         {/* Brazilian Trap (Radar de Erro) */}
         {brazilianTrap && (
-          <div className="mx-1 p-4 rounded-xl bg-orange-50/50 border border-orange-200/50 flex items-start gap-3">
-             <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-orange-100 text-xs">⚠️</div>
+          <div
+            className="mx-1 p-4 rounded-xl flex items-start gap-3"
+            style={{
+              backgroundColor: 'var(--color-warning-bg)',
+              border: '1px solid var(--color-warning-border)',
+            }}
+          >
+             <div
+               className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs"
+               style={{ backgroundColor: 'var(--color-warning-border)', color: 'var(--color-warning)' }}
+             >⚠️</div>
              <div className="flex flex-col gap-0.5">
-                <span className="text-[9px] font-black uppercase tracking-widest text-orange-600">Radar de Erro</span>
-                <p className="text-xs font-medium text-orange-900 leading-relaxed">{brazilianTrap}</p>
+                <span className="text-[9px] font-black uppercase tracking-widest" style={{ color: 'var(--color-warning)' }}>Radar de Erro</span>
+                <p className="text-xs font-medium leading-relaxed" style={{ color: 'var(--color-text-primary)' }}>{brazilianTrap}</p>
              </div>
           </div>
         )}
@@ -157,8 +170,12 @@ export function GrammarBridgeCard({ bridge, language }: GrammarBridgeCardProps) 
               {patterns.map((p, i) => (
                 <div key={i} className="p-3 rounded-xl bg-[var(--color-surface-raised)]/30 border border-[var(--color-border)] flex flex-col gap-1">
                   <span className="text-[8px] font-bold text-[var(--color-text-muted)] uppercase">{p.label}</span>
-                  <p className="text-sm font-bold text-[var(--color-text-primary)]">{p.target}</p>
-                  <p className="text-[10px] italic text-[var(--color-text-secondary)] opacity-70">{p.portuguese}</p>
+                  <p className="text-sm font-bold text-[var(--color-text-primary)]">
+                    <HighlightedText text={p.target} className="bg-[var(--color-primary)] text-white px-1 rounded" />
+                  </p>
+                  <p className="text-[10px] italic text-[var(--color-text-secondary)] opacity-70">
+                    <HighlightedText text={p.portuguese} className="text-[var(--color-text-primary)] font-bold not-italic" />
+                  </p>
                 </div>
               ))}
             </div>
@@ -227,6 +244,120 @@ export function GrammarBridgeCard({ bridge, language }: GrammarBridgeCardProps) 
                  {bridgeRow.difference}
                </p>
             </div>
+          </div>
+        ) : null}
+
+        {/* Verb Spotlight (only for VERB lessons) */}
+        {verbSpotlight && verbSpotlight.infinitive ? (
+          <div
+            className="relative overflow-hidden rounded-2xl shadow-sm border border-[var(--color-primary)]/20"
+            style={{
+              background: 'linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-surface) 100%)',
+            }}
+          >
+            {/* Hero header */}
+            <div className="flex items-start gap-4 p-5 border-b border-[var(--color-border)]/40">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[var(--color-primary)] text-white shadow-md">
+                <Sparkles size={20} strokeWidth={2.5} />
+              </div>
+              <div className="flex flex-col gap-1 min-w-0 flex-1">
+                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-[var(--color-primary)] opacity-70">
+                  O Verbo em Destaque
+                </span>
+                <div className="flex items-baseline gap-3 flex-wrap">
+                  <h3 className="font-display text-2xl font-black tracking-tight text-[var(--color-primary-dark)]">
+                    {verbSpotlight.infinitive}
+                  </h3>
+                  <span className="text-sm italic text-[var(--color-text-secondary)]">
+                    = {verbSpotlight.meaning}
+                  </span>
+                </div>
+                <AudioPlayerButton text={verbSpotlight.infinitive} language={language} size="sm" />
+              </div>
+            </div>
+
+            {/* Personality + frequency */}
+            <div className="flex flex-col gap-3 p-5">
+              {verbSpotlight.personality && (
+                <p className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
+                  {verbSpotlight.personality}
+                </p>
+              )}
+              {verbSpotlight.frequencyNote && (
+                <div className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-primary)]" />
+                  <p className="text-xs font-semibold text-[var(--color-primary-dark)]">
+                    {verbSpotlight.frequencyNote}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Idiomatic expressions */}
+            {verbSpotlight.idiomaticExpressions && verbSpotlight.idiomaticExpressions.length > 0 && (
+              <div className="flex flex-col gap-2 px-5 pb-5">
+                <h4 className="text-[9px] font-black uppercase tracking-widest text-[var(--color-text-muted)]">
+                  Expressões Fixas
+                </h4>
+                <div className="flex flex-col gap-2">
+                  {verbSpotlight.idiomaticExpressions.map((expr, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center justify-between gap-3 rounded-xl p-3 bg-[var(--color-surface)] border border-[var(--color-border)]/60"
+                    >
+                      <div className="flex flex-col gap-0.5 min-w-0">
+                        <p className="text-sm font-bold italic text-[var(--color-text-primary)] truncate">
+                          {expr.target}
+                        </p>
+                        <p className="text-[11px] text-[var(--color-text-muted)] italic truncate">
+                          {expr.portuguese}
+                        </p>
+                      </div>
+                      <AudioPlayerButton text={expr.target} language={language} size="sm" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Conjugation peek (collapsible) */}
+            {verbSpotlight.conjugationPreview && verbSpotlight.conjugationPreview.length > 0 && (
+              <div className="px-5 pb-5">
+                <button
+                  type="button"
+                  onClick={() => setShowConjugation((v) => !v)}
+                  className="flex w-full items-center justify-between gap-2 rounded-xl px-4 py-3 bg-[var(--color-surface)] border border-[var(--color-border)]/60 hover:border-[var(--color-primary)]/40 transition-all"
+                >
+                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-text-secondary)]">
+                    {showConjugation ? 'Ocultar conjugação' : 'Ver conjugação no presente'}
+                  </span>
+                  <ChevronDown
+                    size={14}
+                    className={`text-[var(--color-text-muted)] transition-transform duration-300 ${showConjugation ? 'rotate-180' : ''}`}
+                  />
+                </button>
+
+                {showConjugation && (
+                  <div className="mt-2 rounded-xl overflow-hidden border border-[var(--color-border)]/60 bg-[var(--color-surface)] animate-in fade-in slide-in-from-top-2 duration-300">
+                    {verbSpotlight.conjugationPreview.map((c, i) => (
+                      <div
+                        key={i}
+                        className="flex items-center gap-3 px-4 py-2.5"
+                        style={{ borderTop: i > 0 ? '1px solid var(--color-border)' : 'none' }}
+                      >
+                        <span className="w-20 shrink-0 text-[11px] font-bold text-[var(--color-text-muted)] uppercase tracking-wide">
+                          {c.pronoun}
+                        </span>
+                        <span className="flex-1 font-display text-sm font-bold text-[var(--color-primary-dark)]">
+                          {c.form}
+                        </span>
+                        <AudioPlayerButton text={c.form} language={language} size="sm" />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         ) : null}
 
