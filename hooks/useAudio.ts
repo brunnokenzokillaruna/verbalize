@@ -4,7 +4,15 @@ import { useState, useCallback, useRef } from 'react';
 import { synthesizeSpeech } from '@/app/actions/synthesizeSpeech';
 import type { SupportedLanguage } from '@/types';
 
-export function useAudio() {
+/**
+ * Plays TTS audio for arbitrary text.
+ *
+ * @param fixedVoice  If provided, every call to `speak` will use this exact
+ *                    Google TTS voice name instead of picking a random one.
+ *                    Pass `getFixedVoiceName(lang)` from synthesizeSpeech.ts
+ *                    to keep a consistent voice across a session.
+ */
+export function useAudio(fixedVoice?: string) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -25,7 +33,7 @@ export function useAudio() {
     if (!base64) {
       setIsLoading(true);
       try {
-        base64 = await synthesizeSpeech(text, lang);
+        base64 = await synthesizeSpeech(text, lang, fixedVoice);
         if (base64) cacheRef.current.set(key, base64);
       } catch {
         // silently fail — button resets to idle
@@ -41,7 +49,7 @@ export function useAudio() {
     audio.onended = () => { setIsPlaying(false); audioRef.current = null; };
     audio.onerror = () => { setIsPlaying(false); audioRef.current = null; };
     audio.play().catch(() => { setIsPlaying(false); audioRef.current = null; });
-  }, [stop]);
+  }, [stop, fixedVoice]);
 
   const toggle = useCallback(
     (text: string, lang: SupportedLanguage) => {

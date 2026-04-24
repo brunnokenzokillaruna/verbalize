@@ -16,6 +16,7 @@ import {
 import { useAudio } from '@/hooks/useAudio';
 import { useVoiceRecorder } from '@/hooks/useVoiceRecorder';
 import { transcribeSpeech } from '@/app/actions/transcribeSpeech';
+import { getFixedVoiceName } from '@/lib/voiceConfig';
 import type { SupportedLanguage } from '@/types';
 
 interface LessonMissionRolePlayProps {
@@ -93,7 +94,8 @@ export function LessonMissionRolePlay({
   const [recState, setRecState] = useState<RecState>('idle');
   const [transcript, setTranscript] = useState('');
   const [recordError, setRecordError] = useState('');
-  const { speak, stop: stopAudio } = useAudio();
+  const fixedVoice = useMemo(() => getFixedVoiceName(language), [language]);
+  const { speak, stop: stopAudio } = useAudio(fixedVoice);
   const recorder = useVoiceRecorder();
   const hasSpeechAPI = recorder.isSupported;
 
@@ -614,9 +616,9 @@ function UserTurn({
                   <p className="text-xs font-black" style={{ color: 'var(--color-success)' }}>
                     Perfeito! ({Math.round(score * 100)}% de precisão)
                   </p>
-                  <p className="mt-0.5 text-xs italic" style={{ color: 'var(--color-text-secondary)' }}>
-                    &ldquo;{transcript}&rdquo;
-                  </p>
+                  <div className="mt-1.5">
+                    <WordDiff target={line.text} transcript={transcript} />
+                  </div>
                 </div>
               </div>
               <button
@@ -647,9 +649,9 @@ function UserTurn({
                   <p className="text-xs font-black" style={{ color: '#ef4444' }}>
                     Quase lá ({Math.round(score * 100)}%)
                   </p>
-                  <p className="mt-0.5 text-xs italic" style={{ color: 'var(--color-text-secondary)' }}>
-                    &ldquo;{transcript}&rdquo;
-                  </p>
+                  <div className="mt-1.5">
+                    <WordDiff target={line.text} transcript={transcript} />
+                  </div>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-2.5">
@@ -681,6 +683,39 @@ function UserTurn({
         </div>
       </div>
     </div>
+  );
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Shows the target phrase with each word colored green (matched) or red
+ * (missed) based on the user's transcript.
+ */
+function WordDiff({ target, transcript }: { target: string; transcript: string }) {
+  const spokenWords = new Set(normalizeText(transcript).split(' '));
+  const targetWords = target.split(/\s+/);
+
+  return (
+    <p className="text-xs leading-relaxed flex flex-wrap gap-x-1">
+      {targetWords.map((word, i) => {
+        const matched = spokenWords.has(normalizeText(word));
+        return (
+          <span
+            key={i}
+            className="font-semibold"
+            style={{
+              color: matched ? 'var(--color-success)' : '#ef4444',
+              textDecoration: matched ? 'none' : 'underline',
+              textDecorationStyle: matched ? undefined : 'wavy',
+              textUnderlineOffset: '3px',
+            }}
+          >
+            {word}
+          </span>
+        );
+      })}
+    </p>
   );
 }
 

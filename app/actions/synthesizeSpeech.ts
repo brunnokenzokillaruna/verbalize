@@ -205,19 +205,32 @@ const STUDIO_VOICES: Record<SupportedLanguage, string[]> = {
   en: ['en-US-Studio-O', 'en-US-Studio-Q'],
 };
 
+
 /**
- * Synthesizes a single piece of text with a random voice.
- * Used for word-click audio in TranslationTooltip.
+ * Synthesizes a single piece of text.
+ *
+ * If `fixedVoice` is provided, that exact voice is used regardless of
+ * text length. Otherwise a random voice is picked (original behaviour).
  *
  * Chirp-HD / Chirp3-HD voices require full sentences and fail silently on
- * single words, so short texts (≤ 3 words) always use Studio voices.
+ * single words, so short texts (≤ 3 words) always use Studio voices
+ * when no fixed voice is specified.
  */
 export async function synthesizeSpeech(
   text: string,
   language: SupportedLanguage,
+  fixedVoice?: string,
 ): Promise<string | null> {
   const apiKey = process.env.GOOGLE_TTS_API_KEY;
   if (!apiKey) return null;
+
+  if (fixedVoice) {
+    const voice: VoiceConfig = {
+      languageCode: getLangFromVoice(fixedVoice),
+      name: fixedVoice,
+    };
+    return callTTS(text, voice, apiKey);
+  }
 
   const wordCount = text.trim().split(/\s+/).length;
   const isShort = wordCount <= 3;
