@@ -19,6 +19,7 @@ import type { UserVocabularyDocument, SupportedLanguage } from '@/types';
 import { StatChip } from '@/components/vocabulary/StatChip';
 import { VocabCard } from '@/components/vocabulary/VocabCard';
 import { ReviewOverlay, type ReviewResult } from '@/components/vocabulary/ReviewOverlay';
+import { QuickReviewOverlay } from '@/components/vocabulary/QuickReviewOverlay';
 
 const LANG_LABEL: Record<SupportedLanguage, { label: string; flag: string }> = {
   fr: { label: 'Francês', flag: '🇫🇷' },
@@ -43,6 +44,10 @@ export default function VocabularyPage() {
   const [lastCorrect, setLastCorrect] = useState<boolean | null>(null);
   const [results, setResults] = useState<ReviewResult[]>([]);
   const [savingResults, setSavingResults] = useState(false);
+
+  // Quick Review state
+  const [quickState, setQuickState] = useState<'idle' | 'running' | 'done'>('idle');
+  const [quickIdx, setQuickIdx] = useState(0);
 
   const language = (profile?.currentTargetLanguage ?? 'fr') as SupportedLanguage;
   const lang = LANG_LABEL[language];
@@ -180,6 +185,41 @@ export default function VocabularyPage() {
   function closeReview() {
     setReviewState('idle');
     setReviewItems([]);
+    setResults([]);
+  }
+
+  // ── Quick Review handlers ─────────────────────────────────────────────────────
+
+  function startQuickReview() {
+    if (!user || dueToday.length === 0) return;
+    setQuickIdx(0);
+    setResults([]);
+    setQuickState('running');
+  }
+
+  function handleQuickAnswer(correct: boolean) {
+    const currentItem = dueToday[quickIdx];
+    setResults((prev) => [...prev, { word: currentItem.word, correct }]);
+    if (quickIdx + 1 >= dueToday.length) {
+      setQuickState('done');
+    } else {
+      setQuickIdx(quickIdx + 1);
+    }
+  }
+
+  async function finishQuickReview() {
+    if (!user) return;
+    setSavingResults(true);
+    await Promise.all(
+      results.map((r) => updateVocabSrsAfterReview(user.uid, r.word, language, r.correct)),
+    );
+    await loadVocabulary();
+    setSavingResults(false);
+    setQuickState('idle');
+  }
+
+  function closeQuickReview() {
+    setQuickState('idle');
     setResults([]);
   }
 
@@ -340,46 +380,52 @@ export default function VocabularyPage() {
           {/* ── Review CTA banner ── */}
           {dueToday.length > 0 && (
             <div
-              className="rounded-2xl p-4 flex items-center gap-4 animate-slide-up-spring"
+              className="rounded-2xl p-4 flex flex-col md:flex-row items-start md:items-center gap-4 animate-slide-up-spring"
               style={{
                 background: 'linear-gradient(135deg, var(--color-error-bg) 0%, var(--color-primary-light) 100%)',
                 border: '1.5px solid var(--color-error)',
               }}
             >
-              <div
-                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
-                style={{ backgroundColor: 'var(--color-error)', color: '#fff' }}
-              >
-                <Zap size={20} />
+              <div className="flex items-center gap-4 w-full md:w-auto flex-1">
+                <div
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
+                  style={{ backgroundColor: 'var(--color-error)', color: '#fff' }}
+                >
+                  <Zap size={20} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-bold" style={{ color: 'var(--color-text-primary)' }}>
+                    {dueToday.length} palavra{dueToday.length !== 1 ? 's' : ''} para revisar hoje
+                  </p>
+                  <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-muted)' }}>
+                    Pratique agora para não perder o progresso
+                  </p>
+                </div>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold" style={{ color: 'var(--color-text-primary)' }}>
-                  {dueToday.length} palavra{dueToday.length !== 1 ? 's' : ''} para revisar hoje
-                </p>
-                <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-muted)' }}>
-                  Pratique agora para não perder o progresso
-                </p>
+              <div className="flex items-center gap-2 w-full md:w-auto mt-2 md:mt-0">
+                <button
+                  type="button"
+                  onClick={startQuickReview}
+                  className="flex-1 md:flex-none flex justify-center items-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all active:scale-95"
+                  style={{ backgroundColor: 'var(--color-error)', color: '#fff' }}
+                >
+                  Rápida <Zap size={14} />
+                </button>
+                <button
+                  type="button"
+                  onClick={startReview}
+                  disabled={reviewState === 'loading'}
+                  className="flex-1 md:flex-none flex justify-center items-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all active:scale-95"
+                  style={{
+                    backgroundColor: 'transparent',
+                    border: '1.5px solid var(--color-error)',
+                    color: 'var(--color-error)',
+                    cursor: reviewState === 'loading' ? 'wait' : 'pointer',
+                  }}
+                >
+                  {reviewState === 'loading' ? <Loader2 size={14} className="animate-spin" /> : 'Profunda'}
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={startReview}
-                disabled={reviewState === 'loading'}
-                className="shrink-0 flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all active:scale-95"
-                style={{
-                  backgroundColor: 'var(--color-error)',
-                  color: '#fff',
-                  cursor: reviewState === 'loading' ? 'wait' : 'pointer',
-                }}
-              >
-                {reviewState === 'loading' ? (
-                  <Loader2 size={14} className="animate-spin" />
-                ) : (
-                  <>
-                    Revisar
-                    <ChevronRight size={14} />
-                  </>
-                )}
-              </button>
             </div>
           )}
 
@@ -455,6 +501,20 @@ export default function VocabularyPage() {
           onContinue={handleContinue}
           onFinish={finishReview}
           onClose={closeReview}
+        />
+      )}
+      {/* ── Quick Review Overlay ── */}
+      {(quickState === 'running' || quickState === 'done') && (
+        <QuickReviewOverlay
+          state={quickState}
+          items={dueToday}
+          currentIdx={quickIdx}
+          results={results}
+          language={language}
+          savingResults={savingResults}
+          onAnswer={handleQuickAnswer}
+          onFinish={finishQuickReview}
+          onClose={closeQuickReview}
         />
       )}
     </>

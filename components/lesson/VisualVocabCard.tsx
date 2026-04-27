@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Image from 'next/image';
 import { AudioPlayerButton } from './AudioPlayerButton';
 import type { SupportedLanguage } from '@/types';
@@ -11,6 +12,10 @@ interface VisualVocabCardProps {
   imageUrl?: string;
   imageAlt?: string;
   exampleSentence?: string;
+  /** Short definition in the target language (e.g. "un fruit rouge" for "pomme"). Shown on A2+ immersive mode. */
+  targetDefinition?: string;
+  /** When true, hides translation initially and shows targetDefinition instead. User taps to reveal. */
+  immersive?: boolean;
 }
 
 export function VisualVocabCard({
@@ -20,7 +25,12 @@ export function VisualVocabCard({
   imageUrl,
   imageAlt,
   exampleSentence,
+  targetDefinition,
+  immersive = false,
 }: VisualVocabCardProps) {
+  const [revealed, setRevealed] = useState(false);
+  const showImmersive = immersive && !!targetDefinition && !revealed;
+
   return (
     <div
       className="group relative overflow-hidden rounded-[1.25rem] transition-all duration-500 hover:-translate-y-1 hover:shadow-xl dark:hover:shadow-2xl/50"
@@ -28,6 +38,8 @@ export function VisualVocabCard({
         backgroundColor: 'var(--color-surface)',
         border: '1px solid var(--color-border)',
       }}
+      onClick={() => { if (immersive && !revealed) setRevealed(true); }}
+      role={immersive && !revealed ? 'button' : undefined}
     >
       {/* Image area with refined treatment */}
       <div
@@ -65,9 +77,16 @@ export function VisualVocabCard({
             >
               {word}
             </h3>
-            <p className="mt-0.5 text-xs font-medium text-white/80 italic tracking-wide">
-              {translation}
-            </p>
+            {showImmersive ? (
+              <p className="mt-0.5 text-xs font-medium text-white/70 italic tracking-wide">
+                {targetDefinition}
+                <span className="ml-1.5 text-[9px] text-white/40 not-italic">toque para traduzir</span>
+              </p>
+            ) : (
+              <p className="mt-0.5 text-xs font-medium text-white/80 italic tracking-wide">
+                {translation}
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -94,3 +113,4 @@ export function VisualVocabCard({
     </div>
   );
 }
+

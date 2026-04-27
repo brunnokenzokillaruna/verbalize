@@ -9,6 +9,9 @@ import { ScrambledConversation } from './ScrambledConversation';
 import { InteractiveSubtitles } from './InteractiveSubtitles';
 import { LogicConnectors } from './LogicConnectors';
 import { SpeakRepeatExercise } from './SpeakRepeatExercise';
+import { GrammarTrapExercise } from './GrammarTrapExercise';
+import { MinimalPairExercise } from './MinimalPairExercise';
+import { ConjugationSpeedExercise } from './ConjugationSpeedExercise';
 import type { Exercise, SupportedLanguage } from '@/types';
 
 interface LessonPracticeScreenProps {
@@ -154,6 +157,34 @@ export function LessonPracticeScreen({
           onAnswer={onAnswer}
           answered={exerciseAnswer !== null}
           setIsExerciseReady={setIsExerciseReady}
+        />
+      )}
+      {currentExercise.type === 'grammar-trap' && (
+        <GrammarTrapExercise
+          data={currentExercise.data}
+          onAnswer={onAnswer}
+          answered={exerciseAnswer !== null}
+          setIsExerciseReady={setIsExerciseReady}
+          submitTrigger={submitTrigger}
+        />
+      )}
+      {currentExercise.type === 'minimal-pair' && (
+        <MinimalPairExercise
+          data={currentExercise.data}
+          language={language}
+          onAnswer={onAnswer}
+          answered={exerciseAnswer !== null}
+          setIsExerciseReady={setIsExerciseReady}
+          submitTrigger={submitTrigger}
+        />
+      )}
+      {currentExercise.type === 'conjugation-speed' && (
+        <ConjugationSpeedExercise
+          data={currentExercise.data}
+          onAnswer={onAnswer}
+          answered={exerciseAnswer !== null}
+          setIsExerciseReady={setIsExerciseReady}
+          submitTrigger={submitTrigger}
         />
       )}
     </div>

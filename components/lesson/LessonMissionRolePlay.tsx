@@ -16,6 +16,7 @@ import {
 import { useAudio } from '@/hooks/useAudio';
 import { useVoiceRecorder } from '@/hooks/useVoiceRecorder';
 import { transcribeSpeech } from '@/app/actions/transcribeSpeech';
+import { evaluateFreeResponse } from '@/app/actions/evaluateFreeResponse';
 import { getFixedVoiceName } from '@/lib/voiceConfig';
 import type { SupportedLanguage } from '@/types';
 
@@ -23,6 +24,7 @@ interface LessonMissionRolePlayProps {
   dialogue: string;
   dialogueTranslations?: string[];
   language: SupportedLanguage;
+  intentMode?: boolean;
   onComplete: (spoken: number, totalSpeakable: number) => void;
 }
 
@@ -66,6 +68,7 @@ export function LessonMissionRolePlay({
   dialogue,
   dialogueTranslations,
   language,
+  intentMode = false,
   onComplete,
 }: LessonMissionRolePlayProps) {
   const lines = useMemo<DialogueLine[]>(() => {
@@ -94,6 +97,8 @@ export function LessonMissionRolePlay({
   const [recState, setRecState] = useState<RecState>('idle');
   const [transcript, setTranscript] = useState('');
   const [recordError, setRecordError] = useState('');
+  const [evalFeedback, setEvalFeedback] = useState('');
+  const [evalCorrected, setEvalCorrected] = useState('');
   const fixedVoice = useMemo(() => getFixedVoiceName(language), [language]);
   const { speak, stop: stopAudio } = useAudio(fixedVoice);
   const recorder = useVoiceRecorder();
@@ -120,6 +125,8 @@ export function LessonMissionRolePlay({
     setTranscript('');
     setRecordError('');
     setShowHint(false);
+    setEvalFeedback('');
+    setEvalCorrected('');
   }, [currentIdx]);
 
   function advance(spokeSuccessfully: boolean) {
@@ -181,8 +188,30 @@ export function LessonMissionRolePlay({
 
       const said = result.text.trim();
       setTranscript(said);
-      const score = similarity(current.text, said);
-      setRecState(score >= CORRECT_THRESHOLD ? 'review-correct' : 'review-retry');
+
+      if (intentMode) {
+        setRecState('transcribing');
+        const contextLines = lines.slice(Math.max(0, currentIdx - 3), currentIdx).map(l => `${l.speaker}: ${l.text}`);
+        const evalResult = await evaluateFreeResponse({
+          transcript: said,
+          intent: current.translation || '',
+          language,
+          previousContext: contextLines,
+        });
+
+        if (evalResult.error) {
+          setRecState('idle');
+          setRecordError(evalResult.feedback);
+          return;
+        }
+
+        setEvalFeedback(evalResult.feedback);
+        setEvalCorrected(evalResult.correctedSentence || '');
+        setRecState(evalResult.isCorrect ? 'review-correct' : 'review-retry');
+      } else {
+        const score = similarity(current.text, said);
+        setRecState(score >= CORRECT_THRESHOLD ? 'review-correct' : 'review-retry');
+      }
     } catch (err) {
       console.error('[LessonMissionRolePlay] transcription failed:', err);
       setRecState('idle');
@@ -249,6 +278,9 @@ export function LessonMissionRolePlay({
               transcript={transcript}
               recordError={recordError}
               score={score}
+              intentMode={intentMode}
+              evalFeedback={evalFeedback}
+              evalCorrected={evalCorrected}
               onToggleHint={() => setShowHint((s) => !s)}
               onRecord={startRecording}
               onStopRecord={stopRecording}
@@ -413,6 +445,9 @@ function UserTurn({
   transcript,
   recordError,
   score,
+  intentMode,
+  evalFeedback,
+  evalCorrected,
   onToggleHint,
   onRecord,
   onStopRecord,
@@ -428,6 +463,9 @@ function UserTurn({
   transcript: string;
   recordError: string;
   score: number;
+  intentMode: boolean;
+  evalFeedback: string;
+  evalCorrected: string;
   onToggleHint: () => void;
   onRecord: () => void;
   onStopRecord: () => void;
@@ -460,7 +498,21 @@ function UserTurn({
             border: '2px dashed var(--color-primary)',
           }}
         >
-          {showHint ? (
+          {intentMode ? (
+            <>
+              <p
+                className="text-base font-semibold leading-relaxed"
+                style={{ color: 'var(--color-text-primary)' }}
+              >
+                {line.translation}
+              </p>
+              {showHint && (
+                <p className="mt-2 text-xs italic" style={{ color: 'var(--color-text-muted)' }}>
+                  Dica de como falar: &ldquo;{line.text}&rdquo;
+                </p>
+              )}
+            </>
+          ) : showHint ? (
             <>
               <p
                 className="text-base font-semibold leading-relaxed"
@@ -614,11 +666,20 @@ function UserTurn({
                 <CheckCircle2 size={20} style={{ color: 'var(--color-success)' }} strokeWidth={2.5} />
                 <div>
                   <p className="text-xs font-black" style={{ color: 'var(--color-success)' }}>
-                    Perfeito! ({Math.round(score * 100)}% de precisão)
+                    {intentMode ? 'Perfeito!' : `Perfeito! (${Math.round(score * 100)}% de precisão)`}
                   </p>
                   <div className="mt-1.5">
-                    <WordDiff target={line.text} transcript={transcript} />
+                    {intentMode ? (
+                      <p className="text-sm">{evalFeedback}</p>
+                    ) : (
+                      <WordDiff target={line.text} transcript={transcript} />
+                    )}
                   </div>
+                  {intentMode && evalCorrected && (
+                    <p className="mt-2 text-xs font-bold text-[var(--color-success)] opacity-90">
+                      Dica: {evalCorrected}
+                    </p>
+                  )}
                 </div>
               </div>
               <button
@@ -647,11 +708,20 @@ function UserTurn({
                 <XCircle size={20} style={{ color: '#ef4444' }} strokeWidth={2.5} />
                 <div>
                   <p className="text-xs font-black" style={{ color: '#ef4444' }}>
-                    Quase lá ({Math.round(score * 100)}%)
+                    {intentMode ? 'Precisa melhorar' : `Quase lá (${Math.round(score * 100)}%)`}
                   </p>
                   <div className="mt-1.5">
-                    <WordDiff target={line.text} transcript={transcript} />
+                    {intentMode ? (
+                      <p className="text-sm">{evalFeedback}</p>
+                    ) : (
+                      <WordDiff target={line.text} transcript={transcript} />
+                    )}
                   </div>
+                  {intentMode && evalCorrected && (
+                    <p className="mt-2 text-xs font-bold text-[#ef4444] opacity-90">
+                      Tente dizer: {evalCorrected}
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-2.5">

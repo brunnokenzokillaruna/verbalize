@@ -86,7 +86,7 @@ function pickTopic(level: ProficiencyLevel, interests: string[]) {
 }
 
 const DIALOGUE_LINES: Record<ProficiencyLevel, number> = {
-  A1: 4, A2: 4, B1: 6, B2: 6, C1: 8, C2: 8,
+  A1: 6, A2: 6, B1: 8, B2: 8, C1: 10, C2: 10,
 };
 
 const LEVEL_DESCRIPTORS: Record<ProficiencyLevel, string> = {
@@ -250,6 +250,12 @@ export async function generateHook(params: GenerateHookParams): Promise<HookResu
     ? `"Você: <line 1>\\n<LocalRole>: <line 2>\\n..."`
     : `"${nameA}: <line 1>\\n${nameB}: <line 2>\\n..."`;
 
+  const intentMode = tag === 'MISS' && ['B1', 'B2', 'C1', 'C2'].includes(level);
+  
+  const translationInstruction = intentMode
+    ? `- INTENT MODE TRANSLATIONS: Because this is an advanced mission, 'dialogueTranslations' for the learner's ("Você") lines MUST BE INTENTS, not literal translations. Example: "Diga que você não concorda e sugira ir de trem." or "Peça a conta e pergunte se aceitam cartão." The local's lines should remain normal natural Portuguese translations.`
+    : `- NATURAL TRANSLATIONS: 'dialogueTranslations' must be NATURAL Brazilian Portuguese — NO dictionary-style parentheticals. Just how a Brazilian would say it.`;
+
   const prompt = `${speakerIntro}
 
 Requirements:
@@ -268,7 +274,7 @@ ${tagInstruction}
 ${knownVocabInstruction}
 ${dialogueVocabGuard}
 - DIALOGUE FLOW: Use fillers SPARINGLY and VARIED across lines (FR allowed: "Eh bien", "Alors", "Bah", "Oh", "Ah", "Bon", "Dis donc"; EN allowed: "Well", "So", "Actually", "Right", "Look", "You know"). FORBIDDEN word: "Tiens" — never use it, in any line, under any circumstance. Do NOT repeat the same filler twice in the same dialogue.
-- NATURAL TRANSLATIONS: 'dialogueTranslations' must be NATURAL Brazilian Portuguese — NO dictionary-style parentheticals. Just how a Brazilian would say it.
+${translationInstruction}
 
 LEVEL CONSTRAINTS (follow strictly):
 ${levelDesc}

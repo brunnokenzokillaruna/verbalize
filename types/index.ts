@@ -132,7 +132,10 @@ export type ExerciseType =
   | 'social-roleplay'
   | 'scrambled-conversation'
   | 'interactive-subtitles'
-  | 'logic-connectors';
+  | 'logic-connectors'
+  | 'grammar-trap'
+  | 'minimal-pair'
+  | 'conjugation-speed';
 
 // ─── Server Action Result Types ───────────────────────────────────────────────
 
@@ -299,6 +302,37 @@ export interface LogicConnectorsData {
   translation: string;
 }
 
+export interface GrammarTrapData {
+  scenario: string;        // PT-BR: brief context about the trap being tested
+  question: string;        // PT-BR: question shown to the student
+  options: Array<{
+    sentence: string;      // Sentence in target language
+    translation: string;   // PT-BR translation
+    isCorrect: boolean;    // Exactly ONE must be true
+  }>;
+  explanation: string;     // PT-BR: explanation shown when the student answers wrong
+  trapRule: string;        // PT-BR: 1 short sentence about the Brazilian error pattern
+}
+
+export interface MinimalPairData {
+  wordA: string;           // First word (target language)
+  wordB: string;           // Second word (minimal pair)
+  correctWord: string;     // Which word is being asked about — must equal wordA or wordB
+  sentenceContext: string; // A sentence using the correctWord in context
+  translation: string;     // PT-BR translation of the sentence
+  tip: string;             // PT-BR: pronunciation tip to distinguish the pair
+}
+
+export interface ConjugationSpeedData {
+  verb: string;            // Infinitive form
+  pronoun: string;         // Subject pronoun (e.g. "je", "il", "nous")
+  tense: string;           // PT-BR tense name (e.g. "presente")
+  correctForm: string;     // Correct conjugated form
+  options: string[];       // 4 options (1 correct + 3 distractors)
+  exampleSentence: string; // Full sentence using the correct form
+  translation: string;     // PT-BR translation
+}
+
 export type Exercise =
   | { type: 'context-choice';         data: ContextChoiceData }
   | { type: 'sentence-builder';       data: SentenceBuilderData }
@@ -309,4 +343,7 @@ export type Exercise =
   | { type: 'social-roleplay';        data: SocialRoleplayData }
   | { type: 'scrambled-conversation'; data: ScrambledConversationData }
   | { type: 'interactive-subtitles';  data: InteractiveSubtitlesData }
-  | { type: 'logic-connectors';       data: LogicConnectorsData };
+  | { type: 'logic-connectors';       data: LogicConnectorsData }
+  | { type: 'grammar-trap';           data: GrammarTrapData }
+  | { type: 'minimal-pair';           data: MinimalPairData }
+  | { type: 'conjugation-speed';      data: ConjugationSpeedData };

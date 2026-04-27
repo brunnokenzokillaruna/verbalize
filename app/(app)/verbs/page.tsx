@@ -9,6 +9,8 @@ import { AudioPlayerButton } from '@/components/lesson/AudioPlayerButton';
 import type { VerbDocument, SupportedLanguage } from '@/types';
 import { LANG_META } from './data';
 import { VerbTenseList } from './components';
+import { VerbDrillSession } from '@/components/verbs/VerbDrillSession';
+import { Timer, Zap } from 'lucide-react';
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
@@ -21,6 +23,10 @@ export default function VerbsPage() {
   const [openTenses, setOpenTenses] = useState<Set<string>>(new Set(['present']));
   const [learnedVerbs, setLearnedVerbs] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Drill state
+  const [drillState, setDrillState] = useState<'idle' | 'loading' | 'running'>('idle');
+  const [drillVerbs, setDrillVerbs] = useState<VerbDocument[]>([]);
 
   const language = (profile?.currentTargetLanguage ?? 'fr') as SupportedLanguage;
   const langMeta = LANG_META[language];
@@ -59,6 +65,34 @@ export default function VerbsPage() {
       else next.add(tense);
       return next;
     });
+  }
+
+  async function startDrill() {
+    if (learnedVerbs.length === 0) return;
+    setDrillState('loading');
+    
+    // Pick up to 5 random verbs to avoid hitting limits if they need generating
+    const shuffled = [...learnedVerbs].sort(() => 0.5 - Math.random());
+    const subset = shuffled.slice(0, 5);
+    
+    try {
+      const docs = await Promise.all(
+        subset.map(v => getVerbConjugation(v, language))
+      );
+      
+      const validDocs = docs.filter((d): d is VerbDocument => d !== null);
+      
+      if (validDocs.length > 0) {
+        setDrillVerbs(validDocs);
+        setDrillState('running');
+      } else {
+        setDrillState('idle');
+        setError('Não foi possível carregar os verbos para o desafio.');
+      }
+    } catch (err) {
+      setDrillState('idle');
+      setError('Erro ao iniciar o desafio.');
+    }
   }
 
   return (
@@ -155,8 +189,49 @@ export default function VerbsPage() {
 
             {/* Learned verbs */}
             {learnedVerbs.length > 0 && (
-              <div className="flex flex-col gap-3">
-                <div className="flex items-center gap-2">
+              <div className="flex flex-col gap-4">
+                
+                {/* Time attack CTA */}
+                <div 
+                  className="rounded-2xl p-4 flex items-center gap-4 animate-slide-up-spring"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(99,102,241,0.1) 0%, rgba(139,92,246,0.1) 100%)',
+                    border: '1.5px solid rgba(99,102,241,0.2)',
+                  }}
+                >
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-indigo-500 text-white">
+                    <Timer size={20} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-bold" style={{ color: 'var(--color-text-primary)' }}>
+                      Desafio de Verbos
+                    </p>
+                    <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-muted)' }}>
+                      Treine sua velocidade de conjugação
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={startDrill}
+                    disabled={drillState === 'loading'}
+                    className="shrink-0 flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all active:scale-95 text-white"
+                    style={{
+                      backgroundColor: '#6366f1',
+                      cursor: drillState === 'loading' ? 'wait' : 'pointer',
+                    }}
+                  >
+                    {drillState === 'loading' ? (
+                      <Loader2 size={14} className="animate-spin" />
+                    ) : (
+                      <>
+                        Começar
+                        <Zap size={14} />
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-2 mt-2">
                   <Sparkles size={13} style={{ color: 'var(--color-text-muted)' }} />
                   <p
                     className="text-xs font-bold uppercase tracking-widest"
@@ -407,6 +482,14 @@ export default function VerbsPage() {
           </div>
         )}
       </main>
+
+      {/* ── Drill Session Overlay ── */}
+      {drillState === 'running' && (
+        <VerbDrillSession
+          verbs={drillVerbs}
+          onClose={() => setDrillState('idle')}
+        />
+      )}
     </div>
   );
 }

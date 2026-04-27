@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   LogOut,
   Sun, Moon, Flame, Zap,
@@ -211,6 +211,8 @@ export default function DashboardPage() {
   );
   const [visibleThemeIdx, setVisibleThemeIdx] = useState<number | null>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const currentLessonRef = useRef<HTMLDivElement | null>(null);
+  const hasScrolledToCurrentRef = useRef(false);
   const [showSkipModal, setShowSkipModal] = useState(false);
   const [isSkipping, setIsSkipping] = useState(false);
   const [modalState, setModalState] = useState<{
@@ -251,6 +253,22 @@ export default function DashboardPage() {
   useEffect(() => {
     setVisibleThemeIdx(null);
   }, [selectedLevel]);
+
+  // Scroll to the current (frontier) lesson on initial mount
+  useEffect(() => {
+    if (hasScrolledToCurrentRef.current) return;
+    if (!currentLessonRef.current) return;
+
+    // Small delay to let the DOM fully render (animations, sticky headers, etc.)
+    const timer = setTimeout(() => {
+      if (currentLessonRef.current) {
+        currentLessonRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        hasScrolledToCurrentRef.current = true;
+      }
+    }, 350);
+
+    return () => clearTimeout(timer);
+  }, [frontierIndex, allLessons.length, selectedLevel]);
 
   async function handleLogout() {
     await logOut();
@@ -615,7 +633,8 @@ export default function DashboardPage() {
 
                   return (
                     <div 
-                      key={lesson.id} 
+                      key={lesson.id}
+                      ref={isCurrent ? currentLessonRef : undefined}
                       className="relative flex flex-col items-center animate-scale-in" 
                       style={{ 
                         animationDelay: `${localIdx * 40}ms`, 

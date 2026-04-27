@@ -2,7 +2,7 @@ import React from 'react';
 import { Loader2 } from 'lucide-react';
 import { VisualVocabCard } from './VisualVocabCard';
 
-import type { SupportedLanguage } from '@/types';
+import type { SupportedLanguage, ProficiencyLevel } from '@/types';
 
 interface LessonVocabularyScreenProps {
   isLoading: boolean;
@@ -10,7 +10,13 @@ interface LessonVocabularyScreenProps {
   vocabImages: Record<string, { imageUrl?: string; imageAlt?: string } | null>;
   vocabTranslations: Record<string, string>;
   language: SupportedLanguage;
+  /** Target-language definitions (e.g. "un fruit rouge") keyed by word. Used for immersive mode A2+. */
+  targetDefinitions?: Record<string, string>;
+  /** Lesson level — A2+ enables immersive mode on vocab cards. */
+  level?: ProficiencyLevel;
 }
+
+const IMMERSIVE_LEVELS: ReadonlySet<ProficiencyLevel> = new Set(['A2', 'B1', 'B2', 'C1', 'C2']);
 
 export function LessonVocabularyScreen({
   isLoading,
@@ -18,7 +24,11 @@ export function LessonVocabularyScreen({
   vocabImages,
   vocabTranslations,
   language,
+  targetDefinitions,
+  level,
 }: LessonVocabularyScreenProps) {
+  const useImmersive = !!level && IMMERSIVE_LEVELS.has(level) && !!targetDefinitions;
+
   return (
     <div className="flex flex-col gap-6">
       {/* Header section with refined typography and icon */}
@@ -72,6 +82,8 @@ export function LessonVocabularyScreen({
                 language={language}
                 imageUrl={img?.imageUrl}
                 imageAlt={img?.imageAlt}
+                targetDefinition={useImmersive ? targetDefinitions[word] : undefined}
+                immersive={useImmersive}
               />
             </div>
           );
@@ -80,3 +92,4 @@ export function LessonVocabularyScreen({
     </div>
   );
 }
+

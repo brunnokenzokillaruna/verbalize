@@ -22,6 +22,12 @@ export function buildMistakeContext(exercise: Exercise): string {
       return `Subtitles fix: "${exercise.data.correctText}"`;
     case 'logic-connectors':
       return `Connectors: "${exercise.data.partA} [ ] ${exercise.data.partB}"`;
+    case 'grammar-trap':
+      return `Grammar trap: "${exercise.data.options.find(o => o.isCorrect)?.sentence}" — trapRule: "${exercise.data.trapRule}"`;
+    case 'minimal-pair':
+      return `Minimal pair: context "${exercise.data.sentenceContext}" — correct word: "${exercise.data.correctWord}" vs wrong option.`;
+    case 'conjugation-speed':
+      return `Conjugation speed: "${exercise.data.pronoun}" + "${exercise.data.verb}" — correct form: "${exercise.data.correctForm}"`;
   }
 }
 

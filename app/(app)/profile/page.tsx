@@ -18,7 +18,7 @@ import { SectionLabel } from '@/components/profile/SectionLabel';
 import { MistakesSection } from '@/components/profile/MistakesSection';
 import { DeleteAccountSheet } from '@/components/profile/DeleteAccountSheet';
 
-const ADMIN_EMAIL = 'brunnokenzokillaruna@gmail.com';
+const ADMIN_EMAIL = 'admin@gmail.com';
 
 const PROFESSIONS = [
   'Estudante', 'Tecnologia / TI', 'Saúde', 'Educação',

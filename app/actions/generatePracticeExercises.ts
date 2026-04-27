@@ -27,7 +27,10 @@ type ExerciseTypeId =
   | 'social-roleplay'
   | 'scrambled-conversation'
   | 'interactive-subtitles'
-  | 'logic-connectors';
+  | 'logic-connectors'
+  | 'grammar-trap'
+  | 'minimal-pair'
+  | 'conjugation-speed';
 
 // Tiered progression: free-writing types (audio-dictation, reverse-translation) are
 // gated behind sufficient vocabulary so absolute beginners aren't asked to produce
@@ -99,6 +102,35 @@ function buildTypeDescriptions(langLabel: string): Record<ExerciseTypeId, string
     - "partA" (first half), "partB" (second half).
     - "options" (3 connectors like 'but', 'because', 'so').
     - "correctConnector", "translation" (PT-BR).`,
+    'grammar-trap': `type "grammar-trap":
+   - This exercise tests whether the student can identify the CORRECT sentence among traps.
+   - "scenario" (PT-BR, 1-2 sentences): brief context about the Brazilian interference being tested.
+   - "question" (PT-BR): e.g. "Qual destas frases esta CORRETA?"
+   - "options": array of EXACTLY 4 objects, each with:
+     - "sentence" (target language): a complete sentence
+     - "translation" (PT-BR): natural translation
+     - "isCorrect" (boolean): EXACTLY ONE must be true
+   - The 3 incorrect options MUST contain classic errors Brazilians make due to Portuguese interference on the grammar focus of this lesson.
+   - The 1 correct option must be perfectly grammatical.
+   - "explanation" (PT-BR): clear explanation of WHY the correct answer is right and why the traps are wrong.
+   - "trapRule" (PT-BR, 1 sentence): the core Brazilian error pattern.`,
+    'minimal-pair': `type "minimal-pair":
+   - This exercise trains auditory discrimination between similar-sounding words.
+   - "wordA" (target language): first word of the pair (e.g. "poisson").
+   - "wordB" (target language): second word, minimal pair (e.g. "poison"). Must differ by only 1-2 sounds.
+   - "correctWord": which word fits the sentence context (must equal wordA or wordB).
+   - "sentenceContext" (target language): a sentence using the correctWord naturally.
+   - "translation" (PT-BR): translation of the sentence.
+   - "tip" (PT-BR): a pronunciation tip to help distinguish the two sounds.`,
+    'conjugation-speed': `type "conjugation-speed":
+   - This exercise tests quick verb conjugation.
+   - "verb" (infinitive form in target language).
+   - "pronoun" (subject pronoun, e.g. "je", "il", "nous", "vous").
+   - "tense" (PT-BR tense name, e.g. "presente", "passe compose").
+   - "correctForm" (correctly conjugated form).
+   - "options" (array of EXACTLY 4 strings: 1 correct + 3 plausible but wrong conjugations).
+   - "exampleSentence" (target language): a complete sentence using the correct form.
+   - "translation" (PT-BR): translation of the example sentence.`,
   };
 }
 
@@ -108,21 +140,52 @@ function buildTagGuidance(tag: LessonTag, allowed: Set<ExerciseTypeId>): string 
 
   if (tag === 'PRON') {
     const types = pick(['speak-repeat', 'audio-dictation', 'interactive-subtitles']);
-    return types.length ? `- Focus heavily on ${list(types)} (at least 3 out of 5).` : '';
+    return [
+      `- The FIRST exercise (index 0) MUST be of type 'minimal-pair'. This is mandatory for PRON lessons.`,
+      types.length ? `- The remaining 4 exercises should focus heavily on ${list(types)} (at least 3 out of 4).` : '',
+    ].filter(Boolean).join('\n');
   }
   if (tag === 'GRAM') {
     const types = pick(['error-correction', 'sentence-builder', 'context-choice']);
-    return types.length ? `- Focus on ${list(types)} to reinforce the grammar structure.` : '';
+    return [
+      `- The FIRST exercise (index 0) MUST be of type 'grammar-trap'. This is mandatory for GRAM lessons.`,
+      types.length ? `- The remaining 4 exercises should focus on ${list(types)} to reinforce the grammar structure.` : '',
+    ].filter(Boolean).join('\n');
   }
   if (tag === 'VOC') {
     const types = pick(['context-choice', 'reverse-translation', 'sentence-builder']);
-    return types.length ? `- Focus on ${list(types)} used in very simple sentences.` : '';
+    return [
+      types.length ? `- Focus on ${list(types)} used in very simple sentences.` : '',
+      `- MINI-STORY: All 5 exercise sentences MUST form a coherent micro-narrative. Sentence 2 must follow from sentence 1, sentence 3 from sentence 2, etc. Imagine a short story unfolding — each exercise is the next scene. This makes the vocabulary stick through narrative context.`,
+    ].filter(Boolean).join('\n');
   }
-  if (tag === 'DIAL' || tag === 'MISS') {
+  if (tag === 'DIAL') {
+    const types = pick(['social-roleplay', 'scrambled-conversation', 'interactive-subtitles']);
+    return [
+      types.length
+        ? `- Focus on ${list(types)} to simulate real-world usage. Use scenarios a Brazilian would realistically encounter: at a French restaurant, at a hotel in Lyon, on the Paris metro, at a French pharmacy, at an airport, in a Parisian shop.`
+        : '',
+      `- MINI-STORY: All 5 exercise sentences MUST form a coherent micro-narrative. Sentence 2 must follow from sentence 1, sentence 3 from sentence 2, etc. Imagine a short story unfolding — each exercise is the next scene.`,
+    ].filter(Boolean).join('\n');
+  }
+  if (tag === 'MISS') {
     const types = pick(['social-roleplay', 'scrambled-conversation', 'interactive-subtitles']);
     return types.length
-      ? `- Focus on ${list(types)} to simulate real-world usage. Use scenarios a Brazilian would realistically encounter: at a French restaurant, at a hotel in Lyon, on the Paris metro, at a French pharmacy, at an airport, in a Parisian shop.`
+      ? `- Focus on ${list(types)} to simulate real-world usage. Use scenarios a Brazilian would realistically encounter.`
       : '';
+  }
+  if (tag === 'EXPR') {
+    const types = pick(['social-roleplay', 'context-choice', 'sentence-builder']);
+    return types.length
+      ? `- At least 2 out of 5 exercises MUST be 'social-roleplay' where the correct option uses the target expression naturally. The other options should be grammatically correct but less natural/idiomatic.\n- The remaining exercises should focus on ${list(types)}.`
+      : '';
+  }
+  if (tag === 'VERB') {
+    const types = pick(['error-correction', 'sentence-builder', 'context-choice']);
+    return [
+      `- The FIRST exercise (index 0) MUST be of type 'conjugation-speed'. This is mandatory for VERB lessons.`,
+      types.length ? `- The remaining 4 exercises should focus on ${list(types)} to reinforce the verb conjugation patterns.` : '',
+    ].filter(Boolean).join('\n');
   }
   return '';
 }
@@ -157,7 +220,22 @@ export async function generatePracticeExercises(
   const allowedTypes = getAllowedExerciseTypes(level, knownVocabulary.length);
   const allowedSet = new Set(allowedTypes);
   const typeDescriptions = buildTypeDescriptions(LANG_LABEL[language]);
-  const poolSection = allowedTypes.map((t, i) => `${i + 1}. ${typeDescriptions[t]}`).join('\n\n');
+
+  // Inject tag-exclusive exercise types into the pool
+  if (tag === 'GRAM') allowedSet.add('grammar-trap');
+  if (tag === 'PRON') allowedSet.add('minimal-pair');
+  if (tag === 'VERB') allowedSet.add('conjugation-speed');
+
+  const tagExclusive: ExerciseTypeId | null =
+    tag === 'GRAM' ? 'grammar-trap' :
+    tag === 'PRON' ? 'minimal-pair' :
+    tag === 'VERB' ? 'conjugation-speed' : null;
+
+  const poolTypes: ExerciseTypeId[] = tagExclusive
+    ? [tagExclusive, ...allowedTypes]
+    : allowedTypes;
+
+  const poolSection = poolTypes.map((t, i) => `${i + 1}. ${typeDescriptions[t]}`).join('\n\n');
   const tagGuidance = buildTagGuidance(tag, allowedSet);
 
   const vocabConstraint = isEarlyLearner
@@ -261,8 +339,71 @@ Example for social-roleplay:
         }
         return true;
       }
+      if (ex.type === 'grammar-trap') {
+        const d = ex.data as {
+          scenario: string;
+          question: string;
+          options: Array<{ sentence: string; translation: string; isCorrect: boolean }>;
+          explanation: string;
+          trapRule: string;
+        };
+        if (
+          !d.scenario ||
+          !d.question ||
+          !d.explanation ||
+          !d.trapRule ||
+          !Array.isArray(d.options) ||
+          d.options.length !== 4 ||
+          d.options.filter((o) => o.isCorrect).length !== 1
+        ) {
+          console.warn('[generatePracticeExercises] Dropped malformed grammar-trap exercise');
+          return false;
+        }
+        return true;
+      }
+      if (ex.type === 'minimal-pair') {
+        const d = ex.data as {
+          wordA: string; wordB: string; correctWord: string;
+          sentenceContext: string; translation: string; tip: string;
+        };
+        if (
+          !d.wordA || !d.wordB || !d.correctWord ||
+          !d.sentenceContext || !d.translation || !d.tip ||
+          (d.correctWord !== d.wordA && d.correctWord !== d.wordB)
+        ) {
+          console.warn('[generatePracticeExercises] Dropped malformed minimal-pair exercise');
+          return false;
+        }
+        return true;
+      }
+      if (ex.type === 'conjugation-speed') {
+        const d = ex.data as {
+          verb: string; pronoun: string; tense: string;
+          correctForm: string; options: string[];
+          exampleSentence: string; translation: string;
+        };
+        if (
+          !d.verb || !d.pronoun || !d.tense || !d.correctForm ||
+          !d.exampleSentence || !d.translation ||
+          !Array.isArray(d.options) || d.options.length !== 4 ||
+          !d.options.includes(d.correctForm)
+        ) {
+          console.warn('[generatePracticeExercises] Dropped malformed conjugation-speed exercise');
+          return false;
+        }
+        return true;
+      }
       return true;
     });
+
+    // For tag-exclusive exercises, ensure they are at index 0
+    if (tagExclusive) {
+      const exclusiveIdx = validated.findIndex((ex) => ex.type === tagExclusive);
+      if (exclusiveIdx > 0) {
+        const [exclusive] = validated.splice(exclusiveIdx, 1);
+        validated.unshift(exclusive);
+      }
+    }
 
     return validated;
   } catch (err) {

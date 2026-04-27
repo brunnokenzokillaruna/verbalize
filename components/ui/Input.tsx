@@ -1,5 +1,6 @@
-import { type InputHTMLAttributes, forwardRef } from 'react';
+import { type InputHTMLAttributes, forwardRef, useState } from 'react';
 import type { LucideIcon } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -8,8 +9,12 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, icon: Icon, id, className = '', ...rest }, ref) => {
+  ({ label, error, icon: Icon, id, className = '', type, ...rest }, ref) => {
     const inputId = id ?? label?.toLowerCase().replace(/\s+/g, '-');
+    const isPasswordField = type === 'password';
+    const [showPassword, setShowPassword] = useState(false);
+
+    const resolvedType = isPasswordField && showPassword ? 'text' : type;
 
     return (
       <div className="flex flex-col gap-1.5">
@@ -36,9 +41,11 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           <input
             ref={ref}
             id={inputId}
+            type={resolvedType}
             className={[
               'w-full rounded-2xl border px-4 py-3 text-base outline-none transition-all duration-150',
               Icon ? 'pl-10' : '',
+              isPasswordField ? 'pr-11' : '',
               className,
             ]
               .filter(Boolean)
@@ -72,6 +79,19 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             }}
             {...rest}
           />
+
+          {isPasswordField && (
+            <button
+              type="button"
+              tabIndex={-1}
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center rounded-lg p-0.5 transition-colors duration-150 hover:opacity-70"
+              style={{ color: 'var(--color-text-muted)' }}
+              aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          )}
         </div>
 
         {error && (

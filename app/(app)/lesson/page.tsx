@@ -302,6 +302,9 @@ export default function LessonPage() {
     switch (activeExercise.type) {
       case 'context-choice':   return activeExercise.data.blankWord;
       case 'error-correction': return activeExercise.data.correct_word;
+      case 'grammar-trap':     return activeExercise.data.options.find(o => o.isCorrect)?.sentence;
+      case 'minimal-pair':     return activeExercise.data.correctWord;
+      case 'conjugation-speed':return activeExercise.data.correctForm;
       default:                 return undefined;
     }
   })();
@@ -376,6 +379,16 @@ export default function LessonPage() {
             vocabImages={store.vocabImages}
             vocabTranslations={store.vocabTranslations}
             language={store.lesson.language}
+            level={store.lesson.level}
+            targetDefinitions={
+              store.hook.vocabTranslations
+                ? Object.fromEntries(
+                    Object.entries(store.hook.vocabTranslations)
+                      .filter(([, v]) => v?.example)
+                      .map(([k, v]) => [k, v.example])
+                  )
+                : undefined
+            }
           />
         )}
 
@@ -415,6 +428,7 @@ export default function LessonPage() {
             dialogue={store.hook.dialogue}
             dialogueTranslations={store.hook.dialogueTranslations}
             language={store.lesson.language}
+            intentMode={['B1', 'B2', 'C1', 'C2'].includes(store.lesson.level)}
             onComplete={(spoken, total) => store.completeRolePlay(spoken, total)}
           />
         )}
