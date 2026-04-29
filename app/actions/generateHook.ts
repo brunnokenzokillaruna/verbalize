@@ -199,6 +199,7 @@ export async function generateHook(params: GenerateHookParams): Promise<HookResu
 - SIMPLICITY: Keep the rest of the sentence structure extremely simple so the student can isolate the grammar focus easily.`;
   } else if (tag === 'VOC') {
     tagInstruction = `- VOCABULARY OVER EVERYTHING: The dialogue is merely a vehicle for the 4 words in 'newVocabulary'. Keep the dialogue lines SHORT (max 6 words) and the grammar invisible.
+- TARGET VOCABULARY: The specific word(s) mentioned in the 'Pedagogical Focus' MUST be included as part of the 4 words in 'newVocabulary' and MUST be used in the dialogue. Extract the core word from the focus text (e.g., if it says 'Vocabulário: Bon', the word is 'bon'). The other words should be related to the scene.
 - FOCUS: Do NOT introduce ANY new grammar or complex verbs. Use only the most basic verbs (être/avoir/aller/faire in FR, be/have/go/do in EN) to support the vocabulary.`;
   } else if (tag === 'PRON') {
     tagInstruction = `- PHONETIC FOCUS: The dialogue should naturally feature many instances of the sounds or letters in '${grammarFocus}'.
@@ -230,7 +231,17 @@ export async function generateHook(params: GenerateHookParams): Promise<HookResu
   const systemPrompt = `You are an expert language teacher creating content for Brazilian Portuguese speakers learning ${lang}. Respond with ONLY valid JSON, no markdown, no explanation.`;
 
   const isEarlyLearner = knownVocabulary.length < 30;
-  const normalizedKnown = knownVocabulary.map((w) => w.toLowerCase());
+  let normalizedKnown = knownVocabulary.map((w) => w.toLowerCase());
+
+  let targetVocabWord = '';
+  if (tag === 'VOC') {
+    // If grammarFocus looks like "Vocabulário: Bon", extract "bon" and remove it from known list
+    // so the AI isn't forced to exclude it from newVocabulary.
+    targetVocabWord = grammarFocus.replace(/vocabulario:|vocabulário:|vocabulary:/i, '').trim().toLowerCase();
+    if (targetVocabWord) {
+      normalizedKnown = normalizedKnown.filter((w) => w !== targetVocabWord);
+    }
+  }
 
   const knownVocabInstruction = normalizedKnown.length > 0
     ? `- CRITICAL REPETITION RULE: The user has already learned the following words. You MUST NOT include any of these in 'newVocabulary': [${normalizedKnown.slice(-1000).join(', ')}]`
@@ -249,6 +260,10 @@ export async function generateHook(params: GenerateHookParams): Promise<HookResu
   const jsonDialogueTemplate = tag === 'MISS'
     ? `"Você: <line 1>\\n<LocalRole>: <line 2>\\n..."`
     : `"${nameA}: <line 1>\\n${nameB}: <line 2>\\n..."`;
+
+  const newVocabTemplate = targetVocabWord
+    ? `["${targetVocabWord}", "non_verb_word_2", "non_verb_word_3", "non_verb_word_4"]`
+    : `["non_verb_word_1", "non_verb_word_2", "non_verb_word_3", "non_verb_word_4"]`;
 
   const intentMode = tag === 'MISS' && ['B1', 'B2', 'C1', 'C2'].includes(level);
   
@@ -283,7 +298,7 @@ Output ONLY this JSON object (no extra text):
 {
   "dialogue": ${jsonDialogueTemplate},
   "dialogueTranslations": ["<pt-BR line 1>", "<pt-BR line 2>", ...],
-  "newVocabulary": ["non_verb_word_1", "non_verb_word_2", "non_verb_word_3", "non_verb_word_4"],
+  "newVocabulary": ${newVocabTemplate},
   "dialogueVerbs": ["verb_infinitive_1", "verb_infinitive_2", ...],
   "grammarFocus": "one sentence describing the grammar used",
   "imageKeywords": {

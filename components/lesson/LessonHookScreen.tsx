@@ -6,6 +6,7 @@ import type { WordClickPayload } from './ClickableWord';
 interface LessonHookScreenProps {
   dialogue: string;
   newVocabulary: string[];
+  newVerbs?: string[];
   dialogueTranslations?: string[];
   isPlaying: boolean;
   isLoadingAudio: boolean;
@@ -17,6 +18,7 @@ interface LessonHookScreenProps {
 export function LessonHookScreen({
   dialogue,
   newVocabulary,
+  newVerbs,
   dialogueTranslations,
   isPlaying,
   isLoadingAudio,
@@ -118,6 +120,7 @@ export function LessonHookScreen({
                   <ClickableSentence
                     text={text}
                     newVocabulary={[...new Set(newVocabulary)]}
+                    newVerbs={newVerbs ? [...new Set(newVerbs)] : []}
                     onWordClick={onWordClick}
                     className={`leading-relaxed transition-all duration-300 ${isSecondSpeaker ? 'text-right' : 'text-left'} ${isActive ? 'text-[1.05rem] font-medium' : 'text-base opacity-90'}`}
                   />

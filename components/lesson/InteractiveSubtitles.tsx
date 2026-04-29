@@ -13,6 +13,8 @@ export function InteractiveSubtitles({ data, onAnswer, answered, setIsExerciseRe
   const [selectedWords, setSelectedWords] = useState<string[]>([]);
   
   const words = data.errorText.split(' ');
+  
+  const cleanWord = (w: string) => w.replace(/[.,!?;:'"]/g, '').toLowerCase();
 
   const toggleWord = (word: string) => {
     if (answered) return;
@@ -25,8 +27,9 @@ export function InteractiveSubtitles({ data, onAnswer, answered, setIsExerciseRe
   };
 
   const handleCheck = () => {
+    const normalizedWrongWords = data.wrongWords.map(cleanWord);
     const isCorrect = selectedWords.length === data.wrongWords.length && 
-                      selectedWords.every(w => data.wrongWords.includes(w));
+                      selectedWords.every(w => normalizedWrongWords.includes(cleanWord(w)));
     onAnswer(isCorrect);
   };
 
@@ -41,7 +44,7 @@ export function InteractiveSubtitles({ data, onAnswer, answered, setIsExerciseRe
         <div className="flex flex-wrap gap-x-2 gap-y-3 p-6 rounded-2xl bg-white/5 ring-1 ring-white/10 backdrop-blur-md">
           {words.map((word, idx) => {
             const isSelected = selectedWords.includes(word);
-            const isWrong = data.wrongWords.includes(word);
+            const isWrong = data.wrongWords.some(ww => cleanWord(ww) === cleanWord(word));
             
             let btnStyles = "px-1.5 py-0.5 rounded-md transition-all duration-200 border-b-2 border-transparent ";
             if (isSelected) btnStyles += "bg-[var(--color-primary)]/20 border-[var(--color-primary)] text-[var(--color-primary)] font-bold ";

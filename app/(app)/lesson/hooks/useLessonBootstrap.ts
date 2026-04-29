@@ -382,7 +382,7 @@ export function useLessonBootstrap({
     if (!nextLesson) return;
 
     console.log(`[Timing] 🔮 Pregen próxima lição disparado (background): ${nextLessonId}`);
-    pregenerateNextLesson(user.uid, nextLesson, profile.interests ?? []).catch(console.error);
+    pregenerateNextLesson(user.uid, nextLesson, profile.interests ?? [], store.knownVocabulary).catch(console.error);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [store.phase]);
 

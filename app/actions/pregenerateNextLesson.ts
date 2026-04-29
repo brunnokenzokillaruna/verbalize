@@ -8,7 +8,7 @@ import { savePregeneratedLesson, getUserVocabulary } from '@/services/firestore'
 import { getPreviousTopics } from '@/lib/curriculum';
 import type { LessonDefinition, LessonTag, GrammarBridgeResult, Exercise, MissionBriefingResult } from '@/types';
 
-const TAGS_WITH_GRAMMAR_PHASE: ReadonlySet<LessonTag> = new Set(['GRAM', 'VERB', 'CULT']);
+const TAGS_WITH_GRAMMAR_PHASE: ReadonlySet<LessonTag> = new Set(['GRAM', 'VERB', 'CULT', 'VOC']);
 
 /**
  * Generates the full content for `lesson` in the background (hook + grammar
@@ -22,10 +22,9 @@ export async function pregenerateNextLesson(
   uid: string,
   lesson: LessonDefinition,
   interests: string[],
+  knownVocabulary: string[]
 ): Promise<void> {
   try {
-    const vocabDocs = await getUserVocabulary(uid, lesson.language);
-    const knownVocabulary = vocabDocs.map((doc) => doc.word);
 
     const hook = await generateHook({
       language: lesson.language,
@@ -44,7 +43,7 @@ export async function pregenerateNextLesson(
     const bridgePromise: Promise<GrammarBridgeResult | null> = needsGrammarBridge
       ? generateGrammarBridge({
           dialogue: hook.dialogue,
-          grammarFocus: hook.grammarFocus,
+          grammarFocus: lesson.tag === 'VOC' ? lesson.grammarFocus : hook.grammarFocus,
           language: lesson.language,
           tag: lesson.tag,
         }).catch((err) => {

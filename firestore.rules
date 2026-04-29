@@ -59,7 +59,7 @@ service cloud.firestore {
     match /lesson_pregen/{docId} {
       allow read, delete: if request.auth != null
         && resource.data.uid == request.auth.uid;
-      allow create: if true;
+      allow create, update: if true;
     }
   }
 }

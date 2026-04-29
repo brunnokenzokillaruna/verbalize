@@ -84,7 +84,8 @@ function buildTypeDescriptions(langLabel: string): Record<ExerciseTypeId, string
    - Short ORIGINAL sentence. "text" (${langLabel}), "translation" (PT-BR).`,
     'sentence-builder': `type "sentence-builder":
    - Short ORIGINAL sentence (3-8 words).
-   - "words" (shuffled array), "correctOrder" (correct array), "translation" (PT-BR).`,
+   - "correctOrder" (array of words in the correct order), "words" (array of the EXACT same words, shuffled), "translation" (PT-BR).
+   - CRITICAL: "words" MUST contain the exact same words as "correctOrder". No missing words, no extra distractors.`,
     'social-roleplay': `type "social-roleplay":
    - "context" (PT-BR) describing the situation.
    - "promptLine" (${langLabel}) what the NPC says.
@@ -324,11 +325,21 @@ Example for social-roleplay:
         return true;
       }
       if (ex.type === 'sentence-builder') {
-        const { words, correctOrder } = ex.data as { words: string[]; correctOrder: string[] };
-        if (!words?.length || !correctOrder?.length || words.length !== correctOrder.length) {
+        const data = ex.data as { words: string[]; correctOrder: string[] };
+        if (!data.words?.length || !data.correctOrder?.length) {
           console.warn('[generatePracticeExercises] Dropped malformed sentence-builder exercise');
           return false;
         }
+        
+        // Check if words match correctOrder. If not, auto-fix to prevent missing/extra words.
+        const sortedWords = [...data.words].map(w => w.trim().toLowerCase()).sort();
+        const sortedCorrect = [...data.correctOrder].map(w => w.trim().toLowerCase()).sort();
+        
+        if (sortedWords.join(',') !== sortedCorrect.join(',')) {
+          console.warn('[generatePracticeExercises] Auto-fixing mismatched words in sentence-builder');
+          data.words = [...data.correctOrder].sort(() => Math.random() - 0.5);
+        }
+        
         return true;
       }
       if (ex.type === 'context-choice') {

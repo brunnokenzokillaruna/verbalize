@@ -10,6 +10,7 @@ export interface WordClickPayload {
 interface ClickableWordProps {
   word: string;
   isNewVocabulary?: boolean;
+  isNewVerb?: boolean;
   isPunctuation?: boolean;
   onWordClick?: (payload: WordClickPayload) => void;
 }
@@ -17,6 +18,7 @@ interface ClickableWordProps {
 export function ClickableWord({
   word,
   isNewVocabulary = false,
+  isNewVerb = false,
   isPunctuation = false,
   onWordClick,
 }: ClickableWordProps) {
@@ -37,7 +39,11 @@ export function ClickableWord({
     onWordClick({ word, rect });
   }
 
-  if (isNewVocabulary) {
+  if (isNewVocabulary || isNewVerb) {
+    const mainColor = isNewVerb ? 'var(--color-verb)' : 'var(--color-vocab)';
+    const bgColor = isNewVerb ? 'var(--color-verb-bg)' : 'var(--color-vocab-bg)';
+    const rippleBorderColor = isNewVerb ? 'rgba(124, 58, 237, 0.25)' : 'rgba(217, 119, 6, 0.25)';
+
     return (
       <span
         onClick={handleClick}
@@ -46,10 +52,10 @@ export function ClickableWord({
         onKeyDown={(e) => e.key === 'Enter' && handleClick(e as never)}
         className="relative inline-block cursor-pointer select-none rounded-[4px] px-1 transition-all duration-200"
         style={{
-          color: 'var(--color-vocab)',
-          borderBottom: `1.5px solid ${ripple ? 'var(--color-vocab)' : 'rgba(217, 119, 6, 0.25)'}`,
+          color: mainColor,
+          borderBottom: `1.5px solid ${ripple ? mainColor : rippleBorderColor}`,
           fontWeight: 600,
-          backgroundColor: ripple ? 'var(--color-vocab-bg)' : 'transparent',
+          backgroundColor: ripple ? bgColor : 'transparent',
         }}
         aria-label={`Traduzir: ${word}`}
       >
@@ -57,7 +63,7 @@ export function ClickableWord({
           <span
             className="absolute inset-0 rounded-[4px]"
             style={{
-              backgroundColor: 'var(--color-vocab)',
+              backgroundColor: mainColor,
               opacity: 0.1,
               animation: 'fade-in 400ms ease forwards',
               pointerEvents: 'none',

@@ -6,6 +6,7 @@ interface ClickableSentenceProps {
   text: string;
   /** Words that should be highlighted as new vocabulary */
   newVocabulary?: string[];
+  newVerbs?: string[];
   onWordClick?: (payload: WordClickPayload) => void;
   className?: string;
 }
@@ -46,6 +47,7 @@ function matchesVocab(token: string, vocabWords: string[]): boolean {
 export function ClickableSentence({
   text,
   newVocabulary = [],
+  newVerbs = [],
   onWordClick,
   className = '',
 }: ClickableSentenceProps) {
@@ -86,6 +88,7 @@ export function ClickableSentence({
             key={i}
             word={token.value}
             isNewVocabulary={matchesVocab(clean, newVocabulary)}
+            isNewVerb={matchesVocab(clean, newVerbs)}
             onWordClick={onWordClick}
           />
         );

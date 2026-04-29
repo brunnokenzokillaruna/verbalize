@@ -13,6 +13,7 @@ const STAGES_BY_TAG: Record<LessonTag, { key: LessonStage; label: string }[]> = 
   VOC: [
     { key: 'vocabulary', label: 'Vocabulário' },
     { key: 'hook',       label: 'Diálogo' },
+    { key: 'grammar',    label: 'Gramática' },
     { key: 'practice',   label: 'Prática' },
   ],
   PRON: [

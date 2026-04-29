@@ -12,7 +12,7 @@ import type { LessonPhase } from '@/store/lessonStore';
 
 const LESSON_FLOW: Record<LessonTag, LessonPhase[]> = {
   GRAM: ['vocabulary', 'hook', 'grammar',   'practice', 'complete'],
-  VOC:  ['vocabulary', 'hook',               'practice', 'complete'],
+  VOC:  ['vocabulary', 'hook', 'grammar',   'practice', 'complete'],
   PRON: ['vocabulary', 'hook', 'phonetics', 'practice', 'complete'],
   DIAL: ['vocabulary', 'hook',               'practice', 'complete'],
   MISS: ['mission',    'vocabulary', 'role-play', 'practice', 'complete'],
@@ -123,7 +123,7 @@ export function useLessonFlow({
         grammarBridgePrefetchRef.current ??
         generateGrammarBridge({
           dialogue: store.hook.dialogue,
-          grammarFocus: store.hook.grammarFocus,
+          grammarFocus: store.lesson.tag === 'VOC' ? store.lesson.grammarFocus : store.hook.grammarFocus,
           language: store.lesson.language,
           tag: store.lesson.tag,
         })

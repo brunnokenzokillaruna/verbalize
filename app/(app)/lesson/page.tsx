@@ -392,11 +392,11 @@ export default function LessonPage() {
           />
         )}
 
-        {/* ── Hook phase ── */}
         {phase === 'hook' && store.hook && store.lesson && (
           <LessonHookScreen
             dialogue={store.hook.dialogue}
-            newVocabulary={[...store.hook.newVocabulary, ...store.discoveredVerbs]}
+            newVocabulary={[...store.hook.newVocabulary]}
+            newVerbs={[...store.discoveredVerbs]}
             dialogueTranslations={store.hook.dialogueTranslations}
             isPlaying={isPlaying}
             isLoadingAudio={isLoadingAudio}
