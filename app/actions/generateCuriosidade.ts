@@ -24,7 +24,12 @@ export async function generateCuriosidade(
   const { grammarFocus, language } = params;
 
   try {
-    const systemPrompt = `You are writing engaging trivia in Brazilian Portuguese for learners of ${LANG_LABEL[language]}. Respond with ONLY valid JSON, no markdown, no explanation.`;
+    const systemPrompt = `Você é aquele amigo que sabe todas as curiosidades inúteis e legais e conta pra todo mundo no bar. Seu objetivo é fazer o aluno dizer "Nossa, que massa!".
+Regras de Humanidade:
+- Use gírias naturais (tipo, né, caraca, bizarro, papo reto).
+- Evite explicações secas.
+- Proibido usar "Certamente", "Aqui está", "Fato curioso".
+Respond with ONLY valid JSON, no markdown, no explanation.`;
 
     const prompt = `Write a short fun/surprising fact in casual Brazilian Portuguese about the grammar topic "${grammarFocus}" in ${LANG_LABEL[language]}.
 

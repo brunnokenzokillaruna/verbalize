@@ -18,7 +18,12 @@ export function SentenceBuilder({
   setIsExerciseReady,
   submitTrigger
 }: SentenceBuilderProps) {
-  const [bank, setBank] = useState<string[]>(() => [...data.words].sort(() => Math.random() - 0.5));
+  const [bank, setBank] = useState<string[]>(() => {
+    // Build bank from correctOrder to guarantee casing consistency,
+    // then shuffle for display
+    const wordsFromCorrect = [...data.correctOrder];
+    return wordsFromCorrect.sort(() => Math.random() - 0.5);
+  });
   const [assembled, setAssembled] = useState<string[]>([]);
 
   // Notify parent of readiness
@@ -38,7 +43,7 @@ export function SentenceBuilder({
   }, [submitTrigger]);
 
   function handleSubmit() {
-    onAnswer(assembled.join(' ') === data.correctOrder.join(' '));
+    onAnswer(assembled.join(' ').toLowerCase() === data.correctOrder.join(' ').toLowerCase());
   }
 
   function moveToAssembled(index: number) {
@@ -50,7 +55,7 @@ export function SentenceBuilder({
     setAssembled(newAssembled);
     // Auto-check when all words are placed
     if (newBank.length === 0) {
-      onAnswer(newAssembled.join(' ') === data.correctOrder.join(' '));
+      onAnswer(newAssembled.join(' ').toLowerCase() === data.correctOrder.join(' ').toLowerCase());
     }
   }
 
@@ -61,7 +66,7 @@ export function SentenceBuilder({
     setBank([...bank, word]);
   }
 
-  const isCorrect = assembled.join(' ') === data.correctOrder.join(' ');
+  const isCorrect = assembled.join(' ').toLowerCase() === data.correctOrder.join(' ').toLowerCase();
 
   return (
     <div className="flex flex-col gap-8">

@@ -196,7 +196,8 @@ export async function generateHook(params: GenerateHookParams): Promise<HookResu
   let tagInstruction = '';
   if (tag === 'GRAM') {
     tagInstruction = `- ATOMIC GRAMMAR RULE: This lesson's primary focus is '${grammarFocus}'. You MUST ensure this is the ONLY new grammatical concept or complex verb introduced. If a specific verb is mentioned in the focus, it should be the protagonist of the dialogue.
-- SIMPLICITY: Keep the rest of the sentence structure extremely simple so the student can isolate the grammar focus easily.`;
+- SIMPLICITY: Keep the rest of the sentence structure simple so the student can isolate the grammar focus easily.
+- NATURAL INTEGRATION: The grammar focus must appear INSIDE a real conversation — NOT as isolated descriptive statements. BAD: each speaker just making a standalone observation ("Le hall est sombre", "La porte est étroite"). GOOD: the grammar appears naturally because the conversation calls for it ("On va à l'hôtel ? — Oui, mais le hall est un peu sombre, non ? — C'est vrai, et la porte est étroite aussi !"). The speakers must REACT to each other.`;
   } else if (tag === 'VOC') {
     tagInstruction = `- VOCABULARY OVER EVERYTHING: The dialogue is merely a vehicle for the 4 words in 'newVocabulary'. Keep the dialogue lines SHORT (max 6 words) and the grammar invisible.
 - TARGET VOCABULARY: The specific word(s) mentioned in the 'Pedagogical Focus' MUST be included as part of the 4 words in 'newVocabulary' and MUST be used in the dialogue. Extract the core word from the focus text (e.g., if it says 'Vocabulário: Bon', the word is 'bon'). The other words should be related to the scene.
@@ -228,7 +229,13 @@ export async function generateHook(params: GenerateHookParams): Promise<HookResu
 - SHOW, DON'T TELL: Don't have characters explain culture like tourists. Let the cultural element emerge from what they do or react to naturally.`;
   }
 
-  const systemPrompt = `You are an expert language teacher creating content for Brazilian Portuguese speakers learning ${lang}. Respond with ONLY valid JSON, no markdown, no explanation.`;
+  const systemPrompt = `Você é um amigo brasileiro muito gente boa e fluente em ${lang}. Seu objetivo é criar conteúdo que pareça 100% humano e zero robótico.
+Regras de Humanidade:
+- NUNCA use aberturas de IA como "Certamente!", "Aqui está", "Com certeza".
+- Use português brasileiro natural, de conversa (ex: "só pra você saber", "olha que legal", "né").
+- Proibido usar palavras como "essencial", "crucial", "fundamental", "nuance", "unificar".
+- Seja conciso e direto.
+Respond with ONLY valid JSON, no markdown, no explanation.`;
 
   const isEarlyLearner = knownVocabulary.length < 30;
   let normalizedKnown = knownVocabulary.map((w) => w.toLowerCase());
@@ -279,6 +286,20 @@ Requirements:
 ${tagInstruction}
 - Exactly ${lineCount} lines total, alternating speakers
 - Every line MUST begin with the speaker name and a colon
+- ⚠️ GOLDEN RULE — REAL CONVERSATION, NOT SENTENCE SHOWCASE: The #1 most important requirement is that this reads like a REAL conversation between two humans. Each line must be a genuine RESPONSE to the previous one — agreeing, disagreeing, asking a follow-up, reacting emotionally, suggesting something, sharing an opinion. The vocabulary and grammar being taught must emerge NATURALLY from the conversation flow, not be artificially inserted as isolated statements.
+- ❌ ANTI-PATTERN — NEVER DO THIS: A dialogue where each line is an independent descriptive statement with no connection to the others. Example of what to NEVER produce:
+  "Le hall est sombre ici."
+  "Oui, la porte étroite est là."
+  "La clé magnétique est petite."
+  "Cette auberge est très confortable."
+  This is NOT a conversation — it's a list of disconnected observations. Each line describes something but nobody is actually TALKING to each other.
+- ✅ GOOD PATTERN — ALWAYS DO THIS: A dialogue where people actually communicate, react, and build on each other's words:
+  "On est arrivés ! Mais... le hall est un peu sombre, non ?"
+  "Oui, c'est vrai. Et regarde, la porte est étroite !"
+  "Bon, on entre ? J'ai la clé."
+  "D'accord ! Au moins l'auberge a l'air confortable."
+  This is a real conversation — they arrive somewhere, react to what they see, and decide what to do.
+- CONVERSATION REALITY TEST: Before finalizing, re-read the dialogue and ask: "Would two real humans actually say these exact lines to each other in sequence?" If any line feels like it was inserted just to showcase a word without responding to the previous speaker, REWRITE it.
 - CRITICAL SCENE COHERENCE: Pick ONE specific physical location AND ONE specific moment in time for the whole dialogue (e.g. "inside the plane during the flight", "at the café table after ordering", "in front of the hotel reception desk"). The location and time MUST NOT CHANGE across lines. If the characters start on a plane, they stay on the plane for every line — do NOT teleport them to another room, building, or scene. If a transition is narratively needed, it must be explicit and realistic (e.g. "let's get off", "we arrived, let's go inside"), and the dialogue must END at the new place, not mix scenes.
 - LOGICAL CONTINUITY: Every line must be a direct, realistic reaction to the previous one — same conversation, same place, consistent timeline. No sudden topic jumps, no unexplained changes in setting, no contradictions.
 - REAL-WORLD USEFULNESS: The dialogue must sound like something two real people would actually say in that exact situation. A Brazilian learner should be able to reuse these exact lines if they found themselves in that scene.
@@ -324,7 +345,7 @@ Rules:
 - vocabTranslations: provide for all 4 vocabulary words.`;
 
   try {
-    // thinkingBudget=0 disables Gemini 2.5 Flash's thinking step — trades
+    // thinkingBudget=0 disables Gemini 3.1 Flash-Lite's thinking step — trades
     // a touch of quality for ~2-3s faster response, which is the whole point
     // of the minimal-hook split.
     const result = await callGeminiJSON<HookResult>(prompt, systemPrompt, 2000, 0);

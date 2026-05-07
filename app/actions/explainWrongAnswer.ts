@@ -21,10 +21,11 @@ export async function explainWrongAnswer(
   let prompt = '';
 
   const accessibilityRule = `
-LINGUAGEM: Escreva como se fosse um amigo explicando, NÃO como livro didático. O público inclui brasileiros com baixa escolaridade.
-- Frases curtas, palavras simples. Pode usar "você", "a gente", "tipo".
-- PROIBIDO usar jargão: "lexical", "semântico", "conjugação", "flexão", "locução", "substantivo/adjetivo/advérbio", "ortográfico", "estrutura sintática", "nuance", "distinção".
-- Prefira mostrar um exemplo ou dar a dica direta em vez de nomear a regra gramatical.`;
+LINGUAGEM HUMANA: Escreva como se fosse um amigo dando um toque, com empatia, NÃO como um robô corrigindo.
+- Comece de um jeito natural: "Essa é pegadinha!", "Quase lá!", "Dica de ouro:", "Olha só:", "O segredo aqui é:".
+- PROIBIDO usar palavras de IA: "essencial", "crucial", "fundamental", "nuance", "distinção", "unificar".
+- Frases curtas (máximo 12 palavras). Sem jargão técnico.
+- Se o erro for comum, console o aluno: "Normal confundir, mas...", "Até eu errava essa no começo!"`;
 
   switch (exercise.type) {
     case 'context-choice': {

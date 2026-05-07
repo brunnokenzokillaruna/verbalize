@@ -33,7 +33,7 @@ export async function callGemini(
     temperature: 0.7,
     maxOutputTokens,
   };
-  // Gemini 2.5 Flash has thinking enabled by default; pass thinkingBudget=0
+  // Gemini 3.1 Flash-Lite has thinking enabled by default; pass thinkingBudget=0
   // to disable it for speed-critical calls like the minimal hook.
   if (thinkingBudget !== undefined) {
     generationConfig.thinkingConfig = { thinkingBudget };

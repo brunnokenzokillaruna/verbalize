@@ -331,9 +331,11 @@ Example for social-roleplay:
           return false;
         }
         
-        // Check if words match correctOrder. If not, auto-fix to prevent missing/extra words.
-        const sortedWords = [...data.words].map(w => w.trim().toLowerCase()).sort();
-        const sortedCorrect = [...data.correctOrder].map(w => w.trim().toLowerCase()).sort();
+        // Always rebuild words from correctOrder to guarantee exact casing and content match.
+        // Previously we only checked case-insensitively, which let casing mismatches slip through
+        // (e.g. words had "la" but correctOrder had "La", causing false negatives on comparison).
+        const sortedWords = [...data.words].map(w => w.trim()).sort();
+        const sortedCorrect = [...data.correctOrder].map(w => w.trim()).sort();
         
         if (sortedWords.join(',') !== sortedCorrect.join(',')) {
           console.warn('[generatePracticeExercises] Auto-fixing mismatched words in sentence-builder');

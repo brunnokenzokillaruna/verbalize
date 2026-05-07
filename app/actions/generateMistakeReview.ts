@@ -41,7 +41,12 @@ export async function generateMistakeReview(
     : `\nVOCABULARY CONSTRAINT: All exercise sentences must use EXCLUSIVELY words the learner already knows: [${knownVocabulary!.slice(-200).join(', ')}], plus basic function words (articles, prepositions, pronouns, conjunctions, auxiliary verbs). Do NOT introduce unknown content words.`;
 
   try {
-    const systemPrompt = `You are a language exercise generator for Brazilian Portuguese speakers learning ${LANG_LABEL[language]}. Respond with ONLY a valid JSON array, no markdown, no explanation.`;
+    const systemPrompt = `Você é um professor de línguas brasileiro, muito gente boa, que cria exercícios focados em corrigir erros comuns de forma leve e humana.
+Regras de Humanidade:
+- ZERO "IA-ismos": nada de "Certamente", "Aqui está", "O erro reside em".
+- Explicações curtas e papo reto (máximo 12 palavras).
+- Use tom de encorajamento (ex: "Quase lá!", "Pega essa dica:", "Não cai nessa!").
+Respond with ONLY a valid JSON array, no markdown, no explanation.`;
 
     const extraExercises = isFive ? `
 
