@@ -74,6 +74,15 @@ Contexto do diálogo:
 
 Você está falando com um falante nativo de português brasileiro. Use isso a seu favor: compare diretamente com o português, aponte os erros clássicos que brasileiros cometem e explique POR QUÊ a estrutura funciona diferente.
 
+⚠️ MISSÃO CENTRAL: ENSINO INTUITIVO E PROFUNDO ⚠️
+O objetivo aqui NÃO é ser curto por ser curto. O objetivo é que o aluno REALMENTE ENTENDA a regra.
+Você DEVE:
+- Explicar com calma, usando comparações diretas com o português ("No português a gente faz X, mas no ${LANG_LABEL[language]} faz Y porque...").
+- Dar MÚLTIPLOS exemplos paralelos (PT-BR → ${LANG_LABEL[language]}) para que o aluno veja o padrão se repetindo.
+- Usar analogias do dia a dia quando possível ("É como se...", "Pensa assim:").
+- Incluir equivalências explícitas: para cada conceito, mostrar COMO se diz em português e COMO se diz na língua-alvo.
+Mas NUNCA escreva como um livro acadêmico ou uma tese de doutorado. Escreva como um amigo paciente explicando.
+
 ⚠️ LINGUAGEM ACESSÍVEL — REGRA CRÍTICA ⚠️
 O público inclui brasileiros com baixa escolaridade. Escreva como se estivesse explicando para um amigo que nunca estudou gramática, não como livro didático.
 
@@ -108,28 +117,31 @@ EXEMPLO BOM (escreva assim):
 
 Output ONLY este JSON (sem markdown):
 {
-  "insight": "1 frase de impacto em PT-BR SIMPLES — a sacada central da regra. Pode começar com 'Em português...', 'No francês...', 'A gente...' ou similar. MAX 20 palavras. Linguagem de conversa, não de livro.",
-  "explanation": "2-4 frases em PT-BR SIMPLES. Explique: (1) como funciona na prática (com exemplo concreto), (2) por que brasileiros erram e (3) detalhe importante — se houver. SE o tema tiver múltiplos tópicos distintos (ex: Qui, Que, Combien), use um ARRAY de strings, uma para cada. Cada frase MAX 15 palavras. Proibido usar as palavras da lista acima.",
-  "usageContext": "Descreva em 1-2 palavras a 'vibe' social (ex: 'Casual/Amigos', 'Polidez/Formal', 'Dia-a-dia').",
-  "brazilianTrap": "O 'Erro de Brasileiro' clássico em 1 frase curta e DIRETA, sem jargão. Ex: 'Não tente traduzir 'estar' separado — em francês é o mesmo verbo que 'ser'.'",
+  "insight": "1-2 frases de impacto em PT-BR SIMPLES — a sacada central da regra. Pode começar com 'Em português...', 'No francês...', 'A gente...' ou similar. Linguagem de conversa, não de livro.",
+  "explanation": "CAMPO PRINCIPAL DE ENSINO. Escreva 3-6 frases (ou um array de strings se forem tópicos distintos) em PT-BR SIMPLES explicando a regra DE VERDADE. Inclua: (1) como funciona na prática com exemplo concreto lado a lado (PT → língua-alvo), (2) por que brasileiros erram (com o exemplo errado e o certo), (3) quando usar e quando NÃO usar, (4) uma analogia ou comparação direta com o português se possível. Não economize: o aluno precisa ENTENDER, não apenas memorizar. Mas escreva de forma intuitiva, como um amigo explicando na mesa do bar. Proibido usar as palavras da lista acima.",
+  "usageContext": "Descreva em 1-3 palavras a 'vibe' social (ex: 'Casual/Amigos', 'Polidez/Formal', 'Dia-a-dia').",
+  "brazilianTrap": "O 'Erro de Brasileiro' — explique em 2-3 frases o erro mais comum que brasileiros cometem com essa estrutura. Mostre o que o brasileiro diria errado e como corrigir. Ex: 'A gente tenta traduzir direto do português e fala X, mas o certo é Y. Isso acontece porque no português a gente faz Z, mas na língua-alvo funciona diferente.'",
   "patterns": [
     { "label": "Eu falo", "target": "I speak", "portuguese": "Eu falo" },
-    { "label": "Ela fala", "target": "She speaks", "portuguese": "Ela fala" }
+    { "label": "Ela fala", "target": "She speaks", "portuguese": "Ela fala" },
+    { "label": "Nós falamos", "target": "We speak", "portuguese": "Nós falamos" }
   ],
   "bridge": {
     "portuguese": "Use ^^ para destacar a parte da frase que gera a regra em PT-BR. ex: 'Eu ^^falo^^'",
     "target": "Use ^^ para destacar a parte equivalente. ex: 'I ^^speak^^'",
-    "difference": "1 frase SIMPLES em PT-BR apontando a diferença chave. MAX 15 palavras. Sem jargão."
+    "difference": "Explique a diferença chave em PT-BR. Sem jargão."
   },
   "items": [
-    { "target": "Expressão 1", "portuguese": "Tradução PT-BR", "logic": "A pequena sacada por trás deste item — linguagem simples, MAX 12 palavras (OPCIONAL)" }
+    { "target": "Expressão 1", "portuguese": "Tradução PT-BR", "logic": "A pequena sacada por trás deste item — linguagem simples (OPCIONAL)" }
   ],
   "dialogueExample": {
     "target": "Frase do diálogo acima que melhor ilustra '${grammarFocus}' — VERBATIM, não inventada",
     "portuguese": "Tradução natural PT-BR dessa frase"
   },
   "additionalExamples": [
-    { "target": "Exemplo 2", "portuguese": "Equivalente PT-BR" }
+    { "target": "Exemplo extra 1", "portuguese": "Equivalente PT-BR" },
+    { "target": "Exemplo extra 2", "portuguese": "Equivalente PT-BR" },
+    { "target": "Exemplo extra 3", "portuguese": "Equivalente PT-BR" }
   ]${verbSpotlightBlock}
 }
 ${verbRulesBlock}
@@ -137,15 +149,15 @@ ${verbRulesBlock}
 Regras Cruciais:
 1. Se o tema for uma REGRA SISTÊMICA (ex: Plural, Passado), use o campo 'bridge' e preencha 'patterns' com 2-3 variações. Deixe 'items' como null.
 2. Se o tema for uma LISTA de expressões, preencha o campo 'items'. Deixe 'bridge' e 'patterns' como null.
-3. brazilianTrap: FOQUE no erro clássico. Linguagem direta e simples: "Não tente...", "Evite dizer...", "Não confunda...".
+3. brazilianTrap: FOQUE no erro clássico. Mostre o que o brasileiro tentaria dizer e a versão correta. Linguagem direta e amigável.
 4. Destaque Visual: Use ^^ envolta das palavras-chave em bridge.target e bridge.portuguese para criar o mapeamento visual.
-5. explanation: Tom de amigo explicando, não de livro. Frases curtas, palavras simples, exemplos concretos.
+5. explanation: Este é o CORAÇÃO da lição. O aluno vai ler isso com calma. Explique de verdade, com comparações e exemplos paralelos. Tom de amigo, não de livro.
 6. dialogueExample.target: DEVE ser uma linha real do diálogo acima.
-7. additionalExamples: exatamente 1-2 itens extras.
+7. additionalExamples: 2-3 exemplos extras mostrando o padrão em diferentes contextos do dia a dia.
 8. Todo texto em PT-BR exceto as frases na língua-alvo.
 9. ANTES DE RESPONDER: releia 'insight', 'explanation', 'brazilianTrap' e 'bridge.difference'. Se usou qualquer palavra da lista proibida OU se um brasileiro com ensino fundamental teria dificuldade, REESCREVA mais simples.`;
 
-    return await callGeminiJSON<GrammarBridgeResult>(prompt, systemPrompt, 2000, 0);
+    return await callGeminiJSON<GrammarBridgeResult>(prompt, systemPrompt, 3500);
   } catch (err) {
     console.error('[generateGrammarBridge] Error:', err);
     return null;
