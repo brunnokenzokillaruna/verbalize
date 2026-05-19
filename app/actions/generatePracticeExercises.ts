@@ -72,7 +72,7 @@ function buildTypeDescriptions(langLabel: string): Record<ExerciseTypeId, string
    - "translation" in PT-BR.`,
     'error-correction': `type "error-correction":
    - Write an ORIGINAL sentence with ONE deliberate error.
-   - "sentence_with_error", "error_word", "correct_word", "explanation" (PT-BR).
+   - "sentence_with_error", "error_word", "correct_word", "translation" (PT-BR: translation of the CORRECTED sentence), "explanation" (PT-BR).
    - "acceptable_answers" is an array of other valid options or empty.`,
     'reverse-translation': `type "reverse-translation":
    - "portuguese_sentence" (PT-BR) → "target_translation" (${langLabel}).
@@ -302,15 +302,17 @@ Example for social-roleplay:
         return false;
       }
       if (ex.type === 'error-correction') {
-        const { sentence_with_error, error_word, correct_word } = ex.data as {
+        const { sentence_with_error, error_word, correct_word, translation } = ex.data as {
           sentence_with_error: string;
           error_word: string;
           correct_word: string;
+          translation?: string;
         };
         const ok =
           sentence_with_error &&
           error_word &&
           correct_word &&
+          !!translation &&
           sentence_with_error.toLowerCase().includes(error_word.toLowerCase()) &&
           error_word.toLowerCase() !== correct_word.toLowerCase();
         if (!ok) console.warn('[generatePracticeExercises] Dropped malformed error-correction exercise');

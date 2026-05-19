@@ -301,7 +301,7 @@ ${tagInstruction}
   This is a real conversation — they arrive somewhere, react to what they see, and decide what to do.
 - CONVERSATION REALITY TEST: Before finalizing, re-read the dialogue and ask: "Would two real humans actually say these exact lines to each other in sequence?" If any line feels like it was inserted just to showcase a word without responding to the previous speaker, REWRITE it.
 - CRITICAL SCENE COHERENCE: Pick ONE specific physical location AND ONE specific moment in time for the whole dialogue (e.g. "inside the plane during the flight", "at the café table after ordering", "in front of the hotel reception desk"). The location and time MUST NOT CHANGE across lines. If the characters start on a plane, they stay on the plane for every line — do NOT teleport them to another room, building, or scene. If a transition is narratively needed, it must be explicit and realistic (e.g. "let's get off", "we arrived, let's go inside"), and the dialogue must END at the new place, not mix scenes.
-- LOGICAL CONTINUITY: Every line must be a direct, realistic reaction to the previous one — same conversation, same place, consistent timeline. No sudden topic jumps, no unexplained changes in setting, no contradictions.
+- LOGICAL CONTINUITY (CRITICAL): Every single line must have a clear logical connection ("nexo") to the line immediately preceding it. It is FORBIDDEN to suddenly change the subject. It is FORBIDDEN to contradict what was just said (e.g., if Speaker A says a place is quiet, Speaker B cannot say it's too crowded unless they are explicitly disagreeing with "Je ne suis pas d'accord" or similar). 
 - REAL-WORLD USEFULNESS: The dialogue must sound like something two real people would actually say in that exact situation. A Brazilian learner should be able to reuse these exact lines if they found themselves in that scene.
 - NARRATIVE ARC: Clear beginning (who/where/what's happening), middle (small development or reaction), natural conclusion (a resolution, decision, or closing remark) — all inside the SAME scene.
 - The entire dialogue MUST stay within the ${themeContext} provided. Do NOT drift to other topics.
@@ -345,10 +345,10 @@ Rules:
 - vocabTranslations: provide for all 4 vocabulary words.`;
 
   try {
-    // thinkingBudget=0 disables Gemini 3.1 Flash-Lite's thinking step — trades
-    // a touch of quality for ~2-3s faster response, which is the whole point
-    // of the minimal-hook split.
-    const result = await callGeminiJSON<HookResult>(prompt, systemPrompt, 2000, 0);
+    // Allow the model to think (removed thinkingBudget=0) to ensure the dialogue
+    // maintains strict logical continuity and a natural conversational flow. The user
+    // reported that disabling thinking caused sudden, illogical topic changes.
+    const result = await callGeminiJSON<HookResult>(prompt, systemPrompt, 2048);
     if (!result?.dialogue || result?.newVocabulary?.length !== 4) {
       console.error('[generateHook] Invalid minimal hook response');
       return null;

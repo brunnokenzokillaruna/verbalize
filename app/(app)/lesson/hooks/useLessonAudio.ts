@@ -1,6 +1,23 @@
 import { useState, useRef, useEffect } from 'react';
 import { synthesizeDialogue } from '@/app/actions/synthesizeSpeech';
+import { synthesizeDialogueElevenLabs } from '@/app/actions/synthesizeElevenLabs';
+import type { SupportedLanguage } from '@/types';
 
+/**
+ * Manages dialogue audio playback for the lesson hook screen.
+ *
+ * Provider priority:
+ *   1. ElevenLabs (if ELEVENLABS_API_KEY is set server-side)
+ *   2. Google Cloud TTS (original fallback)
+ *
+ * Caching strategy (two layers — zero wasted credits on replay):
+ *   • Server-side: in-memory Map in synthesizeElevenLabs.ts keyed by
+ *     (text + voiceId + language). Survives across requests within the
+ *     same server process / warm Vercel function.
+ *   • Client-side: `cachedChunksRef` below — once audio is fetched for
+ *     the current dialogue, pressing "play" again never hits the server.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function useLessonAudio(phase: string, lesson: any, hook: any) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [playingLineIdx, setPlayingLineIdx] = useState(-1);
@@ -49,9 +66,32 @@ export function useLessonAudio(phase: string, lesson: any, hook: any) {
     playIndex(0);
   }
 
+  /**
+   * Fetches dialogue audio — tries ElevenLabs first, falls back to Google TTS.
+   * Results are cached client-side in `cachedChunksRef` so replays are instant.
+   */
+  async function fetchDialogueAudio(lines: string[], language: SupportedLanguage): Promise<string[]> {
+    // 1️⃣ Try ElevenLabs
+    try {
+      const elChunks = await synthesizeDialogueElevenLabs(lines, language);
+      if (elChunks.length > 0) {
+        console.log('[useLessonAudio] Using ElevenLabs audio ✓');
+        return elChunks;
+      }
+    } catch (err) {
+      console.warn('[useLessonAudio] ElevenLabs failed, falling back to Google TTS:', err);
+    }
+
+    // 2️⃣ Fallback to Google Cloud TTS
+    console.log('[useLessonAudio] Using Google TTS fallback');
+    return synthesizeDialogue(lines, language);
+  }
+
   function handleAudioButton() {
     if (isPlaying) { stopAudio(); return; }
     if (!hook) return;
+
+    // Client-side cache hit → replay instantly (zero API calls)
     if (cachedChunksRef.current) { startAudio(cachedChunksRef.current); return; }
     if (!lesson || isLoadingAudio) return;
     
@@ -61,7 +101,7 @@ export function useLessonAudio(phase: string, lesson: any, hook: any) {
     (async () => {
       setIsLoadingAudio(true);
       try {
-        const chunks = await synthesizeDialogue(lines, language);
+        const chunks = await fetchDialogueAudio(lines, language);
         if (chunks.length > 0) { cachedChunksRef.current = chunks; startAudio(chunks); }
       } finally {
         setIsLoadingAudio(false);
@@ -69,6 +109,7 @@ export function useLessonAudio(phase: string, lesson: any, hook: any) {
     })();
   }
 
+  // Auto-play when entering the hook phase
   useEffect(() => {
     if (phase !== 'hook') {
       stopAudio();
@@ -84,13 +125,13 @@ export function useLessonAudio(phase: string, lesson: any, hook: any) {
     (async () => {
       setIsLoadingAudio(true);
       try {
-        const chunks = await synthesizeDialogue(lines, language);
+        const chunks = await fetchDialogueAudio(lines, language);
         if (!cancelled && chunks.length > 0) {
           cachedChunksRef.current = chunks;
           startAudio(chunks);
         }
       } catch (err) {
-        console.error('[LessonPage] TTS error:', err);
+        console.error('[useLessonAudio] TTS error:', err);
       } finally {
         if (!cancelled) setIsLoadingAudio(false);
       }

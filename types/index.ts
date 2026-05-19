@@ -265,6 +265,7 @@ export interface ErrorCorrectionData {
   sentence_with_error: string;
   error_word: string;
   correct_word: string;
+  translation: string; // Portuguese translation of the correct sentence
   explanation: string; // in Portuguese
   acceptable_answers?: string[]; // other grammatically valid alternatives
 }
