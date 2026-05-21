@@ -2,7 +2,7 @@ import { getGeminiKey } from '@/lib/env';
 
 // Latest free-tier Gemini model as specified in CLAUDE.md
 // Latest free-tier Gemini model as selected by the user
-const GEMINI_MODEL = 'gemini-3.5-flash';
+const GEMINI_MODEL = 'gemini-2.5-flash';
 
 interface GeminiResponse {
   candidates?: Array<{
