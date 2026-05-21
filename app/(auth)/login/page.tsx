@@ -93,11 +93,12 @@ export default function LoginPage() {
         <div className="relative w-full max-w-sm">
 
           {/* Mobile-only logo */}
-          <div className="mb-10 flex flex-col items-center lg:hidden animate-slide-up-spring">
-            <span className="mb-3 flex gap-1.5 text-xl">🇧🇷 🇫🇷 🇬🇧</span>
+          <div className="mb-8 flex flex-col items-center lg:hidden animate-slide-up-spring">
+            <div className="relative w-14 h-14 rounded-2xl overflow-hidden shadow-md border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.08)] mb-3 select-none">
+              <img src="/logo.png" alt="Verbalize Logo" className="object-cover w-full h-full" />
+            </div>
             <h1
-              className="font-display text-4xl font-bold tracking-tight"
-              style={{ color: 'var(--color-primary)' }}
+              className="font-display text-4xl font-bold tracking-tight bg-gradient-to-r from-[var(--color-primary)] to-[#3b82f6] bg-clip-text text-transparent"
             >
               Verbalize
             </h1>

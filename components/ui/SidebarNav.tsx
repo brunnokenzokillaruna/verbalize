@@ -34,10 +34,12 @@ export function SidebarNav() {
       }}
     >
       {/* Logo */}
-      <div className="px-6 pt-7 pb-6">
+      <div className="px-6 pt-7 pb-6 flex items-center gap-3">
+        <div className="relative w-8 h-8 rounded-xl overflow-hidden shadow-sm border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.08)] select-none">
+          <img src="/logo.png" alt="Verbalize Logo" className="object-cover w-full h-full" />
+        </div>
         <span
-          className="font-display text-2xl font-bold"
-          style={{ color: 'var(--color-primary)' }}
+          className="font-display text-2xl font-bold tracking-tight bg-gradient-to-r from-[var(--color-primary)] to-[#3b82f6] bg-clip-text text-transparent"
         >
           Verbalize
         </span>

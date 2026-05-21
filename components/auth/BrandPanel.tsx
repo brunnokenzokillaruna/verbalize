@@ -71,29 +71,38 @@ export function BrandPanel() {
       ))}
 
       {/* ── Top: Logo ── */}
-      <div className="relative z-10 animate-fade-in">
-        {/* Small decorative accent line */}
-        <div
-          className="mb-5 h-px w-12"
-          style={{ background: 'linear-gradient(90deg, #3b82f6, transparent)' }}
-        />
-        <h1
-          className="font-display text-5xl font-bold tracking-tight"
+      <div className="relative z-10 animate-fade-in flex flex-col items-start gap-4">
+        {/* Modern 3D/Glassmorphism Brand Icon */}
+        <div 
+          className="w-16 h-16 rounded-2xl p-0.5 shadow-2xl relative overflow-hidden group select-none flex items-center justify-center"
           style={{
-            background: 'linear-gradient(135deg, #ffffff 0%, rgba(255,255,255,0.7) 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.03) 100%)',
+            border: '1px solid rgba(255,255,255,0.12)',
+            backdropFilter: 'blur(8px)',
           }}
         >
-          Verbalize
-        </h1>
-        <p
-          className="mt-3 text-lg font-light italic"
-          style={{ color: 'rgba(255,255,255,0.45)' }}
-        >
-          Aprenda o mundo.
-        </p>
+          <img src="/logo.png" alt="Verbalize Icon" className="w-full h-full object-cover rounded-2xl transform transition-transform duration-500 group-hover:scale-105" />
+        </div>
+        
+        <div>
+          <h1
+            className="font-display text-5xl font-bold tracking-tight"
+            style={{
+              background: 'linear-gradient(135deg, #ffffff 0%, rgba(255,255,255,0.7) 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}
+          >
+            Verbalize
+          </h1>
+          <p
+            className="mt-2 text-lg font-light italic"
+            style={{ color: 'rgba(255,255,255,0.45)' }}
+          >
+            Aprenda o mundo.
+          </p>
+        </div>
       </div>
 
       {/* ── Middle: Feature highlights ── */}
