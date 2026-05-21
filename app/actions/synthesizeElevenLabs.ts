@@ -66,12 +66,17 @@ async function callElevenLabs(
   // 1️⃣ Cache hit → return immediately (zero credits used)
   const cached = audioCache.get(key);
   if (cached) {
-    console.log('[ElevenLabs] Cache hit for:', text.substring(0, 40));
+    console.log(
+      `⚡ [ElevenLabs Server Cache] Cache HIT! Reusing base64 audio for text: "${text.substring(0, 40)}..." (0 credits consumed from ElevenLabs)`
+    );
     return cached;
   }
 
   // 2️⃣ Cache miss → call API
   try {
+    console.log(
+      `🎙️ [ElevenLabs Server Cache] Cache MISS! Requesting premium audio from ElevenLabs API for: "${text.substring(0, 40)}..."`
+    );
     const res = await fetch(`${ELEVENLABS_API_URL}/${voiceId}`, {
       method: 'POST',
       headers: {
@@ -95,7 +100,7 @@ async function callElevenLabs(
 
     if (!res.ok) {
       const err = await res.text().catch(() => '');
-      console.error('[ElevenLabs] API error:', res.status, err);
+      console.error('[ElevenLabs Server Cache] API error:', res.status, err);
       return null;
     }
 
@@ -105,11 +110,13 @@ async function callElevenLabs(
 
     // 3️⃣ Store in cache for future replays
     audioCache.set(key, base64);
-    console.log('[ElevenLabs] Generated & cached:', text.substring(0, 40));
+    console.log(
+      `💾 [ElevenLabs Server Cache] SUCCESS: Generated & cached audio under key: "${key}" (Saved for future replays!)`
+    );
 
     return base64;
   } catch (err) {
-    console.error('[ElevenLabs] Error:', err);
+    console.error('[ElevenLabs Server Cache] Fetch Error:', err);
     return null;
   }
 }

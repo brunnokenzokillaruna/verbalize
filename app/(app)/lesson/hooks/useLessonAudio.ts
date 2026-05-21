@@ -75,7 +75,10 @@ export function useLessonAudio(phase: string, lesson: any, hook: any) {
     try {
       const elChunks = await synthesizeDialogueElevenLabs(lines, language);
       if (elChunks.length > 0) {
-        console.log('[useLessonAudio] Using ElevenLabs audio ✓');
+        console.log(
+          '%c🎙️ [Audio Provider] SUCCESS: ElevenLabs premium dialogue voices generated successfully! ✓',
+          'color: #10b981; font-weight: bold; background-color: #ecfdf5; padding: 4px 8px; border-radius: 4px; border: 1px solid #a7f3d0;'
+        );
         return elChunks;
       }
     } catch (err) {
@@ -83,7 +86,10 @@ export function useLessonAudio(phase: string, lesson: any, hook: any) {
     }
 
     // 2️⃣ Fallback to Google Cloud TTS
-    console.log('[useLessonAudio] Using Google TTS fallback');
+    console.log(
+      '%c🎙️ [Audio Provider] FALLBACK: ElevenLabs unavailable or disabled. Using Google TTS (Studio/Chirp voices) instead.',
+      'color: #d97706; font-weight: bold; background-color: #fffbeb; padding: 4px 8px; border-radius: 4px; border: 1px solid #fef3c7;'
+    );
     return synthesizeDialogue(lines, language);
   }
 
@@ -91,8 +97,15 @@ export function useLessonAudio(phase: string, lesson: any, hook: any) {
     if (isPlaying) { stopAudio(); return; }
     if (!hook) return;
 
-    // Client-side cache hit → replay instantly (zero API calls)
-    if (cachedChunksRef.current) { startAudio(cachedChunksRef.current); return; }
+    // Client-side cache hit → replay instantly (zero API calls, zero credit/quota cost)
+    if (cachedChunksRef.current) {
+      console.log(
+        '%c⚡ [Audio Cache] Client Cache Hit! Replaying current dialogue audio instantly without server requests (0 credits used)',
+        'color: #0284c7; font-weight: bold; background-color: #f0f9ff; padding: 4px 8px; border-radius: 4px; border: 1px solid #bae6fd;'
+      );
+      startAudio(cachedChunksRef.current);
+      return;
+    }
     if (!lesson || isLoadingAudio) return;
     
     const lines = hook.dialogue.split('\n').filter((l: string) => l.trim().length > 0);
