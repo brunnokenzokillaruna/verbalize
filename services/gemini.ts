@@ -2,7 +2,7 @@ import { getGeminiKey } from '@/lib/env';
 
 // Latest free-tier Gemini model as specified in CLAUDE.md
 // Latest free-tier Gemini model as selected by the user
-const GEMINI_MODEL = 'gemini-2.5-flash';
+const GEMINI_MODEL = 'gemini-3.5-flash';
 
 interface GeminiResponse {
   candidates?: Array<{
@@ -29,9 +29,16 @@ export async function callGemini(
   const apiKey = getGeminiKey();
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
 
+  // Automatically boost maxOutputTokens for 3.5 or thinking models because
+  // their internal reasoning/thinking output also counts toward the maxOutputTokens limit.
+  // This prevents response truncation on complex prompts like dialogue generation.
+  const adjustedMaxTokens = GEMINI_MODEL.includes('3.5') || GEMINI_MODEL.includes('thinking')
+    ? Math.max(maxOutputTokens * 3, 8192)
+    : maxOutputTokens;
+
   const generationConfig: Record<string, unknown> = {
     temperature: 0.7,
-    maxOutputTokens,
+    maxOutputTokens: adjustedMaxTokens,
   };
   // Gemini 3.1 Flash-Lite has thinking enabled by default; pass thinkingBudget=0
   // to disable it for speed-critical calls like the minimal hook.
