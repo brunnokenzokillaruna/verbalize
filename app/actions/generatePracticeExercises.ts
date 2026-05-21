@@ -247,6 +247,19 @@ export async function generatePracticeExercises(
     ? `\nPREVIOUS LESSON TOPICS (for context and coherence — you may reference these themes): ${previousTopics.join(' | ')}`
     : '';
 
+  const grammarAccuracyBlock = `
+--- CRITICAL LINGUISTIC ACCURACY & GENDER AGREEMENT RULES ---
+- STRICT GENDER & NUMBER AGREEMENT: You MUST double-check the grammatical gender and number of all nouns in the target language (${LANG_LABEL[language]}).
+  - Example (French): "la viennoiserie" is FEMININE singular. Therefore, the adjective MUST be feminine singular ("chère", NOT "cher"). Generating "La viennoiserie est trop cher" as correct is a CRITICAL ERROR.
+  - Example (French): "la chanson" is FEMININE. The adjective must be "bonne", not "bon".
+  - Always verify every noun's gender in the target language.
+- ABSOLUTE GRAMMATICAL CORRECTNESS FOR THE CORRECT OPTION:
+  - The option marked "isCorrect": true or the "blankWord" or "target_translation" MUST be 100% flawlessly grammatical under standard rules of ${LANG_LABEL[language]}. There must be zero typos, zero gender/number agreement errors, and zero conjugation errors.
+- TRAP ERROR VERIFICATION:
+  - The incorrect options must contain ONLY the intended error stemming from Portuguese interference. They must NOT contain accidental/unintended errors, nor should they be grammatically correct sentences marked as false. Double-check that the "isCorrect" boolean is not inverted.
+- SELF-CHECK CHALLENGE: Before generating the final JSON array, mentally verify: "Is the correct option actually correct? Are the distractors actually incorrect? Did I match the adjective gender to the noun gender correctly?"
+`;
+
   try {
     const systemPrompt = `You are a language exercise generator for Brazilian Portuguese speakers learning ${LANG_LABEL[language]}. The student is Brazilian — use scenarios, cultural references, and situations that are engaging and relevant for a Brazilian learner (e.g., a Brazilian tourist in Paris, a Brazilian professional in a French meeting, a Brazilian student abroad, ordering food in Lyon, asking for directions in London). Respond with ONLY a valid JSON array, no markdown, no explanation.`;
 
@@ -266,6 +279,7 @@ CRITICAL RULE: Do NOT copy or reuse any sentence from the dialogue above. Every 
 
 LEVEL CONSTRAINTS — all sentences you write must follow these rules: ${levelDesc}
 ${vocabConstraint}
+${grammarAccuracyBlock}
 
 Generate exactly 5 exercises as a JSON array. Choose varied types from the following pool for a balanced practice session. You MUST use ONLY the types listed below — any other type is forbidden.
 
