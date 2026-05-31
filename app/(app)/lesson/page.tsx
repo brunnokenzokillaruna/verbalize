@@ -488,19 +488,29 @@ export default function LessonPage() {
                 phase === 'role-play'   ? advanceFromRolePlay :
                                           advanceFromGrammar
               }
-              className="cta-shimmer relative flex w-full max-w-sm mx-auto items-center justify-center gap-2.5 overflow-hidden rounded-xl px-6 py-3.5 text-base font-bold transition-all active:scale-[0.98] disabled:cursor-not-allowed"
+              className={[
+                "cta-shimmer relative flex w-full max-w-sm mx-auto items-center justify-center gap-2.5 overflow-hidden rounded-2xl px-6 py-4 text-base font-bold",
+                "transition-all duration-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-[#f59e0b]",
+                (store.isLoading || (phase === 'role-play' && !store.rolePlayComplete))
+                  ? "cursor-not-allowed border border-[var(--color-border)]"
+                  : "cursor-pointer active:translate-y-[2px] active:border-b-[2px]"
+              ].filter(Boolean).join(" ")}
               style={{
                 background: (store.isLoading || (phase === 'role-play' && !store.rolePlayComplete))
                   ? 'var(--color-surface-raised)'
                   : phase === 'role-play'
-                    ? 'linear-gradient(135deg, var(--color-success) 0%, #059669 100%)'
-                    : 'linear-gradient(135deg, var(--color-primary) 0%, #2563eb 100%)',
+                    ? 'var(--color-success)'
+                    : 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%)',
                 color: (store.isLoading || (phase === 'role-play' && !store.rolePlayComplete)) ? 'var(--color-text-muted)' : '#fff',
+                borderBottomWidth: (store.isLoading || (phase === 'role-play' && !store.rolePlayComplete)) ? '1px' : '4px',
+                borderBottomColor: (store.isLoading || (phase === 'role-play' && !store.rolePlayComplete))
+                  ? 'var(--color-border)'
+                  : 'rgba(0, 0, 0, 0.35)',
                 boxShadow: (store.isLoading || (phase === 'role-play' && !store.rolePlayComplete))
                   ? 'none'
                   : phase === 'role-play'
-                    ? '0 8px 20px rgba(16,185,129,0.35)'
-                    : '0 8px 20px rgba(29,94,212,0.3)',
+                    ? '0 6px 16px rgba(16,185,129,0.3)'
+                    : '0 6px 16px rgba(29,94,212,0.25)',
               }}
             >
               {store.isLoading ? (

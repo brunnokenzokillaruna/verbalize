@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import {
   ChevronLeft, ChevronRight, LogOut, Trash2, Check,
   AlertCircle, Loader2, Flame, BookOpen, Target, User,
+  Plane, Utensils, Music, Film, Briefcase, Laptop, Book, Palette,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { updateUser } from '@/services/firestore';
@@ -31,32 +32,30 @@ const GOALS = [
 ];
 
 const INTERESTS = [
-  { label: 'Viagens',       emoji: '✈️' },
-  { label: 'Gastronomia',   emoji: '🍽️' },
-  { label: 'Música',        emoji: '🎵' },
-  { label: 'Cinema & Séries', emoji: '🎬' },
-  { label: 'Negócios',      emoji: '💼' },
-  { label: 'Tecnologia',    emoji: '💻' },
-  { label: 'Literatura',    emoji: '📚' },
-  { label: 'Moda & Design', emoji: '🎨' },
+  { label: 'Viagens',       icon: Plane },
+  { label: 'Gastronomia',   icon: Utensils },
+  { label: 'Música',        icon: Music },
+  { label: 'Cinema & Séries', icon: Film },
+  { label: 'Negócios',      icon: Briefcase },
+  { label: 'Tecnologia',    icon: Laptop },
+  { label: 'Literatura',    icon: Book },
+  { label: 'Moda & Design', icon: Palette },
 ];
 
 // ── Sub-components ────────────────────────────────────────────────────────────
-
-
 
 function SelectPill({ label, selected, onClick }: { label: string; selected: boolean; onClick: () => void }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="rounded-xl px-4 py-2 text-sm font-medium transition-all duration-150 active:scale-95"
+      className="rounded-xl px-4 py-2.5 text-sm font-semibold transition-all active:scale-95 active:translate-y-[2px] active:shadow-none cursor-pointer"
       style={{
         backgroundColor: selected ? 'var(--color-primary-light)' : 'var(--color-surface)',
-        border: `1.5px solid ${selected ? 'var(--color-primary)' : 'var(--color-border)'}`,
+        border: '1.5px solid',
+        borderColor: selected ? 'var(--color-primary)' : 'var(--color-border)',
         color: selected ? 'var(--color-primary)' : 'var(--color-text-secondary)',
-        fontWeight: selected ? 600 : 400,
-        boxShadow: selected ? '0 2px 8px rgba(29,94,212,0.15)' : 'none',
+        boxShadow: selected ? '0 3px 0 var(--color-primary-dark)' : '0 3px 0 var(--color-border)',
       }}
     >
       {label}
@@ -126,8 +125,6 @@ export default function ProfilePage() {
     router.replace('/');
   }
 
-
-
   return (
     <div className="min-h-dvh pb-40 md:pb-24" style={{ backgroundColor: 'var(--color-bg)' }}>
 
@@ -159,60 +156,50 @@ export default function ProfilePage() {
 
       <main className="px-5 py-6 max-w-lg md:max-w-2xl mx-auto flex flex-col gap-8">
 
-        {/* ── Hero: avatar + stats ── */}
+        {/* ── Hero: avatar + stats (Student Passport) ── */}
         <div className="animate-slide-up-spring">
-          {/* Avatar card */}
           <div
-            className="relative overflow-hidden rounded-3xl p-6"
+            className="relative overflow-hidden rounded-3xl p-6 border-2 border-primary-light"
             style={{
-              background: 'linear-gradient(135deg, #0a1628 0%, #1d5ed4 100%)',
-              boxShadow: '0 12px 40px rgba(29,94,212,0.25)',
+              background: 'linear-gradient(to right, #0c1524 0%, #173870 100%)',
+              boxShadow: '0 8px 24px rgba(29, 94, 212, 0.1)',
             }}
           >
-            {/* Diagonal pattern */}
-            <div
-              className="pointer-events-none absolute inset-0 opacity-[0.04]"
-              style={{
-                backgroundImage: 'repeating-linear-gradient(45deg, #fff 0, #fff 1px, transparent 0, transparent 50%)',
-                backgroundSize: '16px 16px',
-              }}
-            />
-            <div
-              className="pointer-events-none absolute -right-8 -bottom-8 h-40 w-40 rounded-full"
-              style={{ background: 'radial-gradient(circle, rgba(96,165,250,0.2) 0%, transparent 70%)' }}
-            />
+            {/* Ambient decoration */}
+            <div className="absolute top-0 right-0 h-32 w-32 bg-primary/20 rounded-full blur-3xl pointer-events-none" />
 
             <div className="relative flex items-center gap-4">
               <div
-                className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl"
-                style={{ backgroundColor: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(8px)' }}
+                className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-white/10 border border-white/15 shadow-sm"
               >
-                <span className="font-display text-2xl font-bold text-white">{initials}</span>
+                <span className="font-display text-2xl font-extrabold text-white">{initials}</span>
               </div>
-              <div className="min-w-0">
-                <p className="font-display text-xl font-bold text-white leading-tight truncate">
+              <div className="min-w-0 flex-1">
+                <p className="font-display text-xl sm:text-2xl font-extrabold text-white leading-tight truncate">
                   {profile.name}
                 </p>
-                <p className="text-sm mt-0.5 truncate" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                <p className="text-xs sm:text-sm mt-1 truncate text-white/50 font-medium">
                   {profile.email}
                 </p>
               </div>
             </div>
 
             {/* Stats strip */}
-            <div className="relative mt-5 grid grid-cols-2 gap-3">
+            <div className="relative mt-5 grid grid-cols-2 gap-3.5">
               <div
-                className="flex items-center gap-2.5 rounded-2xl px-4 py-3"
-                style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}
+                className="flex items-center gap-3.5 rounded-2xl px-4 py-3.5 border border-white/10"
+                style={{ backgroundColor: 'rgba(255, 255, 255, 0.08)' }}
               >
-                <Flame size={18} style={{ color: '#fbbf24' }} />
+                <div className="shrink-0 flex items-center justify-center h-9 w-9 rounded-xl bg-amber-500/20 text-amber-400">
+                  <Flame size={20} className="animate-float" />
+                </div>
                 <div>
                   {(() => {
                     const currentStreak = getEffectiveStreak(profile);
                     return (
                       <>
-                        <p className="text-lg font-bold leading-none text-white">{currentStreak}</p>
-                        <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                        <p className="text-xl font-extrabold leading-none text-white font-display">{currentStreak}</p>
+                        <p className="text-[10px] mt-1 font-bold text-white/50 uppercase tracking-wider">
                           {currentStreak === 1 ? 'dia seguido' : 'dias seguidos'}
                         </p>
                       </>
@@ -220,14 +207,17 @@ export default function ProfilePage() {
                   })()}
                 </div>
               </div>
+
               <div
-                className="flex items-center gap-2.5 rounded-2xl px-4 py-3"
-                style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}
+                className="flex items-center gap-3.5 rounded-2xl px-4 py-3.5 border border-white/10"
+                style={{ backgroundColor: 'rgba(255, 255, 255, 0.08)' }}
               >
-                <BookOpen size={18} style={{ color: '#60a5fa' }} />
+                <div className="shrink-0 flex items-center justify-center h-9 w-9 rounded-xl bg-blue-500/20 text-blue-400">
+                  <BookOpen size={20} className="animate-float" style={{ animationDelay: '0.3s' }} />
+                </div>
                 <div>
-                  <p className="text-lg font-bold leading-none text-white">{profile.totalLessonsCompleted}</p>
-                  <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                  <p className="text-xl font-extrabold leading-none text-white font-display">{profile.totalLessonsCompleted}</p>
+                  <p className="text-[10px] mt-1 font-bold text-white/50 uppercase tracking-wider">
                     {profile.totalLessonsCompleted === 1 ? 'lição' : 'lições'} concluída{profile.totalLessonsCompleted !== 1 ? 's' : ''}
                   </p>
                 </div>
@@ -236,18 +226,18 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* ── Dados pessoais ── */}
+        {/* ── Personal data ── */}
         <section className="flex flex-col gap-5 animate-slide-up-spring delay-75">
           <div className="flex items-center gap-3">
-            <User size={14} style={{ color: 'var(--color-text-muted)' }} />
+            <User size={14} className="text-text-muted" />
             <SectionLabel>Dados pessoais</SectionLabel>
           </div>
 
           <Input label="Nome" type="text" autoComplete="given-name" value={name} onChange={(e) => setName(e.target.value)} />
 
           <div className="flex flex-col gap-3">
-            <p className="text-sm font-semibold" style={{ color: 'var(--color-text-secondary)' }}>Área de atuação</p>
-            <div className="flex flex-wrap gap-2">
+            <p className="text-sm font-bold text-text-secondary">Área de atuação</p>
+            <div className="flex flex-wrap gap-2.5">
               {PROFESSIONS.map((p) => (
                 <SelectPill
                   key={p} label={p} selected={professionPill === p}
@@ -262,10 +252,10 @@ export default function ProfilePage() {
 
           <div className="flex flex-col gap-3">
             <div className="flex items-center gap-2">
-              <Target size={14} style={{ color: 'var(--color-text-muted)' }} />
-              <p className="text-sm font-semibold" style={{ color: 'var(--color-text-secondary)' }}>Objetivo principal</p>
+              <Target size={14} className="text-text-muted" />
+              <p className="text-sm font-bold text-text-secondary">Objetivo principal</p>
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2.5">
               {GOALS.map((g) => (
                 <SelectPill key={g} label={g} selected={goal === g} onClick={() => setGoal(g)} />
               ))}
@@ -273,31 +263,34 @@ export default function ProfilePage() {
           </div>
         </section>
 
-        {/* ── Interesses ── */}
+        {/* ── Interests ── */}
         <section className="flex flex-col gap-4 animate-slide-up-spring delay-150">
           <SectionLabel>Interesses</SectionLabel>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
-            {INTERESTS.map(({ label, emoji }) => {
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
+            {INTERESTS.map(({ label, icon: IconComponent }) => {
               const selected = interests.includes(label);
               return (
                 <button
                   key={label}
                   type="button"
                   onClick={() => toggleInterest(label)}
-                  className="card-lift flex flex-col items-start rounded-2xl p-4 text-left transition-all duration-150 active:scale-95"
+                  className="card-lift flex flex-col items-start rounded-2xl p-4.5 text-left transition-all duration-150 active:scale-95 active:translate-y-[2px] active:shadow-none cursor-pointer"
                   style={{
                     backgroundColor: selected ? 'var(--color-primary-light)' : 'var(--color-surface)',
-                    border: `1.5px solid ${selected ? 'var(--color-primary)' : 'var(--color-border)'}`,
-                    boxShadow: selected ? '0 4px 12px rgba(29,94,212,0.15)' : 'none',
+                    border: '1.5px solid',
+                    borderColor: selected ? 'var(--color-primary)' : 'var(--color-border)',
+                    boxShadow: selected ? '0 4px 0 var(--color-primary-dark)' : '0 4px 0 var(--color-border)',
                   }}
                 >
-                  <span className="mb-2 text-2xl">{emoji}</span>
-                  <span className="text-sm font-semibold" style={{ color: selected ? 'var(--color-primary)' : 'var(--color-text-primary)' }}>
+                  <span className="mb-2 text-2xl flex items-center justify-center" style={{ color: selected ? 'var(--color-primary)' : 'var(--color-text-secondary)' }}>
+                    <IconComponent size={24} />
+                  </span>
+                  <span className="text-sm font-bold" style={{ color: selected ? 'var(--color-primary)' : 'var(--color-text-primary)' }}>
                     {label}
                   </span>
                   {selected && (
                     <span
-                      className="mt-1.5 flex h-4 w-4 items-center justify-center rounded-full"
+                      className="mt-2 flex h-4 w-4 items-center justify-center rounded-full animate-scale-in"
                       style={{ backgroundColor: 'var(--color-primary)' }}
                     >
                       <Check size={9} color="white" strokeWidth={3} />
@@ -309,10 +302,10 @@ export default function ProfilePage() {
           </div>
         </section>
 
-        {/* ── Idioma ── */}
+        {/* ── Target Language ── */}
         <section className="flex flex-col gap-4 animate-slide-up-spring delay-225">
           <SectionLabel>Idioma em aprendizado</SectionLabel>
-          <div className="flex flex-col md:flex-row gap-3">
+          <div className="flex flex-col md:flex-row gap-3.5">
             {([
               { lang: 'fr', flag: '🇫🇷', title: 'Francês', sub: 'Français' },
               { lang: 'en', flag: '🇬🇧', title: 'Inglês',  sub: 'English'  },
@@ -323,20 +316,21 @@ export default function ProfilePage() {
                   key={lang}
                   type="button"
                   onClick={() => setLanguage(lang)}
-                  className="card-lift flex flex-1 items-center gap-4 rounded-2xl p-4 text-left transition-all duration-150 active:scale-95"
+                  className="card-lift flex flex-1 items-center gap-4 rounded-2xl p-4.5 text-left transition-all duration-150 active:scale-95 active:translate-y-[2px] active:shadow-none cursor-pointer"
                   style={{
                     backgroundColor: selected ? 'var(--color-primary-light)' : 'var(--color-surface)',
-                    border: `2px solid ${selected ? 'var(--color-primary)' : 'var(--color-border)'}`,
-                    boxShadow: selected ? '0 4px 16px rgba(29,94,212,0.2)' : 'none',
+                    border: '2px solid',
+                    borderColor: selected ? 'var(--color-primary)' : 'var(--color-border)',
+                    boxShadow: selected ? '0 4px 0 var(--color-primary-dark)' : '0 4px 0 var(--color-border)',
                   }}
                 >
-                  <span className="text-3xl">{flag}</span>
-                  <div className="flex-1">
-                    <p className="font-bold text-sm" style={{ color: selected ? 'var(--color-primary)' : 'var(--color-text-primary)' }}>{title}</p>
-                    <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{sub}</p>
+                  <span className="text-3xl shrink-0 select-none">{flag}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-sm text-text-primary truncate">{title}</p>
+                    <p className="text-xs text-text-muted mt-0.5 truncate">{sub}</p>
                   </div>
                   <span
-                    className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full transition-all duration-200"
+                    className="flex h-6.5 w-6.5 shrink-0 items-center justify-center rounded-full transition-all duration-200"
                     style={{
                       background: selected ? 'linear-gradient(135deg, var(--color-primary), #60a5fa)' : 'var(--color-surface-raised)',
                       border: selected ? 'none' : '1.5px solid var(--color-border)',
@@ -350,54 +344,62 @@ export default function ProfilePage() {
           </div>
         </section>
 
-        {/* ── Erros para revisar ── */}
+        {/* ── Mistakes to review ── */}
         <MistakesSection uid={user.uid} />
 
-        {/* ── Admin ── */}
+        {/* ── Admin Cache manager ── */}
         {profile.email === ADMIN_EMAIL && (
-          <section className="flex flex-col gap-4 animate-slide-up-spring delay-375">
+          <section className="flex flex-col gap-4 animate-slide-up-spring delay-300">
             <SectionLabel>Gerenciar imagens de vocabulário</SectionLabel>
             <ImageCacheManager />
           </section>
         )}
 
-        {/* ── Conta ── */}
-        <section className="flex flex-col gap-3 animate-slide-up-spring delay-450">
+        {/* ── Account Management ── */}
+        <section className="flex flex-col gap-3 animate-slide-up-spring delay-375">
           <SectionLabel>Conta</SectionLabel>
           <button
             type="button"
             onClick={handleLogout}
-            className="card-lift flex items-center gap-3 rounded-2xl px-4 py-3.5 text-left transition-all active:scale-95"
-            style={{ backgroundColor: 'var(--color-surface)', border: '1.5px solid var(--color-border)' }}
+            className="card-lift flex items-center gap-3 rounded-2xl px-4 py-3.5 text-left transition-all active:scale-95 active:translate-y-[2px] active:shadow-none cursor-pointer"
+            style={{
+              backgroundColor: 'var(--color-surface)',
+              border: '1.5px solid var(--color-border)',
+              boxShadow: '0 3px 0 var(--color-border)'
+            }}
           >
             <span
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl animate-float"
               style={{ backgroundColor: 'var(--color-surface-raised)' }}
             >
-              <LogOut size={16} style={{ color: 'var(--color-text-muted)' }} />
+              <LogOut size={16} className="text-text-muted" />
             </span>
-            <span className="flex-1 font-semibold text-sm" style={{ color: 'var(--color-text-primary)' }}>
+            <span className="flex-1 font-bold text-sm text-text-primary">
               Sair da conta
             </span>
-            <ChevronRight size={16} style={{ color: 'var(--color-text-muted)' }} />
+            <ChevronRight size={16} className="text-text-muted" />
           </button>
 
           <button
             type="button"
             onClick={() => setShowDeleteSheet(true)}
-            className="card-lift flex items-center gap-3 rounded-2xl px-4 py-3.5 text-left transition-all active:scale-95"
-            style={{ backgroundColor: 'var(--color-error-bg)', border: '1.5px solid rgba(220,38,38,0.25)' }}
+            className="card-lift flex items-center gap-3 rounded-2xl px-4 py-3.5 text-left transition-all active:scale-95 active:translate-y-[2px] active:shadow-none cursor-pointer"
+            style={{
+              backgroundColor: 'var(--color-error-bg)',
+              border: '1.5px solid rgba(220, 38, 38, 0.25)',
+              boxShadow: '0 3px 0 rgba(220, 38, 38, 0.15)'
+            }}
           >
             <span
               className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl"
-              style={{ backgroundColor: 'rgba(220,38,38,0.15)' }}
+              style={{ backgroundColor: 'rgba(220, 38, 38, 0.15)' }}
             >
-              <Trash2 size={16} style={{ color: 'var(--color-error)' }} />
+              <Trash2 size={16} className="text-error" />
             </span>
-            <span className="flex-1 font-semibold text-sm" style={{ color: 'var(--color-error)' }}>
+            <span className="flex-1 font-bold text-sm text-error">
               Excluir conta
             </span>
-            <ChevronRight size={16} style={{ color: 'var(--color-error)', opacity: 0.5 }} />
+            <ChevronRight size={16} className="text-error opacity-50" />
           </button>
         </section>
       </main>
@@ -405,29 +407,32 @@ export default function ProfilePage() {
       {/* ── Sticky save bar ── */}
       <div
         className="fixed bottom-16 md:bottom-0 left-0 md:left-56 right-0 z-10 px-5 pb-3 pt-2"
-        style={{ backgroundColor: 'var(--color-bg)', borderTop: '1px solid var(--color-border)' }}
+        style={{
+          backgroundColor: 'var(--color-bg)',
+          borderTop: '1px solid var(--color-border)'
+        }}
       >
         <div className="max-w-lg md:max-w-2xl mx-auto">
           <button
             type="button"
             disabled={!isDirty || saving}
             onClick={handleSave}
-            className="cta-shimmer relative w-full overflow-hidden rounded-2xl py-3.5 text-sm font-bold text-white transition-all duration-150 active:scale-[0.98] disabled:cursor-not-allowed"
+            className="cta-shimmer relative w-full overflow-hidden rounded-2xl py-3.5 text-sm font-bold text-white transition-all duration-150 active:scale-[0.98] disabled:cursor-not-allowed cursor-pointer active:translate-y-[2px]"
             style={{
               background: isDirty
-                ? 'linear-gradient(135deg, var(--color-primary) 0%, #2563eb 100%)'
+                ? 'var(--color-primary)'
                 : 'var(--color-surface-raised)',
               color: isDirty ? '#fff' : 'var(--color-text-muted)',
-              boxShadow: isDirty ? '0 6px 20px rgba(29,94,212,0.3)' : 'none',
+              boxShadow: isDirty ? '0 3px 0 var(--color-primary-dark)' : 'none',
             }}
           >
             {saving ? (
               <span className="flex items-center justify-center gap-2">
-                <span className="h-4 w-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                <Loader2 size={16} className="animate-spin" />
                 Salvando…
               </span>
             ) : saveSuccess ? (
-              <span className="flex items-center justify-center gap-2">
+              <span className="flex items-center justify-center gap-2 animate-scale-in">
                 <Check size={16} strokeWidth={3} />
                 Salvo com sucesso!
               </span>

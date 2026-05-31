@@ -33,15 +33,15 @@ export function LessonVocabularyScreen({
     <div className="flex flex-col gap-6">
       {/* Header section with refined typography and icon */}
       <div className="flex flex-col gap-1.5 animate-slide-up">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/5 text-base shadow-inner ring-1 ring-white/10 backdrop-blur-md dark:bg-white/5">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] border-b-[3px] text-lg shadow-sm">
             📖
           </div>
           <div className="flex flex-col">
-            <h2 className="font-display text-xl font-bold tracking-tight text-[var(--color-text-primary)]">
+            <h2 className="font-serif text-2xl font-black italic tracking-tight text-[var(--color-text-primary)]">
               Vocabulário Novo
             </h2>
-            <p className="text-[10px] font-semibold text-[var(--color-text-muted)] uppercase tracking-[0.2em]">
+            <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-[0.2em] mt-0.5">
               Essenciais para esta lição
             </p>
           </div>

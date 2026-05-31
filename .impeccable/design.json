@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-05-31T02:30:00Z",
+  "title": "Design System: Verbalize",
+  "extensions": {
+    "colorMeta": {
+      "primary": { "role": "primary", "displayName": "Active Cobalt", "canonical": "oklch(49% 0.21 254)", "tonalRamp": ["#081d3f", "#0d316a", "#124395", "#1d5ed4", "#528bf2", "#8fbeff", "#ebf3ff", "#f5f9ff"] },
+      "vocab": { "role": "accent", "displayName": "Amber Vocabulary", "canonical": "oklch(62% 0.17 65)", "tonalRamp": ["#422100", "#783e00", "#b45d00", "#d97706", "#f59e0b", "#fcd34d", "#fef3c7", "#fffbeb"] },
+      "verb": { "role": "accent", "displayName": "Purple Verb", "canonical": "oklch(45% 0.24 290)", "tonalRamp": ["#23004b", "#430084", "#631da7", "#7c3aed", "#a78bfa", "#c4b5fd", "#f3e8ff", "#faf5ff"] },
+      "bg": { "role": "neutral", "displayName": "Warm Paper", "canonical": "oklch(98% 0.003 70)", "tonalRamp": ["#1c1917", "#44403c", "#78716c", "#a8a29e", "#d6d3d1", "#e7e5e0", "#fafaf7", "#ffffff"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Fraunces Display", "purpose": "Serif headlines and main lesson headings." },
+      "body": { "displayName": "DM Sans Body", "purpose": "Clean, highly readable text inside exercise blocks and dialogs." }
+    },
+    "shadows": [
+      { "name": "card-lift-shadow", "value": "0 8px 24px rgba(0, 0, 0, 0.10)", "purpose": "Elevation effect on interactive card hovers." }
+    ],
+    "motion": [
+      { "name": "correct-bounce", "value": "cubic-bezier(0.34, 1.56, 0.64, 1) 400ms", "purpose": "Spring-bounce for successful exercises." },
+      { "name": "shake", "value": "ease 350ms", "purpose": "Shaking translation for incorrect choices." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Tactile 3D Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Tactile 3D press button used for primary actions.",
+      "html": "<button class=\"ds-duo-cta\"><div>CONTINUAR</div></button>",
+      "css": ".ds-duo-cta { background: #1648a8; border-radius: 12px; border: none; padding: 0; cursor: pointer; outline-offset: 4px; display: inline-block; } .ds-duo-cta > div { display: block; padding: 12px 32px; border-radius: 12px; background: #1d5ed4; color: white; font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: 0.05em; transform: translateY(-4px); transition: transform 120ms ease; } .ds-duo-cta:hover > div { transform: translateY(-6px); } .ds-duo-cta:active > div { transform: translateY(0px); }"
+    },
+    {
+      "name": "Vocabulary Chip",
+      "kind": "chip",
+      "refersTo": "chip-vocab",
+      "description": "Interactive vocabulary word pill with active 3D compression response.",
+      "html": "<button class=\"ds-duo-chip\">pomme</button>",
+      "css": ".ds-duo-chip { padding: 8px 16px; border-radius: 9999px; background: #fef3c7; border: 1px solid #e7e5e0; border-bottom: 3px solid #d97706; color: #d97706; font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 14px; cursor: pointer; transition: transform 120ms ease, border-bottom-width 120ms ease; } .ds-duo-chip:hover { filter: brightness(1.03); transform: translateY(-1px); } .ds-duo-chip:active { transform: translateY(2px); border-bottom-width: 1px; }"
+    },
+    {
+      "name": "Interactive Raised Card",
+      "kind": "card",
+      "refersTo": "card-interactive",
+      "description": "Dashboard card designed to lift dynamically on hover.",
+      "html": "<div class=\"ds-card-lift\"><h3>Lição 1</h3><p>Introdução ao vocabulário básico.</p></div>",
+      "css": ".ds-card-lift { padding: 24px; border-radius: 16px; background: white; border: 1px solid #e7e5e0; font-family: 'DM Sans', sans-serif; transition: transform 200ms ease, box-shadow 200ms ease; cursor: pointer; } .ds-card-lift h3 { margin: 0 0 8px 0; font-family: 'Fraunces', serif; color: #1c1917; font-size: 20px; } .ds-card-lift p { margin: 0; color: #57534e; font-size: 14px; } .ds-card-lift:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.10); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Tactile Dialog Workshop",
+    "overview": "Verbalize is a premium, interactive language-learning sanctuary. It rejects the cold, flat, gray aesthetics of generic software tools in favor of a warm, rich, physical workspace. Every interactive element possesses visual weight and dimensional presence, rewarding actions with immediate physical feedback, micro-animations, and high-fidelity sonic reinforcement.",
+    "keyCharacteristics": [
+      "Tactile Dimensions: Buttons and chips feel physical, using subtle bottom borders (3D press effects) and scale transitions.",
+      "Dynamic Physics: Orchestrated springs and micro-shakes bring correct and incorrect answers to life.",
+      "Editorial Contrast: Sophisticated serif display headers paired with clean, accessible sans-serif body typography."
+    ],
+    "rules": [
+      { "name": "The Accent Rarity Rule", "body": "Accents (Amber and Purple) must never dominate more than 15% of a given screen. They are reserved strictly for isolating vocabulary and verb types to optimize visual scanning during active exercises.", "section": "colors" },
+      { "name": "The Sentence Rhythm Rule", "body": "Exercise texts must use a line-height of exactly 1.7 (.lesson-text) to allow pronunciation markers and translate hints to sit cleanly between lines without clipping.", "section": "typography" },
+      { "name": "The Tactile Spring Rule", "body": "Surfaces are flat or shallow at rest with a 1px border. Shadows appear only on hover or focus to signify lift. Active clicks must shift elements downwards by 2px to 4px to simulate physical buttons.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do use strict WCAG AA contrast (≥4.5:1) for all translation text. Ensure muted bridge text remains highly legible.",
+      "Do pair .animate-correct with positive auditory feedback and .animate-shake with incorrect answers to give multisensory reassurance.",
+      "Do limit display serif typography strictly to headings (h1 through h3) and keep DM Sans for all instructions."
+    ],
+    "donts": [
+      "Don't use generic, cold gray borders. Always use warm clay borders (#e7e5e0).",
+      "Don't use flat, non-animated state changes on exercise choices. Active buttons must bounce or translate to reward interaction.",
+      "Don't use side-stripe borders or neon text gradients. Design accents must rely purely on clean background shapes and text sizing."
+    ]
+  }
+}

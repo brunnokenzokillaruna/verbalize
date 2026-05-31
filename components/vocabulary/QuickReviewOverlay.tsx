@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { Loader2, X, CheckCircle2, XCircle, ChevronRight, RotateCw, X as XIcon, Check as CheckIcon } from 'lucide-react';
 import { AudioPlayerButton } from '@/components/lesson/AudioPlayerButton';
@@ -32,6 +32,59 @@ export function QuickReviewOverlay({
   const currentItem = state === 'running' ? items[currentIdx] : null;
   const [isFlipped, setIsFlipped] = useState(false);
 
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (state !== 'running' && state !== 'done') return;
+
+    const container = containerRef.current;
+    if (!container) return;
+
+    const getFocusableElements = () => {
+      return Array.from(
+        container.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        )
+      ).filter(el => el.offsetWidth > 0 || el.offsetHeight > 0);
+    };
+
+    const focusable = getFocusableElements();
+    if (focusable.length > 0) {
+      focusable[0].focus();
+    }
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return;
+
+      const focusableElements = getFocusableElements();
+      if (focusableElements.length === 0) {
+        e.preventDefault();
+        return;
+      }
+
+      const first = focusableElements[0];
+      const last = focusableElements[focusableElements.length - 1];
+      const active = document.activeElement as HTMLElement;
+
+      if (e.shiftKey) {
+        if (active === first || !focusableElements.includes(active)) {
+          last.focus();
+          e.preventDefault();
+        }
+      } else {
+        if (active === last || !focusableElements.includes(active)) {
+          first.focus();
+          e.preventDefault();
+        }
+      }
+    };
+
+    container.addEventListener('keydown', handleKeyDown);
+    return () => {
+      container.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [state, currentIdx, isFlipped, results, savingResults]);
+
   // ── Done screen ──────────────────────────────────────────────────────────────
   if (state === 'done') {
     const correctCount = results.filter((r) => r.correct).length;
@@ -39,6 +92,7 @@ export function QuickReviewOverlay({
 
     return (
       <div
+        ref={containerRef}
         className="fixed inset-0 z-50 flex flex-col overflow-y-auto animate-fade-in"
         style={{ backgroundColor: 'var(--color-bg)' }}
       >
@@ -166,6 +220,7 @@ export function QuickReviewOverlay({
 
   return (
     <div
+      ref={containerRef}
       className="fixed inset-0 z-50 flex flex-col overflow-y-auto animate-fade-in"
       style={{ backgroundColor: 'var(--color-bg)' }}
     >

@@ -55,3 +55,38 @@ Rules:
     return null;
   }
 }
+
+/**
+ * Translates multiple words at once to Brazilian Portuguese.
+ * This prevents hitting Gemini rate limits when loading a large vocabulary list.
+ */
+export async function translateWordsBatch(
+  words: string[],
+  language: SupportedLanguage,
+): Promise<{ word: string; translation: string }[] | null> {
+  if (words.length === 0) return [];
+  try {
+    const systemPrompt = `You are a language assistant for Brazilian Portuguese speakers learning ${LANG_LABEL[language]}. Respond with ONLY a valid JSON array of objects, with no markdown formatting, no explanations.`;
+
+    const prompt = `Translate the following list of ${LANG_LABEL[language]} words into Brazilian Portuguese:
+${JSON.stringify(words)}
+
+Output a JSON array of objects in exactly this format:
+[
+  {
+    "word": "original word",
+    "translation": "Portuguese translation"
+  }
+]
+
+Rules:
+- Keep translations brief, accurate, and natural.
+- Respond ONLY with the JSON array, no markdown fences, no extra text.`;
+
+    return await callGeminiJSON<{ word: string; translation: string }[]>(prompt, systemPrompt, 1500, 0);
+  } catch (err) {
+    console.error('[translateWordsBatch] Error:', err);
+    return null;
+  }
+}
+

@@ -97,8 +97,9 @@ export function LessonProgressHeader({ currentStage, tag, onExit, onComplete }: 
           <button
             type="button"
             onClick={onExit}
-            className="group flex h-11 w-11 items-center justify-center rounded-2xl transition-all duration-300 active:scale-90 bg-[var(--color-surface)] border border-[var(--color-border)] hover:border-[var(--color-border-strong)] hover:shadow-sm"
+            className="group flex h-11 w-11 items-center justify-center rounded-xl transition-all duration-100 active:translate-y-[2px] active:border-b-[1px] bg-[var(--color-surface)] border border-[var(--color-border)] border-b-[3px] hover:bg-[var(--color-surface-raised)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#f59e0b] focus-visible:ring-offset-2"
             title="Sair da lição"
+            aria-label="Sair da lição"
           >
             <X size={20} className="text-[var(--color-text-muted)] group-hover:text-[var(--color-text-primary)] group-hover:rotate-90 transition-all duration-300" />
           </button>
@@ -107,17 +108,17 @@ export function LessonProgressHeader({ currentStage, tag, onExit, onComplete }: 
             <button
               type="button"
               onClick={onComplete}
-              className="flex items-center gap-2 px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest text-[var(--color-success)] bg-[var(--color-success-bg)] hover:brightness-95 transition-all active:scale-95 border border-[var(--color-success)]/10 cta-shimmer relative overflow-hidden"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-[var(--color-success)] bg-[var(--color-success-bg)] border border-[var(--color-success)] border-b-[3px] transition-all duration-100 active:translate-y-[2px] active:border-b-[1px] cta-shimmer relative overflow-hidden"
             >
-              <Zap size={14} fill="currentColor" />
+              <Zap size={12} fill="currentColor" />
               <span>Concluir</span>
             </button>
           )}
         </div>
 
         {/* Progress Track - Premium Milestone Design */}
-        <div className="flex flex-1 items-center gap-1 min-w-0 max-w-lg">
-          <div className="flex flex-1 items-center gap-1.5 h-[6px]">
+        <div className="flex flex-1 items-center gap-1.5 min-w-0 max-w-lg">
+          <div className="flex flex-1 items-center gap-2 h-4 rounded-2xl bg-[var(--color-surface-raised)] border border-[var(--color-border)] p-[3px] shadow-[inset_0_2px_4px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)]">
             {stages.map((stage, i) => {
               const isCompleted = i < currentIndex;
               const isActive    = i === currentIndex;
@@ -126,7 +127,7 @@ export function LessonProgressHeader({ currentStage, tag, onExit, onComplete }: 
               return (
                 <div
                   key={stage.key}
-                  className="relative h-full flex-1 rounded-full overflow-hidden bg-[var(--color-border)]/50 border border-black/5"
+                  className="relative h-full flex-1 rounded-lg overflow-hidden bg-[var(--color-border)]/20 border border-black/5"
                 >
                   <div
                     className={`absolute inset-0 transition-all duration-1000 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
@@ -135,7 +136,7 @@ export function LessonProgressHeader({ currentStage, tag, onExit, onComplete }: 
                     style={{
                       backgroundColor: isFuture ? 'transparent' : 'var(--color-primary)',
                       width: (isCompleted || isActive) ? '100%' : '0%',
-                      boxShadow: isActive ? '0 0 10px var(--color-primary)' : 'none',
+                      boxShadow: isActive ? 'inset 0 1px 0 rgba(255,255,255,0.4), 0 0 8px var(--color-primary)' : 'none',
                     }}
                   />
                 </div>
@@ -151,10 +152,11 @@ export function LessonProgressHeader({ currentStage, tag, onExit, onComplete }: 
           <div className="flex items-center gap-2 animate-scale-in">
             {tagInfo && (
               <div
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border shadow-sm"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-b-[3px] shadow-sm transition-all hover:scale-105"
                 style={{ 
                   backgroundColor: 'var(--color-surface)', 
-                  borderColor: `${tagInfo.color}30`, 
+                  borderColor: `${tagInfo.color}30`,
+                  borderBottomColor: tagInfo.color, 
                   color: tagInfo.color 
                 }}
               >

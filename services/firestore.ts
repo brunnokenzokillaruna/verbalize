@@ -259,6 +259,29 @@ export async function updateVocabTranslation(
 }
 
 /**
+ * Patches the imageUrl field of an existing vocabulary item.
+ * Used to lazily enrich missing images on the vocabulary page.
+ */
+export async function updateVocabImage(
+  uid: string,
+  word: string,
+  language: SupportedLanguage,
+  imageUrl: string,
+): Promise<void> {
+  const q = query(
+    collection(db, 'user_vocabulary'),
+    where('uid', '==', uid),
+    where('language', '==', language),
+    where('word', '==', word),
+  );
+  const snap = await getDocs(q);
+  if (!snap.empty) {
+    await updateDoc(snap.docs[0].ref, { imageUrl });
+  }
+}
+
+
+/**
  * Updates the SRS level and next review date for a vocabulary item after a review exercise.
  * Correct → level up (max 5). Incorrect → level down (min 0) + increment mistakeCount.
  */

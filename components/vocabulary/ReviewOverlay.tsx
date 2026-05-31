@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
-import { Loader2, X, CheckCircle2, XCircle, ChevronRight } from 'lucide-react';
+import { Loader2, X, CheckCircle2, XCircle, ChevronRight, Book } from 'lucide-react';
 import { AudioPlayerButton } from '@/components/lesson/AudioPlayerButton';
 import { ContextChoiceExercise } from '@/components/lesson/ContextChoiceExercise';
 import { ReverseTranslationInput } from '@/components/lesson/ReverseTranslationInput';
@@ -48,9 +48,62 @@ export function ReviewOverlay({
   const [isExerciseReady, setIsExerciseReady] = useState(false);
   const [submitTrigger, setSubmitTrigger] = useState(0);
 
+  const containerRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     setIsExerciseReady(false);
   }, [currentIdx]);
+
+  useEffect(() => {
+    if (state !== 'running' && state !== 'done') return;
+
+    const container = containerRef.current;
+    if (!container) return;
+
+    const getFocusableElements = () => {
+      return Array.from(
+        container.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        )
+      ).filter(el => el.offsetWidth > 0 || el.offsetHeight > 0);
+    };
+
+    const focusable = getFocusableElements();
+    if (focusable.length > 0) {
+      focusable[0].focus();
+    }
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return;
+
+      const focusableElements = getFocusableElements();
+      if (focusableElements.length === 0) {
+        e.preventDefault();
+        return;
+      }
+
+      const first = focusableElements[0];
+      const last = focusableElements[focusableElements.length - 1];
+      const active = document.activeElement as HTMLElement;
+
+      if (e.shiftKey) {
+        if (active === first || !focusableElements.includes(active)) {
+          last.focus();
+          e.preventDefault();
+        }
+      } else {
+        if (active === last || !focusableElements.includes(active)) {
+          first.focus();
+          e.preventDefault();
+        }
+      }
+    };
+
+    container.addEventListener('keydown', handleKeyDown);
+    return () => {
+      container.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [state, currentIdx, answered, lastCorrect, results, savingResults, isExerciseReady]);
 
   // ── Done screen ──────────────────────────────────────────────────────────────
   if (state === 'done') {
@@ -59,6 +112,7 @@ export function ReviewOverlay({
 
     return (
       <div
+        ref={containerRef}
         className="fixed inset-0 z-50 flex flex-col overflow-y-auto"
         style={{ backgroundColor: 'var(--color-bg)' }}
       >
@@ -183,6 +237,7 @@ export function ReviewOverlay({
 
   return (
     <div
+      ref={containerRef}
       className="fixed inset-0 z-50 flex flex-col overflow-y-auto"
       style={{ backgroundColor: 'var(--color-bg)' }}
     >
@@ -251,10 +306,10 @@ export function ReviewOverlay({
               </div>
             ) : (
               <div
-                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-xl"
-                style={{ backgroundColor: 'var(--color-surface-raised)' }}
+                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl"
+                style={{ backgroundColor: 'var(--color-surface-raised)', color: 'var(--color-text-muted)' }}
               >
-                📖
+                <Book size={20} />
               </div>
             )}
             <div className="flex-1 min-w-0">

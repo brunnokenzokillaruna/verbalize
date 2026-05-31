@@ -4,32 +4,33 @@ import { Loader2 } from 'lucide-react';
 export function LessonLoadingScreen() {
   return (
     <div
-      className="flex min-h-dvh flex-col items-center justify-center gap-5 px-6"
+      className="flex min-h-dvh flex-col items-center justify-center gap-6 px-6"
       style={{ backgroundColor: 'var(--color-bg)' }}
     >
       <div
-        className="flex h-20 w-20 items-center justify-center rounded-3xl animate-pulse"
+        className="flex h-24 w-24 items-center justify-center rounded-3xl animate-pulse border border-[var(--color-border)] border-b-[4px] shadow-[0_6px_16px_rgba(0,0,0,0.06)]"
         style={{
-          background: 'linear-gradient(135deg, var(--color-primary-light), var(--color-surface-raised))',
-          border: '1.5px solid var(--color-border)',
+          background: 'var(--color-surface)',
         }}
       >
-        <Loader2 size={32} className="animate-spin" style={{ color: 'var(--color-primary)' }} />
+        <Loader2 size={36} className="animate-spin text-[var(--color-primary)]" />
       </div>
-      <div className="text-center">
-        <p className="font-display text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>
-          Preparando sua lição
-        </p>
-        <p className="mt-1 text-sm" style={{ color: 'var(--color-text-muted)' }}>
-          A IA está gerando o conteúdo…
+      
+      <div className="text-center max-w-xs flex flex-col items-center">
+        <h2 className="font-serif text-2xl font-black italic tracking-tight text-[var(--color-text-primary)]">
+          Preparando sua jornada…
+        </h2>
+        <p className="mt-2 text-sm font-medium text-[var(--color-text-muted)] leading-relaxed">
+          Nossa inteligência está moldando e sintonizando seus desafios de áudio e exercícios.
         </p>
       </div>
-      <div className="flex gap-1.5">
+
+      <div className="flex gap-2 mt-2">
         {[0, 1, 2].map((i) => (
           <span
             key={i}
-            className="h-1.5 w-1.5 rounded-full animate-bounce"
-            style={{ backgroundColor: 'var(--color-primary)', animationDelay: `${i * 150}ms`, opacity: 0.5 }}
+            className="h-2 w-2 rounded-full animate-bounce bg-[var(--color-primary)] shadow-sm"
+            style={{ animationDelay: `${i * 150}ms`, opacity: 0.75 }}
           />
         ))}
       </div>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Trash2, AlertCircle } from 'lucide-react';
 import { deleteUserData } from '@/services/firestore';
@@ -15,6 +15,14 @@ export function DeleteAccountSheet({ user, onClose, onReset }: DeleteAccountShee
   const router = useRouter();
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState('');
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
 
   async function handleDeleteAccount() {
     setDeleting(true);
@@ -77,7 +85,7 @@ export function DeleteAccountSheet({ user, onClose, onReset }: DeleteAccountShee
           type="button"
           disabled={deleting}
           onClick={handleDeleteAccount}
-          className="w-full rounded-2xl py-3.5 text-sm font-bold text-white transition-all active:scale-[0.98] disabled:opacity-60"
+          className="w-full rounded-2xl py-3.5 text-sm font-bold text-white transition-all active:scale-[0.98] disabled:opacity-60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-[#f59e0b]"
           style={{ background: 'linear-gradient(135deg, #dc2626, #ef4444)', boxShadow: '0 6px 20px rgba(220,38,38,0.3)' }}
         >
           {deleting ? (
@@ -91,7 +99,7 @@ export function DeleteAccountSheet({ user, onClose, onReset }: DeleteAccountShee
         <button
           type="button"
           onClick={onClose}
-          className="text-center text-sm font-semibold py-1 transition-opacity hover:opacity-70"
+          className="text-center text-sm font-semibold py-1 transition-opacity hover:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f59e0b] focus-visible:rounded"
           style={{ color: 'var(--color-text-muted)' }}
         >
           Cancelar

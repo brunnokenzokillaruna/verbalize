@@ -33,11 +33,11 @@ export function VisualVocabCard({
 
   return (
     <div
-      className="group relative overflow-hidden rounded-[1.25rem] transition-all duration-500 hover:-translate-y-1 hover:shadow-xl dark:hover:shadow-2xl/50"
-      style={{
-        backgroundColor: 'var(--color-surface)',
-        border: '1px solid var(--color-border)',
-      }}
+      className={[
+        "group relative overflow-hidden rounded-2xl transition-all duration-150 border border-[var(--color-border)] border-b-[4px] shadow-[0_4px_10px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_10px_rgba(0,0,0,0.2)] bg-[var(--color-surface)]",
+        "hover:translate-y-[1px] hover:border-b-[3px] active:translate-y-[2px] active:border-b-[1px]",
+        immersive && !revealed ? "cursor-pointer" : ""
+      ].filter(Boolean).join(" ")}
       onClick={() => { if (immersive && !revealed) setRevealed(true); }}
       role={immersive && !revealed ? 'button' : undefined}
     >
@@ -51,7 +51,7 @@ export function VisualVocabCard({
             src={imageUrl}
             alt={imageAlt ?? word}
             fill
-            className="object-cover transition-transform duration-1000 group-hover:scale-105"
+            className="object-cover transition-transform duration-700 group-hover:scale-105"
             sizes="(max-width: 640px) 100vw, 400px"
           />
         ) : (
@@ -66,24 +66,24 @@ export function VisualVocabCard({
 
         {/* Delicate Gradient Overlay */}
         <div
-          className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent opacity-60 transition-opacity duration-700"
+          className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent opacity-70 transition-opacity duration-500"
         />
 
         {/* Word Overlay with sophisticated typography */}
-        <div className="absolute bottom-0 left-0 right-0 p-4">
-          <div className="flex flex-col gap-0 transformation-gpu transition-transform duration-500 group-hover:translate-x-0.5">
+        <div className="absolute bottom-0 left-0 right-0 p-4 z-10">
+          <div className="flex flex-col gap-0.5 transform transition-transform duration-300 group-hover:translate-x-0.5">
             <h3
-              className="font-display text-2xl font-bold tracking-tight text-white"
+              className="font-serif text-2xl font-black italic tracking-tight text-white"
             >
               {word}
             </h3>
             {showImmersive ? (
-              <p className="mt-0.5 text-xs font-medium text-white/70 italic tracking-wide">
+              <p className="mt-0.5 text-xs font-semibold text-white/80 italic tracking-wide">
                 {targetDefinition}
-                <span className="ml-1.5 text-[9px] text-white/40 not-italic">toque para traduzir</span>
+                <span className="ml-1.5 text-[8px] font-black uppercase text-white/40 not-italic tracking-widest bg-black/35 px-1.5 py-0.5 rounded">toque</span>
               </p>
             ) : (
-              <p className="mt-0.5 text-xs font-medium text-white/80 italic tracking-wide">
+              <p className="mt-0.5 text-xs font-semibold text-white/95 italic tracking-wide">
                 {translation}
               </p>
             )}
@@ -92,25 +92,21 @@ export function VisualVocabCard({
       </div>
 
       {/* Subtle Control Bar */}
-      <div className="relative px-4 py-3 bg-[var(--color-surface)]">
+      <div className="relative px-4 py-3 bg-[var(--color-surface)] border-t border-[var(--color-border)]/50">
         <div className="flex items-center justify-between gap-3">
           <div className="flex-1 min-w-0">
             {exampleSentence && (
-              <p className="text-[11px] leading-relaxed text-[var(--color-text-secondary)] opacity-70 italic line-clamp-1 group-hover:opacity-100 transition-opacity">
+              <p className="text-[11px] font-medium leading-relaxed text-[var(--color-text-secondary)] opacity-75 italic line-clamp-1 group-hover:opacity-100 transition-opacity">
                 &quot;{exampleSentence}&quot;
               </p>
             )}
           </div>
 
-          <div className="shrink-0 scale-90 transition-transform duration-300 hover:scale-100">
+          <div className="shrink-0 transition-transform duration-200 hover:scale-105 active:scale-95">
             <AudioPlayerButton text={word} language={language} size="sm" />
           </div>
         </div>
-        
-        {/* Very subtle Accent Line */}
-        <div className="absolute bottom-0 left-0 h-[2px] w-0 bg-[var(--color-primary)] opacity-60 transition-all duration-700 group-hover:w-full"></div>
       </div>
     </div>
   );
 }
-

@@ -122,10 +122,10 @@ export function GrammarBridgeCard({ bridge, language }: GrammarBridgeCardProps) 
         <button
           type="button"
           onClick={() => setActiveTab('logic')}
-          className={`flex-1 flex items-center justify-center gap-2 py-3 px-3 rounded-2xl text-xs font-black tracking-wide uppercase transition-all duration-300 ${
+          className={`flex-1 flex items-center justify-center gap-2 py-3 px-3 rounded-xl text-xs font-black tracking-wide uppercase transition-all duration-150 ${
             activeTab === 'logic'
-              ? 'bg-[var(--color-surface)] text-[var(--color-primary)] shadow-sm ring-1 ring-[var(--color-border)]/50'
-              : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)]/20'
+              ? 'bg-[var(--color-surface)] text-[var(--color-primary)] border border-[var(--color-border)] border-b-[1px] translate-y-[2px] shadow-[inset_0_2px_4px_rgba(0,0,0,0.06)]'
+              : 'text-[var(--color-text-muted)] border border-transparent border-b-[3px] hover:text-[var(--color-text-primary)] active:translate-y-[1px]'
           }`}
         >
           <span>💡</span> A Lógica
@@ -133,10 +133,10 @@ export function GrammarBridgeCard({ bridge, language }: GrammarBridgeCardProps) 
         <button
           type="button"
           onClick={() => setActiveTab('practice')}
-          className={`flex-1 flex items-center justify-center gap-2 py-3 px-3 rounded-2xl text-xs font-black tracking-wide uppercase transition-all duration-300 ${
+          className={`flex-1 flex items-center justify-center gap-2 py-3 px-3 rounded-xl text-xs font-black tracking-wide uppercase transition-all duration-150 ${
             activeTab === 'practice'
-              ? 'bg-[var(--color-surface)] text-[var(--color-primary)] shadow-sm ring-1 ring-[var(--color-border)]/50'
-              : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)]/20'
+              ? 'bg-[var(--color-surface)] text-[var(--color-primary)] border border-[var(--color-border)] border-b-[1px] translate-y-[2px] shadow-[inset_0_2px_4px_rgba(0,0,0,0.06)]'
+              : 'text-[var(--color-text-muted)] border border-transparent border-b-[3px] hover:text-[var(--color-text-primary)] active:translate-y-[1px]'
           }`}
         >
           <span>🎯</span> Na Prática
@@ -144,10 +144,10 @@ export function GrammarBridgeCard({ bridge, language }: GrammarBridgeCardProps) 
         <button
           type="button"
           onClick={() => setActiveTab('context')}
-          className={`flex-1 flex items-center justify-center gap-2 py-3 px-3 rounded-2xl text-xs font-black tracking-wide uppercase transition-all duration-300 ${
+          className={`flex-1 flex items-center justify-center gap-2 py-3 px-3 rounded-xl text-xs font-black tracking-wide uppercase transition-all duration-150 ${
             activeTab === 'context'
-              ? 'bg-[var(--color-surface)] text-[var(--color-primary)] shadow-sm ring-1 ring-[var(--color-border)]/50'
-              : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)]/20'
+              ? 'bg-[var(--color-surface)] text-[var(--color-primary)] border border-[var(--color-border)] border-b-[1px] translate-y-[2px] shadow-[inset_0_2px_4px_rgba(0,0,0,0.06)]'
+              : 'text-[var(--color-text-muted)] border border-transparent border-b-[3px] hover:text-[var(--color-text-primary)] active:translate-y-[1px]'
           }`}
         >
           <span>💬</span> Contexto Real

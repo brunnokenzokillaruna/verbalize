@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Search, Loader2, BookMarked, ChevronDown, ChevronUp, Sparkles, Languages } from 'lucide-react';
+import { Search, Loader2, BookMarked, Sparkles, Languages, AlertCircle, X, Timer, Zap } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { getVerbConjugation } from '@/app/actions/getVerbConjugation';
 import { getUserVocabulary } from '@/services/firestore';
@@ -10,7 +10,6 @@ import type { VerbDocument, SupportedLanguage } from '@/types';
 import { LANG_META } from './data';
 import { VerbTenseList } from './components';
 import { VerbDrillSession } from '@/components/verbs/VerbDrillSession';
-import { Timer, Zap } from 'lucide-react';
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
@@ -23,6 +22,9 @@ export default function VerbsPage() {
   const [openTenses, setOpenTenses] = useState<Set<string>>(new Set(['present']));
   const [learnedVerbs, setLearnedVerbs] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Search filter for learned verbs list
+  const [learnedSearch, setLearnedSearch] = useState('');
 
   // Drill state
   const [drillState, setDrillState] = useState<'idle' | 'loading' | 'running'>('idle');
@@ -95,6 +97,11 @@ export default function VerbsPage() {
     }
   }
 
+  // Filtered learned verbs list
+  const filteredLearned = learnedVerbs.filter(v =>
+    v.toLowerCase().includes(learnedSearch.toLowerCase())
+  );
+
   return (
     <div className="min-h-dvh pb-24 md:pb-10" style={{ backgroundColor: 'var(--color-bg)' }}>
 
@@ -132,49 +139,37 @@ export default function VerbsPage() {
         {/* ── Search bar ── */}
         <form
           onSubmit={(e) => { e.preventDefault(); handleSearch(input); }}
-          className="flex gap-2.5 animate-slide-up-spring"
+          className="flex gap-3 animate-slide-up-spring"
         >
           <div className="relative flex-1">
             <Search
               size={17}
-              className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2"
-              style={{ color: 'var(--color-text-muted)' }}
+              className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-text-muted"
             />
             <input
               ref={inputRef}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder={langMeta.placeholder}
-              className="w-full rounded-2xl py-3.5 pl-11 pr-4 text-base outline-none transition-all duration-150"
-              style={{
-                backgroundColor: 'var(--color-surface)',
-                border: '1.5px solid var(--color-border)',
-                color: 'var(--color-text-primary)',
-              }}
-              onFocus={(e) => {
-                e.currentTarget.style.borderColor = 'var(--color-primary)';
-                e.currentTarget.style.boxShadow = '0 0 0 3px var(--color-primary-light)';
-              }}
-              onBlur={(e) => {
-                e.currentTarget.style.borderColor = 'var(--color-border)';
-                e.currentTarget.style.boxShadow = 'none';
-              }}
+              aria-label="Digite um verbo para conjugar"
+              className="w-full rounded-2xl py-3.5 pl-11 pr-4 text-base outline-none border transition-all duration-150 text-text-primary bg-surface border-border focus-visible:ring-2 focus-visible:ring-primary focus-visible:border-transparent"
             />
           </div>
           <button
             type="submit"
             disabled={loading || !input.trim()}
-            className="cta-shimmer relative overflow-hidden rounded-2xl px-6 py-3.5 text-sm font-bold transition-all duration-150 active:scale-95 disabled:cursor-not-allowed"
+            className="cta-shimmer shrink-0 relative overflow-hidden rounded-2xl px-6 py-3.5 text-sm font-bold transition-all active:scale-95 active:translate-y-[2px]"
             style={{
               background: loading || !input.trim()
                 ? 'var(--color-surface-raised)'
-                : 'linear-gradient(135deg, var(--color-primary) 0%, #2563eb 100%)',
+                : 'var(--color-primary)',
               color: loading || !input.trim()
                 ? 'var(--color-text-muted)'
                 : '#fff',
               boxShadow: loading || !input.trim()
                 ? 'none'
-                : '0 4px 14px rgba(29,94,212,0.3)',
+                : '0 3px 0 var(--color-primary-dark)',
+              cursor: loading || !input.trim() ? 'not-allowed' : 'pointer'
             }}
           >
             {loading
@@ -187,77 +182,118 @@ export default function VerbsPage() {
         {!verb && !loading && (
           <div className="flex flex-col gap-6 animate-slide-up-spring delay-75">
 
-            {/* Learned verbs */}
+            {/* Time attack CTA */}
             {learnedVerbs.length > 0 && (
-              <div className="flex flex-col gap-4">
-                
-                {/* Time attack CTA */}
-                <div 
-                  className="rounded-2xl p-4 flex items-center gap-4 animate-slide-up-spring"
-                  style={{
-                    background: 'linear-gradient(135deg, rgba(99,102,241,0.1) 0%, rgba(139,92,246,0.1) 100%)',
-                    border: '1.5px solid rgba(99,102,241,0.2)',
-                  }}
-                >
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-indigo-500 text-white">
-                    <Timer size={20} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold" style={{ color: 'var(--color-text-primary)' }}>
-                      Desafio de Verbos
-                    </p>
-                    <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-muted)' }}>
-                      Treine sua velocidade de conjugação
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={startDrill}
-                    disabled={drillState === 'loading'}
-                    className="shrink-0 flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all active:scale-95 text-white"
+              <div 
+                className="rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4 animate-slide-up-spring border-2"
+                style={{
+                  background: 'linear-gradient(to right, var(--color-surface), var(--color-surface-raised))',
+                  borderColor: 'var(--color-verb)',
+                  boxShadow: '0 4px 0 var(--color-verb-bg), 0 8px 16px rgba(124, 58, 237, 0.05)',
+                }}
+              >
+                <div className="flex items-center gap-4 w-full sm:w-auto flex-1">
+                  <div 
+                    className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-white animate-float"
                     style={{
-                      backgroundColor: '#6366f1',
-                      cursor: drillState === 'loading' ? 'wait' : 'pointer',
+                      backgroundColor: 'var(--color-verb)',
+                      boxShadow: '0 3px 0 #6d28d9'
                     }}
                   >
-                    {drillState === 'loading' ? (
-                      <Loader2 size={14} className="animate-spin" />
-                    ) : (
-                      <>
-                        Começar
-                        <Zap size={14} />
-                      </>
+                    <Timer size={22} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-base font-bold text-text-primary flex items-center gap-1.5">
+                      <span>Desafio de Verbos</span>
+                      <span className="px-2 py-0.5 rounded-full text-xs font-extrabold bg-verb-bg text-verb">
+                        {learnedVerbs.length}
+                      </span>
+                    </h3>
+                    <p className="text-xs text-text-muted mt-0.5">
+                      Treine sua velocidade de conjugação e fixação dos tempos gramaticais!
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={startDrill}
+                  disabled={drillState === 'loading'}
+                  className="w-full sm:w-auto shrink-0 flex items-center justify-center gap-1.5 rounded-xl px-5 py-3 text-sm font-bold transition-all active:scale-95 text-white active:translate-y-[2px]"
+                  style={{
+                    backgroundColor: 'var(--color-verb)',
+                    boxShadow: '0 3px 0 #6d28d9',
+                    cursor: drillState === 'loading' ? 'wait' : 'pointer',
+                  }}
+                >
+                  {drillState === 'loading' ? (
+                    <Loader2 size={14} className="animate-spin" />
+                  ) : (
+                    <>
+                      Começar Desafio
+                      <Zap size={14} fill="currentColor" />
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
+
+            {/* Learned verbs section */}
+            {learnedVerbs.length > 0 && (
+              <div className="flex flex-col gap-4 p-5 rounded-2xl border border-border bg-surface shadow-sm">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <Sparkles size={13} className="text-text-muted" />
+                    <p className="text-xs font-bold uppercase tracking-widest text-text-muted">
+                      Seus verbos aprendidos ({learnedVerbs.length})
+                    </p>
+                  </div>
+
+                  {/* Learned Verbs Search Input */}
+                  <div className="relative w-full sm:w-60 shrink-0">
+                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
+                    <input
+                      type="text"
+                      value={learnedSearch}
+                      onChange={(e) => setLearnedSearch(e.target.value)}
+                      placeholder="Filtrar verbos..."
+                      className="w-full pl-9 pr-8 py-1.5 rounded-xl border border-border text-text-primary text-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-transparent transition-all"
+                      style={{ backgroundColor: 'var(--color-bg)' }}
+                    />
+                    {learnedSearch && (
+                      <button
+                        onClick={() => setLearnedSearch('')}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary"
+                      >
+                        <X size={12} />
+                      </button>
                     )}
-                  </button>
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-2 mt-2">
-                  <Sparkles size={13} style={{ color: 'var(--color-text-muted)' }} />
-                  <p
-                    className="text-xs font-bold uppercase tracking-widest"
-                    style={{ color: 'var(--color-text-muted)' }}
-                  >
-                    Seus verbos
+                {filteredLearned.length > 0 ? (
+                  <div className="flex flex-wrap gap-2.5 pt-2">
+                    {filteredLearned.map((v) => (
+                      <button
+                        key={v}
+                        type="button"
+                        onClick={() => handleSearch(v)}
+                        className="rounded-xl px-4 py-2.5 text-sm font-semibold transition-all active:scale-95 active:translate-y-[2px] active:shadow-none cursor-pointer"
+                        style={{
+                          backgroundColor: 'var(--color-primary-light)',
+                          border: '1.5px solid rgba(29, 94, 212, 0.25)',
+                          boxShadow: '0 3px 0 rgba(29, 94, 212, 0.15)',
+                          color: 'var(--color-primary)',
+                        }}
+                      >
+                        {v}
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-text-muted italic py-2">
+                    Nenhum verbo correspondente a &ldquo;{learnedSearch}&rdquo;.
                   </p>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {learnedVerbs.map((v) => (
-                    <button
-                      key={v}
-                      type="button"
-                      onClick={() => handleSearch(v)}
-                      className="card-lift rounded-xl px-4 py-2 text-sm font-semibold transition-all active:scale-95"
-                      style={{
-                        backgroundColor: 'var(--color-primary-light)',
-                        border: '1.5px solid',
-                        borderColor: 'rgba(29,94,212,0.25)',
-                        color: 'var(--color-primary)',
-                      }}
-                    >
-                      {v}
-                    </button>
-                  ))}
-                </div>
+                )}
               </div>
             )}
 
@@ -300,12 +336,7 @@ export default function VerbsPage() {
                     key={v}
                     type="button"
                     onClick={() => handleSearch(v)}
-                    className="rounded-xl px-3.5 py-1.5 text-sm font-medium transition-all active:scale-95 hover:opacity-80"
-                    style={{
-                      backgroundColor: 'var(--color-surface)',
-                      border: '1px solid var(--color-border)',
-                      color: 'var(--color-text-secondary)',
-                    }}
+                    className="rounded-xl px-3.5 py-1.5 text-sm font-medium transition-all active:scale-95 hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary border cursor-pointer bg-surface border-border text-text-secondary"
                   >
                     {v}
                   </button>
@@ -358,7 +389,7 @@ export default function VerbsPage() {
               border: '1px solid rgba(220,38,38,0.2)',
             }}
           >
-            <span className="text-lg leading-none mt-0.5">⚠️</span>
+            <AlertCircle size={18} className="shrink-0 mt-0.5" />
             <p>{error}</p>
           </div>
         )}
@@ -369,53 +400,44 @@ export default function VerbsPage() {
 
             {/* Verb hero card */}
             <div
-              className="relative overflow-hidden rounded-3xl p-6"
+              className="relative overflow-hidden rounded-3xl p-6 border-2 border-primary-light"
               style={{
-                background: 'linear-gradient(135deg, #0a1628 0%, #1d5ed4 100%)',
-                boxShadow: '0 12px 40px rgba(29,94,212,0.3)',
+                background: 'linear-gradient(to right, #0c1524 0%, #173870 100%)',
+                boxShadow: '0 8px 24px rgba(29, 94, 212, 0.1)',
               }}
             >
-              {/* Diagonal pattern */}
-              <div
-                className="pointer-events-none absolute inset-0 opacity-[0.04]"
-                style={{
-                  backgroundImage: 'repeating-linear-gradient(45deg, #fff 0, #fff 1px, transparent 0, transparent 50%)',
-                  backgroundSize: '16px 16px',
-                }}
-              />
-              {/* Glow */}
-              <div
-                className="pointer-events-none absolute -right-8 -top-8 h-36 w-36 rounded-full"
-                style={{ background: 'radial-gradient(circle, rgba(96,165,250,0.25) 0%, transparent 70%)' }}
-              />
+              {/* Ambient glow */}
+              <div className="absolute top-0 right-0 h-32 w-32 bg-primary/20 rounded-full blur-3xl pointer-events-none" />
 
               <div className="relative flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
-                  <p
-                    className="text-xs font-bold uppercase tracking-widest mb-1"
-                    style={{ color: 'rgba(255,255,255,0.45)' }}
-                  >
-                    {langMeta.flag} {langMeta.label} · Infinitivo
-                  </p>
-                  <p
-                    className="font-display text-4xl font-bold leading-none"
-                    style={{ color: '#fff' }}
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-base">{langMeta.flag}</span>
+                    <span
+                      className="text-[10px] font-extrabold uppercase tracking-widest text-white/50"
+                    >
+                      {langMeta.label} · Infinitivo
+                    </span>
+                  </div>
+                  <h2
+                    className="font-display text-4xl sm:text-5xl font-extrabold leading-tight text-white tracking-tight drop-shadow-sm"
                   >
                     {verb.infinitive}
-                  </p>
+                  </h2>
                   <p
-                    className="mt-2 text-base italic"
-                    style={{ color: 'rgba(255,255,255,0.6)' }}
+                    className="mt-2 text-base sm:text-lg italic font-medium text-white/70"
                   >
                     {verb.translation}
                   </p>
                 </div>
-                <AudioPlayerButton text={verb.infinitive} language={language} size="sm" />
+                <div className="shrink-0 rounded-full p-1 bg-white/10 backdrop-blur-sm shadow-sm border border-white/15">
+                  <AudioPlayerButton text={verb.infinitive} language={language} size="md" />
+                </div>
               </div>
             </div>
 
             {/* Content: tenses + examples */}
-            <div className="flex flex-col gap-4 lg:grid lg:grid-cols-2 lg:items-start lg:gap-6">
+            <div className="flex flex-col gap-5 lg:grid lg:grid-cols-2 lg:items-start lg:gap-6">
 
               {/* Conjugation tenses */}
               <VerbTenseList
@@ -428,50 +450,44 @@ export default function VerbsPage() {
               {/* Example sentences */}
               {verb.exampleSentences?.length > 0 && (
                 <div className="flex flex-col gap-3">
-                  <p
-                    className="text-xs font-bold uppercase tracking-widest"
-                    style={{ color: 'var(--color-text-muted)' }}
-                  >
-                    Exemplos em contexto
-                  </p>
-                  <div className="flex flex-col gap-3">
+                  <div className="flex items-center gap-1.5">
+                    <Sparkles size={13} className="text-text-muted" />
+                    <p className="text-xs font-bold uppercase tracking-widest text-text-muted">
+                      Exemplos em contexto
+                    </p>
+                  </div>
+                  <div className="flex flex-col gap-3.5">
                     {verb.exampleSentences.slice(0, 3).map((ex, i) => (
                       <div
                         key={i}
-                        className="card-lift rounded-2xl p-4 animate-slide-up"
+                        className="card-lift rounded-2xl p-4.5 animate-slide-up bg-surface border border-border"
                         style={{
                           animationDelay: `${i * 80}ms`,
                           animationFillMode: 'both',
-                          backgroundColor: 'var(--color-surface)',
-                          border: '1.5px solid var(--color-border)',
                         }}
                       >
-                        <div className="flex items-start gap-3">
+                        <div className="flex items-start gap-4">
                           {/* Number badge */}
                           <span
-                            className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold mt-0.5"
+                            className="flex h-6.5 w-6.5 shrink-0 items-center justify-center rounded-full text-xs font-extrabold mt-0.5 text-white"
                             style={{
                               background: 'linear-gradient(135deg, var(--color-primary), #60a5fa)',
-                              color: '#fff',
+                              boxShadow: '0 2px 4px rgba(29, 94, 212, 0.15)'
                             }}
                           >
                             {i + 1}
                           </span>
                           <div className="flex-1 min-w-0">
-                            <p
-                              className="text-base font-semibold leading-snug"
-                              style={{ color: 'var(--color-text-primary)' }}
-                            >
+                            <p className="text-base font-bold leading-snug text-text-primary">
                               {ex.target}
                             </p>
-                            <p
-                              className="mt-1 text-sm italic leading-snug"
-                              style={{ color: 'var(--color-text-secondary)' }}
-                            >
+                            <p className="mt-1.5 text-sm italic leading-snug text-text-secondary">
                               {ex.portuguese}
                             </p>
                           </div>
-                          <AudioPlayerButton text={ex.target} language={language} size="sm" />
+                          <div className="shrink-0">
+                            <AudioPlayerButton text={ex.target} language={language} size="sm" />
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -493,3 +509,4 @@ export default function VerbsPage() {
     </div>
   );
 }
+

@@ -14,8 +14,7 @@ export function VerbTenseList({ verb, openTenses, toggleTense, language }: Tense
   return (
     <div className="flex flex-col gap-3">
       <p
-        className="text-xs font-bold uppercase tracking-widest"
-        style={{ color: 'var(--color-text-muted)' }}
+        className="text-xs font-bold uppercase tracking-widest text-text-muted"
       >
         Conjugações
       </p>
@@ -28,19 +27,18 @@ export function VerbTenseList({ verb, openTenses, toggleTense, language }: Tense
           return (
             <div
               key={tense}
-              className="overflow-hidden rounded-2xl transition-shadow duration-200"
+              className="overflow-hidden rounded-2xl transition-all duration-200 border"
               style={{
                 backgroundColor: 'var(--color-surface)',
-                border: '1.5px solid',
-                borderColor: isOpen ? `${accent}40` : 'var(--color-border)',
-                boxShadow: isOpen ? `0 4px 16px ${accent}18` : 'none',
+                borderColor: isOpen ? `${accent}50` : 'var(--color-border)',
+                boxShadow: isOpen ? `0 4px 16px ${accent}10` : 'none',
               }}
             >
               {/* Tense toggle button */}
               <button
                 type="button"
                 onClick={() => toggleTense(tense)}
-                className="flex w-full items-center gap-3 px-4 py-3.5 transition-opacity hover:opacity-80"
+                className="flex w-full items-center gap-3 px-4 py-3.5 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-t-2xl active:scale-[0.99]"
               >
                 {/* Colored accent dot */}
                 <span
@@ -72,19 +70,18 @@ export function VerbTenseList({ verb, openTenses, toggleTense, language }: Tense
                   {Object.entries(forms).map(([pronoun, form], i) => (
                     <div
                       key={pronoun}
-                      className="flex items-center gap-3 px-4 py-2.5"
+                      className="flex items-center gap-3 px-4 py-3.5 transition-colors duration-150 hover:bg-surface-raised"
                       style={{
                         borderTop: i > 0 ? '1px solid var(--color-border)' : 'none',
                       }}
                     >
                       <span
-                        className="w-20 shrink-0 text-xs font-semibold"
-                        style={{ color: 'var(--color-text-muted)' }}
+                        className="w-20 shrink-0 text-xs font-bold text-text-secondary"
                       >
                         {pronoun}
                       </span>
                       <span
-                        className="flex-1 font-display text-base font-semibold"
+                        className="flex-1 font-display text-base font-bold"
                         style={{ color: accent }}
                       >
                         {form}
@@ -104,3 +101,4 @@ export function VerbTenseList({ verb, openTenses, toggleTense, language }: Tense
     </div>
   );
 }
+

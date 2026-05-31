@@ -46,7 +46,7 @@ export function CheckButton({
           overflow: 'hidden',
           maxHeight: isResult ? '120px' : '0px',
           borderTop: isResult
-            ? `2px solid ${isCorrect ? 'var(--color-success)' : 'var(--color-error)'}`
+            ? `4px solid ${isCorrect ? 'var(--color-success)' : 'var(--color-error)'}`
             : 'none',
         }}
       >
@@ -59,15 +59,15 @@ export function CheckButton({
             )}
             <div>
               <p
-                className="font-semibold"
+                className="font-bold text-base"
                 style={{ color: isCorrect ? 'var(--color-success)' : 'var(--color-error)' }}
               >
                 {isCorrect ? 'Correto!' : 'Resposta incorreta'}
               </p>
               {!isCorrect && correctAnswer && (
-                <p className="mt-0.5 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+                <p className="mt-0.5 text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>
                   Resposta certa:{' '}
-                  <span className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+                  <span className="font-bold text-[var(--color-text-primary)]">
                     {correctAnswer}
                   </span>
                 </p>
@@ -92,9 +92,9 @@ export function CheckButton({
           disabled={state === 'disabled' || loading}
           onClick={handleClick}
           className={[
-            'flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-4 text-base font-semibold',
-            'transition-all duration-150 active:scale-[0.98]',
-            state === 'disabled' ? 'cursor-not-allowed' : 'cursor-pointer',
+            'flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-4 text-base font-bold',
+            'transition-all duration-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-[#f59e0b]',
+            state === 'disabled' ? 'cursor-not-allowed border border-[var(--color-border)]' : 'cursor-pointer active:translate-y-[2px] active:border-b-[2px]',
             isResult ? (isCorrect ? 'animate-correct' : 'animate-shake') : '',
           ]
             .filter(Boolean)
@@ -112,13 +112,15 @@ export function CheckButton({
               state === 'disabled'
                 ? 'var(--color-text-muted)'
                 : 'var(--color-text-inverse)',
+            borderBottomWidth: state === 'disabled' ? '1px' : '4px',
+            borderBottomColor: state === 'disabled' ? 'var(--color-border)' : 'rgba(0, 0, 0, 0.35)',
             boxShadow:
               state !== 'disabled'
                 ? isCorrect
-                  ? '0 4px 16px rgba(5, 150, 105, 0.3)'
+                  ? '0 6px 16px rgba(16, 185, 129, 0.25)'
                   : state === 'incorrect'
-                    ? '0 4px 16px rgba(220, 38, 38, 0.3)'
-                    : '0 4px 16px rgba(29, 94, 212, 0.3)'
+                    ? '0 6px 16px rgba(220, 38, 38, 0.25)'
+                    : '0 6px 16px rgba(29, 94, 212, 0.25)'
                 : 'none',
           }}
         >

@@ -52,7 +52,7 @@ export function ClickableWord({
         role="button"
         tabIndex={0}
         onKeyDown={(e) => e.key === 'Enter' && handleClick(e as never)}
-        className="relative inline-block cursor-pointer select-none rounded-[4px] px-1 transition-all duration-200"
+        className="relative inline-block cursor-pointer select-none rounded-[4px] px-1 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-[#f59e0b]"
         style={{
           color: mainColor,
           borderBottom: `1.5px solid ${ripple ? mainColor : rippleBorderColor}`,
@@ -84,7 +84,7 @@ export function ClickableWord({
       role="button"
       tabIndex={0}
       onKeyDown={(e) => e.key === 'Enter' && handleClick(e as never)}
-      className="inline-block cursor-pointer select-none rounded px-0.5 transition-colors duration-100 hover:bg-[var(--color-surface-raised)]"
+      className="inline-block cursor-pointer select-none rounded px-0.5 transition-colors duration-100 hover:bg-[var(--color-surface-raised)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-[#f59e0b]"
       style={{ color: 'var(--color-text-primary)' }}
       aria-label={`Traduzir: ${word}`}
     >

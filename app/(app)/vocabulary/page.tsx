@@ -2,15 +2,16 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
-import { Loader2, BookOpen, Clock, Sparkles, Trophy, X, ChevronRight, CheckCircle2, XCircle, Zap } from 'lucide-react';
+import { Loader2, BookOpen, Clock, Sparkles, Trophy, X, ChevronRight, CheckCircle2, XCircle, Zap, Brain, Search, LayoutGrid, List } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import {
   getUserVocabulary,
   updateVocabTranslation,
-  getCachedImage,
+  updateVocabImage,
   updateVocabSrsAfterReview,
 } from '@/services/firestore';
-import { translateWord } from '@/app/actions/translateWord';
+import { translateWord, translateWordsBatch } from '@/app/actions/translateWord';
+import { getVocabImage } from '@/app/actions/getVocabImage';
 import { generateVocabReview } from '@/app/actions/generateVocabReview';
 import type { VocabReviewItem } from '@/app/actions/generateVocabReview';
 import { getLessonById, getNextLesson } from '@/lib/curriculum';
@@ -20,6 +21,8 @@ import { StatChip } from '@/components/vocabulary/StatChip';
 import { VocabCard } from '@/components/vocabulary/VocabCard';
 import { ReviewOverlay, type ReviewResult } from '@/components/vocabulary/ReviewOverlay';
 import { QuickReviewOverlay } from '@/components/vocabulary/QuickReviewOverlay';
+import { AudioPlayerButton } from '@/components/lesson/AudioPlayerButton';
+import { SrsBar, SRS_BAR_COLOR, SRS_LABELS, formatNextReview } from '@/components/vocabulary/SrsBar';
 
 const LANG_LABEL: Record<SupportedLanguage, { label: string; flag: string }> = {
   fr: { label: 'Francês', flag: '🇫🇷' },
@@ -27,6 +30,85 @@ const LANG_LABEL: Record<SupportedLanguage, { label: string; flag: string }> = {
 };
 
 type ReviewState = 'idle' | 'loading' | 'running' | 'done';
+
+// ── Compact List Row Component ───────────────────────────────────────────────
+
+function VocabListRow({
+  item,
+  language,
+  urgent = false,
+}: {
+  item: UserVocabularyDocument;
+  language: SupportedLanguage;
+  urgent?: boolean;
+}) {
+  const level = Math.min(Math.max(item.srsLevel ?? 0, 0), 5);
+  const isPlaceholder = item.translation === item.word || !item.translation;
+  const reviewText = formatNextReview(item.nextReview as Parameters<typeof formatNextReview>[0]);
+  const barColor = SRS_BAR_COLOR[level];
+
+  return (
+    <div
+      className="flex items-center justify-between p-3.5 px-4 rounded-xl border transition-all duration-150 gap-4"
+      style={{
+        backgroundColor: 'var(--color-surface)',
+        borderColor: urgent ? 'var(--color-error)' : 'var(--color-border)',
+        boxShadow: urgent ? '0 0 0 2px var(--color-error-bg)' : undefined,
+      }}
+    >
+      <div className="flex items-center gap-3.5 min-w-0 flex-1">
+        <AudioPlayerButton text={item.word} language={language} size="sm" />
+        <div className="min-w-0">
+          <div className="flex items-center gap-2">
+            <span className="font-display text-base font-bold text-text-primary tracking-tight truncate">
+              {item.word}
+            </span>
+            {urgent && (
+              <span className="flex h-1.5 w-1.5 rounded-full bg-error shrink-0 animate-pulse" />
+            )}
+          </div>
+          <p
+            className="text-xs truncate mt-0.5"
+            style={{
+              color: isPlaceholder ? 'var(--color-text-muted)' : 'var(--color-text-secondary)',
+              fontStyle: isPlaceholder ? 'italic' : 'normal',
+            }}
+          >
+            {isPlaceholder ? 'traduzindo…' : item.translation}
+          </p>
+        </div>
+      </div>
+
+      <div className="hidden sm:flex flex-col gap-1 w-32 shrink-0">
+        <div className="flex items-center justify-between text-[10px] font-bold">
+          <span style={{ color: barColor }}>{SRS_LABELS[level]}</span>
+          <span className="text-text-muted">Nível {level}/5</span>
+        </div>
+        <SrsBar level={level} />
+      </div>
+
+      <span
+        className="sm:hidden text-[10px] font-bold rounded-full px-2 py-0.5"
+        style={{ backgroundColor: `${barColor}15`, color: barColor }}
+      >
+        {SRS_LABELS[level]}
+      </span>
+
+      <div className="text-right shrink-0 min-w-[90px]">
+        {reviewText ? (
+          <p
+            className="text-[11px] font-bold"
+            style={{ color: urgent ? 'var(--color-error)' : 'var(--color-text-muted)' }}
+          >
+            {reviewText}
+          </p>
+        ) : (
+          <p className="text-[11px] font-semibold text-text-muted">Pronto</p>
+        )}
+      </div>
+    </div>
+  );
+}
 
 // ── Main page ─────────────────────────────────────────────────────────────────
 
@@ -36,7 +118,6 @@ export default function VocabularyPage() {
   const [loading, setLoading] = useState(true);
   const [enriching, setEnriching] = useState(false);
 
-  // Review session state
   const [reviewState, setReviewState] = useState<ReviewState>('idle');
   const [reviewItems, setReviewItems] = useState<VocabReviewItem[]>([]);
   const [reviewIdx, setReviewIdx] = useState(0);
@@ -45,9 +126,12 @@ export default function VocabularyPage() {
   const [results, setResults] = useState<ReviewResult[]>([]);
   const [savingResults, setSavingResults] = useState(false);
 
-  // Quick Review state
   const [quickState, setQuickState] = useState<'idle' | 'running' | 'done'>('idle');
   const [quickIdx, setQuickIdx] = useState(0);
+
+  const [layoutMode, setLayoutMode] = useState<'grid' | 'list'>('grid');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [srsFilter, setSrsFilter] = useState<'all' | 'new' | 'learning' | 'mastered'>('all');
 
   const language = (profile?.currentTargetLanguage ?? 'fr') as SupportedLanguage;
   const lang = LANG_LABEL[language];
@@ -56,46 +140,135 @@ export default function VocabularyPage() {
     if (!user) return;
     setLoading(true);
     const vocab = await getUserVocabulary(user.uid, language);
-    const cacheResults = await Promise.all(
-      vocab.map((v) => getCachedImage(`${v.word}_${language}`)),
-    );
-    const enriched = vocab.map((v, i) => ({
-      ...v,
-      imageUrl: cacheResults[i]?.imageUrl ?? v.imageUrl,
-    }));
-    setItems(enriched);
+    setItems(vocab);
     setLoading(false);
 
     const placeholders = vocab.filter((v) => v.translation === v.word || !v.translation);
-    if (placeholders.length === 0) return;
+    const missingImages = vocab.filter((v) => !v.imageUrl);
+
+    if (placeholders.length === 0 && missingImages.length === 0) return;
     setEnriching(true);
-    await Promise.all(
-      placeholders.map(async (item) => {
-        const result = await translateWord(item.word, '', language);
-        if (result?.translation && result.translation !== item.word) {
-          await updateVocabTranslation(user.uid, item.word, language, result.translation);
-          setItems((prev) =>
-            prev.map((v) =>
-              v.word === item.word ? { ...v, translation: result.translation } : v,
-            ),
-          );
+
+    // 1. Batch Translate Placeholders
+    if (placeholders.length > 0) {
+      const batchSize = 15;
+      for (let i = 0; i < placeholders.length; i += batchSize) {
+        const chunk = placeholders.slice(i, i + batchSize);
+        const chunkWords = chunk.map((item) => item.word);
+
+        try {
+          const results = await translateWordsBatch(chunkWords, language);
+          if (results && results.length > 0) {
+            const translationMap = new Map(
+              results.map((r) => [r.word.toLowerCase(), r.translation]),
+            );
+
+            await Promise.all(
+              chunk.map(async (item) => {
+                const translation = translationMap.get(item.word.toLowerCase());
+                if (translation && translation !== item.word) {
+                  await updateVocabTranslation(user.uid, item.word, language, translation);
+                  setItems((prev) =>
+                    prev.map((v) =>
+                      v.word === item.word ? { ...v, translation } : v,
+                    ),
+                  );
+                }
+              }),
+            );
+          }
+        } catch (err) {
+          console.error('[loadVocabulary] Batch translation failed:', err);
         }
-      }),
-    );
+
+        // Delay between translation batches to respect rate limits
+        if (i + batchSize < placeholders.length) {
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+        }
+      }
+    }
+
+    // 2. Enrich Missing Images
+    if (missingImages.length > 0) {
+      // Process missing images sequentially to prevent rate limits on Pexels/Gemini
+      for (const item of missingImages) {
+        try {
+          const imgResult = await getVocabImage(item.word, '', language);
+          if (imgResult?.imageUrl) {
+            await updateVocabImage(user.uid, item.word, language, imgResult.imageUrl);
+            setItems((prev) =>
+              prev.map((v) =>
+                v.word === item.word ? { ...v, imageUrl: imgResult.imageUrl } : v,
+              ),
+            );
+          }
+        } catch (err) {
+          console.error('[loadVocabulary] Image enrichment failed for', item.word, err);
+        }
+        // Small delay between image searches to prevent API hammering
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+      }
+    }
+
     setEnriching(false);
   }, [user, language]);
+
+  const handleImageLoaded = useCallback((word: string, imageUrl: string) => {
+    setItems((prev) =>
+      prev.map((item) => (item.word === word ? { ...item, imageUrl } : item)),
+    );
+  }, []);
 
   useEffect(() => {
     loadVocabulary();
   }, [loadVocabulary]);
 
-  // ── Split into due-today vs learned ──────────────────────────────────────────
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (reviewState === 'running' || reviewState === 'done') closeReview();
+        if (quickState === 'running' || quickState === 'done') closeQuickReview();
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, [reviewState, quickState]);
 
   const now = new Date();
+  
+  const rawDueToday = items.filter((item) => {
+    const reviewDate =
+      item.nextReview &&
+      typeof (item.nextReview as { toDate?: () => Date }).toDate === 'function'
+        ? (item.nextReview as { toDate: () => Date }).toDate()
+        : null;
+    return reviewDate && reviewDate <= now;
+  });
+
+  const totalCount = items.length;
+  const newCount = items.filter((v) => (v.srsLevel ?? 0) <= 1).length;
+  const learningCount = items.filter((v) => (v.srsLevel ?? 0) >= 2 && (v.srsLevel ?? 0) <= 4).length;
+  const masteredCount = items.filter((v) => (v.srsLevel ?? 0) >= 5).length;
+
+  const filteredItems = items.filter((item) => {
+    const matchesSearch =
+      item.word.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (item.translation && item.translation.toLowerCase().includes(searchQuery.toLowerCase()));
+
+    if (!matchesSearch) return false;
+
+    const level = item.srsLevel ?? 0;
+    if (srsFilter === 'new') return level <= 1;
+    if (srsFilter === 'learning') return level >= 2 && level <= 4;
+    if (srsFilter === 'mastered') return level >= 5;
+
+    return true;
+  });
+
   const dueToday: UserVocabularyDocument[] = [];
   const learned: UserVocabularyDocument[] = [];
 
-  for (const item of items) {
+  for (const item of filteredItems) {
     const reviewDate =
       item.nextReview &&
       typeof (item.nextReview as { toDate?: () => Date }).toDate === 'function'
@@ -108,18 +281,15 @@ export default function VocabularyPage() {
     }
   }
 
-  const masteredCount = items.filter((v) => (v.srsLevel ?? 0) >= 5).length;
-
-  // ── Image map for review overlay ──────────────────────────────────────────────
+  const focusWord = dueToday.length > 0 ? dueToday[0] : null;
+  const remainingDueToday = dueToday.slice(1);
 
   const wordImageMap = Object.fromEntries(
     items.filter((v) => v.imageUrl).map((v) => [v.word, v.imageUrl!]),
   );
 
-  // ── Review handlers ───────────────────────────────────────────────────────────
-
   async function startReview() {
-    if (!user || dueToday.length === 0) return;
+    if (!user || rawDueToday.length === 0) return;
     setReviewState('loading');
 
     const currentLessonId = profile?.lessonProgress?.[language];
@@ -130,7 +300,7 @@ export default function VocabularyPage() {
     const knownVocabulary = items.map((v) => v.word);
 
     const generated = await generateVocabReview({
-      words: dueToday.map((v) => ({ word: v.word, translation: v.translation })),
+      words: rawDueToday.map((v) => ({ word: v.word, translation: v.translation })),
       language,
       level,
       knownVocabulary,
@@ -188,19 +358,17 @@ export default function VocabularyPage() {
     setResults([]);
   }
 
-  // ── Quick Review handlers ─────────────────────────────────────────────────────
-
   function startQuickReview() {
-    if (!user || dueToday.length === 0) return;
+    if (!user || rawDueToday.length === 0) return;
     setQuickIdx(0);
     setResults([]);
     setQuickState('running');
   }
 
   function handleQuickAnswer(correct: boolean) {
-    const currentItem = dueToday[quickIdx];
+    const currentItem = rawDueToday[quickIdx];
     setResults((prev) => [...prev, { word: currentItem.word, correct }]);
-    if (quickIdx + 1 >= dueToday.length) {
+    if (quickIdx + 1 >= rawDueToday.length) {
       setQuickState('done');
     } else {
       setQuickIdx(quickIdx + 1);
@@ -223,8 +391,6 @@ export default function VocabularyPage() {
     setResults([]);
   }
 
-  // ── Loading ───────────────────────────────────────────────────────────────────
-
   if (loading) {
     return (
       <div
@@ -246,8 +412,6 @@ export default function VocabularyPage() {
       </div>
     );
   }
-
-  // ── Empty state ───────────────────────────────────────────────────────────────
 
   if (items.length === 0) {
     return (
@@ -279,17 +443,21 @@ export default function VocabularyPage() {
           </p>
         </div>
         <div className="flex gap-2 mt-2">
-          {['📚', '🧠', '✨'].map((e, i) => (
+          {[
+            <BookOpen key="book" size={18} style={{ color: 'var(--color-primary)' }} />,
+            <Brain key="brain" size={18} style={{ color: 'var(--color-verb)' }} />,
+            <Sparkles key="sparkles" size={18} style={{ color: 'var(--color-warning)' }} />,
+          ].map((icon, i) => (
             <span
               key={i}
-              className="flex h-10 w-10 items-center justify-center rounded-xl text-lg animate-float"
+              className="flex h-10 w-10 items-center justify-center rounded-xl animate-float"
               style={{
                 backgroundColor: 'var(--color-surface)',
                 border: '1px solid var(--color-border)',
                 animationDelay: `${i * 0.4}s`,
               }}
             >
-              {e}
+              {icon}
             </span>
           ))}
         </div>
@@ -297,13 +465,11 @@ export default function VocabularyPage() {
     );
   }
 
-  // ── Main view ─────────────────────────────────────────────────────────────────
+  const noMatches = filteredItems.length === 0;
 
   return (
     <>
-      <div className="min-h-dvh pb-24 md:pb-10" style={{ backgroundColor: 'var(--color-bg)' }}>
-
-        {/* ── Sticky header ── */}
+      <div className="min-h-dvh pb-24 md:pb-10 animate-fade-in" style={{ backgroundColor: 'var(--color-bg)' }}>
         <header
           className="sticky top-0 z-10 px-5 pt-6 pb-4"
           style={{
@@ -346,7 +512,6 @@ export default function VocabularyPage() {
               )}
             </div>
 
-            {/* Stats row */}
             <div className="flex gap-3 mt-4 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
               <StatChip
                 icon={<BookOpen size={13} />}
@@ -354,10 +519,10 @@ export default function VocabularyPage() {
                 color="var(--color-primary)"
                 bg="var(--color-primary-light)"
               />
-              {dueToday.length > 0 && (
+              {rawDueToday.length > 0 && (
                 <StatChip
                   icon={<Clock size={13} />}
-                  label={`${dueToday.length} para revisar`}
+                  label={`${rawDueToday.length} para revisar`}
                   color="var(--color-error)"
                   bg="var(--color-error-bg)"
                 />
@@ -374,53 +539,158 @@ export default function VocabularyPage() {
           </div>
         </header>
 
-        {/* ── Content ── */}
-        <main className="mx-auto max-w-lg md:max-w-2xl lg:max-w-4xl px-5 pt-6 flex flex-col gap-8">
+        <main className="mx-auto max-w-lg md:max-w-2xl lg:max-w-4xl px-5 pt-6 flex flex-col gap-6">
+          <div className="flex flex-col gap-4 p-4 rounded-2xl border border-border" style={{ backgroundColor: 'var(--color-surface)' }}>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="relative flex-1">
+                <span className="absolute inset-y-0 left-3.5 flex items-center pointer-events-none text-text-muted">
+                  <Search size={16} />
+                </span>
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Buscar palavra ou tradução..."
+                  className="w-full pl-10 pr-9 py-2.5 rounded-xl border border-border text-text-primary text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:border-transparent transition-all"
+                  style={{ backgroundColor: 'var(--color-bg)' }}
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute inset-y-0 right-3 flex items-center text-text-muted hover:text-text-primary"
+                  >
+                    <X size={15} />
+                  </button>
+                )}
+              </div>
 
-          {/* ── Review CTA banner ── */}
-          {dueToday.length > 0 && (
+              <div className="flex rounded-xl p-1 border border-border self-start sm:self-auto shrink-0" style={{ backgroundColor: 'var(--color-bg)' }}>
+                <button
+                  type="button"
+                  onClick={() => setLayoutMode('grid')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all active:scale-95 cursor-pointer ${
+                    layoutMode === 'grid'
+                      ? 'bg-surface text-text-primary shadow-sm border border-border'
+                      : 'text-text-muted hover:text-text-primary'
+                  }`}
+                  title="Visualização em Grid"
+                >
+                  <LayoutGrid size={13} /> Grid
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLayoutMode('list')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all active:scale-95 cursor-pointer ${
+                    layoutMode === 'list'
+                      ? 'bg-surface text-text-primary shadow-sm border border-border'
+                      : 'text-text-muted hover:text-text-primary'
+                  }`}
+                  title="Visualização em Lista Compacta"
+                >
+                  <List size={13} /> Lista
+                </button>
+              </div>
+            </div>
+
+            <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
+              <button
+                type="button"
+                onClick={() => setSrsFilter('all')}
+                className={`duo-level-chip shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border cursor-pointer ${
+                  srsFilter === 'all'
+                    ? 'bg-primary text-white border-primary shadow-sm'
+                    : 'bg-surface text-text-secondary border-border hover:bg-surface-raised'
+                }`}
+              >
+                Tudo <span className="text-[10px] opacity-75 font-extrabold">{totalCount}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setSrsFilter('new')}
+                className={`duo-level-chip shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border cursor-pointer ${
+                  srsFilter === 'new'
+                    ? 'bg-vocab text-white border-vocab shadow-sm'
+                    : 'bg-surface text-text-secondary border-border hover:bg-surface-raised'
+                }`}
+              >
+                Novas <span className="text-[10px] opacity-75 font-extrabold">{newCount}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setSrsFilter('learning')}
+                className={`duo-level-chip shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border cursor-pointer ${
+                  srsFilter === 'learning'
+                    ? 'bg-verb text-white border-verb shadow-sm'
+                    : 'bg-surface text-text-secondary border-border hover:bg-surface-raised'
+                }`}
+              >
+                Praticando <span className="text-[10px] opacity-75 font-extrabold">{learningCount}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setSrsFilter('mastered')}
+                className={`duo-level-chip shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border cursor-pointer ${
+                  srsFilter === 'mastered'
+                    ? 'bg-success text-white border-success shadow-sm'
+                    : 'bg-surface text-text-secondary border-border hover:bg-surface-raised'
+                }`}
+              >
+                Dominadas <span className="text-[10px] opacity-75 font-extrabold">{masteredCount}</span>
+              </button>
+            </div>
+          </div>
+
+          {rawDueToday.length > 0 && (
             <div
-              className="rounded-2xl p-4 flex flex-col md:flex-row items-start md:items-center gap-4 animate-slide-up-spring"
+              className="rounded-2xl p-5 flex flex-col md:flex-row items-start md:items-center gap-5 animate-slide-up-spring border-2"
               style={{
-                background: 'linear-gradient(135deg, var(--color-error-bg) 0%, var(--color-primary-light) 100%)',
-                border: '1.5px solid var(--color-error)',
+                backgroundColor: 'var(--color-surface)',
+                borderColor: 'var(--color-error)',
+                boxShadow: '0 4px 0 var(--color-error-bg), 0 8px 16px rgba(220, 38, 38, 0.05)',
               }}
             >
               <div className="flex items-center gap-4 w-full md:w-auto flex-1">
                 <div
-                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
-                  style={{ backgroundColor: 'var(--color-error)', color: '#fff' }}
+                  className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl"
+                  style={{
+                    backgroundColor: 'var(--color-error)',
+                    color: '#fff',
+                    boxShadow: '0 3px 0 #b91c1c'
+                  }}
                 >
-                  <Zap size={20} />
+                  <Zap size={22} className="animate-float" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold" style={{ color: 'var(--color-text-primary)' }}>
-                    {dueToday.length} palavra{dueToday.length !== 1 ? 's' : ''} para revisar hoje
-                  </p>
-                  <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-muted)' }}>
-                    Pratique agora para não perder o progresso
+                  <h3 className="text-base font-bold text-text-primary flex items-center gap-1.5">
+                    <span>Revisão Pendente</span>
+                    <span className="px-2 py-0.5 rounded-full text-xs font-extrabold bg-error-bg text-error">
+                      {rawDueToday.length}
+                    </span>
+                  </h3>
+                  <p className="text-xs text-text-muted mt-0.5">
+                    Pratique agora para fixar os sons e a ortografia do vocabulário e manter sua ofensiva!
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-2 w-full md:w-auto mt-2 md:mt-0">
+              <div className="flex items-center gap-3 w-full md:w-auto mt-2 md:mt-0 shrink-0">
                 <button
                   type="button"
                   onClick={startQuickReview}
-                  className="flex-1 md:flex-none flex justify-center items-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all active:scale-95"
-                  style={{ backgroundColor: 'var(--color-error)', color: '#fff' }}
+                  className="flex-1 md:flex-none flex justify-center items-center gap-1.5 rounded-xl px-5 py-3 text-sm font-bold transition-all active:scale-95 cursor-pointer bg-error text-white shadow-sm hover:brightness-105 active:translate-y-[2px]"
+                  style={{
+                    boxShadow: '0 3px 0 #b91c1c',
+                  }}
                 >
-                  Rápida <Zap size={14} />
+                  Rápida <Zap size={14} fill="currentColor" />
                 </button>
                 <button
                   type="button"
                   onClick={startReview}
                   disabled={reviewState === 'loading'}
-                  className="flex-1 md:flex-none flex justify-center items-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all active:scale-95"
+                  className="flex-1 md:flex-none flex justify-center items-center gap-1.5 rounded-xl px-5 py-3 text-sm font-bold transition-all active:scale-95 border-2 border-error text-error bg-transparent active:translate-y-[2px]"
                   style={{
-                    backgroundColor: 'transparent',
-                    border: '1.5px solid var(--color-error)',
-                    color: 'var(--color-error)',
                     cursor: reviewState === 'loading' ? 'wait' : 'pointer',
+                    boxShadow: '0 3px 0 var(--color-error-bg)',
                   }}
                 >
                   {reviewState === 'loading' ? <Loader2 size={14} className="animate-spin" /> : 'Profunda'}
@@ -429,12 +699,33 @@ export default function VocabularyPage() {
             </div>
           )}
 
-          {/* Due today */}
+          {noMatches && (
+            <div className="flex flex-col items-center justify-center py-16 px-4 text-center rounded-2xl border border-dashed border-border" style={{ backgroundColor: 'var(--color-surface)' }}>
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-surface-raised border border-border text-text-muted mb-4">
+                <Search size={24} />
+              </div>
+              <h3 className="font-display text-xl font-bold text-text-primary">Nenhum resultado encontrado</h3>
+              <p className="text-sm text-text-secondary mt-1 max-w-xs leading-relaxed">
+                Não encontramos nenhuma palavra correspondente a &ldquo;{searchQuery}&rdquo;. Tente outra busca ou limpe os filtros.
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchQuery('');
+                  setSrsFilter('all');
+                }}
+                className="mt-5 px-5 py-2.5 text-xs font-bold text-primary bg-primary-light hover:brightness-95 rounded-xl transition-all active:scale-95 cursor-pointer border border-primary/10"
+              >
+                Limpar busca e filtros
+              </button>
+            </div>
+          )}
+
           {dueToday.length > 0 && (
             <section className="animate-slide-up-spring">
               <div className="flex items-center gap-2 mb-4">
                 <span
-                  className="flex h-2 w-2 rounded-full animate-ping"
+                  className="flex h-2.5 w-2.5 rounded-full animate-pulse"
                   style={{ backgroundColor: 'var(--color-error)' }}
                 />
                 <p
@@ -444,23 +735,132 @@ export default function VocabularyPage() {
                   Para revisar hoje — {dueToday.length}
                 </p>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                {dueToday.map((item, idx) => (
-                  <VocabCard
-                    key={item.word}
-                    item={item}
-                    language={language}
-                    urgent
-                    animDelay={idx * 50}
-                  />
-                ))}
-              </div>
+
+              {layoutMode === 'grid' ? (
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {focusWord && (
+                    <div
+                      className="col-span-2 md:col-span-3 lg:col-span-4 rounded-2xl overflow-hidden border-2 border-primary-light p-6 flex flex-col md:flex-row items-center gap-6 animate-slide-up-spring relative"
+                      style={{
+                        background: 'linear-gradient(to right, var(--color-surface), var(--color-surface-raised))',
+                        boxShadow: '0 8px 24px rgba(29, 94, 212, 0.05)',
+                      }}
+                    >
+                      <div className="absolute top-0 right-0 h-32 w-32 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+
+                      <div
+                        className="relative w-full md:w-48 shrink-0 overflow-hidden rounded-xl border border-border shadow-sm"
+                        style={{ aspectRatio: '4/3', backgroundColor: 'var(--color-surface-raised)' }}
+                      >
+                        {focusWord.imageUrl ? (
+                          <>
+                            <Image
+                              src={focusWord.imageUrl}
+                              alt={focusWord.word}
+                              fill
+                              className="object-cover transition-transform duration-300 hover:scale-105"
+                              sizes="(max-width: 768px) 100vw, 200px"
+                            />
+                            <div
+                              className="absolute inset-0"
+                              style={{
+                                background: 'linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 60%)',
+                              }}
+                            />
+                          </>
+                        ) : (
+                          <div
+                            className="flex h-full w-full flex-col items-center justify-center gap-1.5 p-4 select-none"
+                            style={{
+                              background: `linear-gradient(90deg, transparent 31px, rgba(220, 38, 38, 0.15) 31px, rgba(220, 38, 38, 0.15) 32px, transparent 32px), 
+                                           repeating-linear-gradient(var(--color-surface) 0px, var(--color-surface) 23px, var(--color-border) 23px, var(--color-border) 24px)`,
+                              backgroundSize: '100% 100%, 100% 24px',
+                            }}
+                          >
+                            <span className="text-primary animate-float">
+                              <BookOpen size={36} style={{ color: 'var(--color-vocab)' }} />
+                            </span>
+                          </div>
+                        )}
+
+                        <span className="absolute top-3 left-3 flex h-3 w-3">
+                          <span className="absolute inline-flex h-full w-full rounded-full bg-error opacity-75 animate-ping" />
+                          <span className="relative inline-flex h-3 w-3 rounded-full bg-error" />
+                        </span>
+
+                        <span
+                          className="absolute top-3 right-3 rounded-full px-2.5 py-0.5 text-[10px] font-bold shadow-sm"
+                          style={{
+                            backgroundColor: focusWord.imageUrl ? 'rgba(0,0,0,0.6)' : 'var(--color-surface)',
+                            color: focusWord.imageUrl ? '#fff' : 'var(--color-text-primary)',
+                            backdropFilter: focusWord.imageUrl ? 'blur(4px)' : undefined,
+                          }}
+                        >
+                          {SRS_LABELS[Math.min(focusWord.srsLevel ?? 0, 5)]}
+                        </span>
+                      </div>
+
+                      <div className="flex-1 w-full flex flex-col md:items-start text-center md:text-left gap-3">
+                        <div>
+                          <div className="flex items-center justify-center md:justify-start gap-3 flex-wrap">
+                            <h2 className="font-display text-3xl font-extrabold tracking-tight text-text-primary">
+                              {focusWord.word}
+                            </h2>
+                            <AudioPlayerButton text={focusWord.word} language={language} size="md" />
+                          </div>
+                          <p className="text-lg text-text-secondary mt-1 font-semibold">
+                            {focusWord.translation}
+                          </p>
+                        </div>
+
+                        <div className="w-full max-w-sm mt-1">
+                          <div className="flex items-center justify-between text-[11px] font-bold text-text-muted mb-1.5">
+                            <span>Progresso de Memorização</span>
+                            <span>Estágio {Math.min(focusWord.srsLevel ?? 0, 5)} de 5</span>
+                          </div>
+                          <SrsBar level={Math.min(focusWord.srsLevel ?? 0, 5)} />
+                        </div>
+
+                        <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mt-1.5 text-xs text-text-muted font-medium">
+                          <span className="flex items-center gap-1 font-bold text-error">
+                            <Clock size={12} />
+                            Revisão Pendente
+                          </span>
+                          <span>•</span>
+                          <span>Estágio: {SRS_LABELS[Math.min(focusWord.srsLevel ?? 0, 5)]}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {remainingDueToday.map((item, idx) => (
+                    <VocabCard
+                      key={item.word}
+                      item={item}
+                      language={language}
+                      urgent
+                      animDelay={(idx + 1) * 45}
+                      onImageLoaded={handleImageLoaded}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  {dueToday.map((item) => (
+                    <VocabListRow
+                      key={item.word}
+                      item={item}
+                      language={language}
+                      urgent
+                    />
+                  ))}
+                </div>
+              )}
             </section>
           )}
 
-          {/* Learned */}
           {learned.length > 0 && (
-            <section className="animate-slide-up-spring delay-150">
+            <section className="animate-slide-up-spring delay-75">
               <div className="flex items-center gap-2 mb-4">
                 <Sparkles size={13} style={{ color: 'var(--color-text-muted)' }} />
                 <p
@@ -470,22 +870,35 @@ export default function VocabularyPage() {
                   Aprendido — {learned.length}
                 </p>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                {learned.map((item, idx) => (
-                  <VocabCard
-                    key={item.word}
-                    item={item}
-                    language={language}
-                    animDelay={idx * 40}
-                  />
-                ))}
-              </div>
+
+              {layoutMode === 'grid' ? (
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {learned.map((item, idx) => (
+                    <VocabCard
+                      key={item.word}
+                      item={item}
+                      language={language}
+                      animDelay={idx * 35}
+                      onImageLoaded={handleImageLoaded}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  {learned.map((item) => (
+                    <VocabListRow
+                      key={item.word}
+                      item={item}
+                      language={language}
+                    />
+                  ))}
+                </div>
+              )}
             </section>
           )}
         </main>
       </div>
 
-      {/* ── Review Session Overlay ── */}
       {(reviewState === 'running' || reviewState === 'done') && (
         <ReviewOverlay
           state={reviewState}
@@ -503,11 +916,10 @@ export default function VocabularyPage() {
           onClose={closeReview}
         />
       )}
-      {/* ── Quick Review Overlay ── */}
       {(quickState === 'running' || quickState === 'done') && (
         <QuickReviewOverlay
           state={quickState}
-          items={dueToday}
+          items={rawDueToday}
           currentIdx={quickIdx}
           results={results}
           language={language}
