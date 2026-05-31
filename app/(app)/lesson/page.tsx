@@ -64,6 +64,8 @@ interface TooltipState {
   translation?: string;
   explanation?: string;
   example?: string;
+  partOfSpeech?: string;
+  infinitive?: string;
 }
 
 const CLOSED_TOOLTIP: TooltipState = { isOpen: false, word: '', isLoading: false };
@@ -260,10 +262,10 @@ export default function LessonPage() {
   // ── Click-to-translate ────────────────────────────────────────────────────
 
   const handleWordClick = useCallback(
-    async ({ word }: WordClickPayload) => {
+    async ({ word, isNewVerb }: WordClickPayload) => {
       if (!store.lesson) return;
       setTooltip({ isOpen: true, word, isLoading: true });
-      const result = await translateWord(word, store.hook?.dialogue ?? '', store.lesson.language);
+      const result = await translateWord(word, store.hook?.dialogue ?? '', store.lesson.language, isNewVerb);
       setTooltip({
         isOpen: true,
         word,
@@ -271,6 +273,8 @@ export default function LessonPage() {
         translation: result?.translation,
         explanation: result?.explanation,
         example: result?.example,
+        partOfSpeech: result?.partOfSpeech,
+        infinitive: result?.infinitive,
       });
     },
     [store.lesson, store.hook],
@@ -552,6 +556,8 @@ export default function LessonPage() {
           translation={tooltip.translation}
           explanation={tooltip.explanation}
           example={tooltip.example}
+          partOfSpeech={tooltip.partOfSpeech}
+          infinitive={tooltip.infinitive}
           isOpen={tooltip.isOpen}
           isLoading={tooltip.isLoading}
           onClose={() => setTooltip(CLOSED_TOOLTIP)}

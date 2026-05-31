@@ -143,6 +143,8 @@ export interface TranslateWordResult {
   translation: string;
   explanation: string;
   example: string;
+  partOfSpeech?: string;
+  infinitive?: string;
 }
 
 export interface PhoneticsTipResult {
@@ -180,6 +182,8 @@ export interface GrammarBridgeResult {
   // ── Novo formato estruturado (Portuguese Bridge Method) ───────────────────
   insight?: string;           // 1 frase "aha!" em PT-BR — o gancho imediato
   explanation?: string | string[]; // 2-4 frases em PT-BR explicando a regra com profundidade. Pode ser um array para múltiplos tópicos.
+  survivalTip?: string;       // Dica de sobrevivência ultra curta, ≤12 palavras
+  culturalNote?: string;      // Detalhe ou curiosidade cultural de uso, ≤15 palavras
   bridge?: {
     portuguese: string;       // Padrão/frase como se diz em PT-BR
     target: string;           // Equivalente na língua-alvo

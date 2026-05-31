@@ -1,7 +1,6 @@
-'use client';
-
-import { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import type { ContextChoiceData } from '@/types';
+import { Languages } from 'lucide-react';
 
 interface ContextChoiceExerciseProps {
   data: ContextChoiceData;
@@ -49,62 +48,79 @@ export function ContextChoiceExercise({ data, onAnswer, answered, setIsExerciseR
   }
 
   const parts = data.sentence.split('___');
+  const isCorrect = choice === data.blankWord;
 
   return (
-    <div className="flex flex-col gap-8">
-      {/* Portuguese translation hint */}
-      <div className="flex items-center gap-3 px-1 opacity-70">
-        <span className="h-px w-6 bg-[var(--color-border)]" />
-        <p className="text-xs font-medium italic text-[var(--color-text-muted)]">
-          {data.translation}
-        </p>
+    <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      
+      {/* 1. Elegant Translation Prompt Card */}
+      <div 
+        className="rounded-2xl p-4.5 border border-dashed border-[var(--color-border)] backdrop-blur-sm"
+        style={{ backgroundColor: 'rgba(255, 255, 255, 0.01)' }}
+      >
+        <div className="flex items-center gap-2 mb-2.5 text-[var(--color-text-muted)]">
+          <Languages size={15} className="text-[var(--color-vocab)]" />
+          <span className="text-[10px] font-black uppercase tracking-[0.15em]">Como se diz em francês?</span>
+        </div>
+        <div className="border-l-4 border-[var(--color-vocab)] pl-3.5 py-1">
+          <p className="text-[17px] font-semibold text-[var(--color-text-primary)] leading-relaxed">
+            {data.translation}
+          </p>
+        </div>
       </div>
 
-      {/* Sentence with fill-in blank */}
-      <div className="px-2">
+      {/* 2. Sentence with fill-in blank */}
+      <div className="px-2 py-2">
         <p
           className="font-display text-xl sm:text-2xl font-bold leading-relaxed text-[var(--color-text-primary)]"
         >
           {parts[0]}
           <span
-            className="mx-1 inline-flex h-8 min-w-[3.5rem] items-center justify-center rounded-lg border-b-2 px-2 text-center transition-all duration-300 transform-gpu"
+            className="mx-1.5 inline-flex h-8.5 min-w-[5.5rem] items-center justify-center rounded-xl border px-3 text-center transition-all duration-300 transform-gpu font-bold text-[15px]"
             style={{
-              borderColor: choice ? 'var(--color-primary)' : 'var(--color-border)',
-              backgroundColor: choice ? 'var(--color-primary-light)/10' : 'transparent',
-              color: choice ? 'var(--color-primary)' : 'transparent',
-              fontSize: choice ? '0.95em' : '1em'
+              borderColor: answered
+                ? (isCorrect ? 'var(--color-success)' : 'var(--color-error)')
+                : choice
+                  ? 'var(--color-primary)'
+                  : 'rgba(217, 119, 6, 0.3)',
+              backgroundColor: answered
+                ? (isCorrect ? 'var(--color-success-bg)' : 'var(--color-error-bg)')
+                : choice
+                  ? 'var(--color-primary-light)'
+                  : 'rgba(217, 119, 6, 0.01)',
+              color: answered
+                ? (isCorrect ? 'var(--color-success)' : 'var(--color-error)')
+                : choice
+                  ? 'var(--color-primary-dark)'
+                  : 'transparent',
+              boxShadow: choice && !answered ? '0 0 10px rgba(37, 99, 235, 0.15)' : 'none',
+              borderStyle: choice ? 'solid' : 'dashed'
             }}
           >
-            {choice ?? ''}
+            {choice ?? '___'}
           </span>
           {parts[1]}
         </p>
       </div>
 
-      {/* Option pills */}
-      <div className="grid grid-cols-2 gap-3 mt-4">
+      {/* 3. Option pills */}
+      <div className="grid grid-cols-2 gap-3 mt-2">
         {shuffledOptions.map((option) => {
           const isChosen = choice === option;
-          const isCorrect = option === data.blankWord;
+          const isCorrectOption = option === data.blankWord;
 
-          let bgColor = 'var(--color-surface)';
-          let borderColor = 'var(--color-border)';
-          let textColor = 'var(--color-text-primary)';
-          let ringColor = 'transparent';
-
-          if (answered && isCorrect) {
-            bgColor = 'var(--color-success-bg)';
-            borderColor = 'var(--color-success)';
-            textColor = 'var(--color-success)';
-          } else if (answered && isChosen && !isCorrect) {
-            bgColor = 'var(--color-error-bg)';
-            borderColor = 'var(--color-error)';
-            textColor = 'var(--color-error)';
-          } else if (!answered && isChosen) {
-            bgColor = 'var(--color-primary-light)';
-            borderColor = 'var(--color-primary)';
-            textColor = 'var(--color-primary-dark)';
-            ringColor = 'rgba(37, 99, 235, 0.1)';
+          let stateStyles = "border border-white/5 bg-white/5 hover:bg-white/10 hover:border-white/10 text-[var(--color-text-primary)] hover:scale-[1.005] active:scale-[0.995]";
+          
+          if (answered) {
+            if (isCorrectOption) {
+              stateStyles = "bg-[rgba(16,185,129,0.08)] border border-emerald-500/40 text-emerald-200 shadow-[0_0_15px_rgba(16,185,129,0.05)]";
+            } else if (isChosen) {
+              stateStyles = "bg-[rgba(239,68,68,0.08)] border border-red-500/40 text-red-200";
+            } else {
+              stateStyles = "opacity-25 scale-98 pointer-events-none";
+            }
+          } else if (isChosen) {
+            stateStyles = "bg-[var(--color-primary-light)] border border-[var(--color-primary)] text-[var(--color-primary-dark)] scale-[1.01]";
           }
 
           return (
@@ -113,19 +129,12 @@ export function ContextChoiceExercise({ data, onAnswer, answered, setIsExerciseR
               type="button"
               disabled={answered || choice !== null}
               onClick={() => handleSelect(option)}
-              className="group relative flex items-center justify-center rounded-xl px-4 py-3.5 text-sm font-semibold transition-all duration-300 active:scale-[0.97]"
+              className={`group relative flex items-center justify-center rounded-xl px-4 py-3.5 text-[15px] font-semibold transition-all duration-200 ${stateStyles}`}
               style={{
-                backgroundColor: bgColor,
-                border: `1px solid ${borderColor}`,
-                color: textColor,
-                boxShadow: isChosen ? `0 0 0 4px ${ringColor}` : 'none',
-                cursor: answered || choice !== null ? 'default' : 'pointer',
+                boxShadow: isChosen && !answered ? '0 4px 12px rgba(29, 78, 216, 0.15)' : undefined
               }}
             >
               {option}
-              {!isChosen && !answered && (
-                <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl" />
-              )}
             </button>
           );
         })}

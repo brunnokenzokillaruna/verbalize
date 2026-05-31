@@ -5,6 +5,8 @@ import { useState } from 'react';
 export interface WordClickPayload {
   word: string;
   rect: DOMRect;
+  isNewVerb?: boolean;
+  isNewVocabulary?: boolean;
 }
 
 interface ClickableWordProps {
@@ -36,7 +38,7 @@ export function ClickableWord({
     setRipple(true);
     setTimeout(() => setRipple(false), 400);
 
-    onWordClick({ word, rect });
+    onWordClick({ word, rect, isNewVerb, isNewVocabulary });
   }
 
   if (isNewVocabulary || isNewVerb) {

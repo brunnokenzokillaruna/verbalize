@@ -141,6 +141,7 @@ export function LessonPracticeScreen({
           onAnswer={onAnswer}
           answered={exerciseAnswer !== null}
           setIsExerciseReady={setIsExerciseReady}
+          submitTrigger={submitTrigger}
         />
       )}
       {currentExercise.type === 'interactive-subtitles' && (
@@ -149,6 +150,7 @@ export function LessonPracticeScreen({
           onAnswer={onAnswer}
           answered={exerciseAnswer !== null}
           setIsExerciseReady={setIsExerciseReady}
+          submitTrigger={submitTrigger}
         />
       )}
       {currentExercise.type === 'logic-connectors' && (

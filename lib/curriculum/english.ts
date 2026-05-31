@@ -419,18 +419,18 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-a1-047",
     "language": "en",
     "level": "A1",
-    "tag": "GRAM",
-    "uiTitle": "Entrando no Bistrôzinho",
-    "grammarFocus": "Par de Confusão: Very VS Too",
+    "tag": "VOC",
+    "uiTitle": "Sentando na Mesa",
+    "grammarFocus": "Vocabulário: Too (Excesso)",
     "theme": "Tema 4: O Primeiro Café da Manhã"
   },
   {
     "id": "en-a1-048",
     "language": "en",
     "level": "A1",
-    "tag": "VOC",
-    "uiTitle": "Sentando na Mesa",
-    "grammarFocus": "Vocabulário: Too (Excesso)",
+    "tag": "GRAM",
+    "uiTitle": "Entrando no Bistrôzinho",
+    "grammarFocus": "Par de Confusão: Very VS Too",
     "theme": "Tema 4: O Primeiro Café da Manhã"
   },
   {
@@ -465,12 +465,21 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "language": "en",
     "level": "A1",
     "tag": "VERB",
+    "uiTitle": "Começo Forte",
+    "grammarFocus": "Verbo Eat (Comer) — Presente",
+    "theme": "Tema 4: O Primeiro Café da Manhã"
+  },
+  {
+    "id": "en-a1-053",
+    "language": "en",
+    "level": "A1",
+    "tag": "VERB",
     "uiTitle": "A Primeira Mordida",
     "grammarFocus": "Verbo Speak (Falar) — Presente",
     "theme": "Tema 4: O Primeiro Café da Manhã"
   },
   {
-    "id": "en-a1-053",
+    "id": "en-a1-054",
     "language": "en",
     "level": "A1",
     "tag": "GRAM",
@@ -479,7 +488,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 4: O Primeiro Café da Manhã"
   },
   {
-    "id": "en-a1-054",
+    "id": "en-a1-055",
     "language": "en",
     "level": "A1",
     "tag": "VERB",
@@ -488,21 +497,12 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 4: O Primeiro Café da Manhã"
   },
   {
-    "id": "en-a1-055",
+    "id": "en-a1-056",
     "language": "en",
     "level": "A1",
     "tag": "GRAM",
     "uiTitle": "A Conta por Favor",
     "grammarFocus": "Negação no Simple Present (Don't / Doesn't)",
-    "theme": "Tema 4: O Primeiro Café da Manhã"
-  },
-  {
-    "id": "en-a1-056",
-    "language": "en",
-    "level": "A1",
-    "tag": "VERB",
-    "uiTitle": "Começo Forte",
-    "grammarFocus": "Verbo Eat (Comer) — Presente",
     "theme": "Tema 4: O Primeiro Café da Manhã"
   },
   {
@@ -1050,12 +1050,21 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "language": "en",
     "level": "A2",
     "tag": "VERB",
+    "uiTitle": "Indo à Luta",
+    "grammarFocus": "Modal Verb: Must (Obrigação Forte)",
+    "theme": "Tema 9: Minha Casa, Minha Rotina"
+  },
+  {
+    "id": "en-a2-118",
+    "language": "en",
+    "level": "A2",
+    "tag": "VERB",
     "uiTitle": "Preparativos no Banheiro",
     "grammarFocus": "Simple Past: Verbos Regulares (-ed)",
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "en-a2-118",
+    "id": "en-a2-119",
     "language": "en",
     "level": "A2",
     "tag": "GRAM",
@@ -1064,7 +1073,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "en-a2-119",
+    "id": "en-a2-120",
     "language": "en",
     "level": "A2",
     "tag": "VERB",
@@ -1073,7 +1082,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "en-a2-120",
+    "id": "en-a2-121",
     "language": "en",
     "level": "A2",
     "tag": "GRAM",
@@ -1082,7 +1091,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "en-a2-121",
+    "id": "en-a2-122",
     "language": "en",
     "level": "A2",
     "tag": "VERB",
@@ -1091,7 +1100,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "en-a2-122",
+    "id": "en-a2-123",
     "language": "en",
     "level": "A2",
     "tag": "GRAM",
@@ -1100,7 +1109,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "en-a2-123",
+    "id": "en-a2-124",
     "language": "en",
     "level": "A2",
     "tag": "VERB",
@@ -1109,7 +1118,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "en-a2-124",
+    "id": "en-a2-125",
     "language": "en",
     "level": "A2",
     "tag": "GRAM",
@@ -1118,7 +1127,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "en-a2-125",
+    "id": "en-a2-126",
     "language": "en",
     "level": "A2",
     "tag": "VERB",
@@ -1127,7 +1136,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "en-a2-126",
+    "id": "en-a2-127",
     "language": "en",
     "level": "A2",
     "tag": "VERB",
@@ -1136,21 +1145,12 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "en-a2-127",
+    "id": "en-a2-128",
     "language": "en",
     "level": "A2",
     "tag": "VERB",
     "uiTitle": "O Espaço Físico",
     "grammarFocus": "Modal Verb: Should / Shouldn't (Conselho)",
-    "theme": "Tema 9: Minha Casa, Minha Rotina"
-  },
-  {
-    "id": "en-a2-128",
-    "language": "en",
-    "level": "A2",
-    "tag": "VERB",
-    "uiTitle": "Indo à Luta",
-    "grammarFocus": "Modal Verb: Must (Obrigação Forte)",
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
@@ -1427,27 +1427,27 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-a2-159",
     "language": "en",
     "level": "A2",
-    "tag": "GRAM",
-    "uiTitle": "Avaliando o Custo",
-    "grammarFocus": "Par de Confusão: Know VS Meet",
+    "tag": "VOC",
+    "uiTitle": "Não Tão Bom Assim",
+    "grammarFocus": "Vocabulário: Meet (Conhecer pela primeira vez)",
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
     "id": "en-a2-160",
     "language": "en",
     "level": "A2",
-    "tag": "EXPR",
-    "uiTitle": "O Critério Principal",
-    "grammarFocus": "5 Expressões com o verbo Be (Be tired, Be hungry)",
+    "tag": "GRAM",
+    "uiTitle": "Avaliando o Custo",
+    "grammarFocus": "Par de Confusão: Know VS Meet",
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
     "id": "en-a2-161",
     "language": "en",
     "level": "A2",
-    "tag": "VOC",
-    "uiTitle": "Não Tão Bom Assim",
-    "grammarFocus": "Vocabulário: Meet (Conhecer pela primeira vez)",
+    "tag": "EXPR",
+    "uiTitle": "O Critério Principal",
+    "grammarFocus": "5 Expressões com o verbo Be (Be tired, Be hungry)",
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {

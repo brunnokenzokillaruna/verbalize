@@ -287,6 +287,19 @@ ${tagInstruction}
 - Exactly ${lineCount} lines total, alternating speakers
 - Every line MUST begin with the speaker name and a colon
 - ⚠️ GOLDEN RULE — REAL CONVERSATION, NOT SENTENCE SHOWCASE: The #1 most important requirement is that this reads like a REAL conversation between two humans. Each line must be a genuine RESPONSE to the previous one — agreeing, disagreeing, asking a follow-up, reacting emotionally, suggesting something, sharing an opinion. The vocabulary and grammar being taught must emerge NATURALLY from the conversation flow, not be artificially inserted as isolated statements.
+- ❌ NO INVISIBLE THIRD CHARACTERS (CRITICAL): The dialogue must be strictly a 2-party conversation. The speakers CANNOT address an invisible third person (like a waiter, cashier, receptionist, or taxi driver) or perform a transaction with someone outside the dialogue. If they are in a commercial/transactional setting (café, shop, paying a fare, buying tickets), they must talk TO EACH OTHER about the transaction, and NOT pretend to order from or pay each other.
+  - BAD:
+    Romane: "Bonjour ! Je voudrais un jus, s'il vous plaît." (Addressing invisible waiter)
+    Julien: "Et moi, je prends une glace au chocolat." (Addressing invisible waiter)
+    Romane: "On mange sur ce joli banc vert ?" (Addressing Julien)
+    Julien: "Oui ! S'il vous plaît, combien ça coûte ?" (Addressing invisible waiter / Romane)
+    Romane: "C'est trois euros. C'est pas cher !" (Romane suddenly acting as the waiter)
+  - GOOD:
+    Romane: "Tu veux boire un jus ou manger une glace ?"
+    Julien: "Je prends une glace au chocolat ! Elle coûte trois euros, c'est pas cher."
+    Romane: "Super, je paye avec ma carte. On mange sur ce joli banc vert ?"
+    Julien: "Oui, c'est une excellente idée !"
+- 🤝 FRIENDLY RELATIONSHIP: Unless this is a 'MISS' lesson (first-person immersion), Speaker A and Speaker B are friends or close acquaintances. They MUST address each other informally (using 'tu' and 'on' in French, never 'vous' or formal 's'il vous plaît' to each other, except when joking).
 - ❌ ANTI-PATTERN — NEVER DO THIS: A dialogue where each line is an independent descriptive statement with no connection to the others. Example of what to NEVER produce:
   "Le hall est sombre ici."
   "Oui, la porte étroite est là."
@@ -301,7 +314,11 @@ ${tagInstruction}
   This is a real conversation — they arrive somewhere, react to what they see, and decide what to do.
 - CONVERSATION REALITY TEST: Before finalizing, re-read the dialogue and ask: "Would two real humans actually say these exact lines to each other in sequence?" If any line feels like it was inserted just to showcase a word without responding to the previous speaker, REWRITE it.
 - CRITICAL SCENE COHERENCE: Pick ONE specific physical location AND ONE specific moment in time for the whole dialogue (e.g. "inside the plane during the flight", "at the café table after ordering", "in front of the hotel reception desk"). The location and time MUST NOT CHANGE across lines. If the characters start on a plane, they stay on the plane for every line — do NOT teleport them to another room, building, or scene. If a transition is narratively needed, it must be explicit and realistic (e.g. "let's get off", "we arrived, let's go inside"), and the dialogue must END at the new place, not mix scenes.
-- LOGICAL CONTINUITY (CRITICAL): Every single line must have a clear logical connection ("nexo") to the line immediately preceding it. It is FORBIDDEN to suddenly change the subject. It is FORBIDDEN to contradict what was just said (e.g., if Speaker A says a place is quiet, Speaker B cannot say it's too crowded unless they are explicitly disagreeing with "Je ne suis pas d'accord" or similar). 
+- LOGICAL & SITUATIONAL CONTINUITY (CRITICAL): Every single line must have a clear, realistic logical connection ("nexo") to the line immediately preceding it. It is FORBIDDEN to suddenly change the subject. It is FORBIDDEN to contradict what was just said (e.g., if Speaker A says a place is quiet, Speaker B cannot say it's too crowded unless they are explicitly disagreeing with "Je ne suis pas d'accord" or similar).
+- PHYSICAL & SPATIAL CONSISTENCY (CRITICAL): You MUST track the spatial orientation, relative distances, physical choices, and movements of the characters.
+  - If a character points to a distant spot/object ("vamos naquele banco?", "regarde ce banc-là"), they cannot refer to it as being "here" ("aqui", "ici") in the very next line unless they explicitly state that they walked over to it.
+  - If a character rejects an option or location (e.g. rejecting a bench because it is in the sun: "Non, il est au soleil", and choosing a shady tree instead: "sous le grand arbre"), they CANNOT suddenly end the dialogue by saying they are comfortable on the rejected location (e.g. "On est bien sur ce banc" - which contradicts the choice of the shady tree) unless they explicitly changed their mind, walked back, and sat there.
+  - Make sure physical actions, spatial proximity markers (ici/là-bas, aqui/lá/ali/este/aquele), and the narrative choices match perfectly. Their physical state must make complete logical sense from line to line.
 - REAL-WORLD USEFULNESS: The dialogue must sound like something two real people would actually say in that exact situation. A Brazilian learner should be able to reuse these exact lines if they found themselves in that scene.
 - NARRATIVE ARC: Clear beginning (who/where/what's happening), middle (small development or reaction), natural conclusion (a resolution, decision, or closing remark) — all inside the SAME scene.
 - The entire dialogue MUST stay within the ${themeContext} provided. Do NOT drift to other topics.

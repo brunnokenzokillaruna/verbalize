@@ -368,6 +368,17 @@ Example for social-roleplay:
         }
         return true;
       }
+      if (ex.type === 'interactive-subtitles') {
+        const d = ex.data as any;
+        if (d.translation && !d.translations) {
+          d.translations = d.translation;
+        }
+        if (!d.correctText || !d.errorText || !Array.isArray(d.wrongWords) || !d.translations) {
+          console.warn('[generatePracticeExercises] Dropped malformed interactive-subtitles');
+          return false;
+        }
+        return true;
+      }
       if (ex.type === 'grammar-trap') {
         const d = ex.data as {
           scenario: string;

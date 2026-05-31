@@ -12,6 +12,8 @@ export interface TranslationData {
   explanation?: string;
   example?: string;
   exampleTranslation?: string;
+  partOfSpeech?: string;
+  infinitive?: string;
 }
 
 interface TranslationTooltipProps extends TranslationData {
@@ -27,6 +29,8 @@ export function TranslationTooltip({
   explanation,
   example,
   exampleTranslation,
+  partOfSpeech,
+  infinitive,
   isOpen,
   isLoading = false,
   onClose,
@@ -109,15 +113,27 @@ export function TranslationTooltip({
         >
           <div className="flex-1">
             {/* Word */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-wrap">
               <span
                 className="font-display text-3xl font-semibold"
-                style={{ color: 'var(--color-vocab)' }}
+                style={{ color: partOfSpeech === 'Verbo' ? 'var(--color-verb)' : 'var(--color-vocab)' }}
               >
                 {word}
               </span>
               {!isLoading && word && (
                 <AudioPlayerButton text={word} language={language} size="sm" />
+              )}
+              {!isLoading && partOfSpeech === 'Verbo' && (
+                <span
+                  className="rounded-full px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider"
+                  style={{
+                    backgroundColor: 'var(--color-verb-bg)',
+                    color: 'var(--color-verb)',
+                    border: '1px solid rgba(124, 58, 237, 0.2)',
+                  }}
+                >
+                  Verbo{infinitive ? `: ${infinitive}` : ''}
+                </span>
               )}
             </div>
 

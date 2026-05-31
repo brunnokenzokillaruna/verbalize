@@ -419,18 +419,18 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "id": "fr-a1-047",
     "language": "fr",
     "level": "A1",
-    "tag": "GRAM",
-    "uiTitle": "Entrando no Bistrôzinho",
-    "grammarFocus": "Par de Confusão: Très VS Trop",
+    "tag": "VOC",
+    "uiTitle": "Sentando na Mesa",
+    "grammarFocus": "Vocabulário: Excesso (Trop)",
     "theme": "Tema 4: O Primeiro Café da Manhã"
   },
   {
     "id": "fr-a1-048",
     "language": "fr",
     "level": "A1",
-    "tag": "VOC",
-    "uiTitle": "Sentando na Mesa",
-    "grammarFocus": "Vocabulário: Excesso (Trop)",
+    "tag": "GRAM",
+    "uiTitle": "Entrando no Bistrôzinho",
+    "grammarFocus": "Par de Confusão: Très VS Trop",
     "theme": "Tema 4: O Primeiro Café da Manhã"
   },
   {
@@ -465,12 +465,21 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "A1",
     "tag": "VERB",
+    "uiTitle": "Começo Forte",
+    "grammarFocus": "Conjugação: Manger",
+    "theme": "Tema 4: O Primeiro Café da Manhã"
+  },
+  {
+    "id": "fr-a1-053",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VERB",
     "uiTitle": "A Primeira Mordida",
     "grammarFocus": "Conjugação: Parler",
     "theme": "Tema 4: O Primeiro Café da Manhã"
   },
   {
-    "id": "fr-a1-053",
+    "id": "fr-a1-054",
     "language": "fr",
     "level": "A1",
     "tag": "GRAM",
@@ -479,7 +488,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 4: O Primeiro Café da Manhã"
   },
   {
-    "id": "fr-a1-054",
+    "id": "fr-a1-055",
     "language": "fr",
     "level": "A1",
     "tag": "VERB",
@@ -488,21 +497,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 4: O Primeiro Café da Manhã"
   },
   {
-    "id": "fr-a1-055",
+    "id": "fr-a1-056",
     "language": "fr",
     "level": "A1",
     "tag": "GRAM",
     "uiTitle": "A Conta por Favor",
     "grammarFocus": "Negação Básica: Ne... pas",
-    "theme": "Tema 4: O Primeiro Café da Manhã"
-  },
-  {
-    "id": "fr-a1-056",
-    "language": "fr",
-    "level": "A1",
-    "tag": "VERB",
-    "uiTitle": "Começo Forte",
-    "grammarFocus": "Conjugação: Manger",
     "theme": "Tema 4: O Primeiro Café da Manhã"
   },
   {
@@ -797,13 +797,22 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "id": "fr-a1-089",
     "language": "fr",
     "level": "A1",
+    "tag": "VOC",
+    "uiTitle": "Mostrando Fotos no Celular",
+    "grammarFocus": "Vocabulário: Là-bas",
+    "theme": "Tema 7: Novas Amizades e A Família"
+  },
+  {
+    "id": "fr-a1-090",
+    "language": "fr",
+    "level": "A1",
     "tag": "GRAM",
     "uiTitle": "Uma Conversa Casual",
     "grammarFocus": "Par de Confusão: Ici VS Là VS Là-bas",
     "theme": "Tema 7: Novas Amizades e A Família"
   },
   {
-    "id": "fr-a1-090",
+    "id": "fr-a1-091",
     "language": "fr",
     "level": "A1",
     "tag": "VERB",
@@ -812,21 +821,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 7: Novas Amizades e A Família"
   },
   {
-    "id": "fr-a1-091",
+    "id": "fr-a1-092",
     "language": "fr",
     "level": "A1",
     "tag": "DIAL",
     "uiTitle": "Contando Suas Origens",
     "grammarFocus": "5 Frases para Pedidos em Cafés",
-    "theme": "Tema 7: Novas Amizades e A Família"
-  },
-  {
-    "id": "fr-a1-092",
-    "language": "fr",
-    "level": "A1",
-    "tag": "VOC",
-    "uiTitle": "Mostrando Fotos no Celular",
-    "grammarFocus": "Vocabulário: Là-bas",
     "theme": "Tema 7: Novas Amizades e A Família"
   },
   {
@@ -1050,12 +1050,21 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
+    "uiTitle": "Indo à Luta",
+    "grammarFocus": "Conjugação: Devoir (Dever)",
+    "theme": "Tema 9: Minha Casa, Minha Rotina"
+  },
+  {
+    "id": "fr-a2-118",
+    "language": "fr",
+    "level": "A2",
+    "tag": "VERB",
     "uiTitle": "Preparativos no Banheiro",
     "grammarFocus": "Conjugação: Choisir",
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "fr-a2-118",
+    "id": "fr-a2-119",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1064,7 +1073,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "fr-a2-119",
+    "id": "fr-a2-120",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1073,7 +1082,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "fr-a2-120",
+    "id": "fr-a2-121",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1082,7 +1091,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "fr-a2-121",
+    "id": "fr-a2-122",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1091,7 +1100,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "fr-a2-122",
+    "id": "fr-a2-123",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1100,7 +1109,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "fr-a2-123",
+    "id": "fr-a2-124",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1109,7 +1118,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "fr-a2-124",
+    "id": "fr-a2-125",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1118,7 +1127,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "fr-a2-125",
+    "id": "fr-a2-126",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1127,7 +1136,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "fr-a2-126",
+    "id": "fr-a2-127",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1136,21 +1145,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "fr-a2-127",
+    "id": "fr-a2-128",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
     "uiTitle": "O Espaço Físico",
     "grammarFocus": "Conjugação: Pouvoir (Possibilidade)",
-    "theme": "Tema 9: Minha Casa, Minha Rotina"
-  },
-  {
-    "id": "fr-a2-128",
-    "language": "fr",
-    "level": "A2",
-    "tag": "VERB",
-    "uiTitle": "Indo à Luta",
-    "grammarFocus": "Conjugação: Devoir (Dever)",
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
@@ -1337,18 +1337,18 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "id": "fr-a2-149",
     "language": "fr",
     "level": "A2",
-    "tag": "GRAM",
-    "uiTitle": "Reações do Amigo",
-    "grammarFocus": "Par de Confusão: Pendant VS Desde (Depuis)",
+    "tag": "VOC",
+    "uiTitle": "As Risadas Mútuas",
+    "grammarFocus": "Vocabulário de Tempo: Desde (Depuis)",
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
     "id": "fr-a2-150",
     "language": "fr",
     "level": "A2",
-    "tag": "VOC",
-    "uiTitle": "As Risadas Mútuas",
-    "grammarFocus": "Vocabulário de Tempo: Desde (Depuis)",
+    "tag": "GRAM",
+    "uiTitle": "Reações do Amigo",
+    "grammarFocus": "Par de Confusão: Pendant VS Desde (Depuis)",
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
@@ -1427,13 +1427,22 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "id": "fr-a2-159",
     "language": "fr",
     "level": "A2",
+    "tag": "VOC",
+    "uiTitle": "Não Tão Bom Assim",
+    "grammarFocus": "Vocabulário: Connaître",
+    "theme": "Tema 12: Expressando Opiniões e Comparações"
+  },
+  {
+    "id": "fr-a2-160",
+    "language": "fr",
+    "level": "A2",
     "tag": "GRAM",
     "uiTitle": "Avaliando o Custo",
     "grammarFocus": "Par de Confusão: Savoir VS Connaître",
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "fr-a2-160",
+    "id": "fr-a2-161",
     "language": "fr",
     "level": "A2",
     "tag": "EXPR",
@@ -1442,34 +1451,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "fr-a2-161",
-    "language": "fr",
-    "level": "A2",
-    "tag": "VOC",
-    "uiTitle": "Não Tão Bom Assim",
-    "grammarFocus": "Vocabulário: Connaître",
-    "theme": "Tema 12: Expressando Opiniões e Comparações"
-  },
-  {
     "id": "fr-a2-162",
-    "language": "fr",
-    "level": "A2",
-    "tag": "GRAM",
-    "uiTitle": "O Degrau Acima",
-    "grammarFocus": "Par de Confusão: Apporter VS Emporter",
-    "theme": "Tema 12: Expressando Opiniões e Comparações"
-  },
-  {
-    "id": "fr-a2-163",
-    "language": "fr",
-    "level": "A2",
-    "tag": "EXPR",
-    "uiTitle": "Veredito Pessoal",
-    "grammarFocus": "5 Expressões com o verbo Avoir",
-    "theme": "Tema 12: Expressando Opiniões e Comparações"
-  },
-  {
-    "id": "fr-a2-164",
     "language": "fr",
     "level": "A2",
     "tag": "VOC",
@@ -1478,16 +1460,25 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "fr-a2-165",
+    "id": "fr-a2-163",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
-    "uiTitle": "Notas do Avaliador",
-    "grammarFocus": "Par de Confusão: Amener VS Emmener",
+    "uiTitle": "O Degrau Acima",
+    "grammarFocus": "Par de Confusão: Apporter VS Emporter",
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "fr-a2-166",
+    "id": "fr-a2-164",
+    "language": "fr",
+    "level": "A2",
+    "tag": "EXPR",
+    "uiTitle": "Veredito Pessoal",
+    "grammarFocus": "5 Expressões com o verbo Avoir",
+    "theme": "Tema 12: Expressando Opiniões e Comparações"
+  },
+  {
+    "id": "fr-a2-165",
     "language": "fr",
     "level": "A2",
     "tag": "VOC",
@@ -1496,16 +1487,16 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "fr-a2-167",
+    "id": "fr-a2-166",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
-    "uiTitle": "Bancando o Juíz",
-    "grammarFocus": "Par de Confusão: Rentrer VS Revenir VS Retourner",
+    "uiTitle": "Notas do Avaliador",
+    "grammarFocus": "Par de Confusão: Amener VS Emmener",
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "fr-a2-168",
+    "id": "fr-a2-167",
     "language": "fr",
     "level": "A2",
     "tag": "VOC",
@@ -1514,21 +1505,30 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
+    "id": "fr-a2-168",
+    "language": "fr",
+    "level": "A2",
+    "tag": "VOC",
+    "uiTitle": "Resultado",
+    "grammarFocus": "Vocabulário: Retourner e Rendre",
+    "theme": "Tema 12: Expressando Opiniões e Comparações"
+  },
+  {
     "id": "fr-a2-169",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
-    "uiTitle": "Fechamento",
-    "grammarFocus": "Par de Confusão: Entendre VS Écouter",
+    "uiTitle": "Bancando o Juíz",
+    "grammarFocus": "Par de Confusão: Rentrer VS Revenir VS Retourner",
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
     "id": "fr-a2-170",
     "language": "fr",
     "level": "A2",
-    "tag": "VOC",
-    "uiTitle": "Resultado",
-    "grammarFocus": "Vocabulário: Retourner e Rendre",
+    "tag": "GRAM",
+    "uiTitle": "Fechamento",
+    "grammarFocus": "Par de Confusão: Entendre VS Écouter",
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {

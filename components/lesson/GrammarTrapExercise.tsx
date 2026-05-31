@@ -1,7 +1,6 @@
-'use client';
-
-import { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import type { GrammarTrapData } from '@/types';
+import { CheckCircle2, XCircle, Lightbulb } from 'lucide-react';
 
 interface GrammarTrapExerciseProps {
   data: GrammarTrapData;
@@ -9,6 +8,17 @@ interface GrammarTrapExerciseProps {
   answered: boolean;
   setIsExerciseReady: (ready: boolean) => void;
   submitTrigger: number;
+}
+
+function formatScenario(text: string): string {
+  if (!text) return '';
+  const upperCount = (text.match(/[A-Z]/g) || []).length;
+  const totalAlpha = (text.match(/[a-zA-Z]/g) || []).length;
+  if (totalAlpha > 0 && (upperCount / totalAlpha) > 0.7) {
+    const lower = text.toLowerCase();
+    return lower.replace(/(^\s*|[.!?]\s+)([a-z])/g, (m) => m.toUpperCase());
+  }
+  return text;
 }
 
 export function GrammarTrapExercise({
@@ -54,73 +64,65 @@ export function GrammarTrapExercise({
   }
 
   const correctOption = shuffledOptions.find((opt) => opt.isCorrect);
+  const formattedScenarioText = formatScenario(data.scenario);
 
   return (
-    <div className="flex flex-col gap-7">
-      {/* Scenario badge */}
+    <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      
+      {/* Scenario / Radar banner with pulse animation */}
       <div
-        className="flex items-start gap-3 rounded-xl p-4"
+        className="flex items-start gap-3.5 rounded-2xl p-4.5 border backdrop-blur-sm relative overflow-hidden"
         style={{
-          backgroundColor: 'var(--color-warning-bg)',
-          border: '1px solid var(--color-warning-border)',
+          backgroundColor: 'rgba(217, 119, 6, 0.02)',
+          borderColor: 'rgba(217, 119, 6, 0.15)',
         }}
       >
         <div
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-base"
-          style={{ backgroundColor: 'var(--color-warning-border)' }}
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-lg relative"
+          style={{ backgroundColor: 'rgba(217, 119, 6, 0.08)' }}
         >
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-xl bg-amber-500 opacity-20 duration-1000"></span>
           🚨
         </div>
         <div className="flex flex-col gap-1">
           <span
             className="text-[9px] font-black uppercase tracking-[0.2em]"
-            style={{ color: 'var(--color-warning)' }}
+            style={{ color: 'var(--color-vocab)' }}
           >
             Desafio do Radar
           </span>
           <p
-            className="text-sm font-medium leading-relaxed"
-            style={{ color: 'var(--color-text-primary)' }}
+            className="text-sm font-medium leading-relaxed italic text-[var(--color-text-secondary)]"
           >
-            {data.scenario}
+            &ldquo;{formattedScenarioText}&rdquo;
           </p>
         </div>
       </div>
 
       {/* Question */}
-      <div className="px-1">
+      <div className="px-1 mt-1">
         <p className="font-display text-lg font-bold leading-snug text-[var(--color-text-primary)]">
           {data.question}
         </p>
       </div>
 
-      {/* Option cards — full-width stacked */}
+      {/* Option cards — stacked with dynamic indicators */}
       <div className="flex flex-col gap-3">
         {shuffledOptions.map((option, i) => {
           const isSelected = selectedIndex === i;
           const isCorrectOption = option.isCorrect;
+          const letter = String.fromCharCode(65 + i);
 
-          let bgColor = 'var(--color-surface)';
-          let borderColor = 'var(--color-border)';
-          let textColor = 'var(--color-text-primary)';
-          let ringColor = 'transparent';
-          let translationColor = 'var(--color-text-muted)';
-
-          if (answered && isCorrectOption) {
-            bgColor = 'var(--color-success-bg)';
-            borderColor = 'var(--color-success)';
-            textColor = 'var(--color-success)';
-            translationColor = 'var(--color-success)';
-          } else if (answered && isSelected && !isCorrectOption) {
-            bgColor = 'var(--color-error-bg)';
-            borderColor = 'var(--color-error)';
-            textColor = 'var(--color-error)';
-            translationColor = 'var(--color-error)';
-          } else if (!answered && isSelected) {
-            bgColor = 'var(--color-primary-light)';
-            borderColor = 'var(--color-primary)';
-            textColor = 'var(--color-primary-dark)';
-            ringColor = 'rgba(37, 99, 235, 0.1)';
+          let stateStyles = "border border-white/5 bg-white/5 hover:bg-white/10 hover:border-white/10 text-[var(--color-text-primary)] hover:scale-[1.005] active:scale-[0.995]";
+          
+          if (answered) {
+            if (isCorrectOption) {
+              stateStyles = "bg-[rgba(16,185,129,0.08)] border border-emerald-500/40 text-emerald-200 shadow-[0_0_15px_rgba(16,185,129,0.05)]";
+            } else if (isSelected) {
+              stateStyles = "bg-[rgba(239,68,68,0.08)] border border-red-500/40 text-red-200";
+            } else {
+              stateStyles = "opacity-25 scale-98 pointer-events-none";
+            }
           }
 
           return (
@@ -129,110 +131,111 @@ export function GrammarTrapExercise({
               type="button"
               disabled={answered || selectedIndex !== null}
               onClick={() => handleSelect(i)}
-              className="group relative flex flex-col items-start gap-1.5 rounded-xl px-5 py-4 text-left transition-all duration-300 active:scale-[0.98]"
+              className={`group relative flex flex-col items-start gap-2.5 rounded-xl px-5 py-4 text-left transition-all duration-200 ${stateStyles}`}
               style={{
-                backgroundColor: bgColor,
-                border: `1.5px solid ${borderColor}`,
-                boxShadow: isSelected ? `0 0 0 4px ${ringColor}` : 'none',
-                cursor: answered || selectedIndex !== null ? 'default' : 'pointer',
+                boxShadow: isSelected && !answered ? '0 4px 12px rgba(29, 78, 216, 0.15)' : undefined
               }}
             >
               {/* Letter badge + sentence */}
-              <div className="flex items-start gap-3 w-full">
-                <span
-                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-xs font-black mt-0.5"
-                  style={{
-                    backgroundColor:
-                      answered && isCorrectOption
-                        ? 'var(--color-success)'
-                        : answered && isSelected && !isCorrectOption
-                          ? 'var(--color-error)'
-                          : !answered && isSelected
-                            ? 'var(--color-primary)'
-                            : 'var(--color-surface-raised)',
-                    color:
-                      (answered && (isCorrectOption || isSelected)) || (!answered && isSelected)
-                        ? '#fff'
-                        : 'var(--color-text-muted)',
-                  }}
+              <div className="flex items-start gap-3.5 w-full">
+                <div 
+                  className={`flex h-6.5 w-6.5 shrink-0 items-center justify-center rounded-md text-xs font-black transition-colors ${
+                    answered && isCorrectOption 
+                      ? 'bg-emerald-500 text-white' 
+                      : answered && isSelected && !isCorrectOption
+                        ? 'bg-red-500 text-white'
+                        : isSelected && !answered
+                          ? 'bg-[var(--color-primary)] text-white'
+                          : 'bg-white/5 text-[var(--color-text-secondary)] border border-white/10'
+                  }`}
                 >
-                  {String.fromCharCode(65 + i)}
-                </span>
+                  {letter}
+                </div>
                 <div className="flex flex-col gap-1 min-w-0 flex-1">
                   <p
-                    className="text-sm font-semibold leading-relaxed"
-                    style={{ color: textColor }}
+                    className="text-base font-semibold leading-relaxed"
                   >
                     {option.sentence}
                   </p>
                   <p
-                    className="text-[11px] italic leading-relaxed opacity-70"
-                    style={{ color: translationColor }}
+                    className="text-xs italic leading-relaxed opacity-65 text-[var(--color-text-muted)]"
                   >
                     {option.translation}
                   </p>
                 </div>
+                
+                {answered && isCorrectOption && <CheckCircle2 size={18} className="text-emerald-500 shrink-0 ml-3 mt-0.5" />}
+                {answered && isSelected && !isCorrectOption && <XCircle size={18} className="text-red-500 shrink-0 ml-3 mt-0.5" />}
               </div>
-
-              {/* Hover effect */}
-              {!isSelected && !answered && (
-                <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl" />
-              )}
             </button>
           );
         })}
       </div>
 
       {/* Feedback — explanation + trap rule (shown after answering) */}
-      {answered && selectedIndex !== null && !shuffledOptions[selectedIndex].isCorrect && (
-        <div className="flex flex-col gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
-          {/* Correct answer highlight */}
-          {correctOption && (
+      {answered && selectedIndex !== null && (
+        <div className="flex flex-col gap-4.5 mt-2 animate-in slide-in-from-bottom-2 duration-300">
+          
+          {/* Correct answer highlight banner (if user got it wrong) */}
+          {!shuffledOptions[selectedIndex].isCorrect && correctOption && (
             <div
-              className="p-4 rounded-xl"
+              className="p-4.5 rounded-xl border border-emerald-500/30"
               style={{
-                backgroundColor: 'var(--color-success-bg)',
-                border: '1px solid var(--color-success)',
+                backgroundColor: 'rgba(16, 185, 129, 0.04)',
               }}
             >
-              <span
-                className="text-[9px] font-black uppercase tracking-[0.2em] opacity-70"
-                style={{ color: 'var(--color-success)' }}
-              >
-                Resposta correta
-              </span>
+              <div className="flex items-center gap-2 mb-1.5">
+                <CheckCircle2 size={15} className="text-emerald-500" />
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-500 opacity-90">
+                  Gabarito Correto
+                </span>
+              </div>
               <p
-                className="text-sm font-bold italic mt-1"
-                style={{ color: 'var(--color-text-primary)' }}
+                className="text-base font-bold italic text-[var(--color-text-primary)]"
               >
                 {correctOption.sentence}
               </p>
             </div>
           )}
 
-          {/* Explanation */}
-          <div className="px-1 border-l-2 border-[var(--color-primary)]/20 pl-4 py-2 opacity-90">
-            <p className="text-sm italic leading-relaxed text-[var(--color-text-muted)]">
+          {/* Explanation with Lightbulb */}
+          <div 
+            className="rounded-xl p-4.5 border-l-4"
+            style={{ 
+              backgroundColor: 'var(--color-surface-raised)',
+              borderLeftColor: shuffledOptions[selectedIndex].isCorrect ? 'var(--color-success)' : 'var(--color-error)'
+            }}
+          >
+            <div className="flex items-center gap-2 mb-2.5">
+              <Lightbulb size={15} style={{ color: shuffledOptions[selectedIndex].isCorrect ? 'var(--color-success)' : 'var(--color-error)' }} />
+              <span className="text-[10px] font-black uppercase tracking-wider text-[var(--color-text-muted)]">
+                Dica & Explicação
+              </span>
+            </div>
+            <p className="text-sm font-medium leading-relaxed text-[var(--color-text-secondary)]">
               {data.explanation}
             </p>
           </div>
 
-          {/* Trap rule */}
+          {/* Trap rule box */}
           <div
-            className="flex items-start gap-3 rounded-xl p-3"
+            className="flex items-start gap-3 rounded-xl p-4 border border-dashed"
             style={{
-              backgroundColor: 'var(--color-warning-bg)',
-              border: '1px solid var(--color-warning-border)',
+              backgroundColor: 'rgba(217, 119, 6, 0.01)',
+              borderColor: 'rgba(217, 119, 6, 0.15)',
             }}
           >
-            <span className="text-sm">⚠️</span>
-            <p
-              className="text-xs font-semibold leading-relaxed"
-              style={{ color: 'var(--color-text-primary)' }}
-            >
-              {data.trapRule}
-            </p>
+            <span className="text-base mt-0.5">⚠️</span>
+            <div className="flex flex-col gap-0.5">
+              <span className="text-[9px] font-black uppercase tracking-wider text-amber-500 opacity-80">Armadilha Comum para Brasileiros</span>
+              <p
+                className="text-xs font-semibold leading-relaxed text-[var(--color-text-secondary)]"
+              >
+                {data.trapRule}
+              </p>
+            </div>
           </div>
+
         </div>
       )}
     </div>

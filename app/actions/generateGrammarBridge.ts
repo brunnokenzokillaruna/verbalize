@@ -63,7 +63,7 @@ Respond with ONLY valid JSON, no markdown, no explanation.`;
 REGRAS EXTRA PARA LIÇÃO DE VERBO:
 - verbSpotlight.infinitive: use o pronome/marcador correto da língua (ex: em FR é 'être', não 'to be'; em EN é 'to be').
 - verbSpotlight.conjugationPreview: forneça as 6 formas do PRESENTE na língua-alvo. Para francês use 'je, tu, il, nous, vous, ils' (forma curta). Para inglês use 'I, you, he/she, we, you, they'.
-- verbSpotlight.idiomaticExpressions: FORNEÇA 1-2 expressões fixas reais, não invente. Se não houver expressão canônica com esse verbo, deixe como array vazio [].
+- verbSpotlight.idiomaticExpressions: FORNEÇA 1-2 expressões fixas reais, não invente. Se não houver expressão canônica com esse verbo, deixe como array vazio []. NUNCA misture palavras em português nos textos da língua-alvo (ex: "jouer avec le feu", NUNCA "jouer avec o feu").
 - verbSpotlight.personality e frequencyNote: linguagem SIMPLES, frases curtas, como amigo explicando.`
       : '';
 
@@ -119,6 +119,8 @@ Output ONLY este JSON (sem markdown):
 {
   "insight": "1-2 frases de impacto em PT-BR SIMPLES — a sacada central da regra. Pode começar com 'Em português...', 'No francês...', 'A gente...' ou similar. Linguagem de conversa, não de livro.",
   "explanation": "CAMPO PRINCIPAL DE ENSINO. Escreva 3-6 frases (ou um array de strings se forem tópicos distintos) em PT-BR SIMPLES explicando a regra DE VERDADE. Inclua: (1) como funciona na prática com exemplo concreto lado a lado (PT → língua-alvo), (2) por que brasileiros erram (com o exemplo errado e o certo), (3) quando usar e quando NÃO usar, (4) uma analogia ou comparação direta com o português se possível. Não economize: o aluno precisa ENTENDER, não apenas memorizar. Mas escreva de forma intuitiva, como um amigo explicando na mesa do bar. Proibido usar as palavras da lista acima.",
+  "survivalTip": "Dica de sobrevivência ultra rápida, prática e direta ao ponto que o aluno possa memorizar imediatamente na língua-alvo. Em PT-BR amigável. MAX 12 palavras.",
+  "culturalNote": "Um detalhe, curiosidade cultural ou hábito social real de uso na língua-alvo (ex: se nativos usam de um jeito especial no dia a dia, nível de formalidade, etc.). Em PT-BR amigável. MAX 15 palavras.",
   "usageContext": "Descreva em 1-3 palavras a 'vibe' social (ex: 'Casual/Amigos', 'Polidez/Formal', 'Dia-a-dia').",
   "brazilianTrap": "O 'Erro de Brasileiro' — explique em 2-3 frases o erro mais comum que brasileiros cometem com essa estrutura. Mostre o que o brasileiro diria errado e como corrigir. Ex: 'A gente tenta traduzir direto do português e fala X, mas o certo é Y. Isso acontece porque no português a gente faz Z, mas na língua-alvo funciona diferente.'",
   "patterns": [
@@ -155,7 +157,8 @@ Regras Cruciais:
 6. dialogueExample.target: DEVE ser uma linha real do diálogo acima.
 7. additionalExamples: 2-3 exemplos extras mostrando o padrão em diferentes contextos do dia a dia.
 8. Todo texto em PT-BR exceto as frases na língua-alvo.
-9. ANTES DE RESPONDER: releia 'insight', 'explanation', 'brazilianTrap' e 'bridge.difference'. Se usou qualquer palavra da lista proibida OU se um brasileiro com ensino fundamental teria dificuldade, REESCREVA mais simples.`;
+9. ANTES DE RESPONDER: releia 'insight', 'explanation', 'brazilianTrap' e 'bridge.difference'. Se usou qualquer palavra da lista proibida OU se um brasileiro com ensino fundamental teria dificuldade, REESCREVA mais simples.
+10. IDIOMA 100% PURO NA LÍNGUA-ALVO: Nos campos destinados à língua-alvo (como target, additionalExamples.target, verbSpotlight.idiomaticExpressions.target), NUNCA misture palavras do português (como "o", "a", "com"). Por exemplo, em francês escreva "jouer avec le feu", NUNCA "jouer avec o feu" ou "jouer avec com feu". O texto na língua-alvo deve ser 100% puro e gramaticalmente correto no idioma em questão.`;
 
     return await callGeminiJSON<GrammarBridgeResult>(prompt, systemPrompt, 3500);
   } catch (err) {
