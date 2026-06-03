@@ -184,6 +184,7 @@ export interface GrammarBridgeResult {
   explanation?: string | string[]; // 2-4 frases em PT-BR explicando a regra com profundidade. Pode ser um array para múltiplos tópicos.
   survivalTip?: string;       // Dica de sobrevivência ultra curta, ≤12 palavras
   culturalNote?: string;      // Detalhe ou curiosidade cultural de uso, ≤15 palavras
+  structureFormula?: string;   // OPCIONAL: representação em cápsulas. ex: "[Sujeito] + [avoir (conjugado)] + mal + [à la / au / aux / à l']"
   bridge?: {
     portuguese: string;       // Padrão/frase como se diz em PT-BR
     target: string;           // Equivalente na língua-alvo
@@ -195,7 +196,11 @@ export interface GrammarBridgeResult {
   };
   additionalExamples?: Array<{ target: string; portuguese: string }>; // 2 exemplos extras
   items?: Array<{ target: string; portuguese: string; logic?: string }>; // OPCIONAL: Usado para lições com múltiplos itens (ex: interrogativas, expressões)
-  brazilianTrap?: string;     // O "Radar do Erro": foca em interferências do PT-BR
+  brazilianTrap?: {
+    wrong: string;
+    right: string;
+    explanation: string;
+  } | string;                 // O "Radar do Erro": foca em interferências do PT-BR (suporta objeto ou string para retrocompatibilidade)
   usageContext?: string;      // O "Cenário de Uso": explica a vibe social (formal, casual, etc)
   patterns?: Array<{          // "Pattern Strips": mostra a regra em 2-3 variações rápidas
     label: string;            // ex: "Plural", "Negativa", "Pessoa"

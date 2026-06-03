@@ -118,11 +118,16 @@ EXEMPLO BOM (escreva assim):
 Output ONLY este JSON (sem markdown):
 {
   "insight": "1-2 frases de impacto em PT-BR SIMPLES — a sacada central da regra. Pode começar com 'Em português...', 'No francês...', 'A gente...' ou similar. Linguagem de conversa, não de livro.",
-  "explanation": "CAMPO PRINCIPAL DE ENSINO. Escreva 3-6 frases (ou um array de strings se forem tópicos distintos) em PT-BR SIMPLES explicando a regra DE VERDADE. Inclua: (1) como funciona na prática com exemplo concreto lado a lado (PT → língua-alvo), (2) por que brasileiros erram (com o exemplo errado e o certo), (3) quando usar e quando NÃO usar, (4) uma analogia ou comparação direta com o português se possível. Não economize: o aluno precisa ENTENDER, não apenas memorizar. Mas escreva de forma intuitiva, como um amigo explicando na mesa do bar. Proibido usar as palavras da lista acima.",
+  "explanation": "CAMPO PRINCIPAL DE ENSINO. Escreva 3-6 frases (ou um array de strings se forem tópicos distintos) em PT-BR SIMPLES explicando a regra DE VERDADE. Inclua: (1) como funciona na prática com exemplo concreto lado a lado (PT → língua-alvo), (2) por que brasileiros erram, (3) quando usar e quando NÃO usar, (4) uma analogia ou comparação direta com o português se possível. Não economize: o aluno precisa ENTENDER, não apenas memorizar. Mas escreva de forma intuitiva, como um amigo explicando na mesa do bar. Proibido usar as palavras da lista acima.",
   "survivalTip": "Dica de sobrevivência ultra rápida, prática e direta ao ponto que o aluno possa memorizar imediatamente na língua-alvo. Em PT-BR amigável. MAX 12 palavras.",
   "culturalNote": "Um detalhe, curiosidade cultural ou hábito social real de uso na língua-alvo (ex: se nativos usam de um jeito especial no dia a dia, nível de formalidade, etc.). Em PT-BR amigável. MAX 15 palavras.",
+  "structureFormula": "fórmula visual usando colchetes para partes variáveis e texto comum para partes fixas/constantes. Use '+' como separador. ex: '[Sujeito] + [avoir (conjugado)] + mal + [à la / au / aux / à l\'] + [Parte do corpo]' ou '[Sujeito] + [verbo ser/estar] + [adjetivo]'",
   "usageContext": "Descreva em 1-3 palavras a 'vibe' social (ex: 'Casual/Amigos', 'Polidez/Formal', 'Dia-a-dia').",
-  "brazilianTrap": "O 'Erro de Brasileiro' — explique em 2-3 frases o erro mais comum que brasileiros cometem com essa estrutura. Mostre o que o brasileiro diria errado e como corrigir. Ex: 'A gente tenta traduzir direto do português e fala X, mas o certo é Y. Isso acontece porque no português a gente faz Z, mas na língua-alvo funciona diferente.'",
+  "brazilianTrap": {
+    "wrong": "frase errada que um brasileiro diria/pensaria ao traduzir direto (ex: 'ma tête fait mal' ou 'je suis 20 ans')",
+    "right": "frase correta na língua-alvo (ex: 'j\'ai mal à la tête' ou 'j\'ai 20 ans')",
+    "explanation": "explicação muito curta e direta de por que isso é um erro e como o brasileiro deve pensar para evitar. MAX 2 frases."
+  },
   "patterns": [
     { "label": "Eu falo", "target": "I speak", "portuguese": "Eu falo" },
     { "label": "Ela fala", "target": "She speaks", "portuguese": "Ela fala" },
@@ -131,7 +136,7 @@ Output ONLY este JSON (sem markdown):
   "bridge": {
     "portuguese": "Use ^^ para destacar a parte da frase que gera a regra em PT-BR. ex: 'Eu ^^falo^^'",
     "target": "Use ^^ para destacar a parte equivalente. ex: 'I ^^speak^^'",
-    "difference": "Explique a diferença chave em PT-BR. Sem jargão."
+    "difference": "Explique a diferença estrutural de forma GERAL (não apenas para o gênero/exemplo atual). Sem jargão. MAX 15 palavras."
   },
   "items": [
     { "target": "Expressão 1", "portuguese": "Tradução PT-BR", "logic": "A pequena sacada por trás deste item — linguagem simples (OPCIONAL)" }
@@ -151,14 +156,20 @@ ${verbRulesBlock}
 Regras Cruciais:
 1. Se o tema for uma REGRA SISTÊMICA (ex: Plural, Passado), use o campo 'bridge' e preencha 'patterns' com 2-3 variações. Deixe 'items' como null.
 2. Se o tema for uma LISTA de expressões, preencha o campo 'items'. Deixe 'bridge' e 'patterns' como null.
-3. brazilianTrap: FOQUE no erro clássico. Mostre o que o brasileiro tentaria dizer e a versão correta. Linguagem direta e amigável.
-4. Destaque Visual: Use ^^ envolta das palavras-chave em bridge.target e bridge.portuguese para criar o mapeamento visual.
+3. brazilianTrap: FOQUE no erro clássico. Mostre o que o brasileiro tentaria dizer e a versão correta no objeto estruturado.
+4. Destaque Visual: Use ^^ envolta das palavras-chave em bridge.target and bridge.portuguese para criar o mapeamento visual.
 5. explanation: Este é o CORAÇÃO da lição. O aluno vai ler isso com calma. Explique de verdade, com comparações e exemplos paralelos. Tom de amigo, não de livro.
 6. dialogueExample.target: DEVE ser uma linha real do diálogo acima.
 7. additionalExamples: 2-3 exemplos extras mostrando o padrão em diferentes contextos do dia a dia.
 8. Todo texto em PT-BR exceto as frases na língua-alvo.
-9. ANTES DE RESPONDER: releia 'insight', 'explanation', 'brazilianTrap' e 'bridge.difference'. Se usou qualquer palavra da lista proibida OU se um brasileiro com ensino fundamental teria dificuldade, REESCREVA mais simples.
-10. IDIOMA 100% PURO NA LÍNGUA-ALVO: Nos campos destinados à língua-alvo (como target, additionalExamples.target, verbSpotlight.idiomaticExpressions.target), NUNCA misture palavras do português (como "o", "a", "com"). Por exemplo, em francês escreva "jouer avec le feu", NUNCA "jouer avec o feu" ou "jouer avec com feu". O texto na língua-alvo deve ser 100% puro e gramaticalmente correto no idioma em questão.`;
+9. ANTES DE RESPONDER: releia 'insight', 'explanation', 'brazilianTrap.explanation' e 'bridge.difference'. Se usou qualquer palavra da lista proibida OU se um brasileiro com ensino fundamental teria dificuldade, REESCREVA mais simples.
+10. IDIOMA 100% PURO NA LÍNGUA-ALVO: Nos campos destinados à língua-alvo (como target, additionalExamples.target, verbSpotlight.idiomaticExpressions.target), NUNCA misture palavras do português (como "o", "a", "com"). Por exemplo, em francês escreva "jouer avec le feu", NUNCA "jouer avec o feu" ou "jouer avec com feu". O texto na língua-alvo deve ser 100% puro e gramaticalmente correto no idioma em questão.
+11. EVITE REPETIÇÕES: Garanta que as explicações em 'insight', 'explanation', 'bridge.difference' e 'brazilianTrap.explanation' não repitam as mesmas informações com as mesmas ou outras palavras. Divida o conteúdo de forma lógica:
+    - 'insight': Foco no modelo mental básico (A Sacada).
+    - 'bridge.difference': Foco na diferença estrutural direta do exemplo principal (PT-BR vs Língua-alvo) em 1 frase curta.
+    - 'explanation': Explicação profunda e conceitual do padrão.
+    - 'brazilianTrap.explanation': Foco estritamente no motivo por trás do erro clássico do brasileiro.
+12. ESTRUTURA E COMPLETUDE EM FRANCÊS: Se o foco for francês e envolver preposições + artigos (ex: contrações para dor, direção, lugares, etc.), você DEVE incluir nos padrões ('patterns') ou exemplos adicionais a contração antes de vogal/H mudo ('à l\''), além de cobrir o masculino ('au'), feminino ('à la') e plural ('aux').`;
 
     return await callGeminiJSON<GrammarBridgeResult>(prompt, systemPrompt, 3500);
   } catch (err) {
