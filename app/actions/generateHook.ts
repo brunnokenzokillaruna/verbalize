@@ -85,8 +85,13 @@ function pickTopic(level: ProficiencyLevel, interests: string[]) {
   return weighted[Math.floor(Math.random() * weighted.length)];
 }
 
-const DIALOGUE_LINES: Record<ProficiencyLevel, number> = {
-  A1: 6, A2: 6, B1: 8, B2: 8, C1: 10, C2: 10,
+const DIALOGUE_LINE_RANGES: Record<ProficiencyLevel, { min: number; max: number }> = {
+  A1: { min: 4, max: 6 },
+  A2: { min: 5, max: 7 },
+  B1: { min: 6, max: 8 },
+  B2: { min: 7, max: 9 },
+  C1: { min: 8, max: 10 },
+  C2: { min: 10, max: 12 },
 };
 
 const LEVEL_DESCRIPTORS: Record<ProficiencyLevel, string> = {
@@ -189,7 +194,7 @@ export async function generateHook(params: GenerateHookParams): Promise<HookResu
   // NARRATIVE ANCHOR: Use the curated theme and uiTitle instead of random topics
   const themeContext = theme ? `Theme: ${theme}${uiTitle ? ` - Scenario: ${uiTitle}` : ''}` : `Topic: ${pickTopic(level, interests)}`;
   
-  const lineCount = DIALOGUE_LINES[level];
+  const { min: minLines, max: maxLines } = DIALOGUE_LINE_RANGES[level];
   const lang = LANG_LABEL[language];
   const levelDesc = LEVEL_DESCRIPTORS[level];
 
@@ -197,10 +202,10 @@ export async function generateHook(params: GenerateHookParams): Promise<HookResu
   if (tag === 'GRAM') {
     tagInstruction = `- ATOMIC GRAMMAR RULE: This lesson's primary focus is '${grammarFocus}'. You MUST ensure this is the ONLY new grammatical concept or complex verb introduced. If a specific verb is mentioned in the focus, it should be the protagonist of the dialogue.
 - SIMPLICITY: Keep the rest of the sentence structure simple so the student can isolate the grammar focus easily.
-- NATURAL INTEGRATION: The grammar focus must appear INSIDE a real conversation — NOT as isolated descriptive statements. BAD: each speaker just making a standalone observation ("Le hall est sombre", "La porte est étroite"). GOOD: the grammar appears naturally because the conversation calls for it ("On va à l'hôtel ? — Oui, mais le hall est un peu sombre, non ? — C'est vrai, et la porte est étroite aussi !"). The speakers must REACT to each other.`;
+- NATURAL INTEGRATION: The grammar focus must appear INSIDE a real conversation — NOT as isolated descriptive statements. BAD: each speaker just making a standalone observation ("Le hall est sombre", "La porte est étroite"). GOOD: the grammar appears naturally because the conversation calls for it ("On va à l'hôtel ? — Oui, mais le hall est un peu sombre, non ? — C'est vrai, e a porta é estreita também !"). The speakers must REACT to each other.`;
   } else if (tag === 'VOC') {
-    tagInstruction = `- VOCABULARY OVER EVERYTHING: The dialogue is merely a vehicle for the 4 words in 'newVocabulary'. Keep the dialogue lines SHORT (max 6 words) and the grammar invisible.
-- TARGET VOCABULARY: The specific word(s) mentioned in the 'Pedagogical Focus' MUST be included as part of the 4 words in 'newVocabulary' and MUST be used in the dialogue. Extract the core word from the focus text (e.g., if it says 'Vocabulário: Bon', the word is 'bon'). The other words should be related to the scene.
+    tagInstruction = `- VOCABULARY OVER EVERYTHING: The dialogue is merely a vehicle for the 2 words in 'newVocabulary'. Keep the dialogue lines SHORT (max 6 words) and the grammar invisible.
+- TARGET VOCABULARY: The specific word(s) mentioned in the 'Pedagogical Focus' MUST be included as part of the 2 words in 'newVocabulary' and MUST be used in the dialogue. Extract the core word from the focus text (e.g., if it says 'Vocabulário: Bon', the word is 'bon'). The other words should be related to the scene.
 - FOCUS: Do NOT introduce ANY new grammar or complex verbs. Use only the most basic verbs (être/avoir/aller/faire in FR, be/have/go/do in EN) to support the vocabulary.`;
   } else if (tag === 'PRON') {
     tagInstruction = `- PHONETIC FOCUS: The dialogue should naturally feature many instances of the sounds or letters in '${grammarFocus}'.
@@ -255,9 +260,9 @@ Respond with ONLY valid JSON, no markdown, no explanation.`;
     : '';
 
   const dialogueVocabGuard = isEarlyLearner
-    ? `- ⚠️ ULTRA-BEGINNER DIALOGUE: This student has learned ${knownVocabulary.length === 0 ? 'nothing yet — this is their very first lesson' : `only ${knownVocabulary.length} words so far`}. Every word in the dialogue (EXCEPT the 4 new vocabulary words) MUST be among the 300 most common ${lang} words. Examples of allowed words: être, avoir, aller, manger, boire, aimer, vouloir, faire, voir, dire, savoir, pouvoir, venir; bonjour, salut, oui, non, merci, s'il vous plaît, pardon, d'accord, voilà; je, tu, il, elle, on, nous, vous, ils; le, la, les, un, une, des, mon, ton, son, notre, votre; ici, là, bien, très, aussi, avec, pour, dans, sur, de, à, et, mais, ou. NO low-frequency, technical, or topic-specific words outside the 4 new vocab words.`
+    ? `- ⚠️ ULTRA-BEGINNER DIALOGUE: This student has learned ${knownVocabulary.length === 0 ? 'nothing yet — this is their very first lesson' : `only ${knownVocabulary.length} words so far`}. Every word in the dialogue (EXCEPT the 2 new vocabulary words) should ideally be among the 300 most common ${lang} words (like: être, avoir, aller, manger, etc.). You may use other basic words if they are necessary to make the dialogue natural and logical.`
     : normalizedKnown.length > 0
-      ? `- VOCABULARY RECYCLING: The student already knows these words — use them naturally throughout the dialogue so they get repeated exposure: [${normalizedKnown.slice(-80).join(', ')}]. The 4 new vocab words are the ONLY truly new content words. Every other content word in the dialogue must come from the student's known list or be a very basic function word.`
+      ? `- VOCABULARY RECYCLING: The student already knows these words. You should PRIORITIZE using them naturally throughout the dialogue to reinforce memory: [${normalizedKnown.slice(-80).join(', ')}]. The 2 new vocab words are the main target words. You are ALLOWED and ENCOURAGED to use other standard everyday words (suited for the user's level) to make the conversation feel 100% natural, logical, and coherent, rather than writing a disjointed dialogue to satisfy constraints.`
       : '';
 
   const speakerIntro = tag === 'MISS'
@@ -269,8 +274,8 @@ Respond with ONLY valid JSON, no markdown, no explanation.`;
     : `"${nameA}: <line 1>\\n${nameB}: <line 2>\\n..."`;
 
   const newVocabTemplate = targetVocabWord
-    ? `["${targetVocabWord}", "non_verb_word_2", "non_verb_word_3", "non_verb_word_4"]`
-    : `["non_verb_word_1", "non_verb_word_2", "non_verb_word_3", "non_verb_word_4"]`;
+    ? `["${targetVocabWord}", "non_verb_word_2"]`
+    : `["non_verb_word_1", "non_verb_word_2"]`;
 
   const intentMode = tag === 'MISS' && ['B1', 'B2', 'C1', 'C2'].includes(level);
   
@@ -284,7 +289,7 @@ Requirements:
 - ${themeContext}
 - Pedadogical Focus: ${grammarFocus}
 ${tagInstruction}
-- Exactly ${lineCount} lines total, alternating speakers
+- Between ${minLines} and ${maxLines} lines total, alternating speakers
 - Every line MUST begin with the speaker name and a colon
 - ⚠️ GOLDEN RULE — REAL CONVERSATION, NOT SENTENCE SHOWCASE: The #1 most important requirement is that this reads like a REAL conversation between two humans. Each line must be a genuine RESPONSE to the previous one — agreeing, disagreeing, asking a follow-up, reacting emotionally, suggesting something, sharing an opinion. The vocabulary and grammar being taught must emerge NATURALLY from the conversation flow, not be artificially inserted as isolated statements.
 - ❌ NO INVISIBLE THIRD CHARACTERS (CRITICAL): The dialogue must be strictly a 2-party conversation. The speakers CANNOT address an invisible third person (like a waiter, cashier, receptionist, or taxi driver) or perform a transaction with someone outside the dialogue. If they are in a commercial/transactional setting (café, shop, paying a fare, buying tickets), they must talk TO EACH OTHER about the transaction, and NOT pretend to order from or pay each other.
@@ -341,32 +346,28 @@ Output ONLY this JSON object (no extra text):
   "grammarFocus": "one sentence describing the grammar used",
   "imageKeywords": {
     "<vocab word 1>": "short English Pexels search term (3-5 words, single object, neutral background)",
-    "<vocab word 2>": "...",
-    "<vocab word 3>": "...",
-    "<vocab word 4>": "..."
+    "<vocab word 2>": "..."
   },
   "vocabTranslations": {
     "<vocab word 1>": { "translation": "pt-BR word/phrase", "explanation": "dica de uso em PT-BR SIMPLES, ≤15 palavras — linguagem de amigo, sem jargão gramatical (nada de 'substantivo feminino', 'locução adverbial', 'distinção semântica'). Prefira exemplos concretos a termos técnicos.", "example": "one sentence in ${lang} using the word" },
-    "<vocab word 2>": { "translation": "...", "explanation": "...", "example": "..." },
-    "<vocab word 3>": { "translation": "...", "explanation": "...", "example": "..." },
-    "<vocab word 4>": { "translation": "...", "explanation": "...", "example": "..." }
+    "<vocab word 2>": { "translation": "...", "explanation": "...", "example": "..." }
   }
 }
 
 Rules:
-- dialogue must have exactly ${lineCount} lines
-- newVocabulary: EXACTLY 4 DISTINCT NON-VERB words (no verbs allowed). Nouns, adjectives, or adverbs only. All 4 must appear LITERALLY in the dialogue.
+- dialogue must have between ${minLines} and ${maxLines} lines
+- newVocabulary: EXACTLY 2 DISTINCT NON-VERB words (no verbs allowed). Nouns, adjectives, or adverbs only. All 2 must appear LITERALLY in the dialogue.
 - dialogueVerbs: List EVERY verb used in the dialogue in its infinitive form.
 - NEVER include days of the week, months of the year, or proper nouns in newVocabulary.
 - imageKeywords: one concise English Pexels search term per vocabulary word.
-- vocabTranslations: provide for all 4 vocabulary words.`;
+- vocabTranslations: provide for all 2 vocabulary words.`;
 
   try {
     // Allow the model to think (removed thinkingBudget=0) to ensure the dialogue
     // maintains strict logical continuity and a natural conversational flow. The user
     // reported that disabling thinking caused sudden, illogical topic changes.
     const result = await callGeminiJSON<HookResult>(prompt, systemPrompt, 2048);
-    if (!result?.dialogue || result?.newVocabulary?.length !== 4) {
+    if (!result?.dialogue || result?.newVocabulary?.length !== 2) {
       console.error('[generateHook] Invalid minimal hook response');
       return null;
     }

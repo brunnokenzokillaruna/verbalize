@@ -93,7 +93,11 @@ function buildTypeDescriptions(langLabel: string): Record<ExerciseTypeId, string
    - "correctIndex" (0-2), "explanation" (PT-BR).`,
     'scrambled-conversation': `type "scrambled-conversation":
    - A short sequence of 3-4 dialogue lines.
-   - "lines" (correct order), "shuffledLines" (random order).`,
+   - "lines" (correct order), "shuffledLines" (random order).
+   - CRITICAL COHERENCE:
+     1. Labeled Speakers: Every line MUST start with a speaker's name (e.g., "Marie: ...", "Thomas: ..."). The speakers MUST alternate (A -> B -> A -> B) to establish structure.
+     2. Unambiguous Logical Ordering: The conversation must have exactly ONE logical chronological order. Use strong chronological clues: greeting at the start, question followed by its direct answer, request followed by its fulfillment, and a closing remark/despedida at the end.
+     3. No Ambiguity: Do not write lines that could logically be swapped or placed in multiple positions (e.g., multiple general thank-yous or remarks). Every line must have a unique, necessary position in the chain.`,
     'interactive-subtitles': `type "interactive-subtitles":
    - "correctText" (original sentence).
    - "errorText" (copy of correctText but with 1-2 words swapped for wrong ones or misspelled).
@@ -240,8 +244,8 @@ export async function generatePracticeExercises(
   const tagGuidance = buildTagGuidance(tag, allowedSet);
 
   const vocabConstraint = isEarlyLearner
-    ? `\nVOCABULARY CONSTRAINT: The learner is a beginner with very limited vocabulary. All exercise sentences must use ONLY: the key vocabulary words listed above, the words involved in the grammar focus ("${grammarFocus}"), basic function words (articles, prepositions, pronouns, conjunctions, auxiliary verbs), and simple A1-level everyday words. Do NOT use any advanced or uncommon content words.`
-    : `\nVOCABULARY CONSTRAINT: All exercise sentences must use EXCLUSIVELY words the learner already knows: [${knownVocabulary.slice(-1000).join(', ')}], plus the key vocabulary words listed above, plus the words involved in the grammar focus ("${grammarFocus}"), plus basic function words (articles, prepositions, pronouns, conjunctions, auxiliary verbs). Do NOT introduce unknown content words.`;
+    ? `\nVOCABULARY CONSTRAINT: The learner is a beginner with very limited vocabulary. All exercise sentences must use ONLY: the key vocabulary words listed above, the words that appeared in the dialogue above, the words involved in the grammar focus ("${grammarFocus}"), basic function words (articles, prepositions, pronouns, conjunctions, auxiliary verbs), and simple A1-level everyday words. Do NOT use any advanced or uncommon content words.`
+    : `\nVOCABULARY CONSTRAINT: All exercise sentences should PRIORITIZE using words the learner already knows: [${knownVocabulary.slice(-1000).join(', ')}], plus the key vocabulary words listed above, plus any words that appeared in the dialogue above, plus the words involved in the grammar focus ("${grammarFocus}"), plus basic function words (articles, prepositions, pronouns, conjunctions, auxiliary verbs). You are ALLOWED to use other standard everyday words if necessary to make the exercise sentences natural and logical. Do NOT introduce highly complex, technical, or obscure vocabulary.`;
 
   const previousTopicsBlock = previousTopics.length > 0
     ? `\nPREVIOUS LESSON TOPICS (for context and coherence — you may reference these themes): ${previousTopics.join(' | ')}`
@@ -365,6 +369,27 @@ Example for social-roleplay:
         if (!sentence || !blankWord || !Array.isArray(options) || options.length < 2) {
           console.warn('[generatePracticeExercises] Dropped malformed context-choice');
           return false;
+        }
+        return true;
+      }
+      if (ex.type === 'scrambled-conversation') {
+        const d = ex.data as { lines: string[]; shuffledLines: string[] };
+        if (!Array.isArray(d.lines) || !Array.isArray(d.shuffledLines) || d.lines.length < 3 || d.lines.length !== d.shuffledLines.length) {
+          console.warn('[generatePracticeExercises] Dropped malformed scrambled-conversation');
+          return false;
+        }
+        
+        // Ensure that shuffledLines actually contains the same lines as lines, and is actually shuffled.
+        const sortedLines = [...d.lines].sort();
+        const sortedShuffled = [...d.shuffledLines].sort();
+        if (sortedLines.join(',') !== sortedShuffled.join(',')) {
+          console.warn('[generatePracticeExercises] Auto-fixing scrambled-conversation with mismatched shuffled lines');
+          d.shuffledLines = [...d.lines].sort(() => Math.random() - 0.5);
+        }
+        
+        // If the shuffle randomly ended up in the same order, reshuffle
+        if (JSON.stringify(d.lines) === JSON.stringify(d.shuffledLines) && d.lines.length > 1) {
+          d.shuffledLines = [...d.lines].sort(() => Math.random() - 0.5);
         }
         return true;
       }

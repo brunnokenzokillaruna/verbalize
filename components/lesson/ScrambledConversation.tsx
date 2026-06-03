@@ -179,6 +179,23 @@ export function ScrambledConversation({ data, onAnswer, answered, setIsExerciseR
         </div>
       </DndContext>
       
+      {/* 3. Correct Answer Feedback when Answered Incorrectly */}
+      {answered && JSON.stringify(currentOrder) !== JSON.stringify(data.lines) && (
+        <div className="mt-2 rounded-xl p-4 bg-[rgba(16,185,129,0.04)] border border-emerald-500/20 animate-slide-up-spring">
+          <h4 className="text-xs font-black text-emerald-400 uppercase tracking-[0.15em] mb-3 flex items-center gap-2">
+            <span>💡</span> Ordem Correta da Conversa:
+          </h4>
+          <div className="flex flex-col gap-2.5 pl-3 border-l-2 border-emerald-500/30">
+            {data.lines.map((line, idx) => (
+              <div key={idx} className="flex items-start gap-2.5 text-sm text-[var(--color-text-secondary)] leading-relaxed">
+                <span className="font-bold text-emerald-500/80 tabular-nums">#{idx + 1}</span>
+                <span>{line}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      
     </div>
   );
 }
