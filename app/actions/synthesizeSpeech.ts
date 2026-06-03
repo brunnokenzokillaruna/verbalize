@@ -156,13 +156,13 @@ function stripSpeakerPrefix(line: string): string {
 
 /**
  * Converts plain text to a TTS `input` object.
+ * Prepends a 250ms break to prevent browser audio device latency clipping the first syllable.
  * If the text contains "/" (e.g. "il/elle"), uses SSML so each alternative
  * is pronounced separately with a short pause — instead of reading "slash".
  */
-function buildTTSInput(text: string): { text: string } | { ssml: string } {
-  if (!text.includes('/')) return { text };
+function buildTTSInput(text: string): { ssml: string } {
   const ssmlContent = text.replace(/\s*\/\s*/g, '<break time="350ms"/>');
-  return { ssml: `<speak>${ssmlContent}</speak>` };
+  return { ssml: `<speak><break time="250ms"/>${ssmlContent}</speak>` };
 }
 
 async function callTTS(
