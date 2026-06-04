@@ -25,6 +25,7 @@ const STAGES_BY_TAG: Record<LessonTag, { key: LessonStage; label: string }[]> = 
   DIAL: [
     { key: 'vocabulary', label: 'Vocabulário' },
     { key: 'hook',       label: 'Diálogo' },
+    { key: 'grammar',    label: 'Gramática' },
     { key: 'practice',   label: 'Prática' },
   ],
   MISS: [
@@ -42,6 +43,7 @@ const STAGES_BY_TAG: Record<LessonTag, { key: LessonStage; label: string }[]> = 
   EXPR: [
     { key: 'vocabulary', label: 'Vocabulário' },
     { key: 'hook',       label: 'Diálogo' },
+    { key: 'grammar',    label: 'Gramática' },
     { key: 'practice',   label: 'Prática' },
   ],
   CULT: [

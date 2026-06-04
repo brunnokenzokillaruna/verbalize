@@ -8,7 +8,7 @@ import { savePregeneratedLesson, getUserVocabulary } from '@/services/firestore'
 import { getPreviousTopics } from '@/lib/curriculum';
 import type { LessonDefinition, LessonTag, GrammarBridgeResult, Exercise, MissionBriefingResult } from '@/types';
 
-const TAGS_WITH_GRAMMAR_PHASE: ReadonlySet<LessonTag> = new Set(['GRAM', 'VERB', 'CULT', 'VOC']);
+const TAGS_WITH_GRAMMAR_PHASE: ReadonlySet<LessonTag> = new Set(['GRAM', 'VERB', 'CULT', 'VOC', 'DIAL', 'EXPR']);
 
 /**
  * Generates the full content for `lesson` in the background (hook + grammar

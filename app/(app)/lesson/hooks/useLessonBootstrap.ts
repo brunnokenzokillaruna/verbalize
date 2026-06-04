@@ -15,7 +15,7 @@ import { translateWord } from '@/app/actions/translateWord';
 import { getPregeneratedLesson, deletePregeneratedLesson, getUserVocabulary, upsertVocabularyItem } from '@/services/firestore';
 import type { GrammarBridgeResult, Exercise, LessonTag, MissionBriefingResult } from '@/types';
 
-const TAGS_WITH_GRAMMAR_PHASE: ReadonlySet<LessonTag> = new Set(['GRAM', 'VERB', 'CULT']);
+const TAGS_WITH_GRAMMAR_PHASE: ReadonlySet<LessonTag> = new Set(['GRAM', 'VERB', 'CULT', 'VOC', 'DIAL', 'EXPR']);
 
 interface UseLessonBootstrapProps {
   requestedLessonId: string | undefined;

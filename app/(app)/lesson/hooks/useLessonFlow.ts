@@ -14,10 +14,10 @@ const LESSON_FLOW: Record<LessonTag, LessonPhase[]> = {
   GRAM: ['vocabulary', 'hook', 'grammar',   'practice', 'complete'],
   VOC:  ['vocabulary', 'hook', 'grammar',   'practice', 'complete'],
   PRON: ['vocabulary', 'hook', 'phonetics', 'practice', 'complete'],
-  DIAL: ['vocabulary', 'hook',               'practice', 'complete'],
+  DIAL: ['vocabulary', 'hook', 'grammar',   'practice', 'complete'],
   MISS: ['mission',    'vocabulary', 'role-play', 'practice', 'complete'],
   VERB: ['vocabulary', 'hook', 'grammar',   'practice', 'complete'],
-  EXPR: ['vocabulary', 'hook',               'practice', 'complete'],
+  EXPR: ['vocabulary', 'hook', 'grammar',   'practice', 'complete'],
   CULT: ['vocabulary', 'hook', 'grammar',   'practice', 'complete'],
 };
 
