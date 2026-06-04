@@ -268,27 +268,21 @@ export function GrammarBridgeCard({ bridge, language }: GrammarBridgeCardProps) 
             )}
 
             {explanation && (
-              <div className="flex flex-col gap-4">
-                {Array.isArray(explanation) ? (
-                  explanation.map((item, idx) => (
-                    <div 
-                      key={idx} 
-                      className="relative p-5 rounded-2xl bg-[var(--color-surface-raised)]/35 border border-[var(--color-border)]/40 backdrop-blur-md transition-all duration-300 hover:bg-[var(--color-surface-raised)]/60"
-                    >
-                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-1/2 bg-[var(--color-primary)] rounded-r-full shadow-[0_0_12px_rgba(0,0,0,0.1)]" />
-                      <p className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
+              <div className="relative p-5 rounded-2xl bg-[var(--color-surface-raised)]/35 border border-[var(--color-border)]/40 backdrop-blur-md transition-all duration-300 hover:bg-[var(--color-surface-raised)]/60">
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-1/2 bg-[var(--color-primary)] rounded-r-full shadow-[0_0_12px_rgba(0,0,0,0.1)]" />
+                <div className="flex flex-col gap-3">
+                  {Array.isArray(explanation) ? (
+                    explanation.map((item, idx) => (
+                      <p key={idx} className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
                         {item}
                       </p>
-                    </div>
-                  ))
-                ) : (
-                  <div className="relative p-5 rounded-2xl bg-[var(--color-surface-raised)]/35 border border-[var(--color-border)]/40 backdrop-blur-md transition-all duration-300 hover:bg-[var(--color-surface-raised)]/60">
-                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-1/2 bg-[var(--color-primary)] rounded-r-full shadow-[0_0_12px_rgba(0,0,0,0.1)]" />
+                    ))
+                  ) : (
                     <p className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
                       {explanation}
                     </p>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             )}
 
