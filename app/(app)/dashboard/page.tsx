@@ -10,7 +10,8 @@ import { LanguageSwitcherSheet } from '@/components/dashboard/LanguageSwitcherSh
 import { useAuthStore } from '@/store/authStore';
 import { useTheme } from '@/components/ThemeProvider';
 import { logOut } from '@/services/auth';
-import { updateUser, getUser, logLesson, updateLessonStats } from '@/services/firestore';
+import { updateUser, getUser, logLesson, updateLessonStats, getPregeneratedLesson, getUserVocabulary } from '@/services/firestore';
+import { pregenerateNextLesson } from '@/app/actions/pregenerateNextLesson';
 import { SkipLessonModal } from '@/components/ui/SkipLessonModal';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -173,6 +174,7 @@ export default function DashboardPage() {
     ? allLessons.findIndex((l) => l.id === frontierLessonId)
     : 0;
   if (frontierIndex === -1) frontierIndex = 0;
+  const activeLessonObj = allLessons[frontierIndex] || allLessons[0];
 
   const [showLangSheet, setShowLangSheet] = useState(false);
   const [switchingLang, setSwitchingLang] = useState(false);
@@ -255,6 +257,52 @@ export default function DashboardPage() {
     }).catch(console.error);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.uid]);
+
+  // Pre-generate active lesson in background
+  useEffect(() => {
+    if (!user || !profile || !activeLessonObj) return;
+
+    const lessonId = activeLessonObj.id;
+    const language = profile.currentTargetLanguage;
+
+    (async () => {
+      try {
+        let cached = null;
+        try {
+          cached = await getPregeneratedLesson(user.uid, lessonId);
+        } catch (err) {
+          // Firestore security rules block reading non-existent docs by checking resource.data.uid,
+          // which throws permission-denied. We catch this safely and treat it as a cache miss.
+          console.log(`[Dashboard Pregen] Cache status check failed or document not found (treating as MISS).`);
+        }
+
+        const isTimedOut = (createdAt: any) => {
+          if (!createdAt) return true;
+          const createdMs = createdAt.toMillis ? createdAt.toMillis() : (createdAt.seconds * 1000);
+          return Date.now() - createdMs > 5 * 60 * 1000; // 5 minutes
+        };
+
+        if (!cached || (cached.status === 'generating' && isTimedOut(cached.createdAt))) {
+          console.log(`[Dashboard Pregen] 🔮 Active lesson ${lessonId} is a cache MISS. Pregenerating in background...`);
+          const userVocabulary = await getUserVocabulary(user.uid, language);
+          const knownVocabulary = userVocabulary.map((v) => v.word.toLowerCase());
+          await pregenerateNextLesson(
+            user.uid,
+            activeLessonObj,
+            profile.interests ?? [],
+            knownVocabulary
+          );
+          console.log(`[Dashboard Pregen] ✅ Active lesson ${lessonId} pregeneration complete.`);
+        } else if (cached.status === 'generating') {
+          console.log(`[Dashboard Pregen] ⏳ Active lesson ${lessonId} is already generating in background (HIT).`);
+        } else {
+          console.log(`[Dashboard Pregen] ✅ Active lesson ${lessonId} is already cached (HIT).`);
+        }
+      } catch (err) {
+        console.error('[Dashboard Pregen] Error pregenerating active lesson:', err);
+      }
+    })();
+  }, [user?.uid, activeLessonObj?.id, profile?.currentTargetLanguage]);
 
   useEffect(() => {
     setVisibleThemeIdx(null);
@@ -463,7 +511,6 @@ export default function DashboardPage() {
   const currentThemeIdx = visibleThemeIdx !== null ? visibleThemeIdx : initialThemeIdx;
   const currentBannerColors = THEME_COLORS[currentThemeIdx % THEME_COLORS.length];
   const activeThemeTitle = themes[currentThemeIdx]?.title ?? `Nível ${selectedLevel}`;
-  const activeLessonObj = allLessons[frontierIndex] || allLessons[0];
   const activeLessonTitle = activeLessonObj?.uiTitle || activeLessonObj?.grammarFocus?.split(' — ')[0] || 'Carregando...';
 
   useEffect(() => {

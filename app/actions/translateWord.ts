@@ -2,6 +2,7 @@
 
 import { callGeminiJSON } from '@/services/gemini';
 import type { SupportedLanguage, TranslateWordResult } from '@/types';
+import { unstable_cacheLife as cacheLife } from 'next/cache';
 
 const LANG_LABEL: Record<SupportedLanguage, string> = {
   fr: 'French',
@@ -18,6 +19,8 @@ export async function translateWord(
   language: SupportedLanguage,
   isNewVerb?: boolean,
 ): Promise<TranslateWordResult | null> {
+  'use cache';
+  cacheLife('weeks');
   try {
     const systemPrompt = `You are a language assistant for Brazilian Portuguese speakers learning ${LANG_LABEL[language]}. Respond with ONLY valid JSON, no markdown, no explanation.`;
 
@@ -64,6 +67,8 @@ export async function translateWordsBatch(
   words: string[],
   language: SupportedLanguage,
 ): Promise<{ word: string; translation: string }[] | null> {
+  'use cache';
+  cacheLife('weeks');
   if (words.length === 0) return [];
   try {
     const systemPrompt = `You are a language assistant for Brazilian Portuguese speakers learning ${LANG_LABEL[language]}. Respond with ONLY a valid JSON array of objects, with no markdown formatting, no explanations.`;

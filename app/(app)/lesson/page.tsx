@@ -48,6 +48,7 @@ import { LessonPhoneticsScreen } from '@/components/lesson/LessonPhoneticsScreen
 import { useLessonAudio } from './hooks/useLessonAudio';
 import { useLessonFlow } from './hooks/useLessonFlow';
 import { useLessonBootstrap } from './hooks/useLessonBootstrap';
+import { useSoundEffects } from '@/hooks/useSoundEffects';
 import { buildMistakeContext, phaseToStage } from './utils';
 
 import type { LessonStage, GrammarBridgeResult, Exercise } from '@/types';
@@ -82,6 +83,8 @@ export default function LessonPage() {
   // Per-exercise answer state
   const [exerciseAnswer, setExerciseAnswer] = useState<boolean | null>(null);
   const [tooltip, setTooltip] = useState<TooltipState>(CLOSED_TOOLTIP);
+
+  const { play: playSound, isMuted, toggleMute } = useSoundEffects();
 
   // ── Audio (Google Cloud TTS — two-voice dialogue) ────────────────────────
 
@@ -162,11 +165,13 @@ export default function LessonPage() {
     setExerciseAnswer(correct);
     if (correct) {
       store.recordCorrect();
+      playSound('correct');
     } else if (store.lesson) {
       const exercise = store.exercises[store.exerciseIndex];
       if (exercise) {
         store.recordMistake(exercise);
       }
+      playSound('incorrect');
     }
   }
 
@@ -177,7 +182,12 @@ export default function LessonPage() {
   function handleReviewAnswer(correct: boolean) {
     if (exerciseAnswer !== null) return;
     setExerciseAnswer(correct);
-    if (correct) store.recordReviewCorrect();
+    if (correct) {
+      store.recordReviewCorrect();
+      playSound('correct');
+    } else {
+      playSound('incorrect');
+    }
   }
 
   async function handleContinue() {
@@ -195,13 +205,17 @@ export default function LessonPage() {
     setIsExerciseReady(false);
     finishLesson();
 
-    if (!user || !store.lesson) return;
+    if (!user || !store.lesson) {
+      playSound('complete');
+      return;
+    }
 
     // 80% Accuracy Rule: Only save mistakes and show immediate review if accuracy < 80%
     const accuracy = store.correctCount / store.exercises.length;
     if (accuracy >= 0.8) {
       store.setIsLoading(false);
       store.setPhase('complete');
+      playSound('complete');
       return;
     }
 
@@ -257,6 +271,7 @@ export default function LessonPage() {
       deleteLessonMistake(store.reviewMistake.id).catch(console.error);
     }
     store.setPhase('complete');
+    playSound('complete');
   }
 
   // ── Click-to-translate ────────────────────────────────────────────────────
@@ -283,7 +298,8 @@ export default function LessonPage() {
   const handleFastComplete = useCallback(async () => {
     await finishLesson();
     store.setPhase('complete');
-  }, [finishLesson, store]);
+    playSound('complete');
+  }, [finishLesson, store, playSound]);
 
   // ── Derived state ─────────────────────────────────────────────────────────
 
@@ -369,6 +385,8 @@ export default function LessonPage() {
         currentStage={phaseToStage(phase)}
         tag={store.lesson?.tag}
         onExit={exitLesson}
+        isMuted={isMuted}
+        onToggleMute={toggleMute}
       />
 
       <main className={`mx-auto max-w-lg md:max-w-2xl lg:max-w-4xl px-6 pt-10 ${

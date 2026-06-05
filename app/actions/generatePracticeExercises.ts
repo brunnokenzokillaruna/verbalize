@@ -68,7 +68,7 @@ function buildTypeDescriptions(langLabel: string): Record<ExerciseTypeId, string
   return {
     'context-choice': `type "context-choice":
    - Write an ORIGINAL sentence with a blank (___) for a key vocabulary word or grammar item.
-   - "blankWord" is correct answer. "options" has 4 items (1 correct + 3 clearly wrong distractors).
+   - "blankWord" is correct answer. "options" has 4 items: the correct word plus 3 highly plausible distractors of the same grammatical category, similar spelling/tense, or common learner mistakes. Do NOT use obviously different or unrelated words. The options must make the student think.
    - "translation" in PT-BR.`,
     'error-correction': `type "error-correction":
    - Write an ORIGINAL sentence with ONE deliberate error.
@@ -89,7 +89,7 @@ function buildTypeDescriptions(langLabel: string): Record<ExerciseTypeId, string
     'social-roleplay': `type "social-roleplay":
    - "context" (PT-BR) describing the situation.
    - "promptLine" (${langLabel}) what the NPC says.
-   - "options" (3 possible natural responses in target language).
+   - "options" (3 responses in target language). The correct option must use the target expression naturally. The other 2 options MUST be highly plausible, grammatically correct responses in target language that are contextually inappropriate or slightly incorrect (e.g. wrong pronoun, incorrect politeness level, or a subtle mismatch in context). DO NOT generate silly, obviously wrong, or unrelated distractors. The options should make the student think.
    - "correctIndex" (0-2), "explanation" (PT-BR).`,
     'scrambled-conversation': `type "scrambled-conversation":
    - A short sequence of 3-4 dialogue lines.
@@ -133,7 +133,7 @@ function buildTypeDescriptions(langLabel: string): Record<ExerciseTypeId, string
    - "pronoun" (subject pronoun, e.g. "je", "il", "nous", "vous").
    - "tense" (PT-BR tense name, e.g. "presente", "passe compose").
    - "correctForm" (correctly conjugated form).
-   - "options" (array of EXACTLY 4 strings: 1 correct + 3 plausible but wrong conjugations).
+   - "options" (array of EXACTLY 4 strings: 1 correct + 3 highly plausible but wrong conjugations of the SAME verb, tense, or similar verbs to make it challenging).
    - "exampleSentence" (target language): a complete sentence using the correct form.
    - "translation" (PT-BR): translation of the example sentence.`,
   };

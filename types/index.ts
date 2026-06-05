@@ -107,7 +107,8 @@ export interface VerbDocument {
 export interface PregeneratedLessonDocument {
   uid: string;
   lessonId: string;
-  hook: HookResult;
+  status?: 'generating' | 'ready';
+  hook?: HookResult;
   grammarBridge?: GrammarBridgeResult;
   exercises?: Exercise[];
   missionBriefing?: MissionBriefingResult; // MISS lessons only

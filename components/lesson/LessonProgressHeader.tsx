@@ -1,6 +1,6 @@
 'use client';
 
-import { X, Book, MessageSquare, Mic, Target, Zap, Repeat, Sparkles, BookOpen } from 'lucide-react';
+import { X, Book, MessageSquare, Mic, Target, Zap, Repeat, Sparkles, BookOpen, Volume2, VolumeX } from 'lucide-react';
 import type { LessonStage, LessonTag } from '@/types';
 
 const STAGES_BY_TAG: Record<LessonTag, { key: LessonStage; label: string }[]> = {
@@ -70,9 +70,18 @@ interface LessonProgressHeaderProps {
   tag?: LessonTag;
   onExit: () => void;
   onComplete?: () => void;
+  isMuted?: boolean;
+  onToggleMute?: () => void;
 }
 
-export function LessonProgressHeader({ currentStage, tag, onExit, onComplete }: LessonProgressHeaderProps) {
+export function LessonProgressHeader({
+  currentStage,
+  tag,
+  onExit,
+  onComplete,
+  isMuted = false,
+  onToggleMute,
+}: LessonProgressHeaderProps) {
   const stages = tag ? (STAGES_BY_TAG[tag] ?? STAGES_BY_TAG['GRAM']) : STAGES_BY_TAG['GRAM'];
   const currentIndex = stages.findIndex((s) => s.key === currentStage);
   const tagInfo = tag ? TAG_CONFIG[tag] : null;
@@ -105,6 +114,22 @@ export function LessonProgressHeader({ currentStage, tag, onExit, onComplete }: 
           >
             <X size={20} className="text-[var(--color-text-muted)] group-hover:text-[var(--color-text-primary)] group-hover:rotate-90 transition-all duration-300" />
           </button>
+
+          {onToggleMute !== undefined && (
+            <button
+              type="button"
+              onClick={onToggleMute}
+              className="group flex h-11 w-11 items-center justify-center rounded-xl transition-all duration-100 active:translate-y-[2px] active:border-b-[1px] bg-[var(--color-surface)] border border-[var(--color-border)] border-b-[3px] hover:bg-[var(--color-surface-raised)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#f59e0b] focus-visible:ring-offset-2"
+              title={isMuted ? 'Ativar som' : 'Desativar som'}
+              aria-label={isMuted ? 'Ativar som' : 'Desativar som'}
+            >
+              {isMuted ? (
+                <VolumeX size={20} className="text-[var(--color-text-muted)] group-hover:text-[var(--color-text-primary)] transition-all" />
+              ) : (
+                <Volume2 size={20} className="text-[var(--color-text-muted)] group-hover:text-[var(--color-text-primary)] transition-all" />
+              )}
+            </button>
+          )}
 
           {onComplete && (
             <button

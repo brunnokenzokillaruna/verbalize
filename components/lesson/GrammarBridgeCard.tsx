@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { ChevronDown, Sparkles, ArrowRight } from 'lucide-react';
 import { AudioPlayerButton } from './AudioPlayerButton';
 import type { GrammarBridgeResult, SupportedLanguage } from '@/types';
+import { getConjugationAudioText, normalizeConjugationPreview } from '@/utils/conjugationHelper';
 
 interface GrammarBridgeCardProps {
   bridge: GrammarBridgeResult;
@@ -89,22 +90,7 @@ function HighlightedText({ text, className }: { text: string; className: string 
   );
 }
 
-function getConjugationAudioText(pronoun: string, form: string): string {
-  const pronounParts = pronoun.split(/[\/|]/);
-  
-  const cleanParts = pronounParts.map(part => {
-    let clean = part.trim();
-    clean = clean.replace(/\s*\(.+?\)\s*/g, '');
-    
-    if (clean.toUpperCase() === 'I') {
-      return 'I';
-    }
-    return clean.toLowerCase();
-  });
-  
-  const cleanPronoun = cleanParts.join(', ');
-  return `${cleanPronoun} ${form}`;
-}
+
 
 function FormulaRenderer({ formula }: { formula: string }) {
   const parts = formula.split(/\s*\+\s*/);
@@ -155,6 +141,10 @@ export function GrammarBridgeCard({ bridge, language }: GrammarBridgeCardProps) 
     survivalTip,
     culturalNote,
   } = normalized;
+
+  const normalizedPreview = verbSpotlight?.conjugationPreview
+    ? normalizeConjugationPreview(verbSpotlight.conjugationPreview, language)
+    : [];
 
   return (
     <div
@@ -498,13 +488,13 @@ export function GrammarBridgeCard({ bridge, language }: GrammarBridgeCardProps) 
                   </div>
                 )}
 
-                {verbSpotlight.conjugationPreview && verbSpotlight.conjugationPreview.length > 0 && (
+                {normalizedPreview && normalizedPreview.length > 0 && (
                   <div className="px-5 pb-5 flex flex-col gap-3">
                     <h4 className="text-[9px] font-black uppercase tracking-widest text-[var(--color-text-muted)]">
                       Conjugação no Presente
                     </h4>
                     <div className="rounded-2xl overflow-hidden border border-[var(--color-border)]/60 bg-[var(--color-surface)] shadow-sm">
-                      {verbSpotlight.conjugationPreview.map((c, i) => (
+                      {normalizedPreview.map((c, i) => (
                         <div
                           key={i}
                           className="flex items-center gap-3 px-5 py-3 transition-colors hover:bg-[var(--color-surface-raised)]/20"
@@ -516,7 +506,7 @@ export function GrammarBridgeCard({ bridge, language }: GrammarBridgeCardProps) 
                           <span className="flex-1 font-display text-sm font-bold text-[var(--color-primary-dark)]">
                             {c.form}
                           </span>
-                          <AudioPlayerButton text={getConjugationAudioText(c.pronoun, c.form)} language={language} size="sm" />
+                          <AudioPlayerButton text={getConjugationAudioText(c.pronoun, c.form, language)} language={language} size="sm" />
                         </div>
                       ))}
                     </div>

@@ -25,7 +25,9 @@ export function useLessonAudio(phase: string, lesson: any, hook: any) {
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const cachedChunksRef = useRef<string[] | null>(null);
+  const lastHookRef = useRef<any>(null);
   const playSessionRef = useRef(0);
+  const fetchPromiseRef = useRef<Promise<string[]> | null>(null);
 
   function stopAudio() {
     playSessionRef.current++; // invalidate any in-flight callbacks
@@ -93,11 +95,43 @@ export function useLessonAudio(phase: string, lesson: any, hook: any) {
     return synthesizeDialogue(lines, language);
   }
 
+  // Clear client cache and reset when a new lesson / hook is loaded
+  if (hook !== lastHookRef.current) {
+    cachedChunksRef.current = null;
+    fetchPromiseRef.current = null;
+    lastHookRef.current = hook;
+    stopAudio();
+  }
+
+  // Background Prefetching Effect - runs as soon as hook & lesson are available (e.g. in vocabulary phase)
+  useEffect(() => {
+    if (!hook || !lesson) return;
+
+    const lines = hook.dialogue.split('\n').filter((l: string) => l.trim().length > 0);
+    const language = lesson.language;
+
+    if (!fetchPromiseRef.current && !cachedChunksRef.current) {
+      console.log(`[Audio Prefetch] 🚀 Iniciar prefetch de áudio em background para o diálogo...`);
+      setIsLoadingAudio(true);
+      fetchPromiseRef.current = fetchDialogueAudio(lines, language)
+        .then((chunks) => {
+          cachedChunksRef.current = chunks;
+          setIsLoadingAudio(false);
+          console.log(`[Audio Prefetch] ✅ Prefetch concluído e cacheado no cliente.`);
+          return chunks;
+        })
+        .catch((err) => {
+          console.error('[Audio Prefetch] Erro no prefetch de áudio:', err);
+          setIsLoadingAudio(false);
+          return [];
+        });
+    }
+  }, [hook, lesson]);
+
   function handleAudioButton() {
     if (isPlaying) { stopAudio(); return; }
-    if (!hook) return;
+    if (!hook || !lesson) return;
 
-    // Client-side cache hit → replay instantly (zero API calls, zero credit/quota cost)
     if (cachedChunksRef.current) {
       console.log(
         '%c⚡ [Audio Cache] Client Cache Hit! Replaying current dialogue audio instantly without server requests (0 credits used)',
@@ -106,53 +140,43 @@ export function useLessonAudio(phase: string, lesson: any, hook: any) {
       startAudio(cachedChunksRef.current);
       return;
     }
-    if (!lesson || isLoadingAudio) return;
-    
-    const lines = hook.dialogue.split('\n').filter((l: string) => l.trim().length > 0);
-    const language = lesson.language;
-    
-    (async () => {
+
+    if (fetchPromiseRef.current) {
+      console.log(`[Audio Play] Aguardando prefetch em andamento finalizar...`);
       setIsLoadingAudio(true);
-      try {
-        const chunks = await fetchDialogueAudio(lines, language);
-        if (chunks.length > 0) { cachedChunksRef.current = chunks; startAudio(chunks); }
-      } finally {
+      fetchPromiseRef.current.then((chunks) => {
         setIsLoadingAudio(false);
-      }
-    })();
+        if (chunks.length > 0) {
+          startAudio(chunks);
+        }
+      });
+    }
   }
 
   // Auto-play when entering the hook phase
   useEffect(() => {
     if (phase !== 'hook') {
       stopAudio();
-      cachedChunksRef.current = null;
       return;
     }
     if (!hook || !lesson) return;
-    
-    const lines = hook.dialogue.split('\n').filter((l: string) => l.trim().length > 0);
-    const language = lesson.language;
-    let cancelled = false;
 
-    (async () => {
+    if (cachedChunksRef.current) {
+      console.log(`[Audio Auto-Play] Cache hit! Tocando diálogo instantaneamente.`);
+      startAudio(cachedChunksRef.current);
+    } else if (fetchPromiseRef.current) {
+      console.log(`[Audio Auto-Play] Aguardando prefetch em andamento para auto-play...`);
       setIsLoadingAudio(true);
-      try {
-        const chunks = await fetchDialogueAudio(lines, language);
-        if (!cancelled && chunks.length > 0) {
-          cachedChunksRef.current = chunks;
+      fetchPromiseRef.current.then((chunks) => {
+        setIsLoadingAudio(false);
+        if (chunks.length > 0) {
           startAudio(chunks);
         }
-      } catch (err) {
-        console.error('[useLessonAudio] TTS error:', err);
-      } finally {
-        if (!cancelled) setIsLoadingAudio(false);
-      }
-    })();
+      });
+    }
 
-    return () => { cancelled = true; stopAudio(); };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase]); // Deliberately omit hook/lesson to avoid over-fetching
+    return () => { stopAudio(); };
+  }, [phase, hook, lesson]);
 
   return {
     isPlaying,

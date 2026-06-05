@@ -456,6 +456,19 @@ function pregeneratedDocId(uid: string, lessonId: string) {
 }
 
 /**
+ * Stores a pre-generated lesson placeholder to mark that pregeneration is active.
+ */
+export async function startPregeneratingLesson(uid: string, lessonId: string): Promise<void> {
+  const id = pregeneratedDocId(uid, lessonId);
+  await setDoc(doc(db, 'lesson_pregen', id), {
+    uid,
+    lessonId,
+    status: 'generating',
+    createdAt: serverTimestamp(),
+  });
+}
+
+/**
  * Stores a pre-generated lesson payload (hook + optional grammar bridge and
  * exercises) in the `lesson_pregen` collection so the next lesson can start
  * instantly without any AI calls. Optional fields are only persisted when
@@ -470,6 +483,7 @@ export async function savePregeneratedLesson(
   const data: Record<string, unknown> = {
     uid,
     lessonId,
+    status: 'ready',
     hook: payload.hook,
     createdAt: serverTimestamp(),
   };

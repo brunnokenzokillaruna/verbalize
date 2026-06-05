@@ -4,7 +4,7 @@ import { generateHook } from './generateHook';
 import { generateGrammarBridge } from './generateGrammarBridge';
 import { generateMissionBriefing } from './generateMissionBriefing';
 import { generatePracticeExercises } from './generatePracticeExercises';
-import { savePregeneratedLesson, getUserVocabulary } from '@/services/firestore';
+import { savePregeneratedLesson, startPregeneratingLesson, getUserVocabulary } from '@/services/firestore';
 import { getPreviousTopics } from '@/lib/curriculum';
 import type { LessonDefinition, LessonTag, GrammarBridgeResult, Exercise, MissionBriefingResult } from '@/types';
 
@@ -25,6 +25,7 @@ export async function pregenerateNextLesson(
   knownVocabulary: string[]
 ): Promise<void> {
   try {
+    await startPregeneratingLesson(uid, lesson.id);
 
     const hook = await generateHook({
       language: lesson.language,
@@ -40,32 +41,38 @@ export async function pregenerateNextLesson(
 
     const needsGrammarBridge = TAGS_WITH_GRAMMAR_PHASE.has(lesson.tag);
 
-    const bridgePromise: Promise<GrammarBridgeResult | null> = needsGrammarBridge
-      ? generateGrammarBridge({
-          dialogue: hook.dialogue,
-          grammarFocus: lesson.tag === 'VOC' ? lesson.grammarFocus : hook.grammarFocus,
-          language: lesson.language,
-          tag: lesson.tag,
-        }).catch((err) => {
-          console.error('[pregenerateNextLesson] grammar bridge error:', err);
-          return null;
-        })
-      : Promise.resolve(null);
+    let grammarBridge: GrammarBridgeResult | null = null;
+    if (needsGrammarBridge) {
+      grammarBridge = await generateGrammarBridge({
+        dialogue: hook.dialogue,
+        grammarFocus: lesson.tag === 'VOC' ? lesson.grammarFocus : hook.grammarFocus,
+        language: lesson.language,
+        tag: lesson.tag,
+      }).catch((err) => {
+        console.error('[pregenerateNextLesson] grammar bridge error:', err);
+        return null;
+      });
+      // Brief cooling period between Gemini calls
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    }
 
-    const briefingPromise: Promise<MissionBriefingResult | null> = lesson.tag === 'MISS'
-      ? generateMissionBriefing({
-          grammarFocus: lesson.grammarFocus,
-          theme: lesson.theme,
-          uiTitle: lesson.uiTitle,
-          language: lesson.language,
-          dialogue: hook.dialogue,
-        }).catch((err) => {
-          console.error('[pregenerateNextLesson] mission briefing error:', err);
-          return null;
-        })
-      : Promise.resolve(null);
+    let missionBriefing: MissionBriefingResult | null = null;
+    if (lesson.tag === 'MISS') {
+      missionBriefing = await generateMissionBriefing({
+        grammarFocus: lesson.grammarFocus,
+        theme: lesson.theme,
+        uiTitle: lesson.uiTitle,
+        language: lesson.language,
+        dialogue: hook.dialogue,
+      }).catch((err) => {
+        console.error('[pregenerateNextLesson] mission briefing error:', err);
+        return null;
+      });
+      // Brief cooling period between Gemini calls
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    }
 
-    const exercisesPromise: Promise<Exercise[] | null> = generatePracticeExercises({
+    const exercises = await generatePracticeExercises({
       dialogue: hook.dialogue,
       newVocabulary: hook.newVocabulary,
       verbWord: hook.verbWord ?? '',
@@ -79,12 +86,6 @@ export async function pregenerateNextLesson(
       console.error('[pregenerateNextLesson] exercises error:', err);
       return null;
     });
-
-    const [grammarBridge, missionBriefing, exercises] = await Promise.all([
-      bridgePromise,
-      briefingPromise,
-      exercisesPromise,
-    ]);
 
     await savePregeneratedLesson(uid, lesson.id, {
       hook,

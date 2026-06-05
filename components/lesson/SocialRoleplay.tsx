@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { SocialRoleplayData } from '@/types';
 import { MessageSquare, CheckCircle2, XCircle, MapPin, Lightbulb } from 'lucide-react';
 
@@ -51,10 +51,20 @@ function getInterlocutorRole(context: string): { label: string; avatar: string }
 export function SocialRoleplay({ data, onAnswer, answered, setIsExerciseReady }: SocialRoleplayProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
+  // Shuffle options once on mount so the correct answer isn't always at the same position
+  const shuffledOptions = useMemo(() => {
+    const indexed = data.options.map((opt, i) => ({ text: opt, isCorrect: i === data.correctIndex }));
+    for (let i = indexed.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [indexed[i], indexed[j]] = [indexed[j], indexed[i]];
+    }
+    return indexed;
+  }, [data.options, data.correctIndex]);
+
   const handleSelect = (index: number) => {
     if (answered) return;
     setSelectedIndex(index);
-    onAnswer(index === data.correctIndex);
+    onAnswer(shuffledOptions[index].isCorrect);
     setIsExerciseReady(true);
   };
 
@@ -121,9 +131,9 @@ export function SocialRoleplay({ data, onAnswer, answered, setIsExerciseReady }:
 
       {/* 3. Student's Turn (Options styled as right-aligned message choices like WhatsApp) */}
       <div className="flex flex-col items-end gap-3 w-full">
-        {data.options.map((option, index) => {
+        {shuffledOptions.map((option, index) => {
           const isSelected = selectedIndex === index;
-          const isCorrect = index === data.correctIndex;
+          const isCorrect = option.isCorrect;
           const letter = String.fromCharCode(65 + index); // A, B, C...
           
           let stateStyles = "border border-[var(--color-primary)]/10 bg-[var(--color-primary-light)]/10 hover:bg-[var(--color-primary-light)]/20 hover:border-[var(--color-primary)]/20 text-[var(--color-text-primary)]";
@@ -163,7 +173,7 @@ export function SocialRoleplay({ data, onAnswer, answered, setIsExerciseReady }:
                 >
                   {letter}
                 </div>
-                <span className="text-sm md:text-[15px] font-semibold leading-relaxed">{option}</span>
+                <span className="text-sm md:text-[15px] font-semibold leading-relaxed">{option.text}</span>
               </div>
               
               {answered && isCorrect && <CheckCircle2 size={18} className="text-emerald-500 shrink-0 ml-3" />}
@@ -179,11 +189,11 @@ export function SocialRoleplay({ data, onAnswer, answered, setIsExerciseReady }:
           className="mt-2 rounded-xl p-4.5 border-l-4 border-[var(--color-primary)] animate-in slide-in-from-bottom-2 duration-300"
           style={{ 
             backgroundColor: 'var(--color-surface-raised)',
-            borderLeftColor: selectedIndex === data.correctIndex ? 'var(--color-success)' : 'var(--color-error)'
+            borderLeftColor: (selectedIndex !== null && shuffledOptions[selectedIndex].isCorrect) ? 'var(--color-success)' : 'var(--color-error)'
           }}
         >
           <div className="flex items-center gap-2 mb-2">
-            <Lightbulb size={15} style={{ color: selectedIndex === data.correctIndex ? 'var(--color-success)' : 'var(--color-error)' }} />
+            <Lightbulb size={15} style={{ color: (selectedIndex !== null && shuffledOptions[selectedIndex].isCorrect) ? 'var(--color-success)' : 'var(--color-error)' }} />
             <span className="text-[10px] font-black uppercase tracking-wider text-[var(--color-text-muted)]">
               Dica & Explicação
             </span>

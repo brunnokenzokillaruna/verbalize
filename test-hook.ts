@@ -4,11 +4,11 @@ async function test() {
   const result = await generateHook({
     language: 'fr',
     level: 'A1',
-    tag: 'VOC',
+    tag: 'MISS',
     interests: [],
-    theme: 'Tema 3: Check-in e Apresentações',
-    uiTitle: 'Pegando a Chave',
-    grammarFocus: 'Vocabulário: Bon',
+    theme: 'Sécurité dans la rue',
+    uiTitle: 'Parler avec le policier',
+    grammarFocus: 'Demander des informations sur la sécurité de la rue',
     knownVocabulary: []
   });
 

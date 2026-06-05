@@ -95,7 +95,7 @@ Exercise 1 — type "context-choice":
 - Replace the key word with ___ in the "sentence" field
 - "blankWord" is the correct answer
 - "options" must have exactly 4 items: the correct word plus 3 distractors
-- CRITICAL: the 3 distractors must be CLEARLY WRONG in this specific sentence — they must not make logical or grammatical sense in the blank. Choose words from different semantic fields or grammatical categories so that ONLY the correct answer fits. Never use synonyms or words from the same category that could also make the sentence true.
+- CRITICAL: the 3 distractors must be grammatically incorrect or contextually wrong in this specific sentence, but they should be highly plausible (e.g. similar verb forms, same grammatical category, or common learner traps) to challenge the student. Do NOT use obviously unrelated or silly distractors. There must be only one correct answer.
 - "translation" is the Brazilian Portuguese translation of the full sentence
 
 Exercise 2 — type "error-correction":

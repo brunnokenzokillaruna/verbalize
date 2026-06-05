@@ -58,7 +58,7 @@ service cloud.firestore {
     // (same pattern as image_cache / verbs) since server actions lack user auth.
     match /lesson_pregen/{docId} {
       allow read, delete: if request.auth != null
-        && resource.data.uid == request.auth.uid;
+        && (resource == null || resource.data.uid == request.auth.uid);
       allow create, update: if true;
     }
   }

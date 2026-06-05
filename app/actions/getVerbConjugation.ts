@@ -3,6 +3,8 @@
 import { callGeminiJSON } from '@/services/gemini';
 import { getCachedVerb, saveVerbCache } from '@/services/firestore';
 import type { VerbDocument, SupportedLanguage } from '@/types';
+import { unstable_cacheLife as cacheLife } from 'next/cache';
+import { normalizeConjugations } from '@/utils/conjugationHelper';
 
 const LANG_LABEL: Record<SupportedLanguage, string> = {
   fr: 'French',
@@ -17,13 +19,18 @@ export async function getVerbConjugation(
   infinitive: string,
   language: SupportedLanguage,
 ): Promise<VerbDocument | null> {
+  'use cache';
+  cacheLife('weeks');
   const clean = infinitive.trim().toLowerCase();
   if (!clean) return null;
 
   try {
     // 1. Check Firestore cache first
     const cached = await getCachedVerb(clean, language);
-    if (cached) return cached;
+    if (cached) {
+      cached.conjugations = normalizeConjugations(cached.conjugations, language);
+      return cached;
+    }
 
     // 2. Generate via Gemini
     const systemPrompt = `You are a language expert creating verb conjugation data for Brazilian Portuguese speakers learning ${LANG_LABEL[language]}. Respond with ONLY valid JSON, no markdown, no explanation.`;
@@ -37,14 +44,67 @@ Output JSON in exactly this format:
   "translation": "Portuguese translation of the verb (infinitive form)",
   "conjugations": {
     "present": {
-      "pronoun1": "conjugated form",
-      "pronoun2": "conjugated form"
+      ${
+        language === 'fr'
+          ? `"je": "conjugated form",
+      "tu": "conjugated form",
+      "il": "conjugated form",
+      "elle": "conjugated form",
+      "on": "conjugated form",
+      "nous": "conjugated form",
+      "vous": "conjugated form",
+      "ils": "conjugated form",
+      "elles": "conjugated form"`
+          : `"I": "conjugated form",
+      "you": "conjugated form",
+      "he": "conjugated form",
+      "she": "conjugated form",
+      "it": "conjugated form",
+      "we": "conjugated form",
+      "they": "conjugated form"`
+      }
     },
     "past": {
-      "pronoun1": "conjugated form"
+      ${
+        language === 'fr'
+          ? `"je": "conjugated form",
+      "tu": "conjugated form",
+      "il": "conjugated form",
+      "elle": "conjugated form",
+      "on": "conjugated form",
+      "nous": "conjugated form",
+      "vous": "conjugated form",
+      "ils": "conjugated form",
+      "elles": "conjugated form"`
+          : `"I": "conjugated form",
+      "you": "conjugated form",
+      "he": "conjugated form",
+      "she": "conjugated form",
+      "it": "conjugated form",
+      "we": "conjugated form",
+      "they": "conjugated form"`
+      }
     },
     "future": {
-      "pronoun1": "conjugated form"
+      ${
+        language === 'fr'
+          ? `"je": "conjugated form",
+      "tu": "conjugated form",
+      "il": "conjugated form",
+      "elle": "conjugated form",
+      "on": "conjugated form",
+      "nous": "conjugated form",
+      "vous": "conjugated form",
+      "ils": "conjugated form",
+      "elles": "conjugated form"`
+          : `"I": "conjugated form",
+      "you": "conjugated form",
+      "he": "conjugated form",
+      "she": "conjugated form",
+      "it": "conjugated form",
+      "we": "conjugated form",
+      "they": "conjugated form"`
+      }
     }
   },
   "exampleSentences": [
@@ -54,8 +114,11 @@ Output JSON in exactly this format:
 }
 
 Rules:
-- For French: use pronouns je, tu, il/elle, nous, vous, ils/elles
-- For English: use pronouns I, you, he/she, we, you (pl.), they
+${
+  language === 'fr'
+    ? `- For French: use exactly the separate pronouns je, tu, il, elle, on, nous, vous, ils, elles. Do NOT group them (e.g. do NOT use il/elle or ils/elles).`
+    : `- For English: use exactly the separate pronouns I, you, he, she, it, we, they. Do NOT group them (e.g. do NOT use he/she).`
+}
 - Include present tense always. Include past and future if commonly used at A1-B1 level.
 - Include 2-3 example sentences showing common usage.
 - Keep examples simple (A1-B1 level vocabulary).
@@ -71,6 +134,7 @@ Rules:
     // Normalize infinitive to what user typed (Gemini may return different casing)
     data.infinitive = clean;
     data.language = language;
+    data.conjugations = normalizeConjugations(data.conjugations, language);
 
     // 3. Cache the result
     await saveVerbCache(data);

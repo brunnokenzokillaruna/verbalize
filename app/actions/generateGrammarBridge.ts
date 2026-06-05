@@ -47,14 +47,29 @@ Respond with ONLY valid JSON, no markdown, no explanation.`;
       { "target": "1 expressão FIXA real na língua-alvo usando esse verbo (ex: 'être en train de', 'avoir faim')", "portuguese": "tradução natural em PT-BR" },
       { "target": "outra expressão comum", "portuguese": "tradução" }
     ],
-    "conjugationPreview": [
-      { "pronoun": "je / I", "form": "conjugação presente — pronome nativo + forma do verbo" },
-      { "pronoun": "tu / you", "form": "..." },
-      { "pronoun": "il/elle / he/she", "form": "..." },
-      { "pronoun": "nous / we", "form": "..." },
-      { "pronoun": "vous / you (pl.)", "form": "..." },
-      { "pronoun": "ils/elles / they", "form": "..." }
-    ]
+    "conjugationPreview": ${
+      language === 'fr'
+        ? `[
+      { "pronoun": "je", "form": "conjugação presente — ex: 'je donne'" },
+      { "pronoun": "tu", "form": "ex: 'tu donnes'" },
+      { "pronoun": "il", "form": "ex: 'il donne'" },
+      { "pronoun": "elle", "form": "ex: 'elle donne'" },
+      { "pronoun": "on", "form": "ex: 'on donne'" },
+      { "pronoun": "nous", "form": "ex: 'nous donnons'" },
+      { "pronoun": "vous", "form": "ex: 'vous donnez'" },
+      { "pronoun": "ils", "form": "ex: 'ils donnent'" },
+      { "pronoun": "elles", "form": "ex: 'elles donnent'" }
+    ]`
+        : `[
+      { "pronoun": "I", "form": "present conjugation — ex: 'I give'" },
+      { "pronoun": "you", "form": "ex: 'you give'" },
+      { "pronoun": "he", "form": "ex: 'he gives'" },
+      { "pronoun": "she", "form": "ex: 'she gives'" },
+      { "pronoun": "it", "form": "ex: 'it gives'" },
+      { "pronoun": "we", "form": "ex: 'we give'" },
+      { "pronoun": "they", "form": "ex: 'they give'" }
+    ]`
+    }
   }`
       : '';
 
@@ -62,7 +77,11 @@ Respond with ONLY valid JSON, no markdown, no explanation.`;
       ? `
 REGRAS EXTRA PARA LIÇÃO DE VERBO:
 - verbSpotlight.infinitive: use o pronome/marcador correto da língua (ex: em FR é 'être', não 'to be'; em EN é 'to be').
-- verbSpotlight.conjugationPreview: forneça as 6 formas do PRESENTE na língua-alvo. Para francês use 'je, tu, il, nous, vous, ils' (forma curta). Para inglês use 'I, you, he/she, we, you, they'.
+- verbSpotlight.conjugationPreview: forneça as formas do PRESENTE na língua-alvo. ${
+          language === 'fr'
+            ? "Para francês use separadamente exatamente: 'je, tu, il, elle, on, nous, vous, ils, elles'."
+            : "Para inglês use separadamente exatamente: 'I, you, he, she, it, we, they'."
+        }
 - verbSpotlight.idiomaticExpressions: FORNEÇA 1-2 expressões fixas reais, não invente. Se não houver expressão canônica com esse verbo, deixe como array vazio []. NUNCA misture palavras em português nos textos da língua-alvo (ex: "jouer avec le feu", NUNCA "jouer avec o feu").
 - verbSpotlight.personality e frequencyNote: linguagem SIMPLES, frases curtas, como amigo explicando.`
       : '';

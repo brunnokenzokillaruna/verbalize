@@ -20,6 +20,7 @@ import { evaluateFreeResponse } from '@/app/actions/evaluateFreeResponse';
 import { getFixedVoiceName } from '@/lib/voiceConfig';
 import type { SupportedLanguage } from '@/types';
 
+
 interface LessonMissionRolePlayProps {
   dialogue: string;
   dialogueTranslations?: string[];
@@ -71,6 +72,8 @@ export function LessonMissionRolePlay({
   intentMode = false,
   onComplete,
 }: LessonMissionRolePlayProps) {
+
+
   const lines = useMemo<DialogueLine[]>(() => {
     return dialogue
       .split('\n')
@@ -261,7 +264,7 @@ export function LessonMissionRolePlay({
 
       {/* Past lines — dimmed history */}
       <div className="flex flex-col gap-3">
-        {lines.slice(0, currentIdx).map((line, i) => (
+        {lines.slice(0, recState === 'done' ? lines.length : currentIdx).map((line, i) => (
           <PastLineBubble key={i} line={line} />
         ))}
       </div>

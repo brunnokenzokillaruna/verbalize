@@ -1,24 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ScrambledConversationData } from '@/types';
-import { GripVertical, CheckCircle2, XCircle, MessageSquare } from 'lucide-react';
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent
-} from '@dnd-kit/core';
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-  useSortable
-} from '@dnd-kit/sortable';
-import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
-import { CSS } from '@dnd-kit/utilities';
+import { ChevronUp, ChevronDown, CheckCircle2, XCircle, MessageSquare } from 'lucide-react';
 
 interface ScrambledConversationProps {
   data: ScrambledConversationData;
@@ -28,22 +10,28 @@ interface ScrambledConversationProps {
   submitTrigger: number;
 }
 
-function SortableItem({ id, line, answered, isCorrectPos, index }: { id: string, line: string, answered: boolean, isCorrectPos: boolean, index: number }) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id, disabled: answered });
+interface ConversationItemProps {
+  line: string;
+  index: number;
+  totalLines: number;
+  answered: boolean;
+  isCorrectPos: boolean;
+  onMoveUp: (index: number) => void;
+  onMoveDown: (index: number) => void;
+}
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    zIndex: isDragging ? 50 : 'auto',
-    position: isDragging ? ('relative' as const) : undefined,
-  };
+function ConversationItem({
+  line,
+  index,
+  totalLines,
+  answered,
+  isCorrectPos,
+  onMoveUp,
+  onMoveDown,
+}: ConversationItemProps) {
+  const match = line.match(/^([^:]+):\s*(.+)/);
+  const speaker = match ? match[1].trim() : '';
+  const text = match ? match[2].trim() : line;
 
   let stateStyles = "border border-white/5 bg-white/5 text-[var(--color-text-primary)]";
   
@@ -53,34 +41,51 @@ function SortableItem({ id, line, answered, isCorrectPos, index }: { id: string,
     } else {
       stateStyles = "bg-[rgba(239,68,68,0.08)] border border-red-500/40 text-red-200";
     }
-  } else if (isDragging) {
-    stateStyles = "shadow-2xl scale-[1.01] bg-[var(--color-surface-raised)] border border-[var(--color-primary)]/50 ring-2 ring-[var(--color-primary)]/20";
   } else {
     stateStyles = "border border-white/5 bg-white/5 hover:bg-white/10 hover:border-white/10 text-[var(--color-text-primary)]";
   }
 
   return (
     <div
-      ref={setNodeRef}
-      style={style}
-      className={`flex items-center gap-4 p-4 rounded-xl transition-all duration-200 ${stateStyles}`}
+      className={`flex items-center gap-3.5 p-4 rounded-xl transition-all duration-200 ${stateStyles}`}
     >
       {!answered && (
-        <div 
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/5 border border-white/10 cursor-grab active:cursor-grabbing touch-none transition-colors hover:bg-white/10" 
-          {...attributes} 
-          {...listeners}
-        >
-          <GripVertical size={16} className="text-[var(--color-text-muted)]" />
+        <div className="flex flex-col gap-1 shrink-0">
+          <button
+            type="button"
+            disabled={index === 0}
+            onClick={() => onMoveUp(index)}
+            className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/5 border border-white/10 transition-colors hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent cursor-pointer disabled:cursor-not-allowed"
+          >
+            <ChevronUp size={14} className="text-[var(--color-text-secondary)]" />
+          </button>
+          <button
+            type="button"
+            disabled={index === totalLines - 1}
+            onClick={() => onMoveDown(index)}
+            className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/5 border border-white/10 transition-colors hover:bg-white/10 disabled:opacity-30 disabled:hover:bg-transparent cursor-pointer disabled:cursor-not-allowed"
+          >
+            <ChevronDown size={14} className="text-[var(--color-text-secondary)]" />
+          </button>
         </div>
       )}
       
       {/* Small number badge inside sorting area */}
-      <span className="text-[10px] font-black tracking-widest text-[var(--color-text-muted)] opacity-60">
+      <span className="text-[10px] font-black tracking-widest text-[var(--color-text-muted)] opacity-60 shrink-0">
         #{index + 1}
       </span>
       
-      <span className="flex-1 text-[15px] font-semibold leading-relaxed">{line}</span>
+      {/* Speaker and speech text */}
+      <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3.5 flex-1">
+        {speaker && (
+          <span 
+            className="inline-flex self-start sm:self-auto items-center rounded-md px-2 py-0.5 text-[10.5px] font-black uppercase tracking-wider bg-[var(--color-primary)]/10 text-[var(--color-primary)] border border-[var(--color-primary)]/20 shrink-0"
+          >
+            {speaker}
+          </span>
+        )}
+        <span className="text-[15px] font-semibold leading-relaxed flex-1">{text}</span>
+      </div>
       
       {answered && isCorrectPos && <CheckCircle2 size={18} className="text-emerald-500 shrink-0 ml-3" />}
       {answered && !isCorrectPos && <XCircle size={18} className="text-red-500 shrink-0 ml-3" />}
@@ -96,27 +101,26 @@ export function ScrambledConversation({ data, onAnswer, answered, setIsExerciseR
     setIsExerciseReady(true);
   }, [data, setIsExerciseReady]);
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 5, // 5px movement required before drag starts, to allow scrolling on mobile
-      },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
+  const handleMoveUp = (index: number) => {
+    if (index === 0) return;
+    setCurrentOrder((prev) => {
+      const copy = [...prev];
+      const temp = copy[index];
+      copy[index] = copy[index - 1];
+      copy[index - 1] = temp;
+      return copy;
+    });
+  };
 
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-
-    if (over && active.id !== over.id) {
-      setCurrentOrder((items) => {
-        const oldIndex = items.indexOf(active.id as string);
-        const newIndex = items.indexOf(over.id as string);
-        return arrayMove(items, oldIndex, newIndex);
-      });
-    }
+  const handleMoveDown = (index: number) => {
+    if (index === currentOrder.length - 1) return;
+    setCurrentOrder((prev) => {
+      const copy = [...prev];
+      const temp = copy[index];
+      copy[index] = copy[index + 1];
+      copy[index + 1] = temp;
+      return copy;
+    });
   };
 
   const handleCheck = () => {
@@ -150,34 +154,24 @@ export function ScrambledConversation({ data, onAnswer, answered, setIsExerciseR
         </div>
       </div>
 
-      {/* 2. Drag and Drop Context */}
-      <DndContext 
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-        modifiers={[restrictToVerticalAxis]}
-      >
-        <div className="flex flex-col gap-3">
-          <SortableContext 
-            items={currentOrder}
-            strategy={verticalListSortingStrategy}
-          >
-            {currentOrder.map((line, index) => {
-              const isCorrectPos = answered && line === data.lines[index];
-              return (
-                <SortableItem 
-                  key={line} 
-                  id={line} 
-                  line={line} 
-                  answered={answered} 
-                  isCorrectPos={isCorrectPos} 
-                  index={index}
-                />
-              );
-            })}
-          </SortableContext>
-        </div>
-      </DndContext>
+      {/* 2. Sorting List */}
+      <div className="flex flex-col gap-3">
+        {currentOrder.map((line, index) => {
+          const isCorrectPos = answered && line === data.lines[index];
+          return (
+            <ConversationItem 
+              key={line} 
+              line={line} 
+              index={index}
+              totalLines={currentOrder.length}
+              answered={answered} 
+              isCorrectPos={isCorrectPos} 
+              onMoveUp={handleMoveUp}
+              onMoveDown={handleMoveDown}
+            />
+          );
+        })}
+      </div>
       
       {/* 3. Correct Answer Feedback when Answered Incorrectly */}
       {answered && JSON.stringify(currentOrder) !== JSON.stringify(data.lines) && (
@@ -186,12 +180,24 @@ export function ScrambledConversation({ data, onAnswer, answered, setIsExerciseR
             <span>💡</span> Ordem Correta da Conversa:
           </h4>
           <div className="flex flex-col gap-2.5 pl-3 border-l-2 border-emerald-500/30">
-            {data.lines.map((line, idx) => (
-              <div key={idx} className="flex items-start gap-2.5 text-sm text-[var(--color-text-secondary)] leading-relaxed">
-                <span className="font-bold text-emerald-500/80 tabular-nums">#{idx + 1}</span>
-                <span>{line}</span>
-              </div>
-            ))}
+            {data.lines.map((line, idx) => {
+              const match = line.match(/^([^:]+):\s*(.+)/);
+              const speaker = match ? match[1].trim() : '';
+              const text = match ? match[2].trim() : line;
+              return (
+                <div key={idx} className="flex items-center gap-2.5 text-sm text-[var(--color-text-secondary)] leading-relaxed">
+                  <span className="font-bold text-emerald-500/80 tabular-nums shrink-0">#{idx + 1}</span>
+                  {speaker && (
+                    <span 
+                      className="inline-flex items-center rounded-md px-2 py-0.5 text-[10.5px] font-black uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0"
+                    >
+                      {speaker}
+                    </span>
+                  )}
+                  <span className="flex-1">{text}</span>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

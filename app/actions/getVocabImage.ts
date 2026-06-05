@@ -4,6 +4,7 @@ import { callGemini } from '@/services/gemini';
 import { searchPexels } from '@/services/pexels';
 import { getCachedImage, saveImageCache } from '@/services/firestore';
 import type { SupportedLanguage, VocabImageResult } from '@/types';
+import { unstable_cacheLife as cacheLife } from 'next/cache';
 
 const LANG_LABEL: Record<SupportedLanguage, string> = {
   fr: 'French',
@@ -24,6 +25,8 @@ export async function getVocabImage(
   excludeUrls: string[] = [],
   precomputedKeyword?: string,
 ): Promise<VocabImageResult | null> {
+  'use cache';
+  cacheLife('days');
   try {
     // ── 1. Check Firestore cache ──────────────────────────────────────────────
     const cacheKey = `${word}_${language}`;

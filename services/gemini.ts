@@ -1,7 +1,7 @@
+import { GoogleGenAI } from '@google/genai';
 import { getGeminiKey } from '@/lib/env';
 
 // Latest free-tier Gemini model as specified in CLAUDE.md
-// Latest free-tier Gemini model as selected by the user
 const GEMINI_MODEL = 'gemini-3.5-flash';
 
 interface GeminiResponse {
@@ -15,8 +15,11 @@ interface GeminiResponse {
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+// Instantiate the official Google Gen AI Client
+const ai = new GoogleGenAI({ apiKey: getGeminiKey() });
+
 /**
- * Calls the Gemini REST API and returns the text response.
+ * Calls the Gemini API using the official SDK and returns the text response.
  * Runs server-side only (uses GEMINI_API_KEY).
  */
 export async function callGemini(
@@ -26,9 +29,6 @@ export async function callGemini(
   retries = 4,
   thinkingBudget?: number,
 ): Promise<string> {
-  const apiKey = getGeminiKey();
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
-
   // Automatically boost maxOutputTokens for 3.5 or thinking models because
   // their internal reasoning/thinking output also counts toward the maxOutputTokens limit.
   // This prevents response truncation on complex prompts like dialogue generation.
@@ -36,64 +36,59 @@ export async function callGemini(
     ? Math.max(maxOutputTokens * 3, 8192)
     : maxOutputTokens;
 
-  const generationConfig: Record<string, unknown> = {
+  // Build the generation config
+  const config: Record<string, any> = {
     temperature: 0.7,
     maxOutputTokens: adjustedMaxTokens,
   };
+
+  if (systemPrompt) {
+    config.systemInstruction = systemPrompt;
+  }
+
   // Gemini 3.1 Flash-Lite has thinking enabled by default; pass thinkingBudget=0
   // to disable it for speed-critical calls like the minimal hook.
   if (thinkingBudget !== undefined) {
-    generationConfig.thinkingConfig = { thinkingBudget };
-  }
-
-  const body: Record<string, unknown> = {
-    contents: [{ role: 'user', parts: [{ text: prompt }] }],
-    generationConfig,
-  };
-
-  if (systemPrompt) {
-    body.systemInstruction = { parts: [{ text: systemPrompt }] };
+    config.thinkingConfig = { thinkingBudget };
   }
 
   let lastError: Error | null = null;
   
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
+      const response = await ai.models.generateContent({
+        model: GEMINI_MODEL,
+        contents: prompt,
+        config,
       });
 
-      const data: GeminiResponse = await res.json();
-
-      if (!res.ok) {
-        // Retry on 503 (Service Unavailable) or 429 (Rate Limit)
-        if ((res.status === 503 || res.status === 429) && attempt < retries) {
-          // For 429, honour the "retry in Xs" hint from the error message
-          let delay = Math.pow(2, attempt) * 1000 + Math.random() * 500;
-          if (res.status === 429) {
-            const match = (data.error?.message ?? '').match(/retry in ([\d.]+)s/i);
-            if (match) delay = (parseFloat(match[1]) + 1) * 1000; // add 1s buffer
-          }
-          console.warn(`[Gemini] Attempt ${attempt + 1} failed with ${res.status}. Retrying in ${Math.round(delay / 1000)}s...`);
-          await wait(delay);
-          continue;
-        }
-        throw new Error(`Gemini API error ${res.status}: ${data.error?.message ?? 'Unknown error'}`);
-      }
-
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      const text = response.text;
       if (!text) {
         throw new Error('Gemini returned empty content');
       }
 
       return text.trim();
-    } catch (err) {
+    } catch (err: any) {
       lastError = err as Error;
-      if (attempt === retries) break;
       
-      // For network errors, we also retry
+      // Handle retry for rate limits (429) or service unavailable (503)
+      const isRateLimit = err?.status === 429 || (err?.message && /429|limit/i.test(err.message));
+      const isServiceUnavailable = err?.status === 503 || (err?.message && /503|unavailable/i.test(err.message));
+
+      if ((isRateLimit || isServiceUnavailable) && attempt < retries) {
+        // For 429, honour the "retry in Xs" hint from the error message
+        let delay = Math.pow(2, attempt) * 1000 + Math.random() * 500;
+        const match = (err?.message ?? '').match(/retry in ([\d.]+)s/i);
+        if (match) delay = (parseFloat(match[1]) + 1) * 1000; // add 1s buffer
+        
+        console.warn(`[Gemini SDK] Attempt ${attempt + 1} failed. Retrying in ${Math.round(delay / 1000)}s...`);
+        await wait(delay);
+        continue;
+      }
+      
+      if (attempt === retries) break;
+
+      // For network errors or other issues, we also retry
       const delay = Math.pow(2, attempt) * 1000 + Math.random() * 500;
       await wait(delay);
     }

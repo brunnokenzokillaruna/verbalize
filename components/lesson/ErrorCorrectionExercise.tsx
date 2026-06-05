@@ -4,6 +4,26 @@ import { useState, useEffect } from 'react';
 import type { ErrorCorrectionData } from '@/types';
 import { isAccentOnlyDiff } from '@/utils/accent';
 
+function findWholeWordIndex(sentence: string, word: string): number {
+  let index = sentence.indexOf(word);
+  const isFirstCharWordChar = word.length > 0 && /\p{L}|\p{N}/u.test(word[0]);
+  const isLastCharWordChar = word.length > 0 && /\p{L}|\p{N}/u.test(word[word.length - 1]);
+
+  while (index !== -1) {
+    const charBefore = index > 0 ? sentence[index - 1] : undefined;
+    const charAfter = index + word.length < sentence.length ? sentence[index + word.length] : undefined;
+
+    const isPrecededByWordChar = isFirstCharWordChar && charBefore ? /\p{L}|\p{N}/u.test(charBefore) : false;
+    const isFollowedByWordChar = isLastCharWordChar && charAfter ? /\p{L}|\p{N}/u.test(charAfter) : false;
+
+    if (!isPrecededByWordChar && !isFollowedByWordChar) {
+      return index;
+    }
+    index = sentence.indexOf(word, index + 1);
+  }
+  return -1;
+}
+
 interface ErrorCorrectionExerciseProps {
   data: ErrorCorrectionData;
   onAnswer: (correct: boolean) => void;
@@ -71,7 +91,7 @@ export function ErrorCorrectionExercise({
   }
 
   // Split only on the FIRST occurrence of the error word to avoid highlighting duplicates
-  const firstIdx = data.sentence_with_error.indexOf(data.error_word);
+  const firstIdx = findWholeWordIndex(data.sentence_with_error, data.error_word);
   const before = firstIdx >= 0 ? data.sentence_with_error.slice(0, firstIdx) : data.sentence_with_error;
   const after = firstIdx >= 0 ? data.sentence_with_error.slice(firstIdx + data.error_word.length) : '';
 

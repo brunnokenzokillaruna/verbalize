@@ -65,7 +65,26 @@ export function useLessonBootstrap({
         if (user) {
           try {
             const tPregen = performance.now();
-            const pregenDoc = await getPregeneratedLesson(user.uid, lesson.id);
+            let pregenDoc = await getPregeneratedLesson(user.uid, lesson.id);
+            
+            // Polling loop if lesson is currently generating
+            if (pregenDoc?.status === 'generating') {
+              console.log(`[Timing] Lição está sendo gerada em background. Iniciando polling...`);
+              let attempts = 0;
+              const maxAttempts = 15; // 30 seconds max
+              while (pregenDoc?.status === 'generating' && attempts < maxAttempts) {
+                await new Promise((resolve) => setTimeout(resolve, 2000));
+                attempts++;
+                try {
+                  pregenDoc = await getPregeneratedLesson(user.uid, lesson.id);
+                  console.log(`[Timing] Polling tentativa ${attempts}/${maxAttempts}: status = ${pregenDoc?.status ?? 'deleted'}`);
+                } catch {
+                  // Catch errors (like permission-denied or deletion) safely
+                  break;
+                }
+              }
+            }
+
             if (pregenDoc?.hook) {
               hook = pregenDoc.hook;
               const parts: string[] = ['hook'];
@@ -251,7 +270,7 @@ export function useLessonBootstrap({
         grammarBridgePrefetchRef.current = Promise.resolve(hook.grammarBridge);
       } else {
         const tBridge = performance.now();
-        console.log(`[Timing] 🚀 Prefetch grammar bridge iniciado (em paralelo)`);
+        console.log(`[Timing] 🚀 Prefetch grammar bridge iniciado`);
         grammarBridgePrefetchRef.current = generateGrammarBridge({
           dialogue,
           grammarFocus: hook.grammarFocus,
@@ -267,34 +286,62 @@ export function useLessonBootstrap({
             return null;
           });
       }
-    }
 
-    // Exercises prefetch — always fires, every lesson ends on 'practice'.
-    // Skipped when the pregen cache already supplied a ready Promise.
-    if (exercisesPrefetchRef.current) {
-      console.log(`[Timing] Exercícios: já vindo do pregen cache (0ms)`);
-    } else {
-      const tEx = performance.now();
-      console.log(`[Timing] 🚀 Prefetch exercícios iniciado (em paralelo)`);
-      exercisesPrefetchRef.current = generatePracticeExercises({
-        dialogue,
-        newVocabulary: words,
-        verbWord: hook.verbWord ?? '',
-        grammarFocus: lesson.grammarFocus,
-        tag: lesson.tag,
-        language,
-        level: lesson.level,
-        knownVocabulary: store.knownVocabulary,
-        previousTopics: getPreviousTopics(language, lesson.id),
-      })
-        .then((result) => {
+      // Exercises prefetch chained after Grammar Bridge to avoid concurrency 429
+      if (exercisesPrefetchRef.current) {
+        console.log(`[Timing] Exercícios: já vindo do pregen cache (0ms)`);
+      } else {
+        console.log(`[Timing] 🚀 Prefetch exercícios encadeado após o Grammar Bridge`);
+        exercisesPrefetchRef.current = grammarBridgePrefetchRef.current!.then(async () => {
+          // Wait 500ms cooling period to avoid rapid subsequent requests
+          await new Promise((resolve) => setTimeout(resolve, 500));
+          const tEx = performance.now();
+          console.log(`[Timing] 🚀 Prefetch exercícios iniciado`);
+          const result = await generatePracticeExercises({
+            dialogue,
+            newVocabulary: words,
+            verbWord: hook.verbWord ?? '',
+            grammarFocus: lesson.grammarFocus,
+            tag: lesson.tag,
+            language,
+            level: lesson.level,
+            knownVocabulary: store.knownVocabulary,
+            previousTopics: getPreviousTopics(language, lesson.id),
+          });
           console.log(`[Timing] ✅ Prefetch exercícios terminou: ${(performance.now() - tEx).toFixed(0)}ms (${result?.length ?? 0} exercícios)`);
           return result;
-        })
-        .catch((err) => {
+        }).catch((err) => {
           console.error('[Prefetch] exercises error:', err);
           return null;
         });
+      }
+    } else {
+      // No grammar bridge, run exercises prefetch immediately
+      if (exercisesPrefetchRef.current) {
+        console.log(`[Timing] Exercícios: já vindo do pregen cache (0ms)`);
+      } else {
+        const tEx = performance.now();
+        console.log(`[Timing] 🚀 Prefetch exercícios iniciado`);
+        exercisesPrefetchRef.current = generatePracticeExercises({
+          dialogue,
+          newVocabulary: words,
+          verbWord: hook.verbWord ?? '',
+          grammarFocus: lesson.grammarFocus,
+          tag: lesson.tag,
+          language,
+          level: lesson.level,
+          knownVocabulary: store.knownVocabulary,
+          previousTopics: getPreviousTopics(language, lesson.id),
+        })
+          .then((result) => {
+            console.log(`[Timing] ✅ Prefetch exercícios terminou: ${(performance.now() - tEx).toFixed(0)}ms (${result?.length ?? 0} exercícios)`);
+            return result;
+          })
+          .catch((err) => {
+            console.error('[Prefetch] exercises error:', err);
+            return null;
+          });
+      }
     }
 
     if (hook.vocabTranslations) {
@@ -305,13 +352,16 @@ export function useLessonBootstrap({
       console.log(`[Timing] Traduções do vocabulário: vindas do hook (0ms)`);
     } else {
       const tTrans = performance.now();
-      words.forEach(async (word) => {
-        const t = performance.now();
-        const result = await translateWord(word, dialogue, language);
-        if (result?.translation) store.setVocabTranslation(word, result.translation);
-        console.log(`[Timing] Tradução '${word}': ${(performance.now() - t).toFixed(0)}ms`);
-      });
-      console.log(`[Timing] Traduções iniciadas (${words.length} palavras): ${(performance.now() - tTrans).toFixed(0)}ms`);
+      (async () => {
+        for (const word of words) {
+          const t = performance.now();
+          const result = await translateWord(word, dialogue, language);
+          if (result?.translation) store.setVocabTranslation(word, result.translation);
+          console.log(`[Timing] Tradução '${word}': ${(performance.now() - t).toFixed(0)}ms`);
+          await new Promise((resolve) => setTimeout(resolve, 300)); // small cooldown
+        }
+      })();
+      console.log(`[Timing] Traduções iniciadas sequencialmente (${words.length} palavras): ${(performance.now() - tTrans).toFixed(0)}ms`);
     }
 
     const tImages = performance.now();
