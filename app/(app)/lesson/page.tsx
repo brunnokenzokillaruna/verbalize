@@ -402,7 +402,7 @@ export default function LessonPage() {
             vocabTranslations={store.vocabTranslations}
             language={store.lesson.language}
             level={store.lesson.level}
-            targetDefinitions={
+            vocabExamples={
               store.hook.vocabTranslations
                 ? Object.fromEntries(
                     Object.entries(store.hook.vocabTranslations)
@@ -411,6 +411,7 @@ export default function LessonPage() {
                   )
                 : undefined
             }
+            targetDefinitions={undefined}
           />
         )}
 

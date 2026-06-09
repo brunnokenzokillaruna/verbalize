@@ -10,6 +10,7 @@ interface LessonVocabularyScreenProps {
   vocabImages: Record<string, { imageUrl?: string; imageAlt?: string } | null>;
   vocabTranslations: Record<string, string>;
   language: SupportedLanguage;
+  vocabExamples?: Record<string, string>;
   /** Target-language definitions (e.g. "un fruit rouge") keyed by word. Used for immersive mode A2+. */
   targetDefinitions?: Record<string, string>;
   /** Lesson level — A2+ enables immersive mode on vocab cards. */
@@ -24,10 +25,12 @@ export function LessonVocabularyScreen({
   vocabImages,
   vocabTranslations,
   language,
+  vocabExamples,
   targetDefinitions,
   level,
 }: LessonVocabularyScreenProps) {
-  const useImmersive = !!level && IMMERSIVE_LEVELS.has(level) && !!targetDefinitions;
+  // Disable immersive mode on the vocabulary screen so translations are shown directly.
+  const useImmersive = false;
 
   return (
     <div className="flex flex-col gap-6">
@@ -82,7 +85,8 @@ export function LessonVocabularyScreen({
                 language={language}
                 imageUrl={img?.imageUrl}
                 imageAlt={img?.imageAlt}
-                targetDefinition={useImmersive ? targetDefinitions[word] : undefined}
+                exampleSentence={vocabExamples?.[word]}
+                targetDefinition={useImmersive ? targetDefinitions?.[word] : undefined}
                 immersive={useImmersive}
               />
             </div>
