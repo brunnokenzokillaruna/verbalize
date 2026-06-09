@@ -10,6 +10,14 @@ interface SentenceBuilderProps {
   submitTrigger: number;
 }
 
+function normalize(s: string): string {
+  return s
+    .toLowerCase()
+    .replace(/[.,!?;:'"-]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 export function SentenceBuilder({ 
   data, 
   onAnswer, 
@@ -19,7 +27,10 @@ export function SentenceBuilder({
 }: SentenceBuilderProps) {
   // Store the randomized list of words once, so they stay at static positions.
   const [shuffled] = useState<string[]>(() => {
-    const wordsFromCorrect = [...data.correctOrder];
+    // Filter out items that are purely punctuation (like "?", ".", "!")
+    const wordsFromCorrect = data.correctOrder.filter(
+      w => !/^[.,!?;:'"-\s]+$/.test(w)
+    );
     // Shuffle
     return wordsFromCorrect.sort(() => Math.random() - 0.5);
   });
@@ -47,7 +58,7 @@ export function SentenceBuilder({
   const correctAnswer = data.correctOrder.join(' ');
 
   function handleSubmit() {
-    onAnswer(assembledSentence.toLowerCase() === correctAnswer.toLowerCase());
+    onAnswer(normalize(assembledSentence) === normalize(correctAnswer));
   }
 
   function handleWordClick(index: number) {
@@ -64,12 +75,13 @@ export function SentenceBuilder({
       setSelectedIndices(newSelected);
       // Auto-check when all words are placed
       if (newSelected.length === shuffled.length) {
-        onAnswer(newSelected.map(idx => shuffled[idx]).join(' ').toLowerCase() === correctAnswer.toLowerCase());
+        const currentSentence = newSelected.map(idx => shuffled[idx]).join(' ');
+        onAnswer(normalize(currentSentence) === normalize(correctAnswer));
       }
     }
   }
 
-  const isCorrect = assembledSentence.toLowerCase() === correctAnswer.toLowerCase();
+  const isCorrect = normalize(assembledSentence) === normalize(correctAnswer);
 
   return (
     <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
