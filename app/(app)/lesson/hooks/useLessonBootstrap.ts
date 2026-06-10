@@ -71,7 +71,7 @@ export function useLessonBootstrap({
             if (pregenDoc?.status === 'generating') {
               console.log(`[Timing] Lição está sendo gerada em background. Iniciando polling...`);
               let attempts = 0;
-              const maxAttempts = 15; // 30 seconds max
+              const maxAttempts = 90; // 3 minutes — matches pregen runway for hook + grammar + exercises
               while (pregenDoc?.status === 'generating' && attempts < maxAttempts) {
                 await new Promise((resolve) => setTimeout(resolve, 2000));
                 attempts++;
@@ -292,7 +292,7 @@ export function useLessonBootstrap({
         console.log(`[Timing] Exercícios: já vindo do pregen cache (0ms)`);
       } else {
         console.log(`[Timing] 🚀 Prefetch exercícios encadeado após o Grammar Bridge`);
-        exercisesPrefetchRef.current = grammarBridgePrefetchRef.current!.then(async () => {
+        exercisesPrefetchRef.current = grammarBridgePrefetchRef.current!.then(async (bridge) => {
           // Wait 500ms cooling period to avoid rapid subsequent requests
           await new Promise((resolve) => setTimeout(resolve, 500));
           const tEx = performance.now();
@@ -307,6 +307,7 @@ export function useLessonBootstrap({
             level: lesson.level,
             knownVocabulary: store.knownVocabulary,
             previousTopics: getPreviousTopics(language, lesson.id),
+            grammarBridge: bridge ?? hook.grammarBridge ?? null,
           });
           console.log(`[Timing] ✅ Prefetch exercícios terminou: ${(performance.now() - tEx).toFixed(0)}ms (${result?.length ?? 0} exercícios)`);
           return result;

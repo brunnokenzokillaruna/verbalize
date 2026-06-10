@@ -2,15 +2,15 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
-import { Loader2, BookOpen, Clock, Sparkles, Trophy, X, ChevronRight, CheckCircle2, XCircle, Zap, Brain, Search, LayoutGrid, List } from 'lucide-react';
+import { Loader2, BookOpen, Clock, Sparkles, Trophy, X, ChevronRight, Zap, Brain, Search, LayoutGrid, List } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import {
   getUserVocabulary,
+  updateVocabSrsAfterReview,
   updateVocabTranslation,
   updateVocabImage,
-  updateVocabSrsAfterReview,
 } from '@/services/firestore';
-import { translateWord, translateWordsBatch } from '@/app/actions/translateWord';
+import { translateWordsBatch } from '@/app/actions/translateWord';
 import { getVocabImage } from '@/app/actions/getVocabImage';
 import { generateVocabReview } from '@/app/actions/generateVocabReview';
 import type { VocabReviewItem } from '@/app/actions/generateVocabReview';
@@ -19,17 +19,21 @@ import type { UserVocabularyDocument, SupportedLanguage } from '@/types';
 
 import { StatChip } from '@/components/vocabulary/StatChip';
 import { VocabCard } from '@/components/vocabulary/VocabCard';
-import { ReviewOverlay, type ReviewResult } from '@/components/vocabulary/ReviewOverlay';
-import { QuickReviewOverlay } from '@/components/vocabulary/QuickReviewOverlay';
+import { ReviewModeSheet } from '@/components/vocabulary/ReviewModeSheet';
+import { FlashcardReviewSession } from '@/components/vocabulary/FlashcardReviewSession';
+import { ContextReviewSession } from '@/components/vocabulary/ContextReviewSession';
+import { ContextReviewLoading } from '@/components/vocabulary/ContextReviewLoading';
+import type { ReviewResult } from '@/components/vocabulary/reviewTypes';
 import { AudioPlayerButton } from '@/components/lesson/AudioPlayerButton';
 import { SrsBar, SRS_BAR_COLOR, SRS_LABELS, formatNextReview } from '@/components/vocabulary/SrsBar';
+import { VocabEnrichButton } from '@/components/vocabulary/VocabEnrichButton';
+import { isMissingImage, isMissingTranslation } from '@/utils/vocabHelpers';
+import { pickReviewSession, REVIEW_SESSION_SIZE } from '@/utils/reviewSession';
 
 const LANG_LABEL: Record<SupportedLanguage, { label: string; flag: string }> = {
   fr: { label: 'Francês', flag: '🇫🇷' },
   en: { label: 'Inglês', flag: '🇬🇧' },
 };
-
-type ReviewState = 'idle' | 'loading' | 'running' | 'done';
 
 // ── Compact List Row Component ───────────────────────────────────────────────
 
@@ -37,13 +41,19 @@ function VocabListRow({
   item,
   language,
   urgent = false,
+  onEnrich,
+  enriching = false,
 }: {
   item: UserVocabularyDocument;
   language: SupportedLanguage;
   urgent?: boolean;
+  onEnrich?: (word: string) => void;
+  enriching?: boolean;
 }) {
   const level = Math.min(Math.max(item.srsLevel ?? 0, 0), 5);
-  const isPlaceholder = item.translation === item.word || !item.translation;
+  const missingTranslation = isMissingTranslation(item);
+  const missingImage = isMissingImage(item);
+  const showEnrich = (missingTranslation || missingImage) && onEnrich;
   const reviewText = formatNextReview(item.nextReview as Parameters<typeof formatNextReview>[0]);
   const barColor = SRS_BAR_COLOR[level];
 
@@ -70,11 +80,11 @@ function VocabListRow({
           <p
             className="text-xs truncate mt-0.5"
             style={{
-              color: isPlaceholder ? 'var(--color-text-muted)' : 'var(--color-text-secondary)',
-              fontStyle: isPlaceholder ? 'italic' : 'normal',
+              color: missingTranslation ? 'var(--color-text-muted)' : 'var(--color-text-secondary)',
+              fontStyle: missingTranslation ? 'italic' : 'normal',
             }}
           >
-            {isPlaceholder ? 'traduzindo…' : item.translation}
+            {missingTranslation ? '—' : item.translation}
           </p>
         </div>
       </div>
@@ -94,17 +104,28 @@ function VocabListRow({
         {SRS_LABELS[level]}
       </span>
 
-      <div className="text-right shrink-0 min-w-[90px]">
-        {reviewText ? (
-          <p
-            className="text-[11px] font-bold"
-            style={{ color: urgent ? 'var(--color-error)' : 'var(--color-text-muted)' }}
-          >
-            {reviewText}
-          </p>
-        ) : (
-          <p className="text-[11px] font-semibold text-text-muted">Pronto</p>
+      <div className="flex items-center gap-2 shrink-0">
+        {showEnrich && (
+          <VocabEnrichButton
+            onClick={() => onEnrich!(item.word)}
+            loading={enriching}
+            missingTranslation={missingTranslation}
+            missingImage={missingImage}
+            variant="inline"
+          />
         )}
+        <div className="text-right min-w-[72px]">
+          {reviewText ? (
+            <p
+              className="text-[11px] font-bold"
+              style={{ color: urgent ? 'var(--color-error)' : 'var(--color-text-muted)' }}
+            >
+              {reviewText}
+            </p>
+          ) : (
+            <p className="text-[11px] font-semibold text-text-muted">Pronto</p>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -116,22 +137,23 @@ export default function VocabularyPage() {
   const { user, profile } = useAuthStore();
   const [items, setItems] = useState<UserVocabularyDocument[]>([]);
   const [loading, setLoading] = useState(true);
-  const [enriching, setEnriching] = useState(false);
 
-  const [reviewState, setReviewState] = useState<ReviewState>('idle');
+  const [showPicker, setShowPicker] = useState(false);
+  const [sessionItems, setSessionItems] = useState<UserVocabularyDocument[]>([]);
+  const [flashcardPhase, setFlashcardPhase] = useState<'ready' | 'running' | 'done' | null>(null);
+  const [contextPhase, setContextPhase] = useState<'running' | 'done' | null>(null);
+  const [contextLoading, setContextLoading] = useState(false);
   const [reviewItems, setReviewItems] = useState<VocabReviewItem[]>([]);
-  const [reviewIdx, setReviewIdx] = useState(0);
+  const [cardIdx, setCardIdx] = useState(0);
   const [answered, setAnswered] = useState(false);
   const [lastCorrect, setLastCorrect] = useState<boolean | null>(null);
   const [results, setResults] = useState<ReviewResult[]>([]);
   const [savingResults, setSavingResults] = useState(false);
 
-  const [quickState, setQuickState] = useState<'idle' | 'running' | 'done'>('idle');
-  const [quickIdx, setQuickIdx] = useState(0);
-
   const [layoutMode, setLayoutMode] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState('');
   const [srsFilter, setSrsFilter] = useState<'all' | 'new' | 'learning' | 'mastered'>('all');
+  const [enrichingWords, setEnrichingWords] = useState<Set<string>>(new Set());
 
   const language = (profile?.currentTargetLanguage ?? 'fr') as SupportedLanguage;
   const lang = LANG_LABEL[language];
@@ -142,75 +164,6 @@ export default function VocabularyPage() {
     const vocab = await getUserVocabulary(user.uid, language);
     setItems(vocab);
     setLoading(false);
-
-    const placeholders = vocab.filter((v) => v.translation === v.word || !v.translation);
-    const missingImages = vocab.filter((v) => !v.imageUrl);
-
-    if (placeholders.length === 0 && missingImages.length === 0) return;
-    setEnriching(true);
-
-    // 1. Batch Translate Placeholders
-    if (placeholders.length > 0) {
-      const batchSize = 15;
-      for (let i = 0; i < placeholders.length; i += batchSize) {
-        const chunk = placeholders.slice(i, i + batchSize);
-        const chunkWords = chunk.map((item) => item.word);
-
-        try {
-          const results = await translateWordsBatch(chunkWords, language);
-          if (results && results.length > 0) {
-            const translationMap = new Map(
-              results.map((r) => [r.word.toLowerCase(), r.translation]),
-            );
-
-            await Promise.all(
-              chunk.map(async (item) => {
-                const translation = translationMap.get(item.word.toLowerCase());
-                if (translation && translation !== item.word) {
-                  await updateVocabTranslation(user.uid, item.word, language, translation);
-                  setItems((prev) =>
-                    prev.map((v) =>
-                      v.word === item.word ? { ...v, translation } : v,
-                    ),
-                  );
-                }
-              }),
-            );
-          }
-        } catch (err) {
-          console.error('[loadVocabulary] Batch translation failed:', err);
-        }
-
-        // Delay between translation batches to respect rate limits
-        if (i + batchSize < placeholders.length) {
-          await new Promise((resolve) => setTimeout(resolve, 2000));
-        }
-      }
-    }
-
-    // 2. Enrich Missing Images
-    if (missingImages.length > 0) {
-      // Process missing images sequentially to prevent rate limits on Pexels/Gemini
-      for (const item of missingImages) {
-        try {
-          const imgResult = await getVocabImage(item.word, '', language);
-          if (imgResult?.imageUrl) {
-            await updateVocabImage(user.uid, item.word, language, imgResult.imageUrl);
-            setItems((prev) =>
-              prev.map((v) =>
-                v.word === item.word ? { ...v, imageUrl: imgResult.imageUrl } : v,
-              ),
-            );
-          }
-        } catch (err) {
-          console.error('[loadVocabulary] Image enrichment failed for', item.word, err);
-        }
-        // Small delay between image searches to prevent API hammering
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-      }
-    }
-
-    setEnriching(false);
   }, [user, language]);
 
   const handleImageLoaded = useCallback((word: string, imageUrl: string) => {
@@ -219,20 +172,78 @@ export default function VocabularyPage() {
     );
   }, []);
 
+  const handleEnrichItem = useCallback(
+    async (word: string) => {
+      if (!user || enrichingWords.has(word)) return;
+
+      const item = items.find((v) => v.word === word);
+      if (!item) return;
+
+      const needsTranslation = isMissingTranslation(item);
+      const needsImage = isMissingImage(item);
+      if (!needsTranslation && !needsImage) return;
+
+      setEnrichingWords((prev) => new Set(prev).add(word));
+
+      try {
+        let translation = item.translation;
+        let imageUrl = item.imageUrl;
+
+        if (needsTranslation) {
+          const results = await translateWordsBatch([word], language);
+          const match = results?.find((r) => r.word.toLowerCase() === word.toLowerCase());
+          if (match?.translation && match.translation !== word) {
+            translation = match.translation;
+            await updateVocabTranslation(user.uid, word, language, translation);
+          }
+        }
+
+        if (needsImage) {
+          const context =
+            translation && translation !== word ? translation : item.word;
+          const imgResult = await getVocabImage(word, context, language);
+          if (imgResult?.imageUrl) {
+            imageUrl = imgResult.imageUrl;
+            await updateVocabImage(user.uid, word, language, imageUrl);
+          }
+        }
+
+        if (
+          translation !== item.translation ||
+          imageUrl !== item.imageUrl
+        ) {
+          setItems((prev) =>
+            prev.map((v) =>
+              v.word === word ? { ...v, translation, imageUrl } : v,
+            ),
+          );
+        }
+      } catch (err) {
+        console.error('[handleEnrichItem] Failed for', word, err);
+      } finally {
+        setEnrichingWords((prev) => {
+          const next = new Set(prev);
+          next.delete(word);
+          return next;
+        });
+      }
+    },
+    [user, items, language, enrichingWords],
+  );
+
   useEffect(() => {
     loadVocabulary();
   }, [loadVocabulary]);
 
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        if (reviewState === 'running' || reviewState === 'done') closeReview();
-        if (quickState === 'running' || quickState === 'done') closeQuickReview();
+      if (e.key === 'Escape' && (showPicker || flashcardPhase || contextPhase || contextLoading)) {
+        closeAllReview();
       }
     };
     window.addEventListener('keydown', handleGlobalKeyDown);
     return () => window.removeEventListener('keydown', handleGlobalKeyDown);
-  }, [reviewState, quickState]);
+  }, [showPicker, flashcardPhase, contextPhase, contextLoading]);
 
   const now = new Date();
   
@@ -288,9 +299,66 @@ export default function VocabularyPage() {
     items.filter((v) => v.imageUrl).map((v) => [v.word, v.imageUrl!]),
   );
 
-  async function startReview() {
+  function openReviewPicker() {
     if (!user || rawDueToday.length === 0) return;
-    setReviewState('loading');
+    setSessionItems(pickReviewSession(rawDueToday));
+    setResults([]);
+    setShowPicker(true);
+  }
+
+  function closeAllReview() {
+    setShowPicker(false);
+    setFlashcardPhase(null);
+    setContextPhase(null);
+    setContextLoading(false);
+    setReviewItems([]);
+    setCardIdx(0);
+    setAnswered(false);
+    setLastCorrect(null);
+    setResults([]);
+  }
+
+  function startFlashcardMode() {
+    setShowPicker(false);
+    setCardIdx(0);
+    setResults([]);
+    setFlashcardPhase('ready');
+  }
+
+  function beginFlashcardSession() {
+    setFlashcardPhase('running');
+  }
+
+  function handleFlashcardAnswer(correct: boolean) {
+    const item = sessionItems[cardIdx];
+    if (cardIdx + 1 >= sessionItems.length) {
+      setResults((prev) => [...prev, { word: item.word, correct }]);
+      setFlashcardPhase('done');
+    } else {
+      setResults((prev) => [...prev, { word: item.word, correct }]);
+      setCardIdx((i) => i + 1);
+    }
+  }
+
+  async function finishFlashcardReview() {
+    if (!user) return;
+    setSavingResults(true);
+    await Promise.all(
+      results.map((r) => updateVocabSrsAfterReview(user.uid, r.word, language, r.correct)),
+    );
+    await loadVocabulary();
+    setSavingResults(false);
+    closeAllReview();
+  }
+
+  async function startContextMode() {
+    if (!user) return;
+    setShowPicker(false);
+    setContextLoading(true);
+    setCardIdx(0);
+    setResults([]);
+    setAnswered(false);
+    setLastCorrect(null);
 
     const currentLessonId = profile?.lessonProgress?.[language];
     const currentLesson =
@@ -299,49 +367,51 @@ export default function VocabularyPage() {
     const level = currentLesson?.level ?? 'A1';
     const knownVocabulary = items.map((v) => v.word);
 
-    const generated = await generateVocabReview({
-      words: rawDueToday.map((v) => ({ word: v.word, translation: v.translation })),
-      language,
-      level,
-      knownVocabulary,
-    });
+    try {
+      const generated = await generateVocabReview({
+        words: sessionItems.map((v) => ({ word: v.word, translation: v.translation })),
+        language,
+        level,
+        knownVocabulary,
+      });
 
-    if (!generated || generated.length === 0) {
-      setReviewState('idle');
-      return;
+      if (!generated || generated.length === 0) {
+        setContextLoading(false);
+        return;
+      }
+
+      setReviewItems(generated);
+      setContextPhase('running');
+    } catch (err) {
+      console.error('[startContextMode] Failed:', err);
+    } finally {
+      setContextLoading(false);
     }
-
-    setReviewItems(generated);
-    setReviewIdx(0);
-    setAnswered(false);
-    setLastCorrect(null);
-    setResults([]);
-    setReviewState('running');
   }
 
-  function handleAnswer(correct: boolean) {
+  function handleContextAnswer(correct: boolean) {
     if (answered) return;
     setAnswered(true);
     setLastCorrect(correct);
   }
 
-  function handleContinue() {
+  function handleContextContinue() {
     if (!answered || lastCorrect === null) return;
 
-    const currentItem = reviewItems[reviewIdx];
+    const currentItem = reviewItems[cardIdx];
     const newResults = [...results, { word: currentItem.word, correct: lastCorrect }];
     setResults(newResults);
 
-    if (reviewIdx + 1 >= reviewItems.length) {
-      setReviewState('done');
+    if (cardIdx + 1 >= reviewItems.length) {
+      setContextPhase('done');
     } else {
-      setReviewIdx(reviewIdx + 1);
+      setCardIdx(cardIdx + 1);
       setAnswered(false);
       setLastCorrect(null);
     }
   }
 
-  async function finishReview() {
+  async function finishContextReview() {
     if (!user) return;
     setSavingResults(true);
     await Promise.all(
@@ -349,46 +419,7 @@ export default function VocabularyPage() {
     );
     await loadVocabulary();
     setSavingResults(false);
-    setReviewState('idle');
-  }
-
-  function closeReview() {
-    setReviewState('idle');
-    setReviewItems([]);
-    setResults([]);
-  }
-
-  function startQuickReview() {
-    if (!user || rawDueToday.length === 0) return;
-    setQuickIdx(0);
-    setResults([]);
-    setQuickState('running');
-  }
-
-  function handleQuickAnswer(correct: boolean) {
-    const currentItem = rawDueToday[quickIdx];
-    setResults((prev) => [...prev, { word: currentItem.word, correct }]);
-    if (quickIdx + 1 >= rawDueToday.length) {
-      setQuickState('done');
-    } else {
-      setQuickIdx(quickIdx + 1);
-    }
-  }
-
-  async function finishQuickReview() {
-    if (!user) return;
-    setSavingResults(true);
-    await Promise.all(
-      results.map((r) => updateVocabSrsAfterReview(user.uid, r.word, language, r.correct)),
-    );
-    await loadVocabulary();
-    setSavingResults(false);
-    setQuickState('idle');
-  }
-
-  function closeQuickReview() {
-    setQuickState('idle');
-    setResults([]);
+    closeAllReview();
   }
 
   if (loading) {
@@ -499,17 +530,6 @@ export default function VocabularyPage() {
                 </h1>
               </div>
 
-              {enriching && (
-                <div
-                  className="flex items-center gap-1.5 rounded-full px-3 py-1.5 mt-1"
-                  style={{ backgroundColor: 'var(--color-surface-raised)' }}
-                >
-                  <Loader2 size={12} className="animate-spin" style={{ color: 'var(--color-text-muted)' }} />
-                  <span className="text-xs font-medium" style={{ color: 'var(--color-text-muted)' }}>
-                    Traduzindo…
-                  </span>
-                </div>
-              )}
             </div>
 
             <div className="flex gap-3 mt-4 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
@@ -668,32 +688,21 @@ export default function VocabularyPage() {
                     </span>
                   </h3>
                   <p className="text-xs text-text-muted mt-0.5">
-                    Pratique agora para fixar os sons e a ortografia do vocabulário e manter sua ofensiva!
+                    {Math.min(rawDueToday.length, REVIEW_SESSION_SIZE)} palavras nesta sessão · escolha cartões ou frases em contexto
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 w-full md:w-auto mt-2 md:mt-0 shrink-0">
+              <div className="w-full md:w-auto mt-2 md:mt-0 shrink-0">
                 <button
                   type="button"
-                  onClick={startQuickReview}
-                  className="flex-1 md:flex-none flex justify-center items-center gap-1.5 rounded-xl px-5 py-3 text-sm font-bold transition-all active:scale-95 cursor-pointer bg-error text-white shadow-sm hover:brightness-105 active:translate-y-[2px]"
+                  onClick={openReviewPicker}
+                  className="w-full md:w-auto flex justify-center items-center gap-2 rounded-xl px-6 py-3 text-sm font-bold transition-all active:scale-95 cursor-pointer bg-error text-white shadow-sm hover:brightness-105 active:translate-y-[2px]"
                   style={{
                     boxShadow: '0 3px 0 #b91c1c',
                   }}
                 >
-                  Rápida <Zap size={14} fill="currentColor" />
-                </button>
-                <button
-                  type="button"
-                  onClick={startReview}
-                  disabled={reviewState === 'loading'}
-                  className="flex-1 md:flex-none flex justify-center items-center gap-1.5 rounded-xl px-5 py-3 text-sm font-bold transition-all active:scale-95 border-2 border-error text-error bg-transparent active:translate-y-[2px]"
-                  style={{
-                    cursor: reviewState === 'loading' ? 'wait' : 'pointer',
-                    boxShadow: '0 3px 0 var(--color-error-bg)',
-                  }}
-                >
-                  {reviewState === 'loading' ? <Loader2 size={14} className="animate-spin" /> : 'Profunda'}
+                  Revisar agora
+                  <ChevronRight size={16} />
                 </button>
               </div>
             </div>
@@ -770,7 +779,7 @@ export default function VocabularyPage() {
                           </>
                         ) : (
                           <div
-                            className="flex h-full w-full flex-col items-center justify-center gap-1.5 p-4 select-none"
+                            className="flex h-full w-full flex-col items-center justify-center gap-2 p-4 select-none"
                             style={{
                               background: `linear-gradient(90deg, transparent 31px, rgba(220, 38, 38, 0.15) 31px, rgba(220, 38, 38, 0.15) 32px, transparent 32px), 
                                            repeating-linear-gradient(var(--color-surface) 0px, var(--color-surface) 23px, var(--color-border) 23px, var(--color-border) 24px)`,
@@ -780,6 +789,14 @@ export default function VocabularyPage() {
                             <span className="text-primary animate-float">
                               <BookOpen size={36} style={{ color: 'var(--color-vocab)' }} />
                             </span>
+                            {isMissingImage(focusWord) && (
+                              <VocabEnrichButton
+                                onClick={() => handleEnrichItem(focusWord.word)}
+                                loading={enrichingWords.has(focusWord.word)}
+                                missingTranslation={isMissingTranslation(focusWord)}
+                                missingImage={isMissingImage(focusWord)}
+                              />
+                            )}
                           </div>
                         )}
 
@@ -808,9 +825,28 @@ export default function VocabularyPage() {
                             </h2>
                             <AudioPlayerButton text={focusWord.word} language={language} size="md" />
                           </div>
-                          <p className="text-lg text-text-secondary mt-1 font-semibold">
-                            {focusWord.translation}
-                          </p>
+                          <div className="flex items-center justify-center md:justify-start gap-2 mt-1 flex-wrap">
+                            <p
+                              className="text-lg font-semibold"
+                              style={{
+                                color: isMissingTranslation(focusWord)
+                                  ? 'var(--color-text-muted)'
+                                  : 'var(--color-text-secondary)',
+                                fontStyle: isMissingTranslation(focusWord) ? 'italic' : 'normal',
+                              }}
+                            >
+                              {isMissingTranslation(focusWord) ? '—' : focusWord.translation}
+                            </p>
+                            {(isMissingTranslation(focusWord) || isMissingImage(focusWord)) && (
+                              <VocabEnrichButton
+                                onClick={() => handleEnrichItem(focusWord.word)}
+                                loading={enrichingWords.has(focusWord.word)}
+                                missingTranslation={isMissingTranslation(focusWord)}
+                                missingImage={isMissingImage(focusWord)}
+                                variant="inline"
+                              />
+                            )}
+                          </div>
                         </div>
 
                         <div className="w-full max-w-sm mt-1">
@@ -841,6 +877,8 @@ export default function VocabularyPage() {
                       urgent
                       animDelay={(idx + 1) * 45}
                       onImageLoaded={handleImageLoaded}
+                      onEnrich={handleEnrichItem}
+                      enriching={enrichingWords.has(item.word)}
                     />
                   ))}
                 </div>
@@ -852,6 +890,8 @@ export default function VocabularyPage() {
                       item={item}
                       language={language}
                       urgent
+                      onEnrich={handleEnrichItem}
+                      enriching={enrichingWords.has(item.word)}
                     />
                   ))}
                 </div>
@@ -880,6 +920,8 @@ export default function VocabularyPage() {
                       language={language}
                       animDelay={idx * 35}
                       onImageLoaded={handleImageLoaded}
+                      onEnrich={handleEnrichItem}
+                      enriching={enrichingWords.has(item.word)}
                     />
                   ))}
                 </div>
@@ -890,6 +932,8 @@ export default function VocabularyPage() {
                       key={item.word}
                       item={item}
                       language={language}
+                      onEnrich={handleEnrichItem}
+                      enriching={enrichingWords.has(item.word)}
                     />
                   ))}
                 </div>
@@ -899,34 +943,51 @@ export default function VocabularyPage() {
         </main>
       </div>
 
-      {(reviewState === 'running' || reviewState === 'done') && (
-        <ReviewOverlay
-          state={reviewState}
+      {showPicker && (
+        <ReviewModeSheet
+          sessionCount={sessionItems.length}
+          totalDue={rawDueToday.length}
+          onSelectFlashcard={startFlashcardMode}
+          onSelectContext={startContextMode}
+          onClose={closeAllReview}
+        />
+      )}
+      {contextLoading && (
+        <ContextReviewLoading
+          wordCount={sessionItems.length}
+          onClose={closeAllReview}
+        />
+      )}
+      {flashcardPhase && (
+        <FlashcardReviewSession
+          state={flashcardPhase}
+          items={sessionItems}
+          currentIdx={cardIdx}
+          results={results}
+          language={language}
+          savingResults={savingResults}
+          onStart={beginFlashcardSession}
+          onAnswer={handleFlashcardAnswer}
+          onFinish={finishFlashcardReview}
+          onClose={closeAllReview}
+        />
+      )}
+      {contextPhase && (
+        <ContextReviewSession
+          state={contextPhase}
           items={reviewItems}
-          currentIdx={reviewIdx}
+          sessionItems={sessionItems}
+          currentIdx={cardIdx}
           answered={answered}
           lastCorrect={lastCorrect}
           results={results}
           language={language}
           wordImageMap={wordImageMap}
           savingResults={savingResults}
-          onAnswer={handleAnswer}
-          onContinue={handleContinue}
-          onFinish={finishReview}
-          onClose={closeReview}
-        />
-      )}
-      {(quickState === 'running' || quickState === 'done') && (
-        <QuickReviewOverlay
-          state={quickState}
-          items={rawDueToday}
-          currentIdx={quickIdx}
-          results={results}
-          language={language}
-          savingResults={savingResults}
-          onAnswer={handleQuickAnswer}
-          onFinish={finishQuickReview}
-          onClose={closeQuickReview}
+          onAnswer={handleContextAnswer}
+          onContinue={handleContextContinue}
+          onFinish={finishContextReview}
+          onClose={closeAllReview}
         />
       )}
     </>

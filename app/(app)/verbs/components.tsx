@@ -2,7 +2,7 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 import { AudioPlayerButton } from '@/components/lesson/AudioPlayerButton';
 import { TENSE_ORDER, TENSE_LABELS, TENSE_ACCENT } from './data';
 import type { VerbDocument, SupportedLanguage } from '@/types';
-import { getConjugationAudioText } from '@/utils/conjugationHelper';
+import { extractVerbOnlyForm, getConjugationAudioText } from '@/utils/conjugationHelper';
 
 interface TenseListProps {
   verb: VerbDocument;
@@ -85,7 +85,7 @@ export function VerbTenseList({ verb, openTenses, toggleTense, language }: Tense
                         className="flex-1 font-display text-base font-bold"
                         style={{ color: accent }}
                       >
-                        {form}
+                        {extractVerbOnlyForm(pronoun, form, language)}
                       </span>
                       <AudioPlayerButton
                         text={getConjugationAudioText(pronoun, form, language)}

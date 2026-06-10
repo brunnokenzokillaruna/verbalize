@@ -1,5 +1,94 @@
 import type { VerbDocument, SupportedLanguage } from '@/types';
 
+export const TENSE_LABELS: Record<string, string> = {
+  present: 'Presente',
+  past: 'Passado',
+  future: 'Futuro',
+  conditional: 'Condicional',
+  imperfect: 'Imperfeito',
+  subjunctive: 'Subjuntivo',
+};
+
+export function inferLanguageFromPronoun(pronoun: string): SupportedLanguage {
+  const p = pronoun.toLowerCase().split(/[\/|]/)[0].trim().replace(/\s*\(.+?\)\s*/g, '');
+  if (['je', 'tu', 'il', 'elle', 'on', 'nous', 'vous', 'ils', 'elles'].includes(p)) {
+    return 'fr';
+  }
+  return 'en';
+}
+
+/**
+ * Returns only the conjugated verb, stripping a leading subject pronoun when present.
+ * E.g. pronoun "il", form "il arrivera" → "arrivera"; form "j'arriverai" → "arriverai".
+ */
+export function extractVerbOnlyForm(
+  pronoun: string,
+  form: string,
+  language?: SupportedLanguage,
+): string {
+  const cleanForm = form.trim();
+  if (!cleanForm) return cleanForm;
+
+  const lang = language ?? inferLanguageFromPronoun(pronoun);
+  const pronounParts = pronoun.split(/[\/|]/).map((part) => {
+    let clean = part.trim().replace(/\s*\(.+?\)\s*/g, '');
+    if (clean.toUpperCase() === 'I') return 'I';
+    return clean.toLowerCase();
+  });
+
+  for (const p of pronounParts) {
+    const pLower = p.toLowerCase();
+    const formLower = cleanForm.toLowerCase();
+
+    if (formLower === pLower) continue;
+
+    if (formLower.startsWith(pLower + ' ')) {
+      return cleanForm.slice(pLower.length + 1).trim();
+    }
+
+    if (lang === 'fr') {
+      if (pLower === 'je' && formLower.startsWith("j'")) {
+        return cleanForm.slice(2).trim();
+      }
+      if (pLower === 'tu' && formLower.startsWith("t'")) {
+        return cleanForm.slice(2).trim();
+      }
+    }
+  }
+
+  return cleanForm;
+}
+
+/**
+ * Strips any known subject pronoun prefix from a conjugated form.
+ * Useful when distractor options use a different subject than the prompt.
+ */
+export function stripPronounPrefix(
+  form: string,
+  language: SupportedLanguage,
+  hintPronoun?: string,
+): string {
+  const clean = form.trim();
+  if (!clean) return clean;
+
+  if (hintPronoun) {
+    const hinted = extractVerbOnlyForm(hintPronoun, clean, language);
+    if (hinted !== clean) return hinted;
+  }
+
+  const pronouns =
+    language === 'fr'
+      ? ['je', 'tu', 'il', 'elle', 'on', 'nous', 'vous', 'ils', 'elles']
+      : ['I', 'you', 'he', 'she', 'it', 'we', 'they'];
+
+  for (const p of pronouns) {
+    const stripped = extractVerbOnlyForm(p, clean, language);
+    if (stripped !== clean) return stripped;
+  }
+
+  return clean;
+}
+
 /**
  * Returns clean audio text to synthesize, avoiding duplicate pronouns.
  * E.g., if pronoun is 'je' and form is 'je donne', returns 'je donne' instead of 'je je donne'.

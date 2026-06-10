@@ -1,10 +1,16 @@
 'use client';
 
 import { useMemo, useState, useEffect } from 'react';
-import type { ConjugationSpeedData } from '@/types';
+import type { ConjugationSpeedData, SupportedLanguage } from '@/types';
+import {
+  inferLanguageFromPronoun,
+  stripPronounPrefix,
+  TENSE_LABELS,
+} from '@/utils/conjugationHelper';
 
 interface ConjugationSpeedExerciseProps {
   data: ConjugationSpeedData;
+  language?: SupportedLanguage;
   onAnswer: (correct: boolean) => void;
   answered: boolean;
   setIsExerciseReady: (ready: boolean) => void;
@@ -13,6 +19,7 @@ interface ConjugationSpeedExerciseProps {
 
 export function ConjugationSpeedExercise({
   data,
+  language,
   onAnswer,
   answered,
   setIsExerciseReady,
@@ -20,15 +27,30 @@ export function ConjugationSpeedExercise({
 }: ConjugationSpeedExerciseProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
-  // Shuffle options once
+  const lang = language ?? inferLanguageFromPronoun(data.pronoun);
+  const correctVerbForm = useMemo(
+    () => stripPronounPrefix(data.correctForm, lang, data.pronoun),
+    [data.correctForm, data.pronoun, lang],
+  );
+  const tenseLabel = TENSE_LABELS[data.tense] ?? data.tense;
+
+  // Deduplicate verb-only options, then shuffle once
   const shuffledOptions = useMemo(() => {
-    const opts = data.options.map((opt, i) => ({ text: opt, originalIndex: i }));
+    const seen = new Set<string>();
+    const uniqueOptions = data.options
+      .map((opt) => stripPronounPrefix(opt, lang, data.pronoun))
+      .filter((opt) => {
+        if (!opt || seen.has(opt)) return false;
+        seen.add(opt);
+        return true;
+      });
+    const opts = uniqueOptions.map((text) => ({ text }));
     for (let i = opts.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [opts[i], opts[j]] = [opts[j], opts[i]];
     }
     return opts;
-  }, [data.options]);
+  }, [data.options, data.pronoun, lang]);
 
   useEffect(() => {
     if (!answered) {
@@ -40,7 +62,7 @@ export function ConjugationSpeedExercise({
 
   useEffect(() => {
     if (submitTrigger > 0 && !answered && selectedIndex !== null) {
-      onAnswer(shuffledOptions[selectedIndex].text === data.correctForm);
+      onAnswer(shuffledOptions[selectedIndex].text === correctVerbForm);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [submitTrigger]);
@@ -48,7 +70,7 @@ export function ConjugationSpeedExercise({
   function handleSelect(index: number) {
     if (answered || selectedIndex !== null) return;
     setSelectedIndex(index);
-    onAnswer(shuffledOptions[index].text === data.correctForm);
+    onAnswer(shuffledOptions[index].text === correctVerbForm);
   }
 
   return (
@@ -92,7 +114,7 @@ export function ConjugationSpeedExercise({
         }}
       >
         <p className="text-[10px] font-black uppercase tracking-[0.25em] mb-3 opacity-60" style={{ color: 'var(--color-text-muted)' }}>
-          {data.tense}
+          {tenseLabel}
         </p>
         <div className="flex items-baseline justify-center gap-3">
           <span
@@ -117,7 +139,7 @@ export function ConjugationSpeedExercise({
       <div className="grid grid-cols-2 gap-3">
         {shuffledOptions.map((opt, i) => {
           const isSelected = selectedIndex === i;
-          const isCorrectOpt = opt.text === data.correctForm;
+          const isCorrectOpt = opt.text === correctVerbForm;
 
           let bgColor = 'var(--color-surface)';
           let borderColor = 'var(--color-border)';

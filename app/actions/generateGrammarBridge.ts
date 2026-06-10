@@ -1,7 +1,25 @@
 'use server';
 
 import { callGeminiJSON } from '@/services/gemini';
+import { normalizeGrammarBridgeResult } from '@/lib/schemas/grammarBridge';
 import type { SupportedLanguage, GrammarBridgeResult, LessonTag } from '@/types';
+
+function buildTagBridgeGuidance(tag: LessonTag | undefined): string {
+  switch (tag) {
+    case 'GRAM':
+      return 'PRIORIDADE: bridge + patterns (2-3) + brazilianTrap. structureFormulas se houver 2 construções alternativas.';
+    case 'VERB':
+      return 'PRIORIDADE: verbSpotlight completo + patterns (1-2 exemplos de uso do verbo) + brazilianTrap. NÃO omita patterns.';
+    case 'EXPR':
+    case 'VOC':
+      return 'PRIORIDADE: items (lista de expressões) + dialogueExample + additionalExamples. bridge/patterns podem ser null.';
+    case 'DIAL':
+    case 'CULT':
+      return 'PRIORIDADE: usageContext + culturalNote + additionalExamples + dialogueExample.';
+    default:
+      return 'Use bridge + patterns para regras sistêmicas, ou items para listas de expressões.';
+  }
+}
 
 const LANG_LABEL: Record<SupportedLanguage, string> = {
   fr: 'French',
@@ -86,10 +104,15 @@ REGRAS EXTRA PARA LIÇÃO DE VERBO:
 - verbSpotlight.personality e frequencyNote: linguagem SIMPLES, frases curtas, como amigo explicando.`
       : '';
 
+    const tagGuidance = buildTagBridgeGuidance(tag);
+
     const prompt = `Explique o padrão gramatical "${grammarFocus}" para um brasileiro aprendendo ${LANG_LABEL[language]}.
 
 Contexto do diálogo:
 "${dialogue}"
+
+ORIENTAÇÃO POR TIPO DE LIÇÃO (tag: ${tag ?? 'GRAM'}):
+${tagGuidance}
 
 Você está falando com um falante nativo de português brasileiro. Use isso a seu favor: compare diretamente com o português, aponte os erros clássicos que brasileiros cometem e explique POR QUÊ a estrutura funciona diferente.
 
@@ -137,15 +160,29 @@ EXEMPLO BOM (escreva assim):
 Output ONLY este JSON (sem markdown):
 {
   "insight": "1-2 frases de impacto em PT-BR SIMPLES — a sacada central da regra. Pode começar com 'Em português...', 'No francês...', 'A gente...' ou similar. Linguagem de conversa, não de livro.",
-  "explanation": "CAMPO PRINCIPAL DE ENSINO. Escreva 3-6 frases (ou um array de strings se forem tópicos distintos) em PT-BR SIMPLES explicando a regra DE VERDADE. Inclua: (1) como funciona na prática com exemplo concreto lado a lado (PT → língua-alvo), (2) por que brasileiros erram, (3) quando usar e quando NÃO usar, (4) uma analogia ou comparação direta com o português se possível. Não economize: o aluno precisa ENTENDER, não apenas memorizar. Mas escreva de forma intuitiva, como um amigo explicando na mesa do bar. Proibido usar as palavras da lista acima.",
-  "survivalTip": "Dica de sobrevivência ultra rápida, prática e direta ao ponto que o aluno possa memorizar imediatamente na língua-alvo. Em PT-BR amigável. MAX 12 palavras.",
-  "culturalNote": "Um detalhe, curiosidade cultural ou hábito social real de uso na língua-alvo (ex: se nativos usam de um jeito especial no dia a dia, nível de formalidade, etc.). Em PT-BR amigável. MAX 15 palavras.",
-  "structureFormula": "fórmula visual usando colchetes para partes variáveis e texto comum para partes fixas/constantes. Use '+' como separador. ex: '[Sujeito] + [avoir (conjugado)] + mal + [à la / au / aux / à l\'] + [Parte do corpo]' ou '[Sujeito] + [verbo ser/estar] + [adjetivo]'",
+  "explanation": [
+    "Item 1 (MAX 15 palavras): como montar a frase na prática, com exemplo PT → língua-alvo.",
+    "Item 2 (MAX 15 palavras): por que brasileiros erram nesse ponto.",
+    "Item 3 (opcional, MAX 15 palavras): quando usar e quando NÃO usar."
+  ],
+  "survivalTip": "Dica de sobrevivência ultra rápida, prática e direta ao ponto que o aluno possa memorizar imediatamente. Em PT-BR amigável. MAX 12 palavras.",
+  "culturalNote": "Um detalhe, curiosidade cultural ou hábito social real de uso na língua-alvo. Em PT-BR amigável. MAX 15 palavras.",
+  "structureFormula": "fórmula única quando há só UMA construção. Use colchetes e '+' como separador. Deixe null se usar structureFormulas.",
+  "structureFormulas": [
+    { "label": "Opção A (ex: necessidade geral)", "formula": "[il faut] + [verbo no infinitivo]" },
+    { "label": "Opção B (ex: obrigação pessoal)", "formula": "[Sujeito] + [devoir conjugado] + [verbo no infinitivo]" }
+  ],
   "usageContext": "Descreva em 1-3 palavras a 'vibe' social (ex: 'Casual/Amigos', 'Polidez/Formal', 'Dia-a-dia').",
   "brazilianTrap": {
-    "wrong": "frase errada que um brasileiro diria/pensaria ao traduzir direto (ex: 'ma tête fait mal' ou 'je suis 20 ans')",
-    "right": "frase correta na língua-alvo (ex: 'j\'ai mal à la tête' ou 'j\'ai 20 ans')",
-    "explanation": "explicação muito curta e direta de por que isso é um erro e como o brasileiro deve pensar para evitar. MAX 2 frases."
+    "wrong": "frase errada que um brasileiro diria/pensaria ao traduzir direto",
+    "right": "frase correta na língua-alvo",
+    "subtitle": "Subtítulo curto do erro (ex: 'Evite a tradução direta do português' ou 'Cuidado com a ordem das palavras')",
+    "explanation": "explicação muito curta e direta de por que isso é um erro. MAX 2 frases curtas."
+  },
+  "retentionCheck": {
+    "question": "Pergunta de 2 opções em PT-BR testando a sacada central (ex: 'Qual expressa obrigação pessoal?')",
+    "options": ["opção errada plausível", "opção correta"],
+    "correctIndex": 1
   },
   "patterns": [
     { "label": "Eu falo", "target": "I speak", "portuguese": "Eu falo" },
@@ -177,7 +214,9 @@ Regras Cruciais:
 2. Se o tema for uma LISTA de expressões, preencha o campo 'items'. Deixe 'bridge' e 'patterns' como null.
 3. brazilianTrap: FOQUE no erro clássico. Mostre o que o brasileiro tentaria dizer e a versão correta no objeto estruturado.
 4. Destaque Visual: Use ^^ envolta das palavras-chave em bridge.target and bridge.portuguese para criar o mapeamento visual.
-5. explanation: Este é o CORAÇÃO da lição. O aluno vai ler isso com calma. Explique de verdade, com comparações e exemplos paralelos. Tom de amigo, não de livro.
+5. explanation: SEMPRE um array de 2-4 strings curtas (MAX 15 palavras cada). Nunca um parágrafo único. Não repita insight nem bridge.difference.
+5b. structureFormulas: use quando a regra tiver 2+ construções alternativas (ex: il faut vs devoir). Cada item com label descritivo. Deixe structureFormula null nesse caso.
+5c. retentionCheck: pergunta opcional de 2 opções reforçando a sacada. correctIndex deve apontar para a opção certa.
 6. dialogueExample.target: DEVE ser uma linha real do diálogo acima.
 7. additionalExamples: 2-3 exemplos extras mostrando o padrão em diferentes contextos do dia a dia.
 8. Todo texto em PT-BR exceto as frases na língua-alvo.
@@ -190,7 +229,8 @@ Regras Cruciais:
     - 'brazilianTrap.explanation': Foco estritamente no motivo por trás do erro clássico do brasileiro.
 12. ESTRUTURA E COMPLETUDE EM FRANCÊS: Se o foco for francês e envolver preposições + artigos (ex: contrações para dor, direção, lugares, etc.), você DEVE incluir nos padrões ('patterns') ou exemplos adicionais a contração antes de vogal/H mudo ('à l\''), além de cobrir o masculino ('au'), feminino ('à la') e plural ('aux').`;
 
-    return await callGeminiJSON<GrammarBridgeResult>(prompt, systemPrompt, 3500);
+    const raw = await callGeminiJSON<GrammarBridgeResult>(prompt, systemPrompt, 3500);
+    return normalizeGrammarBridgeResult(raw);
   } catch (err) {
     console.error('[generateGrammarBridge] Error:', err);
     return null;

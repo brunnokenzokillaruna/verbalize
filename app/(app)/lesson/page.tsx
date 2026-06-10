@@ -51,7 +51,9 @@ import { useLessonBootstrap } from './hooks/useLessonBootstrap';
 import { useSoundEffects } from '@/hooks/useSoundEffects';
 import { buildMistakeContext, phaseToStage } from './utils';
 
-import type { LessonStage, GrammarBridgeResult, Exercise } from '@/types';
+import type { LessonStage, GrammarBridgeResult, Exercise, LessonTag } from '@/types';
+
+const TAGS_WITH_GRAMMAR_PHASE: ReadonlySet<LessonTag> = new Set(['GRAM', 'VERB', 'CULT', 'VOC', 'DIAL', 'EXPR']);
 import type { WordClickPayload } from '@/components/lesson/ClickableWord';
 
 
@@ -402,15 +404,6 @@ export default function LessonPage() {
             vocabTranslations={store.vocabTranslations}
             language={store.lesson.language}
             level={store.lesson.level}
-            vocabExamples={
-              store.hook.vocabTranslations
-                ? Object.fromEntries(
-                    Object.entries(store.hook.vocabTranslations)
-                      .filter(([, v]) => v?.example)
-                      .map(([k, v]) => [k, v.example])
-                  )
-                : undefined
-            }
             targetDefinitions={undefined}
           />
         )}
@@ -434,6 +427,10 @@ export default function LessonPage() {
           <LessonGrammarScreen
             bridge={store.grammarBridge}
             language={store.lesson.language}
+            grammarFocus={store.lesson.grammarFocus}
+            newVocabulary={store.hook?.newVocabulary ? [...store.hook.newVocabulary] : []}
+            newVerbs={[...store.discoveredVerbs]}
+            onWordClick={handleWordClick}
           />
         )}
 
@@ -558,7 +555,11 @@ export default function LessonPage() {
               {phase === 'vocabulary'
                 ? (store.lesson?.tag === 'MISS' ? 'Role-play' : 'Diálogo')
                 : phase === 'hook'
-                  ? (store.lesson?.tag === 'GRAM' ? 'Gramática' : store.lesson?.tag === 'PRON' ? 'Fonética' : 'Prática')
+                  ? (store.lesson?.tag && TAGS_WITH_GRAMMAR_PHASE.has(store.lesson.tag)
+                      ? 'Gramática'
+                      : store.lesson?.tag === 'PRON'
+                        ? 'Fonética'
+                        : 'Prática')
                   : phase === 'mission'
                     ? 'Vocabulário'
                     : 'Prática'}

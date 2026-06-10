@@ -183,6 +183,7 @@ export function LessonPracticeScreen({
       {currentExercise.type === 'conjugation-speed' && (
         <ConjugationSpeedExercise
           data={currentExercise.data}
+          language={language}
           onAnswer={onAnswer}
           answered={exerciseAnswer !== null}
           setIsExerciseReady={setIsExerciseReady}

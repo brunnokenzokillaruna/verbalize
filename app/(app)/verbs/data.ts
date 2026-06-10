@@ -1,13 +1,7 @@
 import type { SupportedLanguage } from '@/types';
+import { TENSE_LABELS } from '@/utils/conjugationHelper';
 
-export const TENSE_LABELS: Record<string, string> = {
-  present:     'Presente',
-  past:        'Passado',
-  future:      'Futuro',
-  conditional: 'Condicional',
-  imperfect:   'Imperfeito',
-  subjunctive: 'Subjuntivo',
-};
+export { TENSE_LABELS };
 
 export const TENSE_ORDER = ['present', 'past', 'imperfect', 'future', 'conditional', 'subjunctive'];
 

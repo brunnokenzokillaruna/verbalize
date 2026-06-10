@@ -286,13 +286,17 @@ export default function DashboardPage() {
           console.log(`[Dashboard Pregen] 🔮 Active lesson ${lessonId} is a cache MISS. Pregenerating in background...`);
           const userVocabulary = await getUserVocabulary(user.uid, language);
           const knownVocabulary = userVocabulary.map((v) => v.word.toLowerCase());
-          await pregenerateNextLesson(
+          const ok = await pregenerateNextLesson(
             user.uid,
             activeLessonObj,
             profile.interests ?? [],
             knownVocabulary
           );
-          console.log(`[Dashboard Pregen] ✅ Active lesson ${lessonId} pregeneration complete.`);
+          if (ok) {
+            console.log(`[Dashboard Pregen] ✅ Active lesson ${lessonId} pregeneration complete.`);
+          } else {
+            console.warn(`[Dashboard Pregen] ⚠️ Active lesson ${lessonId} pregeneration failed.`);
+          }
         } else if (cached.status === 'generating') {
           console.log(`[Dashboard Pregen] ⏳ Active lesson ${lessonId} is already generating in background (HIT).`);
         } else {

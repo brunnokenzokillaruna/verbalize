@@ -1,7 +1,10 @@
 'use server';
 
 import { callGeminiJSON } from '@/services/gemini';
-import type { Exercise, SupportedLanguage, ProficiencyLevel, LessonTag } from '@/types';
+import { getVerbConjugation } from '@/app/actions/getVerbConjugation';
+import { extractVerbOnlyForm, stripPronounPrefix } from '@/utils/conjugationHelper';
+import { sanitizeConjugationOptions } from '@/utils/verbDrillGenerator';
+import type { ConjugationSpeedData, Exercise, GrammarBridgeResult, SupportedLanguage, ProficiencyLevel, LessonTag } from '@/types';
 
 const LANG_LABEL: Record<SupportedLanguage, string> = {
   fr: 'French',
@@ -133,7 +136,7 @@ function buildTypeDescriptions(langLabel: string): Record<ExerciseTypeId, string
    - "pronoun" (subject pronoun, e.g. "je", "il", "nous", "vous").
    - "tense" (PT-BR tense name, e.g. "presente", "passe compose").
    - "correctForm" (correctly conjugated form).
-   - "options" (array of EXACTLY 4 strings: 1 correct + 3 highly plausible but wrong conjugations of the SAME verb, tense, or similar verbs to make it challenging).
+   - "options" (array of EXACTLY 4 UNIQUE strings: 1 correct + 3 highly plausible but wrong conjugations of the SAME verb. No duplicates allowed.).
    - "exampleSentence" (target language): a complete sentence using the correct form.
    - "translation" (PT-BR): translation of the example sentence.`,
   };
@@ -195,6 +198,30 @@ function buildTagGuidance(tag: LessonTag, allowed: Set<ExerciseTypeId>): string 
   return '';
 }
 
+async function fixConjugationSpeedExercise(
+  data: ConjugationSpeedData,
+  language: SupportedLanguage,
+): Promise<ConjugationSpeedData | null> {
+  const correctForm = stripPronounPrefix(data.correctForm, language, data.pronoun);
+  const options = data.options.map((opt) => stripPronounPrefix(opt, language, data.pronoun));
+
+  let sanitized = sanitizeConjugationOptions(correctForm, options);
+  if (sanitized) {
+    return { ...data, correctForm, options: sanitized };
+  }
+
+  const verbDoc = await getVerbConjugation(data.verb, language);
+  const extraPool = verbDoc?.conjugations
+    ? Object.values(verbDoc.conjugations).flatMap((c) =>
+        Object.entries(c || {}).map(([p, f]) => extractVerbOnlyForm(p, f, language)),
+      )
+    : [];
+
+  sanitized = sanitizeConjugationOptions(correctForm, options, extraPool);
+  if (!sanitized) return null;
+  return { ...data, correctForm, options: sanitized };
+}
+
 interface GeneratePracticeParams {
   dialogue: string;
   newVocabulary: string[];
@@ -205,6 +232,28 @@ interface GeneratePracticeParams {
   level: ProficiencyLevel;
   knownVocabulary: string[];
   previousTopics: string[];
+  grammarBridge?: GrammarBridgeResult | null;
+}
+
+function buildGrammarBridgeExerciseBlock(bridge: GrammarBridgeResult | null | undefined): string {
+  if (!bridge) return '';
+
+  const trap =
+    typeof bridge.brazilianTrap === 'object' && bridge.brazilianTrap
+      ? bridge.brazilianTrap
+      : null;
+
+  const lines = [
+    '\n--- GRAMMAR BRIDGE CONTEXT (from the lesson the student just studied) ---',
+    bridge.insight ? `Central insight: ${bridge.insight}` : '',
+    bridge.survivalTip ? `Survival tip: ${bridge.survivalTip}` : '',
+    trap
+      ? `Brazilian trap — WRONG: "${trap.wrong}" | CORRECT: "${trap.right}" | Why: ${trap.explanation}`
+      : '',
+    'For grammar-trap (exercise #1 when tag is GRAM): the incorrect options MUST echo the brazilianTrap wrong pattern above. The correct option MUST match the trap.right pattern or equivalent correct usage.',
+  ].filter(Boolean);
+
+  return lines.join('\n');
 }
 
 /**
@@ -218,7 +267,7 @@ interface GeneratePracticeParams {
 export async function generatePracticeExercises(
   params: GeneratePracticeParams,
 ): Promise<Exercise[] | null> {
-  const { dialogue, newVocabulary, grammarFocus, tag, language, level, knownVocabulary, previousTopics } = params;
+  const { dialogue, newVocabulary, grammarFocus, tag, language, level, knownVocabulary, previousTopics, grammarBridge } = params;
   const levelDesc = LEVEL_EXERCISE_DESCRIPTORS[level];
   const isEarlyLearner = knownVocabulary.length < 30;
 
@@ -251,6 +300,8 @@ export async function generatePracticeExercises(
     ? `\nPREVIOUS LESSON TOPICS (for context and coherence — you may reference these themes): ${previousTopics.join(' | ')}`
     : '';
 
+  const grammarBridgeBlock = buildGrammarBridgeExerciseBlock(grammarBridge);
+
   const grammarAccuracyBlock = `
 --- CRITICAL LINGUISTIC ACCURACY & GENDER AGREEMENT RULES ---
 - STRICT GENDER & NUMBER AGREEMENT: You MUST double-check the grammatical gender and number of all nouns in the target language (${LANG_LABEL[language]}).
@@ -275,6 +326,7 @@ THEME/CONTEXT (from dialogue):
 
 Key vocabulary words from this lesson: ${newVocabulary.join(', ')}
 ${previousTopicsBlock}
+${grammarBridgeBlock}
 
 TAG-SPECIFIC EXERCISE BALANCE (follow this strictly):
 ${tagGuidance}
@@ -442,11 +494,7 @@ Example for social-roleplay:
         return true;
       }
       if (ex.type === 'conjugation-speed') {
-        const d = ex.data as {
-          verb: string; pronoun: string; tense: string;
-          correctForm: string; options: string[];
-          exampleSentence: string; translation: string;
-        };
+        const d = ex.data as ConjugationSpeedData;
         if (
           !d.verb || !d.pronoun || !d.tense || !d.correctForm ||
           !d.exampleSentence || !d.translation ||
@@ -461,16 +509,30 @@ Example for social-roleplay:
       return true;
     });
 
+    const dedupedValidated: Exercise[] = [];
+    for (const ex of validated) {
+      if (ex.type === 'conjugation-speed') {
+        const fixed = await fixConjugationSpeedExercise(ex.data, language);
+        if (!fixed) {
+          console.warn('[generatePracticeExercises] Dropped conjugation-speed exercise with duplicate options');
+          continue;
+        }
+        dedupedValidated.push({ ...ex, data: fixed });
+        continue;
+      }
+      dedupedValidated.push(ex);
+    }
+
     // For tag-exclusive exercises, ensure they are at index 0
     if (tagExclusive) {
-      const exclusiveIdx = validated.findIndex((ex) => ex.type === tagExclusive);
+      const exclusiveIdx = dedupedValidated.findIndex((ex) => ex.type === tagExclusive);
       if (exclusiveIdx > 0) {
-        const [exclusive] = validated.splice(exclusiveIdx, 1);
-        validated.unshift(exclusive);
+        const [exclusive] = dedupedValidated.splice(exclusiveIdx, 1);
+        dedupedValidated.unshift(exclusive);
       }
     }
 
-    return validated;
+    return dedupedValidated;
   } catch (err) {
     console.error('[generatePracticeExercises] Error:', err);
     return null;

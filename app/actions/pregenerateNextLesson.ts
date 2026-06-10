@@ -4,7 +4,7 @@ import { generateHook } from './generateHook';
 import { generateGrammarBridge } from './generateGrammarBridge';
 import { generateMissionBriefing } from './generateMissionBriefing';
 import { generatePracticeExercises } from './generatePracticeExercises';
-import { savePregeneratedLesson, startPregeneratingLesson, getUserVocabulary } from '@/services/firestore';
+import { savePregeneratedLesson, startPregeneratingLesson, deletePregeneratedLesson } from '@/services/firestore';
 import { getPreviousTopics } from '@/lib/curriculum';
 import type { LessonDefinition, LessonTag, GrammarBridgeResult, Exercise, MissionBriefingResult } from '@/types';
 
@@ -23,7 +23,7 @@ export async function pregenerateNextLesson(
   lesson: LessonDefinition,
   interests: string[],
   knownVocabulary: string[]
-): Promise<void> {
+): Promise<boolean> {
   try {
     await startPregeneratingLesson(uid, lesson.id);
 
@@ -37,7 +37,11 @@ export async function pregenerateNextLesson(
       grammarFocus: lesson.grammarFocus,
       knownVocabulary,
     });
-    if (!hook) return;
+    if (!hook) {
+      await deletePregeneratedLesson(uid, lesson.id).catch(() => {});
+      console.error('[pregenerateNextLesson] Hook generation failed — cache cleared.');
+      return false;
+    }
 
     const needsGrammarBridge = TAGS_WITH_GRAMMAR_PHASE.has(lesson.tag);
 
@@ -82,6 +86,7 @@ export async function pregenerateNextLesson(
       level: lesson.level,
       knownVocabulary,
       previousTopics: getPreviousTopics(lesson.language, lesson.id),
+      grammarBridge,
     }).catch((err) => {
       console.error('[pregenerateNextLesson] exercises error:', err);
       return null;
@@ -93,8 +98,11 @@ export async function pregenerateNextLesson(
       ...(missionBriefing ? { missionBriefing } : {}),
       ...(exercises && exercises.length > 0 ? { exercises } : {}),
     });
+    return true;
   } catch (err) {
     // Non-critical — lesson will just generate normally on next open
     console.error('[pregenerateNextLesson] Error:', err);
+    await deletePregeneratedLesson(uid, lesson.id).catch(() => {});
+    return false;
   }
 }

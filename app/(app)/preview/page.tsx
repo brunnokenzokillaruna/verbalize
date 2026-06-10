@@ -182,19 +182,50 @@ export default function PreviewPage() {
         <Section title="GrammarBridgeCard">
           <GrammarBridgeCard
             bridge={{
-              insight: 'Em francês, usamos "Je voudrais" (condicional de vouloir) para fazer pedidos educados.',
+              insight: 'Il faut é regra geral; devoir é obrigação sua, pessoal.',
+              usageContext: 'Dia-a-dia',
+              explanation: [
+                'Monte com il faut + verbo no infinitivo para regras gerais.',
+                'Brasileiros tentam usar devoir para tudo, como "tem que" no PT.',
+                'Use devoir quando a obrigação é de alguém específico.',
+              ],
               bridge: {
-                portuguese: 'Eu gostaria de um café.',
-                target: 'Je voudrais un café.',
-                difference: 'Mesma estrutura condicional, mesma função de polidez.',
+                portuguese: 'A gente ^^tem que^^ fazer tudo, eles separam o geral do pessoal.',
+                target: 'Ils ^^séparent^^ le général du personnel.',
+                difference: 'Il faut é fixo e impessoal, devoir muda conforme a pessoa.',
               },
+              structureFormulas: [
+                { label: 'Opção A (necessidade geral)', formula: '[il faut] + [verbo no infinitivo]' },
+                { label: 'Opção B (obrigação pessoal)', formula: '[Sujeito] + [devoir conjugado] + [verbo no infinitivo]' },
+              ],
+              patterns: [
+                { label: 'Necessidade geral', target: 'Il faut ranger.', portuguese: 'É preciso organizar.' },
+                { label: 'Obrigação pessoal', target: 'Je dois ranger.', portuguese: 'Eu tenho que organizar.' },
+              ],
+              brazilianTrap: {
+                wrong: 'Il dois organiser cette chambre.',
+                right: 'Il faut organiser cette chambre.',
+                subtitle: 'Evite a tradução direta do português',
+                explanation: 'Il faut não muda de pessoa; devoir sim.',
+              },
+              survivalTip: 'Regra geral? Il faut. Sua obrigação? Je dois.',
               dialogueExample: {
-                target: "Je voudrais un café, s'il vous plaît.",
-                portuguese: 'Eu gostaria de um café, por favor.',
+                target: "Il faut organiser cette chambre, c'est le bazar ici.",
+                portuguese: 'É preciso organizar este quarto, está uma bagunça aqui.',
               },
-              additionalExamples: [],
+              additionalExamples: [
+                { target: 'Il faut étudier pour réussir.', portuguese: 'É preciso estudar para vencer.' },
+                { target: 'Je dois étudier ce soir.', portuguese: 'Eu tenho que estudar hoje à noite.' },
+              ],
+              retentionCheck: {
+                question: 'Qual expressa obrigação pessoal?',
+                options: ['Il faut partir.', 'Je dois partir.'],
+                correctIndex: 1,
+              },
             }}
             language="fr"
+            newVocabulary={NEW_VOCAB}
+            onWordClick={handleWordClick}
           />
         </Section>
 

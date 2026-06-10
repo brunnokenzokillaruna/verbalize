@@ -346,6 +346,7 @@ export function VerbDrillSession({ verbs, onClose }: VerbDrillSessionProps) {
         {currentDrill ? (
           <ConjugationSpeedExercise
             data={currentDrill}
+            language={verbs[0]?.language}
             onAnswer={handleAnswer}
             answered={answered}
             setIsExerciseReady={() => {}}

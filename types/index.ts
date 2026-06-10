@@ -186,6 +186,7 @@ export interface GrammarBridgeResult {
   survivalTip?: string;       // Dica de sobrevivência ultra curta, ≤12 palavras
   culturalNote?: string;      // Detalhe ou curiosidade cultural de uso, ≤15 palavras
   structureFormula?: string;   // OPCIONAL: representação em cápsulas. ex: "[Sujeito] + [avoir (conjugado)] + mal + [à la / au / aux / à l']"
+  structureFormulas?: Array<{ label: string; formula: string }>; // Alternativas quando a regra tem 2+ construções
   bridge?: {
     portuguese: string;       // Padrão/frase como se diz em PT-BR
     target: string;           // Equivalente na língua-alvo
@@ -201,7 +202,13 @@ export interface GrammarBridgeResult {
     wrong: string;
     right: string;
     explanation: string;
+    subtitle?: string;        // Subtítulo dinâmico do Radar de Erro (ex.: "Evite a tradução direta")
   } | string;                 // O "Radar do Erro": foca em interferências do PT-BR (suporta objeto ou string para retrocompatibilidade)
+  retentionCheck?: {
+    question: string;
+    options: string[];
+    correctIndex: number;
+  };
   usageContext?: string;      // O "Cenário de Uso": explica a vibe social (formal, casual, etc)
   patterns?: Array<{          // "Pattern Strips": mostra a regra em 2-3 variações rápidas
     label: string;            // ex: "Plural", "Negativa", "Pessoa"

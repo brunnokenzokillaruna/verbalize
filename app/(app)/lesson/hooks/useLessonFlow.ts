@@ -58,6 +58,7 @@ export function useLessonFlow({
       level: store.lesson.level,
       knownVocabulary: store.knownVocabulary,
       previousTopics: getPreviousTopics(store.lesson.language, store.lesson.id),
+      grammarBridge: store.grammarBridge,
     });
   }, [store]);
 

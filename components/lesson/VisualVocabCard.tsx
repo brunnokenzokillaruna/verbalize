@@ -91,17 +91,14 @@ export function VisualVocabCard({
         </div>
       </div>
 
-      {/* Subtle Control Bar */}
-      <div className="relative px-4 py-3 bg-[var(--color-surface)] border-t border-[var(--color-border)]/50">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex-1 min-w-0">
-            {exampleSentence && (
-              <p className="text-[11px] font-medium leading-relaxed text-[var(--color-text-secondary)] opacity-75 italic line-clamp-2 group-hover:opacity-100 transition-opacity">
-                &quot;{exampleSentence}&quot;
-              </p>
-            )}
-          </div>
-
+      {/* Audio control */}
+      <div className="relative px-4 py-2.5 bg-[var(--color-surface)] border-t border-[var(--color-border)]/50">
+        <div className={`flex items-center gap-3 ${exampleSentence ? 'justify-between' : 'justify-end'}`}>
+          {exampleSentence && (
+            <p className="flex-1 min-w-0 text-[11px] font-medium leading-relaxed text-[var(--color-text-secondary)] opacity-75 italic line-clamp-2 group-hover:opacity-100 transition-opacity">
+              &quot;{exampleSentence}&quot;
+            </p>
+          )}
           <div className="shrink-0 transition-transform duration-200 hover:scale-105 active:scale-95">
             <AudioPlayerButton text={word} language={language} size="sm" />
           </div>

@@ -1,6 +1,7 @@
 'use server';
 
 import { callGeminiJSON } from '@/services/gemini';
+import { REVIEW_SESSION_SIZE } from '@/utils/reviewSession';
 import type { Exercise, SupportedLanguage, ProficiencyLevel } from '@/types';
 
 const LANG_LABEL: Record<SupportedLanguage, string> = {
@@ -32,7 +33,7 @@ export async function generateVocabReview(
   const { words, language, level, knownVocabulary } = params;
   const langLabel = LANG_LABEL[language];
 
-  const reviewWords = words.slice(0, 8);
+  const reviewWords = words.slice(0, REVIEW_SESSION_SIZE);
 
   const isEarlyLearner = !knownVocabulary || knownVocabulary.length < 30;
   const vocabConstraint = isEarlyLearner

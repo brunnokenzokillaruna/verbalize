@@ -1,13 +1,25 @@
 import React from 'react';
 import { GrammarBridgeCard } from './GrammarBridgeCard';
 import type { GrammarBridgeResult, SupportedLanguage } from '@/types';
+import type { WordClickPayload } from './ClickableWord';
 
 interface LessonGrammarScreenProps {
   bridge: GrammarBridgeResult;
   language: SupportedLanguage;
+  grammarFocus?: string;
+  newVocabulary?: string[];
+  newVerbs?: string[];
+  onWordClick?: (payload: WordClickPayload) => void;
 }
 
-export function LessonGrammarScreen({ bridge, language }: LessonGrammarScreenProps) {
+export function LessonGrammarScreen({
+  bridge,
+  language,
+  grammarFocus,
+  newVocabulary,
+  newVerbs,
+  onWordClick,
+}: LessonGrammarScreenProps) {
   return (
     <div className="flex flex-col gap-6 animate-slide-up-spring">
       <div className="flex flex-col gap-1.5 animate-slide-up">
@@ -20,12 +32,18 @@ export function LessonGrammarScreen({ bridge, language }: LessonGrammarScreenPro
               Ponte Gramatical
             </h2>
             <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-[0.2em] mt-0.5">
-              Entenda a lógica por trás
+              {grammarFocus ? grammarFocus : 'Entenda a lógica por trás'}
             </p>
           </div>
         </div>
       </div>
-      <GrammarBridgeCard bridge={bridge} language={language} />
+      <GrammarBridgeCard
+        bridge={bridge}
+        language={language}
+        newVocabulary={newVocabulary}
+        newVerbs={newVerbs}
+        onWordClick={onWordClick}
+      />
     </div>
   );
 }

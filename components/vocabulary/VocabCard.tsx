@@ -3,8 +3,10 @@ import Image from 'next/image';
 import { AudioPlayerButton } from '@/components/lesson/AudioPlayerButton';
 import { Book } from 'lucide-react';
 import { SrsBar, SRS_BAR_COLOR, SRS_LABELS, formatNextReview } from './SrsBar';
+import { VocabEnrichButton } from './VocabEnrichButton';
 import type { UserVocabularyDocument, SupportedLanguage } from '@/types';
 import { getCachedImage } from '@/services/firestore';
+import { isMissingImage, isMissingTranslation } from '@/utils/vocabHelpers';
 
 export function VocabCard({
   item,
@@ -12,19 +14,25 @@ export function VocabCard({
   urgent = false,
   animDelay = 0,
   onImageLoaded,
+  onEnrich,
+  enriching = false,
 }: {
   item: UserVocabularyDocument;
   language: SupportedLanguage;
   urgent?: boolean;
   animDelay?: number;
   onImageLoaded?: (word: string, imageUrl: string) => void;
+  onEnrich?: (word: string) => void;
+  enriching?: boolean;
 }) {
   const level = Math.min(Math.max(item.srsLevel ?? 0, 0), 5);
-  const isPlaceholder = item.translation === item.word || !item.translation;
+  const [imageUrl, setImageUrl] = React.useState(item.imageUrl);
+
+  const missingTranslation = isMissingTranslation(item);
+  const missingImage = !imageUrl && isMissingImage(item);
+  const showEnrich = missingTranslation || missingImage;
   const reviewText = formatNextReview(item.nextReview as Parameters<typeof formatNextReview>[0]);
   const barColor = SRS_BAR_COLOR[level];
-
-  const [imageUrl, setImageUrl] = React.useState(item.imageUrl);
 
   React.useEffect(() => {
     setImageUrl(item.imageUrl);
@@ -109,6 +117,16 @@ export function VocabCard({
             >
               {item.word}
             </p>
+            {showEnrich && onEnrich && (
+              <div className="relative z-10 mt-2">
+                <VocabEnrichButton
+                  onClick={() => onEnrich(item.word)}
+                  loading={enriching}
+                  missingTranslation={missingTranslation}
+                  missingImage={missingImage}
+                />
+              </div>
+            )}
           </div>
         )}
 
@@ -142,15 +160,26 @@ export function VocabCard({
 
       {/* Content */}
       <div className="flex flex-col gap-2 p-3">
-        <p
-          className="text-sm leading-tight"
-          style={{
-            color: isPlaceholder ? 'var(--color-text-muted)' : 'var(--color-text-secondary)',
-            fontStyle: isPlaceholder ? 'italic' : 'normal',
-          }}
-        >
-          {isPlaceholder ? 'traduzindo…' : item.translation}
-        </p>
+        <div className="flex items-start justify-between gap-2">
+          <p
+            className="text-sm leading-tight flex-1"
+            style={{
+              color: missingTranslation ? 'var(--color-text-muted)' : 'var(--color-text-secondary)',
+              fontStyle: missingTranslation ? 'italic' : 'normal',
+            }}
+          >
+            {missingTranslation ? '—' : item.translation}
+          </p>
+          {showEnrich && imageUrl && onEnrich && (
+            <VocabEnrichButton
+              onClick={() => onEnrich(item.word)}
+              loading={enriching}
+              missingTranslation={missingTranslation}
+              missingImage={missingImage}
+              variant="inline"
+            />
+          )}
+        </div>
         <SrsBar level={level} />
         <div className="flex items-center justify-between mt-0.5">
           {reviewText ? (
