@@ -107,7 +107,7 @@ export interface VerbDocument {
 export interface PregeneratedLessonDocument {
   uid: string;
   lessonId: string;
-  status?: 'generating' | 'ready';
+  status?: 'generating' | 'ready' | 'failed';
   hook?: HookResult;
   grammarBridge?: GrammarBridgeResult;
   exercises?: Exercise[];
@@ -203,6 +203,8 @@ export interface GrammarBridgeResult {
     right: string;
     explanation: string;
     subtitle?: string;        // Subtítulo dinâmico do Radar de Erro (ex.: "Evite a tradução direta")
+    wrongPortuguese?: string; // Tradução PT-BR da frase errada (wrong)
+    rightPortuguese?: string; // Tradução PT-BR da frase correta (right)
   } | string;                 // O "Radar do Erro": foca em interferências do PT-BR (suporta objeto ou string para retrocompatibilidade)
   retentionCheck?: {
     question: string;
@@ -264,6 +266,7 @@ export interface SentenceBuilderData {
   words: string[];        // shuffled word list
   correctOrder: string[]; // correct arrangement
   translation: string;    // Portuguese translation
+  explanation?: string;   // PT-BR: why this word order is correct (shown after a wrong answer)
 }
 
 export interface ReverseTranslationData {

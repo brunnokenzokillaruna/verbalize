@@ -53,6 +53,8 @@ export function useLessonFlow({
       newVocabulary: store.hook.newVocabulary,
       verbWord: store.hook.verbWord ?? '',
       grammarFocus: store.lesson.grammarFocus,
+      theme: store.lesson.theme,
+      uiTitle: store.lesson.uiTitle,
       tag: store.lesson.tag,
       language: store.lesson.language,
       level: store.lesson.level,

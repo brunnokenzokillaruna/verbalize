@@ -179,8 +179,9 @@ export default function PreviewPage() {
         </Section>
 
         {/* ── Grammar Bridge ── */}
-        <Section title="GrammarBridgeCard">
+        <Section title="GrammarBridgeFlow">
           <GrammarBridgeCard
+            previewMode
             bridge={{
               insight: 'Il faut é regra geral; devoir é obrigação sua, pessoal.',
               usageContext: 'Dia-a-dia',
@@ -199,12 +200,14 @@ export default function PreviewPage() {
                 { label: 'Opção B (obrigação pessoal)', formula: '[Sujeito] + [devoir conjugado] + [verbo no infinitivo]' },
               ],
               patterns: [
-                { label: 'Necessidade geral', target: 'Il faut ranger.', portuguese: 'É preciso organizar.' },
-                { label: 'Obrigação pessoal', target: 'Je dois ranger.', portuguese: 'Eu tenho que organizar.' },
+                { label: 'Afirmação', target: 'Il faut ranger.', portuguese: 'É preciso organizar.' },
+                { label: 'Negação', target: "Il ne faut pas ranger.", portuguese: 'Não é preciso organizar.' },
               ],
               brazilianTrap: {
                 wrong: 'Il dois organiser cette chambre.',
                 right: 'Il faut organiser cette chambre.',
+                wrongPortuguese: 'Ele deve organizar este quarto.',
+                rightPortuguese: 'É preciso organizar este quarto.',
                 subtitle: 'Evite a tradução direta do português',
                 explanation: 'Il faut não muda de pessoa; devoir sim.',
               },
@@ -215,7 +218,6 @@ export default function PreviewPage() {
               },
               additionalExamples: [
                 { target: 'Il faut étudier pour réussir.', portuguese: 'É preciso estudar para vencer.' },
-                { target: 'Je dois étudier ce soir.', portuguese: 'Eu tenho que estudar hoje à noite.' },
               ],
               retentionCheck: {
                 question: 'Qual expressa obrigação pessoal?',

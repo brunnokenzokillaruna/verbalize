@@ -1,24 +1,30 @@
 import React from 'react';
-import { GrammarBridgeCard } from './GrammarBridgeCard';
-import type { GrammarBridgeResult, SupportedLanguage } from '@/types';
+import { GrammarBridgeFlow } from './grammar-bridge/GrammarBridgeFlow';
+import type { GrammarBridgeResult, LessonTag, SupportedLanguage } from '@/types';
 import type { WordClickPayload } from './ClickableWord';
 
 interface LessonGrammarScreenProps {
   bridge: GrammarBridgeResult;
   language: SupportedLanguage;
+  tag?: LessonTag;
   grammarFocus?: string;
   newVocabulary?: string[];
   newVerbs?: string[];
   onWordClick?: (payload: WordClickPayload) => void;
+  onComplete?: (complete: boolean) => void;
+  onAdvanceToPractice?: () => void;
 }
 
 export function LessonGrammarScreen({
   bridge,
   language,
+  tag,
   grammarFocus,
   newVocabulary,
   newVerbs,
   onWordClick,
+  onComplete,
+  onAdvanceToPractice,
 }: LessonGrammarScreenProps) {
   return (
     <div className="flex flex-col gap-6 animate-slide-up-spring">
@@ -37,12 +43,15 @@ export function LessonGrammarScreen({
           </div>
         </div>
       </div>
-      <GrammarBridgeCard
+      <GrammarBridgeFlow
         bridge={bridge}
         language={language}
+        tag={tag}
         newVocabulary={newVocabulary}
         newVerbs={newVerbs}
         onWordClick={onWordClick}
+        onComplete={onComplete}
+        onAdvanceToPractice={onAdvanceToPractice}
       />
     </div>
   );

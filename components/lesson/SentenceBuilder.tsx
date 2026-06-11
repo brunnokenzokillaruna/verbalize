@@ -170,6 +170,11 @@ export function SentenceBuilder({
           <p className="text-base font-semibold text-[var(--color-text-primary)] pl-0.5">
             {correctAnswer}
           </p>
+          {data.explanation && (
+            <p className="mt-3 text-sm leading-relaxed text-[var(--color-text-muted)] pl-0.5 border-t border-[var(--color-border)]/40 pt-3">
+              {data.explanation}
+            </p>
+          )}
         </div>
       )}
 

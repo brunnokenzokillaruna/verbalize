@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import type { GrammarBridgeResult } from '@/types';
+import { stripUndefinedDeep } from '@/utils/stripUndefined';
 
 const wordLimit = (max: number) =>
   z.string().transform((s) => {
@@ -20,6 +21,8 @@ const brazilianTrapSchema = z.union([
     right: z.string(),
     explanation: wordLimit(30),
     subtitle: z.string().optional(),
+    wrongPortuguese: z.string().optional(),
+    rightPortuguese: z.string().optional(),
   }),
 ]);
 
@@ -51,6 +54,7 @@ export const grammarBridgeSchema = z
       .optional(),
     additionalExamples: z
       .array(z.object({ target: z.string(), portuguese: z.string() }))
+      .max(1)
       .optional(),
     items: z
       .array(
@@ -60,6 +64,7 @@ export const grammarBridgeSchema = z
           logic: z.string().optional(),
         }),
       )
+      .max(3)
       .optional(),
     brazilianTrap: brazilianTrapSchema.optional(),
     usageContext: z.string().optional(),
@@ -71,6 +76,7 @@ export const grammarBridgeSchema = z
           portuguese: z.string(),
         }),
       )
+      .max(2)
       .optional(),
     verbSpotlight: z
       .object({
@@ -80,6 +86,7 @@ export const grammarBridgeSchema = z
         frequencyNote: wordLimit(12).optional(),
         idiomaticExpressions: z
           .array(z.object({ target: z.string(), portuguese: z.string() }))
+          .max(2)
           .optional(),
         conjugationPreview: z
           .array(z.object({ pronoun: z.string(), form: z.string() }))
@@ -98,19 +105,26 @@ function toExplanationArray(
 ): string[] | null {
   if (!explanation) return null;
   if (Array.isArray(explanation)) {
-    return explanation.map((s) => s.trim()).filter(Boolean).slice(0, 4);
+    return explanation.map((s) => s.trim()).filter(Boolean).slice(0, 2);
   }
   const sentences = explanation
     .split(/(?<=[.!?])\s+/)
     .map((s) => s.trim())
     .filter(Boolean);
   if (sentences.length <= 1) return [explanation.trim()];
-  return sentences.slice(0, 4);
+  return sentences.slice(0, 2);
 }
 
 function normalizeTrap(
   trap: GrammarBridgeResult['brazilianTrap'],
-): { wrong: string; right: string; explanation: string; subtitle?: string } | null {
+): {
+  wrong: string;
+  right: string;
+  explanation: string;
+  subtitle?: string;
+  wrongPortuguese?: string;
+  rightPortuguese?: string;
+} | null {
   if (!trap) return null;
   if (typeof trap === 'string') {
     return { wrong: '', right: '', explanation: trap };
@@ -120,6 +134,8 @@ function normalizeTrap(
     right: trap.right ?? '',
     explanation: trap.explanation ?? '',
     subtitle: trap.subtitle,
+    wrongPortuguese: trap.wrongPortuguese,
+    rightPortuguese: trap.rightPortuguese,
   };
 }
 
@@ -142,14 +158,14 @@ export function normalizeGrammarBridgeResult(
     data.structureFormulas;
 
   if (!hasNewFormat && data.rule) {
-    return {
+    return stripUndefinedDeep({
       insight: data.rule,
       dialogueExample:
         data.targetExample && data.portugueseComparison
           ? { target: data.targetExample, portuguese: data.portugueseComparison }
           : undefined,
       additionalExamples: data.additionalExamples ?? [],
-    };
+    }) as GrammarBridgeResult;
   }
 
   const retentionCheck = data.retentionCheck;
@@ -160,7 +176,7 @@ export function normalizeGrammarBridgeResult(
       ? retentionCheck
       : undefined;
 
-  return {
+  return stripUndefinedDeep({
     insight: data.insight,
     explanation: toExplanationArray(data.explanation) ?? undefined,
     survivalTip: data.survivalTip,
@@ -169,12 +185,18 @@ export function normalizeGrammarBridgeResult(
     structureFormulas: data.structureFormulas,
     bridge: data.bridge,
     dialogueExample: data.dialogueExample,
-    additionalExamples: data.additionalExamples ?? [],
-    items: data.items,
+    additionalExamples: (data.additionalExamples ?? []).slice(0, 1),
+    items: data.items?.slice(0, 3)?.map((item) =>
+      stripUndefinedDeep({
+        target: item.target,
+        portuguese: item.portuguese,
+        logic: item.logic,
+      }),
+    ),
     brazilianTrap: normalizeTrap(data.brazilianTrap) ?? undefined,
     usageContext: data.usageContext,
-    patterns: data.patterns,
+    patterns: data.patterns?.slice(0, 2),
     verbSpotlight: data.verbSpotlight,
     retentionCheck: safeRetention,
-  };
+  }) as GrammarBridgeResult;
 }

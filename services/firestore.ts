@@ -18,6 +18,7 @@ import type { UserDocument, UserVocabularyDocument, ImageCacheDocument, VerbDocu
 import { calculateNextReview } from '@/lib/srs';
 import { getNextLessonId, getLessonsForLanguage } from '@/lib/curriculum';
 import { getEffectiveStreak } from '@/lib/stats';
+import { stripUndefinedDeep } from '@/utils/stripUndefined';
 
 // ─── Users ────────────────────────────────────────────────────────────────────
 
@@ -480,17 +481,31 @@ export async function savePregeneratedLesson(
   payload: Pick<PregeneratedLessonDocument, 'hook' | 'grammarBridge' | 'exercises' | 'missionBriefing'>,
 ): Promise<void> {
   const id = pregeneratedDocId(uid, lessonId);
-  const data: Record<string, unknown> = {
+  const data = stripUndefinedDeep({
     uid,
     lessonId,
-    status: 'ready',
+    status: 'ready' as const,
     hook: payload.hook,
     createdAt: serverTimestamp(),
-  };
-  if (payload.grammarBridge) data.grammarBridge = payload.grammarBridge;
-  if (payload.exercises) data.exercises = payload.exercises;
-  if (payload.missionBriefing) data.missionBriefing = payload.missionBriefing;
+    ...(payload.grammarBridge ? { grammarBridge: payload.grammarBridge } : {}),
+    ...(payload.exercises && payload.exercises.length > 0 ? { exercises: payload.exercises } : {}),
+    ...(payload.missionBriefing ? { missionBriefing: payload.missionBriefing } : {}),
+  });
   await setDoc(doc(db, 'lesson_pregen', id), data);
+}
+
+/**
+ * Marks a failed pre-generation attempt so clients treat it as a cache miss.
+ * Server actions cannot delete lesson_pregen docs (no Firebase Auth token).
+ */
+export async function abortPregeneratedLesson(uid: string, lessonId: string): Promise<void> {
+  const id = pregeneratedDocId(uid, lessonId);
+  await setDoc(doc(db, 'lesson_pregen', id), {
+    uid,
+    lessonId,
+    status: 'failed',
+    createdAt: serverTimestamp(),
+  });
 }
 
 /**

@@ -1,4 +1,6 @@
-import React from 'react';
+'use client';
+
+import React, { useEffect, useRef } from 'react';
 import { Loader2, Volume2, VolumeX, MessageSquare } from 'lucide-react';
 import { ClickableSentence } from './ClickableSentence';
 import type { WordClickPayload } from './ClickableWord';
@@ -26,6 +28,22 @@ export function LessonHookScreen({
   onAudioButton,
   onWordClick,
 }: LessonHookScreenProps) {
+  const lineRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  useEffect(() => {
+    if (playingLineIdx < 0) return;
+
+    const lineEl = lineRefs.current[playingLineIdx];
+    if (!lineEl) return;
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    lineEl.scrollIntoView({
+      behavior: prefersReducedMotion ? 'instant' : 'smooth',
+      block: 'center',
+      inline: 'nearest',
+    });
+  }, [playingLineIdx]);
+
   return (
     <div className="flex flex-col gap-10 animate-slide-up-spring">
       {/* Refined Header */}
@@ -72,8 +90,8 @@ export function LessonHookScreen({
         </button>
       </div>
 
-      {/* Dialogue area with alternating conversation flow */}
-      <div className="relative flex flex-col gap-8">
+      {/* Dialogue area — WhatsApp-style alternating bubbles */}
+      <div className="relative flex flex-col gap-3">
         {dialogue.split('\n').filter((l) => l.trim()).map((line, i) => {
           const match = line.match(/^([^:]+):\s*(.+)/);
           const speakerName = match?.[1]?.trim() ?? '';
@@ -87,75 +105,87 @@ export function LessonHookScreen({
           return (
             <div
               key={i}
-              className={`group flex transition-all duration-300 ${isSecondSpeaker ? 'flex-row-reverse' : 'flex-row'} gap-4 ${isActive ? 'scale-[1.01] opacity-100' : 'opacity-85'}`}
+              ref={(node) => {
+                lineRefs.current[i] = node;
+              }}
+              className={`group flex w-full scroll-mt-28 transition-all duration-300 ${
+                isSecondSpeaker ? 'justify-end' : 'justify-start'
+              } ${isActive ? 'opacity-100' : 'opacity-90'}`}
               style={{ animationDelay: `${i * 100}ms`, animationFillMode: 'both' }}
             >
-              {/* Refined Speaker Avatar */}
-              <div className="shrink-0 pt-1">
-                <div 
-                  className={`flex h-11 w-11 items-center justify-center rounded-xl text-xs font-black transition-all duration-300 border border-[var(--color-border)] border-b-[3px] active:translate-y-[2px] active:border-b-[1px] ${
-                    isActive 
-                      ? 'text-white scale-105 shadow-sm' 
-                      : 'bg-[var(--color-surface-raised)] text-[var(--color-text-muted)] group-hover:bg-[var(--color-surface)]'
-                  }`}
-                  style={{ 
-                    backgroundColor: isActive ? speakerColor : undefined,
-                    borderColor: isActive ? speakerColor : undefined,
-                    borderBottomColor: isActive ? 'rgba(0,0,0,0.3)' : undefined,
-                  }}
-                >
-                  {speakerInitials}
-                </div>
-              </div>
-
-              {/* Message Content Bubble */}
-              <div className={`flex flex-col gap-2 flex-1 min-w-0 ${isSecondSpeaker ? 'items-end' : 'items-start'}`}>
-                <div className={`flex items-center gap-2.5 ${isSecondSpeaker ? 'flex-row-reverse' : 'flex-row'}`}>
-                  <span 
-                    className="text-[10px] font-black uppercase tracking-widest transition-colors duration-300"
-                    style={{ color: isActive ? speakerColor : 'var(--color-text-muted)' }}
+              <div
+                className={`flex items-end gap-2 max-w-[82%] sm:max-w-[75%] ${
+                  isSecondSpeaker ? 'flex-row-reverse' : 'flex-row'
+                }`}
+              >
+                {/* Avatar pinned to the outer edge */}
+                <div className="shrink-0 pb-0.5">
+                  <div
+                    className={`flex h-8 w-8 items-center justify-center rounded-full text-[10px] font-black transition-all duration-300 ${
+                      isActive
+                        ? 'text-white shadow-sm'
+                        : 'bg-[var(--color-surface-raised)] text-[var(--color-text-muted)]'
+                    }`}
+                    style={{
+                      backgroundColor: isActive ? speakerColor : undefined,
+                    }}
                   >
-                    {speakerName}
-                  </span>
-                  {isActive && (
-                    <span className="flex gap-0.5 h-2.5 items-end mb-[2px]">
-                      <span className="w-0.5 h-full animate-bounce [animation-duration:0.6s]" style={{ backgroundColor: speakerColor }}></span>
-                      <span className="w-0.5 h-2/3 animate-bounce [animation-duration:0.8s]" style={{ backgroundColor: speakerColor }}></span>
-                      <span className="w-0.5 h-1/2 animate-bounce [animation-duration:1.0s]" style={{ backgroundColor: speakerColor }}></span>
-                    </span>
-                  )}
+                    {speakerInitials}
+                  </div>
                 </div>
 
-                <div 
-                  className={[
-                    "w-full max-w-[95%] rounded-2xl p-4 border transition-all duration-300",
-                    isSecondSpeaker ? "rounded-tr-none" : "rounded-tl-none",
-                    isActive 
-                      ? "bg-[var(--color-surface)] shadow-md border-b-[4px]" 
-                      : "bg-[var(--color-surface-raised)]/45 border-[var(--color-border)] border-b-[3px]"
-                  ].join(" ")}
-                  style={{
-                    borderColor: isActive ? speakerColor : undefined,
-                    borderBottomColor: isActive ? 'rgba(0,0,0,0.2)' : undefined,
-                  }}
-                >
-                  <ClickableSentence
-                    text={text}
-                    newVocabulary={[...new Set(newVocabulary)]}
-                    newVerbs={newVerbs ? [...new Set(newVerbs)] : []}
-                    onWordClick={onWordClick}
-                    className={`leading-relaxed transition-all duration-300 ${isSecondSpeaker ? 'text-right' : 'text-left'} ${isActive ? 'text-[1.02rem] font-bold text-[var(--color-text-primary)]' : 'text-base font-medium opacity-95'}`}
-                  />
-                  
-                  {dialogueTranslations?.[i]?.trim() && (
-                    <div className="mt-2.5 border-t border-[var(--color-border)]/50 pt-2.5 transition-all duration-500">
-                      <p 
-                        className={`text-xs italic text-[var(--color-text-secondary)] leading-relaxed transition-colors ${isSecondSpeaker ? 'text-right' : 'text-left'}`}
-                      >
-                        {dialogueTranslations[i]}
-                      </p>
-                    </div>
-                  )}
+                {/* Bubble column — shrinks to content, capped by max-w on parent */}
+                <div className={`flex min-w-0 flex-col gap-1 ${isSecondSpeaker ? 'items-end' : 'items-start'}`}>
+                  <div className={`flex items-center gap-2 ${isSecondSpeaker ? 'flex-row-reverse' : 'flex-row'}`}>
+                    <span
+                      className="text-[10px] font-bold uppercase tracking-wider transition-colors duration-300"
+                      style={{ color: isActive ? speakerColor : 'var(--color-text-muted)' }}
+                    >
+                      {speakerName}
+                    </span>
+                    {isActive && (
+                      <span className="flex h-2.5 items-end gap-0.5">
+                        <span className="h-full w-0.5 animate-bounce [animation-duration:0.6s]" style={{ backgroundColor: speakerColor }} />
+                        <span className="h-2/3 w-0.5 animate-bounce [animation-duration:0.8s]" style={{ backgroundColor: speakerColor }} />
+                        <span className="h-1/2 w-0.5 animate-bounce [animation-duration:1.0s]" style={{ backgroundColor: speakerColor }} />
+                      </span>
+                    )}
+                  </div>
+
+                  <div
+                    className={[
+                      'w-fit max-w-full rounded-2xl px-3.5 py-2.5 transition-all duration-300',
+                      isSecondSpeaker ? 'rounded-br-sm' : 'rounded-bl-sm',
+                      isActive
+                        ? 'bg-[var(--color-surface)] shadow-md ring-1 ring-[var(--color-border)]'
+                        : isSecondSpeaker
+                          ? 'bg-[var(--color-primary)]/10'
+                          : 'bg-[var(--color-surface-raised)]/80',
+                    ].join(' ')}
+                    style={{
+                      ...(isActive ? { boxShadow: `0 2px 12px ${speakerColor}22` } : {}),
+                    }}
+                  >
+                    <ClickableSentence
+                      text={text}
+                      newVocabulary={[...new Set(newVocabulary)]}
+                      newVerbs={newVerbs ? [...new Set(newVerbs)] : []}
+                      onWordClick={onWordClick}
+                      className={`text-left leading-relaxed transition-all duration-300 ${
+                        isActive
+                          ? 'text-[1.02rem] font-bold text-[var(--color-text-primary)]'
+                          : 'text-[0.95rem] font-medium text-[var(--color-text-primary)]'
+                      }`}
+                    />
+
+                    {dialogueTranslations?.[i]?.trim() && (
+                      <div className="mt-2 border-t border-[var(--color-border)]/40 pt-2">
+                        <p className="text-left text-xs italic leading-relaxed text-[var(--color-text-secondary)]">
+                          {dialogueTranslations[i]}
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

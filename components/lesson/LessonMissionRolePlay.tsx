@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useAudio } from '@/hooks/useAudio';
 import { useVoiceRecorder } from '@/hooks/useVoiceRecorder';
+import { useSoundEffects } from '@/hooks/useSoundEffects';
 import { transcribeSpeech } from '@/app/actions/transcribeSpeech';
 import { evaluateFreeResponse } from '@/app/actions/evaluateFreeResponse';
 import { getFixedVoiceName } from '@/lib/voiceConfig';
@@ -106,6 +107,8 @@ export function LessonMissionRolePlay({
   const { speak, stop: stopAudio } = useAudio(fixedVoice);
   const recorder = useVoiceRecorder();
   const hasSpeechAPI = recorder.isSupported;
+  const { play: playSound } = useSoundEffects();
+  const prevRecStateRef = useRef<RecState>('idle');
 
   const current = lines[currentIdx];
   const isLast = currentIdx >= lines.length - 1;
@@ -121,6 +124,15 @@ export function LessonMissionRolePlay({
     }, 400);
     return () => clearTimeout(t);
   }, [currentIdx, current, language, speak]);
+
+  useEffect(() => {
+    if (recState === 'review-correct' && prevRecStateRef.current !== 'review-correct') {
+      playSound('correct');
+    } else if (recState === 'review-retry' && prevRecStateRef.current !== 'review-retry') {
+      playSound('incorrect', { soft: true });
+    }
+    prevRecStateRef.current = recState;
+  }, [recState, playSound]);
 
   // Reset per-line state when advancing
   useEffect(() => {

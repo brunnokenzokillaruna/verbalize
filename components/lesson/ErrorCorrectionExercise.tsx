@@ -3,6 +3,11 @@
 import { useState, useEffect } from 'react';
 import type { ErrorCorrectionData } from '@/types';
 import { isAccentOnlyDiff } from '@/utils/accent';
+import {
+  errorCorrectionPlaceholder,
+  isDeletionAnswer,
+  isDeletionCorrection,
+} from '@/utils/errorCorrection';
 
 function findWholeWordIndex(sentence: string, word: string): number {
   let index = sentence.indexOf(word);
@@ -43,15 +48,16 @@ export function ErrorCorrectionExercise({
 }: ErrorCorrectionExerciseProps) {
   const [input, setInput] = useState('');
   const [answerStatus, setAnswerStatus] = useState<AnswerStatus>('idle');
+  const isDeletion = isDeletionCorrection(data.correct_word);
 
   // Notify parent of readiness
   useEffect(() => {
     if (!answered) {
-      setIsExerciseReady(input.trim().length > 0);
+      setIsExerciseReady(isDeletion || input.trim().length > 0);
     } else {
       setIsExerciseReady(false);
     }
-  }, [input, answered, setIsExerciseReady]);
+  }, [input, answered, setIsExerciseReady, isDeletion]);
 
   // Listen for global submit
   useEffect(() => {
@@ -65,7 +71,9 @@ export function ErrorCorrectionExercise({
 
   const normalizedInput = normalize(input);
   const normalizedCorrect = normalize(data.correct_word);
-  const isExactCorrect = normalizedInput === normalizedCorrect;
+  const isExactCorrect = isDeletion
+    ? isDeletionAnswer(input)
+    : normalizedInput === normalizedCorrect;
   // Safety net: if correct_word is a bare clitic ending with ' (e.g. "J'"),
   // also accept answers that start with it (e.g. "J'écoute").
   // Use raw (non-normalized) strings so the apostrophe isn't stripped.
@@ -101,7 +109,9 @@ export function ErrorCorrectionExercise({
       <div className="flex items-center gap-3 px-1 opacity-70">
         <span className="h-px w-6 bg-[var(--color-border)]" />
         <p className="text-xs font-medium italic text-[var(--color-text-muted)]">
-          Encontre e corrija o erro na frase abaixo:
+          {isDeletion
+            ? 'Encontre o erro e apague a palavra destacada (deixe em branco):'
+            : 'Encontre e corrija o erro na frase abaixo:'}
         </p>
       </div>
 
@@ -158,7 +168,7 @@ export function ErrorCorrectionExercise({
           value={input}
           onChange={(e) => setInput(e.target.value)}
           disabled={answered}
-          placeholder={`Substitua "${data.error_word}"…`}
+          placeholder={errorCorrectionPlaceholder(data)}
           className="w-full rounded-xl bg-[var(--color-surface-raised)] px-6 py-4 text-base font-medium outline-none transition-all duration-300 ring-1 shadow-inner"
           style={{
             borderColor: 
@@ -214,6 +224,15 @@ export function ErrorCorrectionExercise({
             </p>
             <p className="text-sm font-semibold text-[var(--color-text-primary)] leading-relaxed italic">
               No diálogo foi usado &ldquo;{data.correct_word}&rdquo;.
+            </p>
+          </div>
+        )}
+
+        {answered && answerStatus === 'wrong' && isDeletion && !isDeletionAnswer(input) && (
+          <div className="p-4 rounded-xl bg-[var(--color-error-bg)]/40 border border-[var(--color-error)]/20 animate-in fade-in slide-in-from-top-2 duration-300">
+            <p className="text-sm leading-relaxed text-[var(--color-text-primary)]">
+              A correção é <strong>apagar</strong> &ldquo;{data.error_word}&rdquo; — não substituir por outra palavra
+              {input.trim() ? ', nem reescrever a frase inteira' : ''}.
             </p>
           </div>
         )}

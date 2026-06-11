@@ -69,19 +69,27 @@ export function useLessonAudio(phase: string, lesson: any, hook: any) {
   }
 
   /**
-   * Fetches dialogue audio — tries ElevenLabs first, falls back to Google TTS.
+   * Fetches dialogue audio — tries ElevenLabs first, falls back to Google TTS
+   * when ElevenLabs is unavailable or returns fewer lines than expected.
    * Results are cached client-side in `cachedChunksRef` so replays are instant.
    */
   async function fetchDialogueAudio(lines: string[], language: SupportedLanguage): Promise<string[]> {
+    const expectedLines = lines.filter((l) => l.trim().length > 0).length;
+
     // 1️⃣ Try ElevenLabs
     try {
       const elChunks = await synthesizeDialogueElevenLabs(lines, language);
-      if (elChunks.length > 0) {
+      if (elChunks.length === expectedLines) {
         console.log(
           '%c🎙️ [Audio Provider] SUCCESS: ElevenLabs premium dialogue voices generated successfully! ✓',
           'color: #10b981; font-weight: bold; background-color: #ecfdf5; padding: 4px 8px; border-radius: 4px; border: 1px solid #a7f3d0;'
         );
         return elChunks;
+      }
+      if (elChunks.length > 0) {
+        console.warn(
+          `[useLessonAudio] ElevenLabs partial failure (${elChunks.length}/${expectedLines} lines), falling back to Google TTS`,
+        );
       }
     } catch (err) {
       console.warn('[useLessonAudio] ElevenLabs failed, falling back to Google TTS:', err);

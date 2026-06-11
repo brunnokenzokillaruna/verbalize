@@ -5,10 +5,12 @@ import {
   LogOut,
   Sun, Moon, Flame, Zap,
   ArrowLeftRight, Lock, FastForward, X, Search, User,
+  Volume2, VolumeX,
 } from 'lucide-react';
 import { LanguageSwitcherSheet } from '@/components/dashboard/LanguageSwitcherSheet';
 import { useAuthStore } from '@/store/authStore';
 import { useTheme } from '@/components/ThemeProvider';
+import { useSoundEffects } from '@/hooks/useSoundEffects';
 import { logOut } from '@/services/auth';
 import { updateUser, getUser, logLesson, updateLessonStats, getPregeneratedLesson, getUserVocabulary } from '@/services/firestore';
 import { pregenerateNextLesson } from '@/app/actions/pregenerateNextLesson';
@@ -166,6 +168,7 @@ function getTagIcon(tag: string, size = 30) {
 export default function DashboardPage() {
   const { profile, user, setProfile, reset } = useAuthStore();
   const { theme, toggleTheme } = useTheme();
+  const { isMuted, toggleMute } = useSoundEffects();
   const router = useRouter();
 
   const allLessons = profile ? getLessonsForLanguage(profile.currentTargetLanguage) : [];
@@ -282,7 +285,11 @@ export default function DashboardPage() {
           return Date.now() - createdMs > 5 * 60 * 1000; // 5 minutes
         };
 
-        if (!cached || (cached.status === 'generating' && isTimedOut(cached.createdAt))) {
+        if (
+          !cached ||
+          cached.status === 'failed' ||
+          (cached.status === 'generating' && isTimedOut(cached.createdAt))
+        ) {
           console.log(`[Dashboard Pregen] 🔮 Active lesson ${lessonId} is a cache MISS. Pregenerating in background...`);
           const userVocabulary = await getUserVocabulary(user.uid, language);
           const knownVocabulary = userVocabulary.map((v) => v.word.toLowerCase());
@@ -1076,6 +1083,27 @@ export default function DashboardPage() {
                     {theme === 'dark' ? 'Tema Claro' : 'Tema Escuro'}
                   </span>
                   <span className="text-[10px] font-black uppercase text-primary">Alterar</span>
+                </button>
+
+                <button
+                  onClick={toggleMute}
+                  className="w-full flex items-center justify-between p-3.5 rounded-xl text-left font-bold text-xs transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary active:translate-y-[2px] active:shadow-none cursor-pointer border bg-surface"
+                  style={{
+                    borderColor: 'var(--color-border)',
+                    boxShadow: '0 3px 0 var(--color-border)'
+                  }}
+                >
+                  <span className="flex items-center gap-2 text-text-primary">
+                    {isMuted ? (
+                      <VolumeX size={16} className="text-text-muted" />
+                    ) : (
+                      <Volume2 size={16} className="text-primary" />
+                    )}
+                    {isMuted ? 'Sons desativados' : 'Sons ativados'}
+                  </span>
+                  <span className="text-[10px] font-black uppercase text-primary">
+                    {isMuted ? 'Ativar' : 'Desativar'}
+                  </span>
                 </button>
 
                 <Link

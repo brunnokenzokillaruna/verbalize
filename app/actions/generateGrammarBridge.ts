@@ -35,7 +35,7 @@ interface GenerateGrammarBridgeParams {
 
 /**
  * Generates a Grammar Bridge explanation using the Portuguese Bridge Method (Prompt #2).
- * Output maps directly to GrammarBridgeCard props.
+ * Output maps directly to GrammarBridgeFlow step builder.
  * Returns null on any error.
  */
 export async function generateGrammarBridge(
@@ -116,6 +116,17 @@ ${tagGuidance}
 
 Você está falando com um falante nativo de português brasileiro. Use isso a seu favor: compare diretamente com o português, aponte os erros clássicos que brasileiros cometem e explique POR QUÊ a estrutura funciona diferente.
 
+⚠️ FORMATO DE EXIBIÇÃO — JORNADA PEDAGÓGICA v2 ⚠️
+Cada campo do JSON tem uma FUNÇÃO COGNITIVA distinta. NÃO repita a mesma sacada em campos diferentes.
+- insight = modelo mental (1 frase impacto)
+- bridge.difference = diferença estrutural do exemplo principal (1 frase)
+- explanation = mecanismo/procedimento SOMENTE se insight+difference não cobrirem — omita ou use [] se redundante
+- patterns = par contrastante quando possível (labels: "Afirmação" e "Negação", ou equivalente)
+- dialogueExample = frase verbatim do diálogo acima
+- additionalExamples = MÁXIMO 1 item, vocabulário DIFERENTE dos patterns, para generalização
+- brazilianTrap = erro que brasileiro cometeria em conversa espontânea
+- retentionCheck = pergunta de produção mental ("Como você diria X?") quando possível
+
 ⚠️ MISSÃO CENTRAL: ENSINO INTUITIVO E PROFUNDO ⚠️
 O objetivo aqui NÃO é ser curto por ser curto. O objetivo é que o aluno REALMENTE ENTENDA a regra.
 Você DEVE:
@@ -162,8 +173,7 @@ Output ONLY este JSON (sem markdown):
   "insight": "1-2 frases de impacto em PT-BR SIMPLES — a sacada central da regra. Pode começar com 'Em português...', 'No francês...', 'A gente...' ou similar. Linguagem de conversa, não de livro.",
   "explanation": [
     "Item 1 (MAX 15 palavras): como montar a frase na prática, com exemplo PT → língua-alvo.",
-    "Item 2 (MAX 15 palavras): por que brasileiros erram nesse ponto.",
-    "Item 3 (opcional, MAX 15 palavras): quando usar e quando NÃO usar."
+    "Item 2 (MAX 15 palavras): por que brasileiros erram nesse ponto."
   ],
   "survivalTip": "Dica de sobrevivência ultra rápida, prática e direta ao ponto que o aluno possa memorizar imediatamente. Em PT-BR amigável. MAX 12 palavras.",
   "culturalNote": "Um detalhe, curiosidade cultural ou hábito social real de uso na língua-alvo. Em PT-BR amigável. MAX 15 palavras.",
@@ -176,6 +186,8 @@ Output ONLY este JSON (sem markdown):
   "brazilianTrap": {
     "wrong": "frase errada que um brasileiro diria/pensaria ao traduzir direto",
     "right": "frase correta na língua-alvo",
+    "wrongPortuguese": "tradução natural em PT-BR do que o brasileiro pensaria (ex: 'Eu espero por você.')",
+    "rightPortuguese": "tradução natural em PT-BR da frase correta (ex: 'Eu te espero.')",
     "subtitle": "Subtítulo curto do erro (ex: 'Evite a tradução direta do português' ou 'Cuidado com a ordem das palavras')",
     "explanation": "explicação muito curta e direta de por que isso é um erro. MAX 2 frases curtas."
   },
@@ -185,9 +197,8 @@ Output ONLY este JSON (sem markdown):
     "correctIndex": 1
   },
   "patterns": [
-    { "label": "Eu falo", "target": "I speak", "portuguese": "Eu falo" },
-    { "label": "Ela fala", "target": "She speaks", "portuguese": "Ela fala" },
-    { "label": "Nós falamos", "target": "We speak", "portuguese": "Nós falamos" }
+    { "label": "Afirmação", "target": "I speak", "portuguese": "Eu falo" },
+    { "label": "Negação", "target": "I do not speak", "portuguese": "Eu não falo" }
   ],
   "bridge": {
     "portuguese": "Use ^^ para destacar a parte da frase que gera a regra em PT-BR. ex: 'Eu ^^falo^^'",
@@ -202,23 +213,21 @@ Output ONLY este JSON (sem markdown):
     "portuguese": "Tradução natural PT-BR dessa frase"
   },
   "additionalExamples": [
-    { "target": "Exemplo extra 1", "portuguese": "Equivalente PT-BR" },
-    { "target": "Exemplo extra 2", "portuguese": "Equivalente PT-BR" },
-    { "target": "Exemplo extra 3", "portuguese": "Equivalente PT-BR" }
+    { "target": "Exemplo extra com vocabulário diferente", "portuguese": "Equivalente PT-BR" }
   ]${verbSpotlightBlock}
 }
 ${verbRulesBlock}
 
 Regras Cruciais:
-1. Se o tema for uma REGRA SISTÊMICA (ex: Plural, Passado), use o campo 'bridge' e preencha 'patterns' com 2-3 variações. Deixe 'items' como null.
-2. Se o tema for uma LISTA de expressões, preencha o campo 'items'. Deixe 'bridge' e 'patterns' como null.
-3. brazilianTrap: FOQUE no erro clássico. Mostre o que o brasileiro tentaria dizer e a versão correta no objeto estruturado.
+1. Se o tema for uma REGRA SISTÊMICA (ex: Plural, Passado), use o campo 'bridge' e preencha 'patterns' com no máximo 2 variações. Deixe 'items' como null.
+2. Se o tema for uma LISTA de expressões, preencha o campo 'items' (máx. 3). Deixe 'bridge' e 'patterns' como null.
+3. brazilianTrap: FOQUE no erro clássico. Mostre o que o brasileiro tentaria dizer e a versão correta no objeto estruturado. SEMPRE preencha wrongPortuguese e rightPortuguese com traduções naturais em PT-BR das frases wrong e right.
 4. Destaque Visual: Use ^^ envolta das palavras-chave em bridge.target and bridge.portuguese para criar o mapeamento visual.
-5. explanation: SEMPRE um array de 2-4 strings curtas (MAX 15 palavras cada). Nunca um parágrafo único. Não repita insight nem bridge.difference.
+5. explanation: array de 0-2 strings. OMITA se insight + bridge.difference já explicam a regra. Nunca repita insight nem bridge.difference.
 5b. structureFormulas: use quando a regra tiver 2+ construções alternativas (ex: il faut vs devoir). Cada item com label descritivo. Deixe structureFormula null nesse caso.
-5c. retentionCheck: pergunta opcional de 2 opções reforçando a sacada. correctIndex deve apontar para a opção certa.
+5c. retentionCheck: pergunta de 2 opções; prefira "Como você diria X?" quando possível. correctIndex deve apontar para a opção certa.
 6. dialogueExample.target: DEVE ser uma linha real do diálogo acima.
-7. additionalExamples: 2-3 exemplos extras mostrando o padrão em diferentes contextos do dia a dia.
+7. additionalExamples: no máximo 1 exemplo com vocabulário diferente dos patterns (generalização).
 8. Todo texto em PT-BR exceto as frases na língua-alvo.
 9. ANTES DE RESPONDER: releia 'insight', 'explanation', 'brazilianTrap.explanation' e 'bridge.difference'. Se usou qualquer palavra da lista proibida OU se um brasileiro com ensino fundamental teria dificuldade, REESCREVA mais simples.
 10. IDIOMA 100% PURO NA LÍNGUA-ALVO: Nos campos destinados à língua-alvo (como target, additionalExamples.target, verbSpotlight.idiomaticExpressions.target), NUNCA misture palavras do português (como "o", "a", "com"). Por exemplo, em francês escreva "jouer avec le feu", NUNCA "jouer avec o feu" ou "jouer avec com feu". O texto na língua-alvo deve ser 100% puro e gramaticalmente correto no idioma em questão.

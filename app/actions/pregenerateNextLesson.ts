@@ -4,7 +4,11 @@ import { generateHook } from './generateHook';
 import { generateGrammarBridge } from './generateGrammarBridge';
 import { generateMissionBriefing } from './generateMissionBriefing';
 import { generatePracticeExercises } from './generatePracticeExercises';
-import { savePregeneratedLesson, startPregeneratingLesson, deletePregeneratedLesson } from '@/services/firestore';
+import {
+  savePregeneratedLesson,
+  startPregeneratingLesson,
+  abortPregeneratedLesson,
+} from '@/services/firestore';
 import { getPreviousTopics } from '@/lib/curriculum';
 import type { LessonDefinition, LessonTag, GrammarBridgeResult, Exercise, MissionBriefingResult } from '@/types';
 
@@ -38,7 +42,7 @@ export async function pregenerateNextLesson(
       knownVocabulary,
     });
     if (!hook) {
-      await deletePregeneratedLesson(uid, lesson.id).catch(() => {});
+      await abortPregeneratedLesson(uid, lesson.id).catch(() => {});
       console.error('[pregenerateNextLesson] Hook generation failed — cache cleared.');
       return false;
     }
@@ -81,6 +85,8 @@ export async function pregenerateNextLesson(
       newVocabulary: hook.newVocabulary,
       verbWord: hook.verbWord ?? '',
       grammarFocus: lesson.grammarFocus,
+      theme: lesson.theme,
+      uiTitle: lesson.uiTitle,
       tag: lesson.tag,
       language: lesson.language,
       level: lesson.level,
@@ -102,7 +108,7 @@ export async function pregenerateNextLesson(
   } catch (err) {
     // Non-critical — lesson will just generate normally on next open
     console.error('[pregenerateNextLesson] Error:', err);
-    await deletePregeneratedLesson(uid, lesson.id).catch(() => {});
+    await abortPregeneratedLesson(uid, lesson.id).catch(() => {});
     return false;
   }
 }

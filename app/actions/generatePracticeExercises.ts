@@ -4,6 +4,7 @@ import { callGeminiJSON } from '@/services/gemini';
 import { getVerbConjugation } from '@/app/actions/getVerbConjugation';
 import { extractVerbOnlyForm, stripPronounPrefix } from '@/utils/conjugationHelper';
 import { sanitizeConjugationOptions } from '@/utils/verbDrillGenerator';
+import { isDeletionCorrection } from '@/utils/errorCorrection';
 import type { ConjugationSpeedData, Exercise, GrammarBridgeResult, SupportedLanguage, ProficiencyLevel, LessonTag } from '@/types';
 
 const LANG_LABEL: Record<SupportedLanguage, string> = {
@@ -76,6 +77,8 @@ function buildTypeDescriptions(langLabel: string): Record<ExerciseTypeId, string
     'error-correction': `type "error-correction":
    - Write an ORIGINAL sentence with ONE deliberate error.
    - "sentence_with_error", "error_word", "correct_word", "translation" (PT-BR: translation of the CORRECTED sentence), "explanation" (PT-BR).
+   - When the fix is to REMOVE the error word (e.g. an unnecessary preposition copied from Portuguese), set "correct_word" to "" (empty string). Do NOT use "---" or other placeholders.
+   - When the fix is to REPLACE the error word, set "correct_word" to the replacement word.
    - "acceptable_answers" is an array of other valid options or empty.`,
     'reverse-translation': `type "reverse-translation":
    - "portuguese_sentence" (PT-BR) → "target_translation" (${langLabel}).
@@ -88,6 +91,7 @@ function buildTypeDescriptions(langLabel: string): Record<ExerciseTypeId, string
     'sentence-builder': `type "sentence-builder":
    - Short ORIGINAL sentence (3-8 words).
    - "correctOrder" (array of words in the correct order), "words" (array of the EXACT same words, shuffled), "translation" (PT-BR).
+   - "explanation" (PT-BR): 1-2 short sentences explaining the word order — especially adverb placement vs Portuguese when relevant.
    - CRITICAL: "words" MUST contain the exact same words as "correctOrder". No missing words, no extra distractors.`,
     'social-roleplay': `type "social-roleplay":
    - "context" (PT-BR) describing the situation.
@@ -227,6 +231,8 @@ interface GeneratePracticeParams {
   newVocabulary: string[];
   verbWord: string;
   grammarFocus: string;
+  theme?: string;
+  uiTitle?: string;
   tag: LessonTag;
   language: SupportedLanguage;
   level: ProficiencyLevel;
@@ -267,7 +273,7 @@ function buildGrammarBridgeExerciseBlock(bridge: GrammarBridgeResult | null | un
 export async function generatePracticeExercises(
   params: GeneratePracticeParams,
 ): Promise<Exercise[] | null> {
-  const { dialogue, newVocabulary, grammarFocus, tag, language, level, knownVocabulary, previousTopics, grammarBridge } = params;
+  const { dialogue, newVocabulary, grammarFocus, theme, uiTitle, tag, language, level, knownVocabulary, previousTopics, grammarBridge } = params;
   const levelDesc = LEVEL_EXERCISE_DESCRIPTORS[level];
   const isEarlyLearner = knownVocabulary.length < 30;
 
@@ -302,6 +308,10 @@ export async function generatePracticeExercises(
 
   const grammarBridgeBlock = buildGrammarBridgeExerciseBlock(grammarBridge);
 
+  const curatedAnchorBlock = theme
+    ? `\nCURATED LESSON ANCHOR (all exercise scenarios MUST stay within this — do NOT invent unrelated situations):\n- Theme: "${theme}"${uiTitle ? `\n- Scenario: "${uiTitle}"` : ''}`
+    : '';
+
   const grammarAccuracyBlock = `
 --- CRITICAL LINGUISTIC ACCURACY & GENDER AGREEMENT RULES ---
 - STRICT GENDER & NUMBER AGREEMENT: You MUST double-check the grammatical gender and number of all nouns in the target language (${LANG_LABEL[language]}).
@@ -320,8 +330,8 @@ export async function generatePracticeExercises(
 
     const prompt = `The learner just studied a ${LANG_LABEL[language]} dialogue at ${level} level.
 
-GRAMMAR FOCUS: ${grammarFocus}
-THEME/CONTEXT (from dialogue):
+GRAMMAR FOCUS: ${grammarFocus}${curatedAnchorBlock}
+DIALOGUE (for vocabulary and tone reference only — do NOT copy sentences):
 "${dialogue}"
 
 Key vocabulary words from this lesson: ${newVocabulary.join(', ')}
@@ -381,10 +391,12 @@ Example for social-roleplay:
         const ok =
           sentence_with_error &&
           error_word &&
-          correct_word &&
+          correct_word != null &&
           !!translation &&
           sentence_with_error.toLowerCase().includes(error_word.toLowerCase()) &&
-          error_word.toLowerCase() !== correct_word.toLowerCase();
+          (isDeletionCorrection(correct_word) ||
+            (correct_word.trim() !== '' &&
+              error_word.toLowerCase() !== correct_word.toLowerCase()));
         if (!ok) console.warn('[generatePracticeExercises] Dropped malformed error-correction exercise');
         return ok;
       }

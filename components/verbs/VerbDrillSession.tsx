@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Loader2, X, Timer, Zap, ChevronRight, Trophy } from 'lucide-react';
 import { ConjugationSpeedExercise } from '@/components/lesson/ConjugationSpeedExercise';
 import { generateLocalDrill } from '@/utils/verbDrillGenerator';
+import { useSoundEffects } from '@/hooks/useSoundEffects';
 import type { VerbDocument, ConjugationSpeedData } from '@/types';
 
 interface VerbDrillSessionProps {
@@ -23,6 +24,9 @@ export function VerbDrillSession({ verbs, onClose }: VerbDrillSessionProps) {
   const [showExitConfirm, setShowExitConfirm] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
+  const sessionEndPlayedRef = useRef(false);
+
+  const { play: playSound } = useSoundEffects();
 
   // Generate a new question
   const nextQuestion = useCallback(() => {
@@ -43,6 +47,7 @@ export function VerbDrillSession({ verbs, onClose }: VerbDrillSessionProps) {
     setTotalAttempted(0);
     setCombo(0);
     setShowExitConfirm(false);
+    sessionEndPlayedRef.current = false;
     nextQuestion();
   }
 
@@ -59,6 +64,13 @@ export function VerbDrillSession({ verbs, onClose }: VerbDrillSessionProps) {
     return () => clearInterval(timer);
   }, [gameState, timeLeft, showExitConfirm]);
 
+  useEffect(() => {
+    if (gameState === 'done' && !sessionEndPlayedRef.current) {
+      sessionEndPlayedRef.current = true;
+      playSound('session-end');
+    }
+  }, [gameState, playSound]);
+
   // Handle answer
   function handleAnswer(correct: boolean) {
     if (answered) return;
@@ -68,11 +80,18 @@ export function VerbDrillSession({ verbs, onClose }: VerbDrillSessionProps) {
 
     if (correct) {
       setCorrectCount((c) => c + 1);
+      const nextCombo = combo + 1;
       const points = 10 + (combo * 2);
       setScore((s) => s + points);
-      setCombo((c) => c + 1);
+      setCombo(nextCombo);
+      if (nextCombo >= 3) {
+        playSound('combo', { comboLevel: Math.min(nextCombo, 5) });
+      } else {
+        playSound('correct');
+      }
     } else {
       setCombo(0);
+      playSound('incorrect');
     }
 
     // Auto-advance after short delay

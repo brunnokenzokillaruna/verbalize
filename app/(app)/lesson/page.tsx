@@ -33,6 +33,7 @@ import { LessonProgressHeader } from '@/components/lesson/LessonProgressHeader';
 import { ClickableSentence } from '@/components/lesson/ClickableSentence';
 import { TranslationTooltip } from '@/components/lesson/TranslationTooltip';
 import { CheckButton } from '@/components/lesson/CheckButton';
+import { formatErrorCorrectionAnswer } from '@/utils/errorCorrection';
 import { LessonLoadingScreen } from '@/components/lesson/LessonLoadingScreen';
 import { LessonErrorScreen } from '@/components/lesson/LessonErrorScreen';
 import { LessonCompleteScreen } from '@/components/lesson/LessonCompleteScreen';
@@ -87,6 +88,12 @@ export default function LessonPage() {
   const [tooltip, setTooltip] = useState<TooltipState>(CLOSED_TOOLTIP);
 
   const { play: playSound, isMuted, toggleMute } = useSoundEffects();
+
+  const playCompletionSound = useCallback(() => {
+    const total = store.exercises.length;
+    const isPerfect = total > 0 && store.correctCount >= total;
+    playSound(isPerfect ? 'perfect' : 'complete');
+  }, [store.exercises.length, store.correctCount, playSound]);
 
   // ── Audio (Google Cloud TTS — two-voice dialogue) ────────────────────────
 
@@ -208,7 +215,7 @@ export default function LessonPage() {
     finishLesson();
 
     if (!user || !store.lesson) {
-      playSound('complete');
+      playCompletionSound();
       return;
     }
 
@@ -217,7 +224,7 @@ export default function LessonPage() {
     if (accuracy >= 0.8) {
       store.setIsLoading(false);
       store.setPhase('complete');
-      playSound('complete');
+      playCompletionSound();
       return;
     }
 
@@ -273,7 +280,7 @@ export default function LessonPage() {
       deleteLessonMistake(store.reviewMistake.id).catch(console.error);
     }
     store.setPhase('complete');
-    playSound('complete');
+    playCompletionSound();
   }
 
   // ── Click-to-translate ────────────────────────────────────────────────────
@@ -300,12 +307,13 @@ export default function LessonPage() {
   const handleFastComplete = useCallback(async () => {
     await finishLesson();
     store.setPhase('complete');
-    playSound('complete');
-  }, [finishLesson, store, playSound]);
+    playCompletionSound();
+  }, [finishLesson, store, playCompletionSound]);
 
   // ── Derived state ─────────────────────────────────────────────────────────
 
   const phase = store.phase;
+
   const currentExercise = store.exercises[store.exerciseIndex];
   const currentReviewExercise = store.reviewExercises[store.reviewIndex];
   const activeExercise = phase === 'review' ? currentReviewExercise : currentExercise;
@@ -323,7 +331,7 @@ export default function LessonPage() {
     if (!activeExercise || exerciseAnswer !== false) return undefined;
     switch (activeExercise.type) {
       case 'context-choice':   return activeExercise.data.blankWord;
-      case 'error-correction': return activeExercise.data.correct_word;
+      case 'error-correction': return formatErrorCorrectionAnswer(activeExercise.data);
       case 'grammar-trap':     return activeExercise.data.options.find(o => o.isCorrect)?.sentence;
       case 'minimal-pair':     return activeExercise.data.correctWord;
       case 'conjugation-speed':return activeExercise.data.correctForm;
@@ -427,10 +435,12 @@ export default function LessonPage() {
           <LessonGrammarScreen
             bridge={store.grammarBridge}
             language={store.lesson.language}
+            tag={store.lesson.tag}
             grammarFocus={store.lesson.grammarFocus}
             newVocabulary={store.hook?.newVocabulary ? [...store.hook.newVocabulary] : []}
             newVerbs={[...store.discoveredVerbs]}
             onWordClick={handleWordClick}
+            onAdvanceToPractice={advanceFromGrammar}
           />
         )}
 
@@ -491,11 +501,14 @@ export default function LessonPage() {
         )}
 
         {/* ── Integrated Continue Button (non-practice, non-review phases) ── */}
-        {phase !== 'practice' && phase !== 'review' && (
+        {phase !== 'practice' && phase !== 'review' && phase !== 'grammar' && (
           <div className="mt-10 animate-slide-up delay-300">
             <button
               type="button"
-              disabled={store.isLoading || (phase === 'role-play' && !store.rolePlayComplete)}
+              disabled={
+                store.isLoading ||
+                (phase === 'role-play' && !store.rolePlayComplete)
+              }
               onClick={
                 phase === 'vocabulary'  ? advanceFromVocabulary :
                 phase === 'hook'        ? advanceFromHook :
@@ -534,8 +547,6 @@ export default function LessonPage() {
                   <Loader2 size={18} className="animate-spin" />
                   <span className="text-sm">Sincronizando…</span>
                 </>
-              ) : phase === 'grammar' ? (
-                <>Praticar agora 💪</>
               ) : phase === 'hook' ? (
                 <>Entendido!</>
               ) : phase === 'mission' ? (

@@ -1,6 +1,7 @@
 'use server';
 
 import { callGeminiJSON } from '@/services/gemini';
+import { validateDialogueCoherence } from '@/lib/validateDialogueCoherence';
 import type { SupportedLanguage, ProficiencyLevel, HookResult, LessonTag } from '@/types';
 
 const LANG_LABEL: Record<SupportedLanguage, string> = {
@@ -181,6 +182,50 @@ function stripForbiddenFillers(dialogue: string): string {
     .replace(/\bTiens\b\s*/gi, '');
 }
 
+function normalizeHookResult(
+  result: HookResult,
+  nameA: string,
+  nameB: string,
+): HookResult {
+  result.dialogue = stripForbiddenFillers(result.dialogue);
+  result.dialogue = fixDialogueLabels(result.dialogue, nameA, nameB);
+
+  result.newVocabulary = [...new Set(
+    result.newVocabulary
+      .map((w: string) => w.trim().toLowerCase())
+      .filter((w: string) => w.length > 0),
+  )];
+
+  if (result.dialogueVerbs) {
+    result.dialogueVerbs = [...new Set(
+      result.dialogueVerbs
+        .map((v: string) => v.trim().toLowerCase())
+        .filter((v: string) => v.length > 0),
+    )];
+  }
+
+  if (result.imageKeywords) {
+    const ik: typeof result.imageKeywords = {};
+    for (const [k, v] of Object.entries(result.imageKeywords)) ik[k.trim().toLowerCase()] = v;
+    result.imageKeywords = ik;
+  }
+
+  if (result.vocabTranslations) {
+    const vt: typeof result.vocabTranslations = {};
+    for (const [k, v] of Object.entries(result.vocabTranslations)) vt[k.trim().toLowerCase()] = v;
+    result.vocabTranslations = vt;
+  }
+
+  return result;
+}
+
+function buildCoherenceCorrectionBlock(breaks: string[]): string {
+  return `
+
+CORREÇÕES OBRIGATÓRIAS (o diálogo anterior falhou no nexo — reescreva completamente):
+${breaks.map((b) => `- ${b}`).join('\n')}`;
+}
+
 /**
  * MINIMAL hook: generates ONLY the critical-path fields so the user can start
  * the lesson in 1-2 seconds. Secondary fields (grammarBridge, curiosidade,
@@ -200,13 +245,16 @@ export async function generateHook(params: GenerateHookParams): Promise<HookResu
 
   let tagInstruction = '';
   if (tag === 'GRAM') {
-    tagInstruction = `- ATOMIC GRAMMAR RULE: This lesson's primary focus is '${grammarFocus}'. You MUST ensure this is the ONLY new grammatical concept or complex verb introduced. If a specific verb is mentioned in the focus, it should be the protagonist of the dialogue.
-- SIMPLICITY: Keep the rest of the sentence structure simple so the student can isolate the grammar focus easily.
-- NATURAL INTEGRATION: The grammar focus must appear INSIDE a real conversation — NOT as isolated descriptive statements. BAD: each speaker just making a standalone observation ("Le hall est sombre", "La porte est étroite"). GOOD: the grammar appears naturally because the conversation calls for it ("On va à l'hôtel ? — Oui, mais le hall est un peu sombre, non ? — C'est vrai, e a porta é estreita também !"). The speakers must REACT to each other.`;
+    const scenarioLock = uiTitle
+      ? `Scenario "${uiTitle}" inside Theme "${theme}"`
+      : `Theme "${theme}"`;
+    tagInstruction = `- SCENARIO LOCK: The scene MUST match ${scenarioLock}. The grammar focus '${grammarFocus}' must emerge FROM this scene — never pick a random scene just because it fits the rule.
+- GRAMMAR IN CONTEXT: Introduce only this grammar focus. Keep other structures simple. The pattern should appear 1–3 times naturally because the conversation needs it — not as isolated observations.
+- SPEAKERS MUST REACT: Each line responds to the previous one. BAD: "Le hall est sombre." / "La porte est étroite." GOOD: "On va à l'hôtel ? — Oui, mais le hall est un peu sombre, non ?"`;
   } else if (tag === 'VOC') {
-    tagInstruction = `- VOCABULARY OVER EVERYTHING: The dialogue is merely a vehicle for the 2 words in 'newVocabulary'. Keep the dialogue lines SHORT (max 6 words) and the grammar invisible.
-- TARGET VOCABULARY: The specific word(s) mentioned in the 'Pedagogical Focus' MUST be included as part of the 2 words in 'newVocabulary' and MUST be used in the dialogue. Extract the core word from the focus text (e.g., if it says 'Vocabulário: Bon', the word is 'bon'). The other words should be related to the scene.
-- FOCUS: Do NOT introduce ANY new grammar or complex verbs. Use only the most basic verbs (être/avoir/aller/faire in FR, be/have/go/do in EN) to support the vocabulary.`;
+    tagInstruction = `- VOCABULARY LESSON: The 2 new words must fit naturally in the same scene. Conversation flow is priority #1 — never break the dialogue just to showcase a word.
+- PREFERRED TARGET: If the Pedagogical Focus names a word (e.g. 'Vocabulário: Bon'), prefer it as one of the 2 new words — but if it does not fit the scene without breaking coherence, pick a different word from the same theme instead.
+- SIMPLICITY: Keep lines short (max 8 words) and grammar basic (être/avoir/aller/faire in FR; be/have/go/do in EN).`;
   } else if (tag === 'PRON') {
     tagInstruction = `- PHONETIC FOCUS: The dialogue should naturally feature many instances of the sounds or letters in '${grammarFocus}'.
 - AUDIO QUALITY: Keep sentences short and clear so the student can focus on hearing the target sounds.`;
@@ -222,10 +270,9 @@ export async function generateHook(params: GenerateHookParams): Promise<HookResu
 - The scenario MUST feel urgent/high-stakes. The learner NEEDS something from the local and has to communicate to get it. Do NOT write a generic casual chat — this is a mission with a concrete goal tied to "${grammarFocus}".
 - SATISFYING MISSION RESOLUTION: The dialogue must have a complete narrative arc that resolves the learner's mission. The final lines of the conversation MUST mark the successful completion of the goal or a clear final instruction/guidance (e.g., providing the requested directions, warning of a specific danger and advising what to do, handing over a key/item, or finalizing the purchase/transaction). The dialogue must never end on a cliffhanger, an unanswered question, or a statement that leaves the learner's needs unresolved.`;
   } else if (tag === 'VERB') {
-    tagInstruction = `- VERB PROTAGONIST: The lesson's focus is a single verb mentioned in '${grammarFocus}'. That verb MUST be the PROTAGONIST of the dialogue — it has to appear at least 3 times across the lines.
-- CONJUGATION VARIETY: Show the target verb in AT LEAST 2 different persons (e.g. "je", "il", "on", "nous" / "I", "you", "she", "we") so the learner SEES the conjugation shift in context. If the level allows, add 1 different tense too (e.g. one present + one passé composé / simple past).
-- AVOID OTHER NEW VERBS: Every other verb in the dialogue should be a very basic verb the student already knows (être/avoir/aller/faire in FR; be/have/go/do in EN). The target verb is the only verb worth teaching here.
-- NATURAL DIALOGUE: Don't make it feel like a conjugation drill — the verb must appear organically inside a real human conversation.`;
+    tagInstruction = `- VERB LESSON: The target verb from '${grammarFocus}' may appear 1–2 times ONLY where it sounds natural in this scene. Do NOT repeat it to teach conjugation — that happens later in Grammar Bridge and Practice exercises.
+- CONJUGATION TEACHING: Do NOT force multiple persons or tenses in the hook dialogue. One natural use (e.g. "j'ai oublié ma serviette" or "n'oublie pas !") is enough.
+- KEEP IT SIMPLE: Other verbs in the dialogue should stay basic (être/avoir/aller/faire in FR; be/have/go/do in EN).`;
   } else if (tag === 'EXPR') {
     tagInstruction = `- EXPRESSION SHOWCASE: The focus '${grammarFocus}' is a list of fixed expressions or idioms. The dialogue MUST naturally use AT LEAST 2 of these expressions verbatim.
 - CONTEXT IS KING: Each expression should be used in a situation that makes its meaning obvious from context, so the learner absorbs it without needing a translation.
@@ -261,9 +308,9 @@ Respond with ONLY valid JSON, no markdown, no explanation.`;
     : '';
 
   const dialogueVocabGuard = isEarlyLearner
-    ? `- ⚠️ ULTRA-BEGINNER DIALOGUE: This student has learned ${knownVocabulary.length === 0 ? 'nothing yet — this is their very first lesson' : `only ${knownVocabulary.length} words so far`}. Every word in the dialogue (EXCEPT the 2 new vocabulary words) should ideally be among the 300 most common ${lang} words (like: être, avoir, aller, manger, etc.). You may use other basic words if they are necessary to make the dialogue natural and logical.`
+    ? `- BEGINNER: This student has learned ${knownVocabulary.length === 0 ? 'nothing yet — first lesson' : `only ${knownVocabulary.length} words`}. Prefer the 300 most common ${lang} words, but never sacrifice conversation coherence to stay within a word list.`
     : normalizedKnown.length > 0
-      ? `- VOCABULARY RECYCLING: The student already knows these words. You should PRIORITIZE using them naturally throughout the dialogue to reinforce memory: [${normalizedKnown.slice(-80).join(', ')}]. The 2 new vocab words are the main target words. You are ALLOWED and ENCOURAGED to use other standard everyday words (suited for the user's level) to make the conversation feel 100% natural, logical, and coherent, rather than writing a disjointed dialogue to satisfy constraints.`
+      ? `- OPTIONAL RECYCLING: You MAY reuse a few words the student already knows if they fit naturally: [${normalizedKnown.slice(-40).join(', ')}]. Never force recycling — a coherent dialogue always wins.`
       : '';
 
   const speakerIntro = tag === 'MISS'
@@ -282,60 +329,74 @@ Respond with ONLY valid JSON, no markdown, no explanation.`;
   
   const translationInstruction = intentMode
     ? `- INTENT MODE TRANSLATIONS: Because this is an advanced mission, 'dialogueTranslations' for the learner's ("Você") lines MUST BE INTENTS, not literal translations. Example: "Diga que você não concorda e sugira ir de trem." or "Peça a conta e pergunte se aceitam cartão." The local's lines should remain normal natural Portuguese translations.`
-    : `- NATURAL TRANSLATIONS: 'dialogueTranslations' must be NATURAL Brazilian Portuguese — NO dictionary-style parentheticals. Just how a Brazilian would say it.`;
+    : `- NATURAL TRANSLATIONS: 'dialogueTranslations' must be NATURAL Brazilian Portuguese — NO dictionary-style parentheticals. Just how a Brazilian would say it. Use "buscar" (go get) not "procurar" (search) when the speaker already knows where something is.`;
 
   const prompt = `${speakerIntro}
 
-Requirements:
+⚠️ PRIORITY ORDER (when rules conflict, follow this order):
+1. Each line must RESPOND to or REACT to the previous line — real conversation, not a word checklist
+2. ONE scene, ONE moment, ONE topic thread — no sudden subject changes
+3. The 2 new vocabulary words appear naturally within that scene (pick scene-fitting words if needed)
+4. Target verb/grammar appears 1–2 times only if it fits naturally — never force repetition
+5. Never use false causal links (car/parce que/porque/because) without a real logical connection
+
+Context:
 - ${themeContext}
-- Pedadogical Focus: ${grammarFocus}
+- Pedagogical Focus: ${grammarFocus}
 ${tagInstruction}
-- Between ${minLines} and ${maxLines} lines total, alternating speakers
+
+Format:
+- Between ${minLines} and ${maxLines} lines, alternating speakers
 - Every line MUST begin with the speaker name and a colon
-- ⚠️ GOLDEN RULE — REAL CONVERSATION, NOT SENTENCE SHOWCASE: The #1 most important requirement is that this reads like a REAL conversation between two humans. Each line must be a genuine RESPONSE to the previous one — agreeing, disagreeing, asking a follow-up, reacting emotionally, suggesting something, sharing an opinion. The vocabulary and grammar being taught must emerge NATURALLY from the conversation flow, not be artificially inserted as isolated statements.
-- ❌ NO INVISIBLE THIRD CHARACTERS (CRITICAL): The dialogue must be strictly a 2-party conversation. The speakers CANNOT address an invisible third person (like a waiter, cashier, receptionist, or taxi driver) or perform a transaction with someone outside the dialogue. If they are in a commercial/transactional setting (café, shop, paying a fare, buying tickets), they must talk TO EACH OTHER about the transaction, and NOT pretend to order from or pay each other.
-  - BAD:
-    Romane: "Bonjour ! Je voudrais un jus, s'il vous plaît." (Addressing invisible waiter)
-    Julien: "Et moi, je prends une glace au chocolat." (Addressing invisible waiter)
-    Romane: "On mange sur ce joli banc vert ?" (Addressing Julien)
-    Julien: "Oui ! S'il vous plaît, combien ça coûte ?" (Addressing invisible waiter / Romane)
-    Romane: "C'est trois euros. C'est pas cher !" (Romane suddenly acting as the waiter)
-  - GOOD:
-    Romane: "Tu veux boire un jus ou manger une glace ?"
-    Julien: "Je prends une glace au chocolat ! Elle coûte trois euros, c'est pas cher."
-    Romane: "Super, je paye avec ma carte. On mange sur ce joli banc vert ?"
-    Julien: "Oui, c'est une excellente idée !"
-- 🤝 FRIENDLY RELATIONSHIP: Unless this is a 'MISS' lesson (first-person immersion), Speaker A and Speaker B are friends or close acquaintances. They MUST address each other informally (using 'tu' and 'on' in French, never 'vous' or formal 's'il vous plaît' to each other, except when joking).
-- ❌ ANTI-PATTERN — NEVER DO THIS: A dialogue where each line is an independent descriptive statement with no connection to the others. Example of what to NEVER produce:
-  "Le hall est sombre ici."
-  "Oui, la porte étroite est là."
-  "La clé magnétique est petite."
-  "Cette auberge est très confortable."
-  This is NOT a conversation — it's a list of disconnected observations. Each line describes something but nobody is actually TALKING to each other.
-- ✅ GOOD PATTERN — ALWAYS DO THIS: A dialogue where people actually communicate, react, and build on each other's words:
-  "On est arrivés ! Mais... le hall est un peu sombre, non ?"
-  "Oui, c'est vrai. Et regarde, la porte est étroite !"
-  "Bon, on entre ? J'ai la clé."
-  "D'accord ! Au moins l'auberge a l'air confortable."
-  This is a real conversation — they arrive somewhere, react to what they see, and decide what to do.
-- CONVERSATION REALITY TEST: Before finalizing, re-read the dialogue and ask: "Would two real humans actually say these exact lines to each other in sequence?" If any line feels like it was inserted just to showcase a word without responding to the previous speaker, REWRITE it.
-- CRITICAL SCENE COHERENCE: Pick ONE specific physical location AND ONE specific moment in time for the whole dialogue (e.g. "inside the plane during the flight", "at the café table after ordering", "in front of the hotel reception desk"). The location and time MUST NOT CHANGE across lines. If the characters start on a plane, they stay on the plane for every line — do NOT teleport them to another room, building, or scene. If a transition is narratively needed, it must be explicit and realistic (e.g. "let's get off", "we arrived, let's go inside"), and the dialogue must END at the new place, not mix scenes.
-- LOGICAL & SITUATIONAL CONTINUITY (CRITICAL): Every single line must have a clear, realistic logical connection ("nexo") to the line immediately preceding it. It is FORBIDDEN to suddenly change the subject. It is FORBIDDEN to contradict what was just said (e.g., if Speaker A says a place is quiet, Speaker B cannot say it's too crowded unless they are explicitly disagreeing with "Je ne suis pas d'accord" or similar).
-- STRICT QUESTION-ANSWER COHERENCE: If any line (especially the penultimate line) contains a question, request, or inquiry, the subsequent line MUST directly, fully, and logically answer or address it. It is forbidden to give a generic statement that ignores the specific question asked. For example, if asked "What is the danger?", the response must explain the danger itself, not just state an unrelated rule.
-- PHYSICAL & SPATIAL CONSISTENCY (CRITICAL): You MUST track the spatial orientation, relative distances, physical choices, and movements of the characters.
-  - If a character points to a distant spot/object ("vamos naquele banco?", "regarde ce banc-là"), they cannot refer to it as being "here" ("aqui", "ici") in the very next line unless they explicitly state that they walked over to it.
-  - If a character rejects an option or location (e.g. rejecting a bench because it is in the sun: "Non, il est au soleil", and choosing a shady tree instead: "sous le grand arbre"), they CANNOT suddenly end the dialogue by saying they are comfortable on the rejected location (e.g. "On est bien sur ce banc" - which contradicts the choice of the shady tree) unless they explicitly changed their mind, walked back, and sat there.
-  - Make sure physical actions, spatial proximity markers (ici/là-bas, aqui/lá/ali/este/aquele), and the narrative choices match perfectly. Their physical state must make complete logical sense from line to line.
-- REAL-WORLD USEFULNESS & SURVIVAL WORDS: The dialogue must sound like something two real people would actually say in that exact situation. A Brazilian learner should be able to reuse these exact lines if they found themselves in that scene. You are explicitly ALLOWED to use highly relevant, standard survival words related directly to the active scenario (e.g., 'médecin', 'médicament', 'pharmacie' for health/illness; 'billet', 'vol', 'bagage' for airport; 'l'addition', 'serveur' for restaurant), even if they are not in the known vocabulary list.
-- NARRATIVE ARC & ACTIVE RESOLUTIONS: Clear beginning (who/where/what's happening), middle (small development or reaction), and a natural, active conclusion (a resolution or decision) — all inside the SAME scene.
-  - Avoid anticlimactic or passive "cop-out" resolutions (like simply 'going home to rest' when someone is ill, or 'giving up' when there is a travel issue), unless the scenario explicitly demands it.
-  - The characters must resolve the conflict in a practical, active, real-world way (e.g., suggesting to call a doctor, going to the pharmacy, asking a clerk for help, taking a taxi to the hospital).
-- The entire dialogue MUST stay within the ${themeContext} provided. Do NOT drift to other topics.
-- AVOID REPETITION and QUESTION BARRAGE. Do not start multiple lines with the same filler or interjection.
-- NO STILTED LANGUAGE: Use contractions, "On" instead of "Nous" in French (unless formal), sounds human.
+- Unless 'MISS' lesson: speakers are friends — use informal 'tu'/'on' (FR) or casual tone (EN)
+- ONE location for the whole dialogue — no teleporting between scenes
+- If a line asks a question, the next line must answer it
+- Beginning → small development → natural conclusion, all in the same scene
+- Stay within ${themeContext} — do not drift to unrelated topics
+- Sound human: contractions, varied fillers (FR: Alors, Bah, Oh, Bon; EN: Well, So, Right). FORBIDDEN: "Tiens"
+- Strictly 2-party dialogue — never address an invisible waiter/cashier/receptionist
+
+ACTION AND SEMANTICS:
+- ACTION PLAN STABILITY: When line N assigns roles (A waits, B goes to get something), lines N+1 onward MUST keep those roles unless someone explicitly changes the plan. BAD: "I wait while you search" → next line "let's wait together".
+- FETCH vs SEARCH (FR: chercher vs aller chercher/récupérer): If the speaker already said WHERE the object is, use "aller la/le chercher", "récupérer", "vais la prendre" — NOT "chercher" (unknown location). EN: "go get it" not "look for it" when location is known.
+- NO PHANTOM PROPS: Do NOT introduce new objects or places (tree, bench, cupboard) unless mentioned in the previous 1-2 lines or part of the opening scene. Do NOT invent a location just to teach a preposition (e.g. no "under a tree" to use "sous").
+- PRESENT MOMENT: Keep the dialogue in present/immediate future. No past-tense anecdotes ("I waited 10 minutes...") unless explicitly reminiscing.
+- ENDING: If someone will go get something, end with them leaving or about to leave — NOT suddenly "I found it" without the fetch action.
+
+❌ BAD — vocabulary checklist (NEVER produce this):
+Sarah: "Tu as des chaussures pour le sport dans ton sac ?"
+Mathis: "Non, j'ai seulement des baskets."
+Sarah: "C'est dommage, car j'ai des chaussettes mais pas de serviettes." ← BROKEN: 'car' has no link to sneakers; towels appear from nowhere
+Mathis: "Je vais chercher des serviettes dans l'armoire."
+Sarah: "N'oublie pas les vêtements de rechange !" ← BROKEN: new items with no setup
+
+❌ BAD — disconnected observations (NEVER produce this):
+"Le hall est sombre." / "La porte est étroite." / "La clé est petite." — nobody is talking TO each other
+
+❌ BAD — key on door (NEVER produce this):
+Julia: "j'ai oublié ma clé sur la porte"
+Victor: "j'attends pendant que tu la cherches" ← wrong verb; she knows where it is
+Julia: "on attend ensemble devant l'immeuble" ← contradicts: both waiting now
+Victor: "j'ai attendu sous cet arbre" ← phantom tree + past tense
+Julia: "je l'ai trouvée" ← magic resolution without her going to get it
+
+✅ GOOD — key on door (USE THIS PATTERN):
+Julia: "Oh non, j'ai oublié ma clé sur la porte !"
+Victor: "Bah, j'attends ici pendant que tu vas la chercher."
+Julia: "D'accord, attends-moi devant cet immeuble sombre."
+Victor: "Pas de souci, je ne bouge pas d'ici."
+Julia: "Super, je reviens tout de suite !"
+
+✅ GOOD — each line reacts to the previous (gym bag scene):
+Sarah: "On va à la salle ? Tu as tes chaussures ?"
+Mathis: "Oui, et mes chaussettes propres aussi. Tu as tout, toi ?"
+Sarah: "Ah non, j'ai oublié ma serviette !"
+Mathis: "Pas grave, j'en ai une. On y va ?"
+Sarah: "Allez, on y va !"
+
+Before returning JSON, re-read line by line: does line N make sense because of line N-1? If not, rewrite.
 ${knownVocabInstruction}
 ${dialogueVocabGuard}
-- DIALOGUE FLOW: Use fillers SPARINGLY and VARIED across lines (FR allowed: "Eh bien", "Alors", "Bah", "Oh", "Ah", "Bon", "Dis donc"; EN allowed: "Well", "So", "Actually", "Right", "Look", "You know"). FORBIDDEN word: "Tiens" — never use it, in any line, under any circumstance. Do NOT repeat the same filler twice in the same dialogue.
 ${translationInstruction}
 
 LEVEL CONSTRAINTS (follow strictly):
@@ -360,52 +421,65 @@ Output ONLY this JSON object (no extra text):
 
 Rules:
 - dialogue must have between ${minLines} and ${maxLines} lines
-- newVocabulary: EXACTLY 2 DISTINCT NON-VERB words (no verbs allowed). Nouns, adjectives, or adverbs only. All 2 must appear LITERALLY in the dialogue.
+- newVocabulary: EXACTLY 2 DISTINCT NON-VERB words (nouns, adjectives, or adverbs). Both must appear in the dialogue. Choose words that fit the scene naturally — do not break the conversation to force a word in.
 - dialogueVerbs: List EVERY verb used in the dialogue in its infinitive form.
 - NEVER include days of the week, months of the year, or proper nouns in newVocabulary.
 - imageKeywords: one concise English Pexels search term per vocabulary word.
 - vocabTranslations: provide for all 2 vocabulary words.`;
 
   try {
-    // Allow the model to think (removed thinkingBudget=0) to ensure the dialogue
-    // maintains strict logical continuity and a natural conversational flow. The user
-    // reported that disabling thinking caused sudden, illogical topic changes.
-    const result = await callGeminiJSON<HookResult>(prompt, systemPrompt, 2048);
-    if (!result?.dialogue || result?.newVocabulary?.length !== 2) {
-      console.error('[generateHook] Invalid minimal hook response');
-      return null;
+    const fetchHook = async (generationPrompt: string): Promise<HookResult | null> => {
+      const raw = await callGeminiJSON<HookResult>(generationPrompt, systemPrompt, 2048);
+      if (!raw?.dialogue || raw?.newVocabulary?.length !== 2) {
+        console.error('[generateHook] Invalid minimal hook response');
+        return null;
+      }
+      return normalizeHookResult(raw, nameA, nameB);
+    };
+
+    const first = await fetchHook(prompt);
+    if (!first) return null;
+
+    const coherenceFirst = await validateDialogueCoherence(first.dialogue);
+    if (!coherenceFirst) {
+      console.warn('[generateHook] Coherence judge unavailable — accepting first dialogue');
+      return first;
     }
 
-    result.dialogue = stripForbiddenFillers(result.dialogue);
-    result.dialogue = fixDialogueLabels(result.dialogue, nameA, nameB);
-
-    result.newVocabulary = [...new Set(
-      result.newVocabulary
-        .map((w: string) => w.trim().toLowerCase())
-        .filter((w: string) => w.length > 0),
-    )];
-
-    if (result.dialogueVerbs) {
-      result.dialogueVerbs = [...new Set(
-        result.dialogueVerbs
-          .map((v: string) => v.trim().toLowerCase())
-          .filter((v: string) => v.length > 0)
-      )];
+    if (coherenceFirst.pass) {
+      console.log(`[generateHook] Coherence pass (score ${coherenceFirst.score})`);
+      return first;
     }
 
-    if (result.imageKeywords) {
-      const ik: typeof result.imageKeywords = {};
-      for (const [k, v] of Object.entries(result.imageKeywords)) ik[k.trim().toLowerCase()] = v;
-      result.imageKeywords = ik;
+    console.warn(
+      `[generateHook] Coherence fail (score ${coherenceFirst.score}) — retrying:`,
+      coherenceFirst.breaks,
+    );
+
+    const retryPrompt = prompt + buildCoherenceCorrectionBlock(coherenceFirst.breaks);
+    const second = await fetchHook(retryPrompt);
+
+    if (!second) {
+      console.warn('[generateHook] Retry generation failed — keeping first dialogue');
+      return first;
     }
 
-    if (result.vocabTranslations) {
-      const vt: typeof result.vocabTranslations = {};
-      for (const [k, v] of Object.entries(result.vocabTranslations)) vt[k.trim().toLowerCase()] = v;
-      result.vocabTranslations = vt;
+    const coherenceSecond = await validateDialogueCoherence(second.dialogue);
+    if (!coherenceSecond) return second;
+
+    if (coherenceSecond.score > coherenceFirst.score) {
+      console.log(
+        `[generateHook] Retry improved coherence (${coherenceFirst.score} → ${coherenceSecond.score})`,
+      );
+      return second;
     }
 
-    return result;
+    if (coherenceSecond.pass && !coherenceFirst.pass) return second;
+
+    console.log(
+      `[generateHook] Keeping first dialogue (scores: first=${coherenceFirst.score}, retry=${coherenceSecond.score})`,
+    );
+    return first;
   } catch (err) {
     console.error('[generateHook] Error:', err);
     return null;

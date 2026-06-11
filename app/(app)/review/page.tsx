@@ -9,9 +9,11 @@ import { getMistakeById, deleteLessonMistake, getUserVocabulary } from '@/servic
 import { generateMistakeReview } from '@/app/actions/generateMistakeReview';
 
 import { CheckButton } from '@/components/lesson/CheckButton';
+import { formatErrorCorrectionAnswer } from '@/utils/errorCorrection';
 import { ContextChoiceExercise } from '@/components/lesson/ContextChoiceExercise';
 import { ErrorCorrectionExercise } from '@/components/lesson/ErrorCorrectionExercise';
 import { ReverseTranslationInput } from '@/components/lesson/ReverseTranslationInput';
+import { useSoundEffects } from '@/hooks/useSoundEffects';
 
 import type { Exercise, LessonMistakeDocument } from '@/types';
 
@@ -35,6 +37,8 @@ function ReviewContent() {
   const [knownVocab, setKnownVocab] = useState<string[]>([]);
   const [isExerciseReady, setIsExerciseReady] = useState(false);
   const [submitTrigger, setSubmitTrigger] = useState(0);
+
+  const { play: playSound } = useSoundEffects();
 
   // Load mistake + generate exercises
   useEffect(() => {
@@ -84,8 +88,14 @@ function ReviewContent() {
   }, [mistakeId, router, user]);
 
   function handleAnswer(correct: boolean) {
+    if (exerciseAnswer !== null) return;
     setExerciseAnswer(correct);
-    if (correct) setCorrectCount((n) => n + 1);
+    if (correct) {
+      setCorrectCount((n) => n + 1);
+      playSound('correct');
+    } else {
+      playSound('incorrect');
+    }
   }
 
   function handleContinue() {
@@ -96,8 +106,9 @@ function ReviewContent() {
       setCurrentIndex((i) => i + 1);
       return;
     }
-    // Last exercise — go to complete (correctCount is already up-to-date)
+    const allCorrect = correctCount >= TOTAL;
     setPhase('complete');
+    playSound(allCorrect ? 'perfect' : 'complete');
   }
 
   function handleCheck() {
@@ -144,7 +155,7 @@ function ReviewContent() {
     if (!currentExercise || exerciseAnswer !== false) return undefined;
     switch (currentExercise.type) {
       case 'context-choice':   return currentExercise.data.blankWord;
-      case 'error-correction': return currentExercise.data.correct_word;
+      case 'error-correction': return formatErrorCorrectionAnswer(currentExercise.data);
       default:                 return undefined;
     }
   })();
