@@ -13,6 +13,7 @@ interface LessonGrammarScreenProps {
   onWordClick?: (payload: WordClickPayload) => void;
   onComplete?: (complete: boolean) => void;
   onAdvanceToPractice?: () => void;
+  onQuizCorrect?: (correct: boolean) => void;
 }
 
 export function LessonGrammarScreen({
@@ -25,6 +26,7 @@ export function LessonGrammarScreen({
   onWordClick,
   onComplete,
   onAdvanceToPractice,
+  onQuizCorrect,
 }: LessonGrammarScreenProps) {
   return (
     <div className="flex flex-col gap-6 animate-slide-up-spring">
@@ -52,6 +54,7 @@ export function LessonGrammarScreen({
         onWordClick={onWordClick}
         onComplete={onComplete}
         onAdvanceToPractice={onAdvanceToPractice}
+        onQuizCorrect={onQuizCorrect}
       />
     </div>
   );

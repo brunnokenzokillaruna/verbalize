@@ -10,6 +10,7 @@ import type { SpeakRepeatData, SupportedLanguage } from '@/types';
 interface SpeakRepeatExerciseProps {
   data: SpeakRepeatData;
   language: SupportedLanguage;
+  strictMode?: boolean;
   onAnswer: (correct: boolean) => void;
   answered: boolean;
   setIsExerciseReady: (ready: boolean) => void;
@@ -33,23 +34,31 @@ function similarity(target: string, transcript: string): number {
   return matches / Math.max(tWords.length, 1);
 }
 
+function missingWords(target: string, transcript: string): string[] {
+  const rWords = new Set(normalizeText(transcript).split(' '));
+  return normalizeText(target).split(' ').filter((w) => w && !rWords.has(w));
+}
+
 type Phase = 'idle' | 'requesting-mic' | 'recording' | 'transcribing' | 'review' | 'answered';
 
 export function SpeakRepeatExercise({
   data,
   language,
+  strictMode = false,
   onAnswer,
   answered,
   setIsExerciseReady,
   submitTrigger
 }: SpeakRepeatExerciseProps) {
+  const threshold = strictMode ? 0.9 : 0.85;
   const recorder = useVoiceRecorder();
   const hasSpeechAPI = recorder.isSupported;
   const [phase, setPhase] = useState<Phase>(answered ? 'answered' : 'idle');
   const [transcript, setTranscript] = useState('');
   const [recordError, setRecordError] = useState('');
 
-  const isCorrect = transcript ? similarity(data.text, transcript) >= 0.85 : null;
+  const isCorrect = transcript ? similarity(data.text, transcript) >= threshold : null;
+  const missed = transcript ? missingWords(data.text, transcript) : [];
 
   // Notify parent of readiness
   useEffect(() => {
@@ -221,6 +230,11 @@ export function SpeakRepeatExercise({
             <div className="flex-1">
               <p className="text-[10px] font-black uppercase tracking-widest text-[var(--color-text-muted)] mb-1 opacity-60">Você disse:</p>
               <p className="text-base font-semibold text-[var(--color-text-primary)] leading-relaxed italic">&ldquo;{transcript}&rdquo;</p>
+              {missed.length > 0 && !isCorrect && (
+                <p className="text-xs text-[var(--color-error)] mt-2">
+                  Palavras faltando: {missed.join(', ')}
+                </p>
+              )}
             </div>
           </div>
 

@@ -34,6 +34,16 @@ const DELETION_ANSWER_MARKERS = new Set([
   '(remover)',
 ]);
 
+export type ErrorCorrectionAnswerMode = 'replace' | 'rewrite';
+
+export function normalizeErrorText(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[.,!?;:'"«»()]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 export function isDeletionCorrection(correctWord: string | undefined | null): boolean {
   if (correctWord == null) return false;
   return DELETION_MARKERS.has(correctWord.trim().toLowerCase());
@@ -43,16 +53,242 @@ export function isDeletionAnswer(input: string): boolean {
   return DELETION_ANSWER_MARKERS.has(input.trim().toLowerCase());
 }
 
-export function formatErrorCorrectionAnswer(data: ErrorCorrectionData): string {
+export function findAllWholeWordIndices(sentence: string, word: string): number[] {
+  const indices: number[] = [];
+  let index = sentence.indexOf(word);
+  const isFirstCharWordChar = word.length > 0 && /\p{L}|\p{N}/u.test(word[0]);
+  const isLastCharWordChar =
+    word.length > 0 && /\p{L}|\p{N}/u.test(word[word.length - 1]);
+
+  while (index !== -1) {
+    const charBefore = index > 0 ? sentence[index - 1] : undefined;
+    const charAfter =
+      index + word.length < sentence.length ? sentence[index + word.length] : undefined;
+
+    const isPrecededByWordChar =
+      isFirstCharWordChar && charBefore ? /\p{L}|\p{N}/u.test(charBefore) : false;
+    const isFollowedByWordChar =
+      isLastCharWordChar && charAfter ? /\p{L}|\p{N}/u.test(charAfter) : false;
+
+    if (!isPrecededByWordChar && !isFollowedByWordChar) {
+      indices.push(index);
+    }
+    index = sentence.indexOf(word, index + 1);
+  }
+
+  return indices;
+}
+
+function collapseWhitespace(text: string): string {
+  return text.replace(/\s+/g, ' ').replace(/\s+([?.!,;:])/g, '$1').trim();
+}
+
+/** Builds the corrected sentence by applying the fix at a specific occurrence. */
+export function applyCorrectionAtIndex(
+  sentence: string,
+  errorWord: string,
+  correctWord: string,
+  index: number,
+): string {
+  if (index < 0) return sentence;
+
+  const replacement = isDeletionCorrection(correctWord) ? '' : correctWord;
+  const raw =
+    sentence.slice(0, index) + replacement + sentence.slice(index + errorWord.length);
+
+  return collapseWhitespace(raw);
+}
+
+export function deriveCorrectedSentence(data: ErrorCorrectionData): string {
+  if (data.corrected_sentence?.trim()) {
+    return collapseWhitespace(data.corrected_sentence.trim());
+  }
+
+  const index = resolveErrorHighlightIndex(data);
+  return applyCorrectionAtIndex(
+    data.sentence_with_error,
+    data.error_word,
+    data.correct_word,
+    index,
+  );
+}
+
+/**
+ * Picks which occurrence of error_word to highlight when it appears more than once.
+ * Uses corrected_sentence when available; for deletions, prefers the last occurrence.
+ */
+export function resolveErrorHighlightIndex(data: ErrorCorrectionData): number {
+  if (typeof data.error_span_start === 'number' && data.error_span_start >= 0) {
+    return data.error_span_start;
+  }
+
+  const indices = findAllWholeWordIndices(data.sentence_with_error, data.error_word);
+  if (indices.length === 0) return -1;
+  if (indices.length === 1) return indices[0];
+
+  if (data.corrected_sentence?.trim()) {
+    const target = normalizeErrorText(data.corrected_sentence);
+
+    for (const index of indices) {
+      const candidate = normalizeErrorText(
+        applyCorrectionAtIndex(
+          data.sentence_with_error,
+          data.error_word,
+          data.correct_word,
+          index,
+        ),
+      );
+
+      if (candidate === target) {
+        return index;
+      }
+    }
+
+    let bestIndex = indices[0];
+    let bestScore = -1;
+
+    for (const index of indices) {
+      const candidate = normalizeErrorText(
+        applyCorrectionAtIndex(
+          data.sentence_with_error,
+          data.error_word,
+          data.correct_word,
+          index,
+        ),
+      );
+      const score = tokenOverlapScore(candidate, target);
+      if (score > bestScore) {
+        bestScore = score;
+        bestIndex = index;
+      }
+    }
+
+    return bestIndex;
+  }
+
+  // Redundant repetition (e.g. "en" + repeated noun) usually errors on the later occurrence.
   if (isDeletionCorrection(data.correct_word)) {
-    return `Apague "${data.error_word}" (deixe em branco)`;
+    return indices[indices.length - 1];
+  }
+
+  return indices[0];
+}
+
+function tokenOverlapScore(a: string, b: string): number {
+  const setA = new Set(a.split(' ').filter(Boolean));
+  const setB = new Set(b.split(' ').filter(Boolean));
+  if (setA.size === 0 || setB.size === 0) return 0;
+
+  let intersection = 0;
+  for (const token of setA) {
+    if (setB.has(token)) intersection++;
+  }
+
+  return intersection / Math.max(setA.size, setB.size);
+}
+
+export function getErrorCorrectionAnswerMode(
+  data: ErrorCorrectionData,
+): ErrorCorrectionAnswerMode {
+  if (data.answer_mode === 'replace' || data.answer_mode === 'rewrite') {
+    return data.answer_mode;
+  }
+
+  if (data.corrected_sentence?.trim()) {
+    return 'rewrite';
+  }
+
+  if (isDeletionCorrection(data.correct_word)) {
+    return 'rewrite';
+  }
+
+  return 'replace';
+}
+
+export function normalizeErrorCorrectionData(
+  data: ErrorCorrectionData,
+): ErrorCorrectionData {
+  const errorSpanStart = resolveErrorHighlightIndex(data);
+  const correctedSentence =
+    data.corrected_sentence?.trim() ||
+    applyCorrectionAtIndex(
+      data.sentence_with_error,
+      data.error_word,
+      data.correct_word,
+      errorSpanStart,
+    );
+
+  const enriched: ErrorCorrectionData = {
+    ...data,
+    corrected_sentence: collapseWhitespace(correctedSentence),
+    error_span_start: errorSpanStart >= 0 ? errorSpanStart : data.error_span_start,
+  };
+
+  return {
+    ...enriched,
+    answer_mode: getErrorCorrectionAnswerMode(enriched),
+  };
+}
+
+export function countErrorWordOccurrences(sentence: string, errorWord: string): number {
+  return findAllWholeWordIndices(sentence, errorWord).length;
+}
+
+export function isValidErrorCorrectionExercise(data: ErrorCorrectionData): boolean {
+  if (!data.sentence_with_error?.trim() || !data.error_word?.trim()) return false;
+  if (data.correct_word == null || !data.translation?.trim()) return false;
+
+  const occurrences = countErrorWordOccurrences(data.sentence_with_error, data.error_word);
+  if (occurrences === 0) return false;
+
+  const normalized = normalizeErrorCorrectionData(data);
+  const isReplace = normalized.answer_mode === 'replace';
+
+  if (isReplace) {
+    return (
+      !isDeletionCorrection(data.correct_word) &&
+      data.error_word.toLowerCase() !== data.correct_word.trim().toLowerCase()
+    );
+  }
+
+  return normalizeErrorText(normalized.corrected_sentence ?? '') !== normalizeErrorText(data.sentence_with_error);
+}
+
+export function formatErrorCorrectionAnswer(data: ErrorCorrectionData): string {
+  const normalized = normalizeErrorCorrectionData(data);
+  if (normalized.answer_mode === 'rewrite') {
+    return normalized.corrected_sentence ?? data.correct_word;
   }
   return data.correct_word;
 }
 
+export function errorCorrectionInstruction(data: ErrorCorrectionData): string {
+  const normalized = normalizeErrorCorrectionData(data);
+  if (normalized.answer_mode === 'rewrite') {
+    return 'Corrija a frase abaixo — reescreva a versão certa:';
+  }
+  return 'Encontre e corrija o erro na frase abaixo:';
+}
+
 export function errorCorrectionPlaceholder(data: ErrorCorrectionData): string {
-  if (isDeletionCorrection(data.correct_word)) {
-    return `Apague "${data.error_word}" — deixe em branco`;
+  const normalized = normalizeErrorCorrectionData(data);
+  if (normalized.answer_mode === 'rewrite') {
+    return 'Digite a frase corrigida…';
   }
   return `Substitua "${data.error_word}"…`;
+}
+
+export function isRewriteAnswerCorrect(
+  input: string,
+  data: ErrorCorrectionData,
+): boolean {
+  const normalized = normalizeErrorCorrectionData(data);
+  const normalizedInput = normalizeErrorText(input);
+  const normalizedCorrect = normalizeErrorText(normalized.corrected_sentence ?? '');
+
+  if (normalizedInput === normalizedCorrect) return true;
+
+  return (data.acceptable_answers ?? []).some(
+    (alt) => normalizeErrorText(alt) === normalizedInput,
+  );
 }

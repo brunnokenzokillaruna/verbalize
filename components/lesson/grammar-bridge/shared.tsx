@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { AudioPlayerButton } from '../AudioPlayerButton';
 import { ClickableSentence } from '../ClickableSentence';
 import type { WordClickPayload } from '../ClickableWord';
 import type { GrammarBridgeResult, SupportedLanguage } from '@/types';
@@ -113,32 +114,106 @@ function parseFormulaBranches(formula: string): Array<{ label?: string; formula:
   }));
 }
 
+type FormulaBranch = {
+  label?: string;
+  formula: string;
+  example?: { target: string; portuguese: string };
+};
+
+export function FormulaExampleCard({
+  example,
+  language,
+  newVocabulary = [],
+  newVerbs = [],
+  onWordClick,
+}: {
+  example: { target: string; portuguese: string };
+  language: SupportedLanguage;
+  newVocabulary?: string[];
+  newVerbs?: string[];
+  onWordClick?: (payload: WordClickPayload) => void;
+}) {
+  const cleanTarget = stripHighlights(example.target);
+
+  return (
+    <div className="w-full max-w-md rounded-2xl bg-[var(--color-surface-raised)]/25 border border-[var(--color-border)]/60 p-4 flex flex-col gap-2.5 items-center text-center">
+      <span className="text-[10px] font-black uppercase tracking-[0.12em] text-[var(--color-text-muted)]">
+        Exemplo na prática
+      </span>
+      <AudioPlayerButton text={cleanTarget} language={language} size="sm" />
+      <TargetPhrase
+        text={cleanTarget}
+        language={language}
+        newVocabulary={newVocabulary}
+        newVerbs={newVerbs}
+        onWordClick={onWordClick}
+        className="text-base font-bold text-[var(--color-text-primary)] leading-relaxed"
+        highlightClassName="bg-[var(--color-primary)] text-white px-1 py-0.5 rounded"
+      />
+      <p className="text-sm italic text-[var(--color-text-secondary)]">
+        <HighlightedText
+          text={example.portuguese}
+          className="text-[var(--color-text-primary)] font-semibold not-italic"
+        />
+      </p>
+    </div>
+  );
+}
+
 export function FormulaRenderer({
   structureFormula,
   structureFormulas,
+  formulaExample,
+  language,
+  newVocabulary = [],
+  newVerbs = [],
+  onWordClick,
 }: {
   structureFormula?: string | null;
-  structureFormulas?: Array<{ label: string; formula: string }> | null;
+  structureFormulas?: Array<{
+    label: string;
+    formula: string;
+    example?: { target: string; portuguese: string };
+  }> | null;
+  formulaExample?: { target: string; portuguese: string } | null;
+  language?: SupportedLanguage;
+  newVocabulary?: string[];
+  newVerbs?: string[];
+  onWordClick?: (payload: WordClickPayload) => void;
 }) {
-  const branches =
+  const branches: FormulaBranch[] =
     structureFormulas && structureFormulas.length > 0
       ? structureFormulas
       : structureFormula
-        ? parseFormulaBranches(structureFormula)
+        ? parseFormulaBranches(structureFormula).map((branch) => ({
+            ...branch,
+            example: formulaExample ?? undefined,
+          }))
         : [];
 
   if (branches.length === 0) return null;
 
+  const showExamples = Boolean(language);
+
   return (
-    <div className="flex flex-col gap-4 items-center">
+    <div className="flex flex-col gap-5 items-center w-full">
       {branches.map((branch, i) => (
-        <div key={i} className="flex flex-col gap-2 items-center w-full">
+        <div key={i} className="flex flex-col gap-3 items-center w-full">
           {branch.label && branches.length > 1 && (
             <span className="text-[10px] font-bold text-[var(--color-primary)] uppercase tracking-wide">
               {branch.label}
             </span>
           )}
           <FormulaLine formula={branch.formula} />
+          {showExamples && branch.example && (
+            <FormulaExampleCard
+              example={branch.example}
+              language={language!}
+              newVocabulary={newVocabulary}
+              newVerbs={newVerbs}
+              onWordClick={onWordClick}
+            />
+          )}
         </div>
       ))}
     </div>
@@ -152,7 +227,7 @@ export function RetentionCheckCard({
   feedback,
 }: {
   check: NonNullable<GrammarBridgeResult['retentionCheck']>;
-  onAnswered?: (answered: boolean) => void;
+  onAnswered?: (correct: boolean) => void;
   onPlaySound?: (type: 'correct' | 'incorrect') => void;
   feedback?: { survivalTip?: string; trapExplanation?: string };
 }) {
@@ -161,7 +236,7 @@ export function RetentionCheckCard({
   const handleSelect = (i: number) => {
     setSelected(i);
     const correct = i === check.correctIndex;
-    onAnswered?.(true);
+    onAnswered?.(correct);
     onPlaySound?.(correct ? 'correct' : 'incorrect');
   };
 

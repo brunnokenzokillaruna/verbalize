@@ -28,6 +28,14 @@ export function buildMistakeContext(exercise: Exercise): string {
       return `Minimal pair: context "${exercise.data.sentenceContext}" — correct word: "${exercise.data.correctWord}" vs wrong option.`;
     case 'conjugation-speed':
       return `Conjugation speed: "${exercise.data.pronoun}" + "${exercise.data.verb}" — correct form: "${exercise.data.correctForm}"`;
+    case 'image-match':
+      return `Image match: word "${exercise.data.targetWord}" (${exercise.data.translation})`;
+    case 'word-bank-translation':
+      return `Word bank translation: "${exercise.data.portuguese_sentence}" → "${exercise.data.correctOrder.join(' ')}"`;
+    case 'bridge-choice':
+      return `Bridge choice: "${exercise.data.question}" — correct: "${exercise.data.options[exercise.data.correctIndex]}"`;
+    case 'listen-and-select':
+      return `Listen and select: "${exercise.data.audioText}"`;
   }
 }
 

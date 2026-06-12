@@ -68,11 +68,14 @@ export interface CuidadoStep extends GrammarStepBase {
   };
 }
 
+type FormulaExample = { target: string; portuguese: string };
+
 export interface FormulaStep extends GrammarStepBase {
   type: 'formula';
   data: {
     structureFormula?: string;
-    structureFormulas?: Array<{ label: string; formula: string }>;
+    structureFormulas?: Array<{ label: string; formula: string; example?: FormulaExample }>;
+    formulaExample?: FormulaExample;
   };
 }
 
@@ -328,6 +331,57 @@ function pushCuidadoStep(drafts: StepDraft[], bridge: GrammarBridgeResult): void
   }
 }
 
+function stripHighlights(text: string): string {
+  return text.replace(/\^\^/g, '');
+}
+
+function collectFormulaFallbackExamples(bridge: GrammarBridgeResult): FormulaExample[] {
+  const examples: FormulaExample[] = [];
+  const seen = new Set<string>();
+
+  const push = (ex?: FormulaExample) => {
+    if (!ex?.target?.trim()) return;
+    const key = ex.target.trim().toLowerCase();
+    if (seen.has(key)) return;
+    seen.add(key);
+    examples.push(ex);
+  };
+
+  push(bridge.formulaExample);
+  bridge.structureFormulas?.forEach((f) => push(f.example));
+  push(bridge.dialogueExample);
+  bridge.patterns?.forEach((p) => push(p));
+  bridge.additionalExamples?.forEach((ex) => push(ex));
+  if (bridge.bridge?.target && bridge.bridge?.portuguese) {
+    push({
+      target: stripHighlights(bridge.bridge.target),
+      portuguese: stripHighlights(bridge.bridge.portuguese),
+    });
+  }
+
+  return examples;
+}
+
+function resolveFormulaStepData(
+  bridge: GrammarBridgeResult,
+): FormulaStep['data'] {
+  const fallbacks = collectFormulaFallbackExamples(bridge);
+
+  if (bridge.structureFormulas?.length) {
+    return {
+      structureFormulas: bridge.structureFormulas.map((formula, i) => ({
+        ...formula,
+        example: formula.example ?? fallbacks[i] ?? fallbacks[0],
+      })),
+    };
+  }
+
+  return {
+    structureFormula: bridge.structureFormula,
+    formulaExample: bridge.formulaExample ?? fallbacks[0],
+  };
+}
+
 function pushFormulaStep(drafts: StepDraft[], bridge: GrammarBridgeResult, tag?: LessonTag): void {
   const hasFormula = Boolean(bridge.structureFormulas?.length || bridge.structureFormula);
   if (!hasFormula || tag === 'VOC' || tag === 'EXPR') return;
@@ -337,10 +391,7 @@ function pushFormulaStep(drafts: StepDraft[], bridge: GrammarBridgeResult, tag?:
     type: 'formula',
     label: 'Fórmula da estrutura',
     phase: 'estruturar',
-    data: {
-      structureFormula: bridge.structureFormula,
-      structureFormulas: bridge.structureFormulas,
-    },
+    data: resolveFormulaStepData(bridge),
   });
 }
 
@@ -517,7 +568,7 @@ export function buildGrammarSteps(
   language: SupportedLanguage,
   tag?: LessonTag,
 ): GrammarStep[] {
-  const bridge = normalizeGrammarBridgeResult(raw);
+  const bridge = normalizeGrammarBridgeResult(raw, language);
   if (!bridge) return [];
 
   const drafts: StepDraft[] = [];

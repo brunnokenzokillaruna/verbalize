@@ -196,8 +196,16 @@ export default function PreviewPage() {
                 difference: 'Il faut é fixo e impessoal, devoir muda conforme a pessoa.',
               },
               structureFormulas: [
-                { label: 'Opção A (necessidade geral)', formula: '[il faut] + [verbo no infinitivo]' },
-                { label: 'Opção B (obrigação pessoal)', formula: '[Sujeito] + [devoir conjugado] + [verbo no infinitivo]' },
+                {
+                  label: 'Opção A (necessidade geral)',
+                  formula: '[il faut] + [verbo no infinitivo]',
+                  example: { target: 'Il faut ranger.', portuguese: 'É preciso organizar.' },
+                },
+                {
+                  label: 'Opção B (obrigação pessoal)',
+                  formula: '[Sujeito] + [devoir conjugado] + [verbo no infinitivo]',
+                  example: { target: 'Je dois ranger.', portuguese: 'Eu preciso organizar.' },
+                },
               ],
               patterns: [
                 { label: 'Afirmação', target: 'Il faut ranger.', portuguese: 'É preciso organizar.' },

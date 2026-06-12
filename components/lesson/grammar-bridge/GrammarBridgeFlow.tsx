@@ -19,6 +19,7 @@ interface GrammarBridgeFlowProps {
   onWordClick?: (payload: WordClickPayload) => void;
   onComplete?: (complete: boolean) => void;
   onAdvanceToPractice?: () => void;
+  onQuizCorrect?: (correct: boolean) => void;
   previewMode?: boolean;
 }
 
@@ -31,6 +32,7 @@ export function GrammarBridgeFlow({
   onWordClick,
   onComplete,
   onAdvanceToPractice,
+  onQuizCorrect,
   previewMode = false,
 }: GrammarBridgeFlowProps) {
   const { play } = useSoundEffects();
@@ -136,7 +138,10 @@ export function GrammarBridgeFlow({
             newVocabulary={newVocabulary}
             newVerbs={newVerbs}
             onWordClick={onWordClick}
-            onQuizAnswered={setQuizAnswered}
+            onQuizAnswered={(correct) => {
+              setQuizAnswered(true);
+              onQuizCorrect?.(correct);
+            }}
             onPlaySound={handlePlaySound}
           />
         </div>

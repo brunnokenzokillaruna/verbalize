@@ -116,6 +116,21 @@ ${tagGuidance}
 
 Você está falando com um falante nativo de português brasileiro. Use isso a seu favor: compare diretamente com o português, aponte os erros clássicos que brasileiros cometem e explique POR QUÊ a estrutura funciona diferente.
 
+⚠️ CAMPO bridge — FRASES EXEMPLO, NUNCA META-EXPLICAÇÃO ⚠️
+bridge.portuguese e bridge.target são EXCLUSIVAMENTE um par de frases exemplo paralelas (PT-BR ↔ ${LANG_LABEL[language]}).
+A explicação comparativa vai em insight, bridge.difference e explanation — NUNCA dentro de bridge.portuguese ou bridge.target.
+
+ERRADO (meta-explicação — rejeitado pelo app):
+{ "portuguese": "No português, a gente omite o objeto. No francês, você substitui pelo 'en'.", "target": "Em português, a gente omite. Em francês, você insere o 'en' antes do verbo." }
+
+CERTO (frases concretas ilustrando a regra):
+{ "portuguese": "Eu ^^quero mais^^", "target": "J'^^en^^ veux plus", "difference": "O francês exige 'en' para retomar o objeto; o português permite omitir." }
+
+Regras do bridge:
+- portuguese: frase curta em PT-BR como alguém falaria (pode omitir objeto se a regra for omissão).
+- target: tradução/equivalente 100% em ${LANG_LABEL[language]} — zero português neste campo.
+- difference: única frase explicando a diferença estrutural entre as duas frases acima.
+
 ⚠️ FORMATO DE EXIBIÇÃO — JORNADA PEDAGÓGICA v2 ⚠️
 Cada campo do JSON tem uma FUNÇÃO COGNITIVA distinta. NÃO repita a mesma sacada em campos diferentes.
 - insight = modelo mental (1 frase impacto)
@@ -178,9 +193,18 @@ Output ONLY este JSON (sem markdown):
   "survivalTip": "Dica de sobrevivência ultra rápida, prática e direta ao ponto que o aluno possa memorizar imediatamente. Em PT-BR amigável. MAX 12 palavras.",
   "culturalNote": "Um detalhe, curiosidade cultural ou hábito social real de uso na língua-alvo. Em PT-BR amigável. MAX 15 palavras.",
   "structureFormula": "fórmula única quando há só UMA construção. Use colchetes e '+' como separador. Deixe null se usar structureFormulas.",
+  "formulaExample": { "target": "Frase real que instancia a fórmula única", "portuguese": "Tradução natural PT-BR" },
   "structureFormulas": [
-    { "label": "Opção A (ex: necessidade geral)", "formula": "[il faut] + [verbo no infinitivo]" },
-    { "label": "Opção B (ex: obrigação pessoal)", "formula": "[Sujeito] + [devoir conjugado] + [verbo no infinitivo]" }
+    {
+      "label": "Opção A (ex: necessidade geral)",
+      "formula": "[il faut] + [verbo no infinitivo]",
+      "example": { "target": "Il faut ranger.", "portuguese": "É preciso organizar." }
+    },
+    {
+      "label": "Opção B (ex: obrigação pessoal)",
+      "formula": "[Sujeito] + [devoir conjugado] + [verbo no infinitivo]",
+      "example": { "target": "Je dois ranger.", "portuguese": "Eu preciso organizar." }
+    }
   ],
   "usageContext": "Descreva em 1-3 palavras a 'vibe' social (ex: 'Casual/Amigos', 'Polidez/Formal', 'Dia-a-dia').",
   "brazilianTrap": {
@@ -224,7 +248,8 @@ Regras Cruciais:
 3. brazilianTrap: FOQUE no erro clássico. Mostre o que o brasileiro tentaria dizer e a versão correta no objeto estruturado. SEMPRE preencha wrongPortuguese e rightPortuguese com traduções naturais em PT-BR das frases wrong e right.
 4. Destaque Visual: Use ^^ envolta das palavras-chave em bridge.target and bridge.portuguese para criar o mapeamento visual.
 5. explanation: array de 0-2 strings. OMITA se insight + bridge.difference já explicam a regra. Nunca repita insight nem bridge.difference.
-5b. structureFormulas: use quando a regra tiver 2+ construções alternativas (ex: il faut vs devoir). Cada item com label descritivo. Deixe structureFormula null nesse caso.
+5b. structureFormulas: use quando a regra tiver 2+ construções alternativas (ex: il faut vs devoir). Cada item com label descritivo e example (frase real + tradução PT-BR que instancia aquela fórmula). Deixe structureFormula e formulaExample null nesse caso.
+5b2. formulaExample: quando usar structureFormula única, inclua 1 frase real + tradução PT-BR que mostra a fórmula aplicada na prática (ex: fórmula [Sujeito] + [réponds] + [à/au/aux] + [resposta] → target: "Je réponds à la question.", portuguese: "Eu respondo à pergunta.").
 5c. retentionCheck: pergunta de 2 opções; prefira "Como você diria X?" quando possível. correctIndex deve apontar para a opção certa.
 6. dialogueExample.target: DEVE ser uma linha real do diálogo acima.
 7. additionalExamples: no máximo 1 exemplo com vocabulário diferente dos patterns (generalização).
@@ -239,7 +264,7 @@ Regras Cruciais:
 12. ESTRUTURA E COMPLETUDE EM FRANCÊS: Se o foco for francês e envolver preposições + artigos (ex: contrações para dor, direção, lugares, etc.), você DEVE incluir nos padrões ('patterns') ou exemplos adicionais a contração antes de vogal/H mudo ('à l\''), além de cobrir o masculino ('au'), feminino ('à la') e plural ('aux').`;
 
     const raw = await callGeminiJSON<GrammarBridgeResult>(prompt, systemPrompt, 3500);
-    return normalizeGrammarBridgeResult(raw);
+    return normalizeGrammarBridgeResult(raw, language);
   } catch (err) {
     console.error('[generateGrammarBridge] Error:', err);
     return null;

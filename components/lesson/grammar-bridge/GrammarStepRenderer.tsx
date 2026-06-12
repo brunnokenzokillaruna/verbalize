@@ -24,7 +24,7 @@ interface GrammarStepRendererProps {
   newVocabulary?: string[];
   newVerbs?: string[];
   onWordClick?: (payload: WordClickPayload) => void;
-  onQuizAnswered?: (answered: boolean) => void;
+  onQuizAnswered?: (correct: boolean) => void;
   onPlaySound?: (type: 'correct' | 'incorrect') => void;
 }
 
@@ -51,7 +51,15 @@ export function GrammarStepRenderer({
     case 'cuidado':
       return <CuidadoStepView step={step} />;
     case 'formula':
-      return <FormulaStepView step={step} />;
+      return (
+        <FormulaStepView
+          step={step}
+          language={language}
+          newVocabulary={newVocabulary}
+          newVerbs={newVerbs}
+          onWordClick={onWordClick}
+        />
+      );
     case 'compare':
       return (
         <CompareStepView

@@ -52,7 +52,7 @@ export interface ImageCacheDocument {
   imageUrl: string;
   photographer: string;
   createdAt: Timestamp;
-  approved?: boolean;    // true = excluded from admin review queue
+  approved?: boolean;    // true = approved for visual exercises
   translation?: string;  // pt-BR translation, cached for admin display
 }
 
@@ -126,10 +126,14 @@ export type ProficiencyLevel = 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2';
 export type ExerciseType =
   | 'context-choice'
   | 'sentence-builder'
+  | 'image-match'
   | 'audio-dictation'
   | 'speak-repeat'
   | 'error-correction'
   | 'reverse-translation'
+  | 'word-bank-translation'
+  | 'bridge-choice'
+  | 'listen-and-select'
   | 'social-roleplay'
   | 'scrambled-conversation'
   | 'interactive-subtitles'
@@ -172,6 +176,10 @@ export interface HookResult {
   // Bundled from super-hook (eliminates separate Gemini round-trips)
   grammarBridge?: GrammarBridgeResult;
   imageKeywords?: Record<string, string>;            // word → Pexels search term
+  imageMatchOptions?: Record<string, {
+    distractors: string[];
+    semanticFields: string[];
+  }>;
   vocabTranslations?: Record<string, TranslateWordResult>; // word → translation data
   dialogueVerbs?: string[];                          // all verbs (infinitives) used in the dialogue
   curiosidade?: string;                              // engaging fun fact in casual PT-BR, every lesson
@@ -186,7 +194,12 @@ export interface GrammarBridgeResult {
   survivalTip?: string;       // Dica de sobrevivência ultra curta, ≤12 palavras
   culturalNote?: string;      // Detalhe ou curiosidade cultural de uso, ≤15 palavras
   structureFormula?: string;   // OPCIONAL: representação em cápsulas. ex: "[Sujeito] + [avoir (conjugado)] + mal + [à la / au / aux / à l']"
-  structureFormulas?: Array<{ label: string; formula: string }>; // Alternativas quando a regra tem 2+ construções
+  structureFormulas?: Array<{
+    label: string;
+    formula: string;
+    example?: { target: string; portuguese: string }; // Exemplo real que instancia esta fórmula
+  }>; // Alternativas quando a regra tem 2+ construções
+  formulaExample?: { target: string; portuguese: string }; // Exemplo real quando há só UMA fórmula
   bridge?: {
     portuguese: string;       // Padrão/frase como se diz em PT-BR
     target: string;           // Equivalente na língua-alvo
@@ -285,6 +298,12 @@ export interface ErrorCorrectionData {
   sentence_with_error: string;
   error_word: string;
   correct_word: string;
+  /** Full corrected sentence — preferred for validation and rewrite mode. */
+  corrected_sentence?: string;
+  /** 0-based index of error_word in sentence_with_error when it appears more than once. */
+  error_span_start?: number;
+  /** replace = type only the replacement word; rewrite = type the full corrected sentence. */
+  answer_mode?: 'replace' | 'rewrite';
   translation: string; // Portuguese translation of the correct sentence
   explanation: string; // in Portuguese
   acceptable_answers?: string[]; // other grammatically valid alternatives
@@ -313,6 +332,11 @@ export interface InteractiveSubtitlesData {
   errorText: string;       // The sentence with some words swapped/wrong
   wrongWords: string[];    // The words the user must click to "fix"
   translations: string;    // Portuguese translation
+  corrections?: Array<{
+    wrong: string;
+    correct: string;
+    options: string[];
+  }>;
 }
 
 export interface LogicConnectorsData {
@@ -354,10 +378,50 @@ export interface ConjugationSpeedData {
   translation: string;     // PT-BR translation
 }
 
+export interface ImageMatchData {
+  targetWord: string;
+  translation: string;
+  contextSentence?: string;
+  options: Array<{
+    word: string;
+    imageUrl: string;
+    imageAlt: string;
+  }>;
+  correctWord: string;
+}
+
+export interface WordBankTranslationData {
+  portuguese_sentence: string;
+  words: string[];
+  correctOrder: string[];
+  acceptable_variants?: string[][];
+  hint?: string;
+}
+
+export interface BridgeChoiceData {
+  scenario: string;
+  question: string;
+  options: string[];
+  correctIndex: number;
+  explanation: string;
+  trapRule?: string;
+}
+
+export interface ListenAndSelectData {
+  audioText: string;
+  options: string[];
+  correctIndex: number;
+  translation: string;
+}
+
 export type Exercise =
   | { type: 'context-choice';         data: ContextChoiceData }
   | { type: 'sentence-builder';       data: SentenceBuilderData }
+  | { type: 'image-match';            data: ImageMatchData }
   | { type: 'reverse-translation';    data: ReverseTranslationData }
+  | { type: 'word-bank-translation';  data: WordBankTranslationData }
+  | { type: 'bridge-choice';          data: BridgeChoiceData }
+  | { type: 'listen-and-select';      data: ListenAndSelectData }
   | { type: 'audio-dictation';        data: DictationData }
   | { type: 'error-correction';       data: ErrorCorrectionData }
   | { type: 'speak-repeat';           data: SpeakRepeatData }

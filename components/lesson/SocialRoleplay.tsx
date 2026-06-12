@@ -1,22 +1,21 @@
-import React, { useState, useMemo } from 'react';
-import { SocialRoleplayData } from '@/types';
+import React, { useState, useEffect } from 'react';
 import { MessageSquare, CheckCircle2, XCircle, MapPin, Lightbulb } from 'lucide-react';
+import { SocialRoleplayData } from '@/types';
 
 interface SocialRoleplayProps {
   data: SocialRoleplayData;
   onAnswer: (correct: boolean) => void;
   answered: boolean;
   setIsExerciseReady: (ready: boolean) => void;
+  submitTrigger: number;
 }
 
 function formatContext(text: string): string {
   if (!text) return '';
-  // If the text is heavily uppercase, convert to natural sentence case
   const upperCount = (text.match(/[A-Z]/g) || []).length;
   const totalAlpha = (text.match(/[a-zA-Z]/g) || []).length;
   if (totalAlpha > 0 && (upperCount / totalAlpha) > 0.7) {
     const lower = text.toLowerCase();
-    // Capitalize first letter of each sentence
     return lower.replace(/(^\s*|[.!?]\s+)([a-z])/g, (m) => m.toUpperCase());
   }
   return text;
@@ -48,11 +47,10 @@ function getInterlocutorRole(context: string): { label: string; avatar: string }
   return { label: 'Interlocutor', avatar: '💬' };
 }
 
-export function SocialRoleplay({ data, onAnswer, answered, setIsExerciseReady }: SocialRoleplayProps) {
+export function SocialRoleplay({ data, onAnswer, answered, setIsExerciseReady, submitTrigger }: SocialRoleplayProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
-  // Shuffle options once on mount so the correct answer isn't always at the same position
-  const shuffledOptions = useMemo(() => {
+  const shuffledOptions = React.useMemo(() => {
     const indexed = data.options.map((opt, i) => ({ text: opt, isCorrect: i === data.correctIndex }));
     for (let i = indexed.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -61,11 +59,24 @@ export function SocialRoleplay({ data, onAnswer, answered, setIsExerciseReady }:
     return indexed;
   }, [data.options, data.correctIndex]);
 
+  useEffect(() => {
+    if (!answered) {
+      setIsExerciseReady(selectedIndex !== null);
+    } else {
+      setIsExerciseReady(false);
+    }
+  }, [selectedIndex, answered, setIsExerciseReady]);
+
+  useEffect(() => {
+    if (submitTrigger > 0 && !answered && selectedIndex !== null) {
+      onAnswer(shuffledOptions[selectedIndex].isCorrect);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [submitTrigger]);
+
   const handleSelect = (index: number) => {
     if (answered) return;
     setSelectedIndex(index);
-    onAnswer(shuffledOptions[index].isCorrect);
-    setIsExerciseReady(true);
   };
 
   const formattedContext = formatContext(data.context);
@@ -73,9 +84,7 @@ export function SocialRoleplay({ data, onAnswer, answered, setIsExerciseReady }:
 
   return (
     <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      
-      {/* 1. Scenario / Narrator setup */}
-      <div 
+      <div
         className="rounded-2xl p-4.5 border border-dashed border-[var(--color-border)] backdrop-blur-sm"
         style={{ backgroundColor: 'rgba(255, 255, 255, 0.01)' }}
       >
@@ -88,10 +97,8 @@ export function SocialRoleplay({ data, onAnswer, answered, setIsExerciseReady }:
         </p>
       </div>
 
-      {/* 2. Chat Simulation (Interlocutor Speech Bubble) */}
       <div className="flex items-start gap-3 mt-1">
-        {/* Avatar with gradient and initials */}
-        <div 
+        <div
           className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-bold text-lg shadow-md ring-2 ring-white/10"
           style={{
             background: 'linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%)',
@@ -100,17 +107,13 @@ export function SocialRoleplay({ data, onAnswer, answered, setIsExerciseReady }:
         >
           {role.avatar}
         </div>
-
-        {/* Speech Bubble */}
         <div className="flex flex-col gap-1.5 max-w-[85%]">
           <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)] ml-1">
             {role.label}
           </span>
-          <div 
+          <div
             className="rounded-2xl rounded-tl-none px-4.5 py-3 border border-white/5 shadow-lg relative animate-slide-up-spring"
-            style={{
-              backgroundColor: 'var(--color-surface-raised)',
-            }}
+            style={{ backgroundColor: 'var(--color-surface-raised)' }}
           >
             <p className="text-base font-semibold text-[var(--color-text-primary)] leading-relaxed">
               {data.promptLine}
@@ -119,25 +122,23 @@ export function SocialRoleplay({ data, onAnswer, answered, setIsExerciseReady }:
         </div>
       </div>
 
-      {/* Divider */}
       <div className="relative my-2 flex items-center justify-center">
         <div className="absolute inset-0 flex items-center" aria-hidden="true">
-          <div className="w-full border-t border-[var(--color-border)] opacity-30"></div>
+          <div className="w-full border-t border-[var(--color-border)] opacity-30" />
         </div>
         <span className="relative rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)] bg-[var(--color-bg)] border border-[var(--color-border)] opacity-85">
           Escolha como responder
         </span>
       </div>
 
-      {/* 3. Student's Turn (Options styled as right-aligned message choices like WhatsApp) */}
       <div className="flex flex-col items-end gap-3 w-full">
         {shuffledOptions.map((option, index) => {
           const isSelected = selectedIndex === index;
           const isCorrect = option.isCorrect;
-          const letter = String.fromCharCode(65 + index); // A, B, C...
-          
+          const letter = String.fromCharCode(65 + index);
+
           let stateStyles = "border border-[var(--color-primary)]/10 bg-[var(--color-primary-light)]/10 hover:bg-[var(--color-primary-light)]/20 hover:border-[var(--color-primary)]/20 text-[var(--color-text-primary)]";
-          
+
           if (answered) {
             if (isCorrect) {
               stateStyles = "bg-[rgba(16,185,129,0.08)] border border-emerald-500/40 text-emerald-200 shadow-[0_0_15px_rgba(16,185,129,0.05)]";
@@ -146,6 +147,8 @@ export function SocialRoleplay({ data, onAnswer, answered, setIsExerciseReady }:
             } else {
               stateStyles = "opacity-25 scale-98 pointer-events-none border-white/5 bg-white/5";
             }
+          } else if (isSelected) {
+            stateStyles = "border-[var(--color-primary)] bg-[var(--color-primary-light)]/30";
           }
 
           return (
@@ -154,16 +157,12 @@ export function SocialRoleplay({ data, onAnswer, answered, setIsExerciseReady }:
               disabled={answered}
               onClick={() => handleSelect(index)}
               className={`flex items-center justify-between w-full self-end max-w-[88%] md:max-w-[75%] p-4 rounded-2xl rounded-tr-none text-left transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] shadow-md ${stateStyles}`}
-              style={{
-                boxShadow: isSelected && !answered ? '0 4px 15px rgba(29, 78, 216, 0.2)' : undefined
-              }}
             >
               <div className="flex items-start gap-3">
-                {/* Badge A, B, C */}
-                <div 
+                <div
                   className={`flex h-6.5 w-6.5 shrink-0 items-center justify-center rounded-lg text-xs font-black transition-colors ${
-                    answered && isCorrect 
-                      ? 'bg-emerald-500 text-white shadow-sm' 
+                    answered && isCorrect
+                      ? 'bg-emerald-500 text-white shadow-sm'
                       : answered && isSelected
                         ? 'bg-red-500 text-white shadow-sm'
                         : isSelected && !answered
@@ -175,7 +174,6 @@ export function SocialRoleplay({ data, onAnswer, answered, setIsExerciseReady }:
                 </div>
                 <span className="text-sm md:text-[15px] font-semibold leading-relaxed">{option.text}</span>
               </div>
-              
               {answered && isCorrect && <CheckCircle2 size={18} className="text-emerald-500 shrink-0 ml-3" />}
               {answered && isSelected && !isCorrect && <XCircle size={18} className="text-red-500 shrink-0 ml-3" />}
             </button>
@@ -183,13 +181,12 @@ export function SocialRoleplay({ data, onAnswer, answered, setIsExerciseReady }:
         })}
       </div>
 
-      {/* 4. Pedagogical Explanation */}
       {answered && (
-        <div 
+        <div
           className="mt-2 rounded-xl p-4.5 border-l-4 border-[var(--color-primary)] animate-in slide-in-from-bottom-2 duration-300"
-          style={{ 
+          style={{
             backgroundColor: 'var(--color-surface-raised)',
-            borderLeftColor: (selectedIndex !== null && shuffledOptions[selectedIndex].isCorrect) ? 'var(--color-success)' : 'var(--color-error)'
+            borderLeftColor: (selectedIndex !== null && shuffledOptions[selectedIndex].isCorrect) ? 'var(--color-success)' : 'var(--color-error)',
           }}
         >
           <div className="flex items-center gap-2 mb-2">

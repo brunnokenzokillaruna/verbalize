@@ -1,7 +1,8 @@
 'use server';
 
 import { callGeminiJSON } from '@/services/gemini';
-import type { Exercise, SupportedLanguage, ProficiencyLevel } from '@/types';
+import { isValidErrorCorrectionExercise, normalizeErrorCorrectionData } from '@/utils/errorCorrection';
+import type { ErrorCorrectionData, Exercise, SupportedLanguage, ProficiencyLevel } from '@/types';
 
 const LANG_LABEL: Record<SupportedLanguage, string> = {
   fr: 'French',
@@ -50,13 +51,10 @@ Respond with ONLY a valid JSON array, no markdown, no explanation.`;
 
     const extraExercises = isFive ? `
 
-Exercise 4 — type "context-choice":
-- Create a DIFFERENT sentence (not the same as Exercise 1) that tests this exact grammar point
-- Replace the key word with ___ in the "sentence" field
-- "blankWord" is the correct answer
-- "options" must have exactly 4 items: the correct word plus 3 distractors
-- CRITICAL: the 3 distractors must be CLEARLY WRONG in this specific sentence
-- "translation" is the Brazilian Portuguese translation of the full sentence
+Exercise 4 — type "bridge-choice" OR "context-choice":
+- Prefer "bridge-choice" if the mistake stems from Brazilian Portuguese interference
+- For bridge-choice: "scenario" (PT-BR), "question" (PT-BR), "options" (3-4 ${LANG_LABEL[language]} sentences), "correctIndex", "explanation", optional "trapRule"
+- Otherwise use context-choice as originally specified
 
 Exercise 5 — type "reverse-translation":
 - "portuguese_sentence" MUST be written ENTIRELY in Brazilian Portuguese — do NOT include any ${LANG_LABEL[language]} words. Write a DIFFERENT sentence from Exercise 3 that exercises this grammar point
@@ -102,10 +100,13 @@ Exercise 2 — type "error-correction":
 - Write a ${LANG_LABEL[language]} sentence that contains ONE deliberate error related to this grammar point
 - "sentence_with_error" is the full sentence (with the error)
 - "error_word" is the incorrect word or short phrase
-- "correct_word" is the ideal correct replacement
-- "acceptable_answers" is an array of OTHER words that are also grammatically correct in that slot and demonstrate the same grammar concept. If no valid alternatives exist, use an empty array.
+- "correct_word" is the replacement word/phrase (for deletions, repeat the removed span)
+- "corrected_sentence" is ALWAYS required: the full sentence after fixing the error
+- "answer_mode": "replace" for single-word swaps; "rewrite" when the student must type the full corrected sentence (deletions, redundant repetition, multi-word fixes)
+- "acceptable_answers" is an array of OTHER valid corrected sentences or replacement words. If none exist, use an empty array.
 - "explanation" is a brief explanation in Brazilian Portuguese of why the error is wrong and what the correct form should be
-- CRITICAL: "error_word" must appear EXACTLY ONCE in "sentence_with_error". Write the sentence so the error word does not repeat elsewhere. The sentence must be grammatically clean except for that single deliberate error.
+- CRITICAL: "error_word" must appear EXACTLY ONCE in "sentence_with_error". If context naturally repeats the phrase, isolate ONLY the clause with the error (e.g. "Oui, j'en ai du pain." not "Tu as du pain ? Oui, j'en ai du pain.").
+- NEVER ask the student to leave the answer blank. For deletions, use answer_mode "rewrite" and corrected_sentence as the full fixed sentence.
 - CRITICAL: The sentence_with_error must be OBJECTIVELY AND UNAMBIGUOUSLY WRONG. A native speaker would immediately recognize the error. NEVER create trick sentences where the "error" is actually grammatically valid.
 - SELF-CHECK before outputting: ask yourself "Is this sentence clearly wrong? Would every native speaker agree it contains an error?" If there is any doubt, choose a different, clearer error.
 - GOOD error types (clear and unambiguous): wrong verb conjugation, wrong gender agreement, wrong subject pronoun, missing negation particle, wrong required preposition.
@@ -135,6 +136,8 @@ Output format (exactly this structure, ${isFive ? 5 : 3} items):
       "sentence_with_error": "sentence with one error",
       "error_word": "wrong word",
       "correct_word": "correct word",
+      "corrected_sentence": "full sentence after fix",
+      "answer_mode": "replace",
       "acceptable_answers": ["other_valid_word1"],
       "explanation": "Explicação em português"
     }
@@ -157,15 +160,16 @@ Output format (exactly this structure, ${isFive ? 5 : 3} items):
       return null;
     }
 
-    // Structural validation: drop error-correction exercises where
-    // error_word is absent from the sentence or equals correct_word
+    // Structural validation: drop malformed error-correction exercises
     const validated = exercises.filter((ex) => {
       if (ex.type !== 'error-correction') return true;
-      const { sentence_with_error, error_word, correct_word } = ex.data as {
-        sentence_with_error: string; error_word: string; correct_word: string;
-      };
-      const ok = sentence_with_error?.includes(error_word) && error_word !== correct_word;
-      if (!ok) console.warn('[generateMistakeReview] Dropped malformed error-correction exercise');
+      const normalized = normalizeErrorCorrectionData(ex.data as ErrorCorrectionData);
+      const ok = isValidErrorCorrectionExercise(normalized);
+      if (ok) {
+        Object.assign(ex.data, normalized);
+      } else {
+        console.warn('[generateMistakeReview] Dropped malformed error-correction exercise');
+      }
       return ok;
     });
 

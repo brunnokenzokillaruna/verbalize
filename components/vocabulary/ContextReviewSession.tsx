@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { CheckCircle2, XCircle, ChevronRight } from 'lucide-react';
 import { ContextChoiceExercise } from '@/components/lesson/ContextChoiceExercise';
 import { ReverseTranslationInput } from '@/components/lesson/ReverseTranslationInput';
+import { WordBankTranslation } from '@/components/lesson/WordBankTranslation';
 import { ReviewSessionShell } from './ReviewSessionShell';
 import { ReviewResultsScreen } from './ReviewResultsScreen';
 import { VocabReviewExerciseFrame } from './VocabReviewExerciseFrame';
@@ -71,7 +72,9 @@ export function ContextReviewSession({
   const exercise = currentItem.exercise;
   const wordImage = wordImageMap[currentItem.word];
   const exerciseType =
-    exercise.type === 'context-choice' || exercise.type === 'reverse-translation'
+    exercise.type === 'context-choice' ||
+    exercise.type === 'reverse-translation' ||
+    exercise.type === 'word-bank-translation'
       ? exercise.type
       : 'context-choice';
 
@@ -172,6 +175,16 @@ export function ContextReviewSession({
             <ReverseTranslationInput
               data={exercise.data}
               language={language}
+              onAnswer={onAnswer}
+              answered={answered}
+              setIsExerciseReady={setIsExerciseReady}
+              submitTrigger={submitTrigger}
+            />
+          )}
+
+          {exercise.type === 'word-bank-translation' && (
+            <WordBankTranslation
+              data={exercise.data}
               onAnswer={onAnswer}
               answered={answered}
               setIsExerciseReady={setIsExerciseReady}

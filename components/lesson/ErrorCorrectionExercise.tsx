@@ -1,33 +1,17 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import type { ErrorCorrectionData } from '@/types';
 import { isAccentOnlyDiff } from '@/utils/accent';
 import {
+  errorCorrectionInstruction,
   errorCorrectionPlaceholder,
-  isDeletionAnswer,
-  isDeletionCorrection,
+  getErrorCorrectionAnswerMode,
+  isRewriteAnswerCorrect,
+  normalizeErrorCorrectionData,
+  normalizeErrorText,
+  resolveErrorHighlightIndex,
 } from '@/utils/errorCorrection';
-
-function findWholeWordIndex(sentence: string, word: string): number {
-  let index = sentence.indexOf(word);
-  const isFirstCharWordChar = word.length > 0 && /\p{L}|\p{N}/u.test(word[0]);
-  const isLastCharWordChar = word.length > 0 && /\p{L}|\p{N}/u.test(word[word.length - 1]);
-
-  while (index !== -1) {
-    const charBefore = index > 0 ? sentence[index - 1] : undefined;
-    const charAfter = index + word.length < sentence.length ? sentence[index + word.length] : undefined;
-
-    const isPrecededByWordChar = isFirstCharWordChar && charBefore ? /\p{L}|\p{N}/u.test(charBefore) : false;
-    const isFollowedByWordChar = isLastCharWordChar && charAfter ? /\p{L}|\p{N}/u.test(charAfter) : false;
-
-    if (!isPrecededByWordChar && !isFollowedByWordChar) {
-      return index;
-    }
-    index = sentence.indexOf(word, index + 1);
-  }
-  return -1;
-}
 
 interface ErrorCorrectionExerciseProps {
   data: ErrorCorrectionData;
@@ -39,57 +23,60 @@ interface ErrorCorrectionExerciseProps {
 
 type AnswerStatus = 'idle' | 'correct' | 'accent-warning' | 'wrong';
 
-export function ErrorCorrectionExercise({ 
-  data, 
-  onAnswer, 
+export function ErrorCorrectionExercise({
+  data,
+  onAnswer,
   answered,
   setIsExerciseReady,
-  submitTrigger
+  submitTrigger,
 }: ErrorCorrectionExerciseProps) {
   const [input, setInput] = useState('');
   const [answerStatus, setAnswerStatus] = useState<AnswerStatus>('idle');
-  const isDeletion = isDeletionCorrection(data.correct_word);
 
-  // Notify parent of readiness
+  const exercise = useMemo(() => normalizeErrorCorrectionData(data), [data]);
+  const isRewrite = getErrorCorrectionAnswerMode(exercise) === 'rewrite';
+
   useEffect(() => {
     if (!answered) {
-      setIsExerciseReady(isDeletion || input.trim().length > 0);
+      setIsExerciseReady(input.trim().length > 0);
     } else {
       setIsExerciseReady(false);
     }
-  }, [input, answered, setIsExerciseReady, isDeletion]);
+  }, [input, answered, setIsExerciseReady]);
 
-  // Listen for global submit
   useEffect(() => {
     if (submitTrigger > 0 && !answered) {
       handleSubmit();
     }
   }, [submitTrigger]);
 
-  const normalize = (s: string) =>
-    s.toLowerCase().replace(/[.,!?;:'"-]/g, '').replace(/\s+/g, ' ').trim();
+  const normalizedInput = normalizeErrorText(input);
+  const normalizedCorrect = normalizeErrorText(exercise.correct_word);
 
-  const normalizedInput = normalize(input);
-  const normalizedCorrect = normalize(data.correct_word);
-  const isExactCorrect = isDeletion
-    ? isDeletionAnswer(input)
+  const isExactCorrect = isRewrite
+    ? isRewriteAnswerCorrect(input, exercise)
     : normalizedInput === normalizedCorrect;
-  // Safety net: if correct_word is a bare clitic ending with ' (e.g. "J'"),
-  // also accept answers that start with it (e.g. "J'écoute").
-  // Use raw (non-normalized) strings so the apostrophe isn't stripped.
+
   const isElisionPrefix =
     !isExactCorrect &&
-    data.correct_word.trimEnd().endsWith("'") &&
-    input.toLowerCase().startsWith(data.correct_word.toLowerCase());
+    !isRewrite &&
+    exercise.correct_word.trimEnd().endsWith("'") &&
+    input.toLowerCase().startsWith(exercise.correct_word.toLowerCase());
+
   const isAlternativeCorrect =
     !isExactCorrect &&
     !isElisionPrefix &&
-    (data.acceptable_answers ?? []).some((alt) => normalize(alt) === normalizedInput);
+    (exercise.acceptable_answers ?? []).some(
+      (alt) => normalizeErrorText(alt) === normalizedInput,
+    );
+
   const isCorrect = isExactCorrect || isElisionPrefix || isAlternativeCorrect;
+
   const isAccentWarning =
     !isCorrect &&
-    (isAccentOnlyDiff(input, data.correct_word) ||
-      (data.acceptable_answers ?? []).some((alt) => isAccentOnlyDiff(input, alt)));
+    !isRewrite &&
+    (isAccentOnlyDiff(input, exercise.correct_word) ||
+      (exercise.acceptable_answers ?? []).some((alt) => isAccentOnlyDiff(input, alt)));
 
   function handleSubmit() {
     if (answered) return;
@@ -98,27 +85,26 @@ export function ErrorCorrectionExercise({
     onAnswer(status === 'correct');
   }
 
-  // Split only on the FIRST occurrence of the error word to avoid highlighting duplicates
-  const firstIdx = findWholeWordIndex(data.sentence_with_error, data.error_word);
-  const before = firstIdx >= 0 ? data.sentence_with_error.slice(0, firstIdx) : data.sentence_with_error;
-  const after = firstIdx >= 0 ? data.sentence_with_error.slice(firstIdx + data.error_word.length) : '';
+  const highlightIdx = resolveErrorHighlightIndex(exercise);
+  const before =
+    highlightIdx >= 0
+      ? exercise.sentence_with_error.slice(0, highlightIdx)
+      : exercise.sentence_with_error;
+  const after =
+    highlightIdx >= 0
+      ? exercise.sentence_with_error.slice(highlightIdx + exercise.error_word.length)
+      : '';
 
   return (
     <div className="flex flex-col gap-8">
-      {/* Instruction */}
       <div className="flex items-center gap-3 px-1 opacity-70">
         <span className="h-px w-6 bg-[var(--color-border)]" />
         <p className="text-xs font-medium italic text-[var(--color-text-muted)]">
-          {isDeletion
-            ? 'Encontre o erro e apague a palavra destacada (deixe em branco):'
-            : 'Encontre e corrija o erro na frase abaixo:'}
+          {errorCorrectionInstruction(exercise)}
         </p>
       </div>
 
-      {/* Sentence with highlighted error word */}
-      <div
-        className="rounded-xl p-6 bg-[var(--color-surface-raised)]/30 border border-[var(--color-border)]"
-      >
+      <div className="rounded-xl p-6 bg-[var(--color-surface-raised)]/30 border border-[var(--color-border)]">
         <p className="font-display text-xl leading-relaxed text-[var(--color-text-primary)]">
           {before}
           <span
@@ -138,48 +124,46 @@ export function ErrorCorrectionExercise({
                 ? isCorrect
                   ? 'var(--color-success)'
                   : 'var(--color-error)'
-                : 'var(--color-primary-dark)'
+                : 'var(--color-primary-dark)',
             }}
           >
-            {data.error_word}
+            {exercise.error_word}
           </span>
           {after}
         </p>
-        
-        {data.translation && (
+
+        {exercise.translation && (
           <div className="mt-4 pt-4 border-t border-[var(--color-border)]/50">
             <p className="text-sm font-medium italic text-[var(--color-text-muted)]">
-              &ldquo;{data.translation}&rdquo;
+              &ldquo;{exercise.translation}&rdquo;
             </p>
           </div>
         )}
       </div>
 
-      {/* Correction input */}
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-2 px-1">
           <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--color-text-muted)] opacity-60">
             Sua Correção
           </span>
         </div>
-        
+
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           disabled={answered}
-          placeholder={errorCorrectionPlaceholder(data)}
+          placeholder={errorCorrectionPlaceholder(exercise)}
           className="w-full rounded-xl bg-[var(--color-surface-raised)] px-6 py-4 text-base font-medium outline-none transition-all duration-300 ring-1 shadow-inner"
           style={{
-            borderColor: 
-              !answered
-                ? 'var(--color-border)'
-                : answerStatus === 'correct'
-                  ? 'var(--color-success)'
-                  : answerStatus === 'accent-warning'
-                    ? '#d97706'
-                    : 'var(--color-error)',
-            boxShadow: 
+            borderColor: !answered
+              ? 'var(--color-border)'
+              : answerStatus === 'correct'
+                ? 'var(--color-success)'
+                : answerStatus === 'accent-warning'
+                  ? '#d97706'
+                  : 'var(--color-error)',
+            boxShadow:
               answered && answerStatus === 'correct'
                 ? '0 0 0 3px rgba(34, 197, 94, 0.1), inset 0 2px 4px rgba(0,0,0,0.05)'
                 : answered && answerStatus === 'accent-warning'
@@ -204,7 +188,6 @@ export function ErrorCorrectionExercise({
         />
       </div>
 
-      {/* Feedback Messages */}
       <div className="flex flex-col gap-4">
         {answered && answerStatus === 'accent-warning' && (
           <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 animate-in fade-in zoom-in-95 duration-300">
@@ -212,7 +195,7 @@ export function ErrorCorrectionExercise({
               Quase lá! Atenção aos acentos:
             </p>
             <p className="text-sm font-semibold text-amber-900 italic">
-              {data.correct_word}
+              {exercise.correct_word}
             </p>
           </div>
         )}
@@ -223,16 +206,18 @@ export function ErrorCorrectionExercise({
               Também correto!
             </p>
             <p className="text-sm font-semibold text-[var(--color-text-primary)] leading-relaxed italic">
-              No diálogo foi usado &ldquo;{data.correct_word}&rdquo;.
+              {isRewrite
+                ? <>Outra forma válida da frase corrigida.</>
+                : <>No diálogo foi usado &ldquo;{exercise.correct_word}&rdquo;.</>}
             </p>
           </div>
         )}
 
-        {answered && answerStatus === 'wrong' && isDeletion && !isDeletionAnswer(input) && (
+        {answered && answerStatus === 'wrong' && isRewrite && (
           <div className="p-4 rounded-xl bg-[var(--color-error-bg)]/40 border border-[var(--color-error)]/20 animate-in fade-in slide-in-from-top-2 duration-300">
             <p className="text-sm leading-relaxed text-[var(--color-text-primary)]">
-              A correção é <strong>apagar</strong> &ldquo;{data.error_word}&rdquo; — não substituir por outra palavra
-              {input.trim() ? ', nem reescrever a frase inteira' : ''}.
+              A frase correta é:{' '}
+              <strong className="not-italic">{exercise.corrected_sentence}</strong>
             </p>
           </div>
         )}
@@ -240,7 +225,7 @@ export function ErrorCorrectionExercise({
         {answered && (
           <div className="px-1 border-l-2 border-[var(--color-primary)]/20 pl-4 py-2 opacity-90 italic">
             <p className="text-sm italic leading-relaxed text-[var(--color-text-muted)]">
-              {data.explanation}
+              {exercise.explanation}
             </p>
           </div>
         )}

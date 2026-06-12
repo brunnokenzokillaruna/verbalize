@@ -4,20 +4,16 @@ import React from 'react';
 import Image from 'next/image';
 import { Book } from 'lucide-react';
 import { AudioPlayerButton } from '@/components/lesson/AudioPlayerButton';
+import { ExerciseTypeShell } from '@/components/lesson/ExerciseTypeShell';
 import type { SupportedLanguage } from '@/types';
 
 interface VocabReviewExerciseFrameProps {
-  exerciseType: 'context-choice' | 'reverse-translation';
+  exerciseType: 'context-choice' | 'reverse-translation' | 'word-bank-translation';
   word: string;
   wordImage?: string;
   language: SupportedLanguage;
   children: React.ReactNode;
 }
-
-const TYPE_LABELS: Record<VocabReviewExerciseFrameProps['exerciseType'], string> = {
-  'context-choice': 'Complete a frase',
-  'reverse-translation': 'Traduza para o idioma',
-};
 
 export function VocabReviewExerciseFrame({
   exerciseType,
@@ -28,21 +24,6 @@ export function VocabReviewExerciseFrame({
 }: VocabReviewExerciseFrameProps) {
   return (
     <div className="flex flex-col gap-5">
-      <div
-        className="flex items-center gap-2 rounded-xl px-3 py-2"
-        style={{
-          backgroundColor: 'var(--color-primary-light)',
-          border: '1px solid rgba(29, 94, 212, 0.2)',
-        }}
-      >
-        <span
-          className="text-[10px] font-black uppercase tracking-widest"
-          style={{ color: 'var(--color-primary)' }}
-        >
-          {TYPE_LABELS[exerciseType]}
-        </span>
-      </div>
-
       {exerciseType === 'reverse-translation' && (
         <div
           className="flex items-center gap-3 rounded-2xl p-3"
@@ -78,7 +59,9 @@ export function VocabReviewExerciseFrame({
         </div>
       )}
 
-      {children}
+      <ExerciseTypeShell type={exerciseType} hideInstruction>
+        {children}
+      </ExerciseTypeShell>
     </div>
   );
 }

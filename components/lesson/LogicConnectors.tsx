@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { LogicConnectorsData } from '@/types';
 import { Link } from 'lucide-react';
 
@@ -7,16 +7,30 @@ interface LogicConnectorsProps {
   onAnswer: (correct: boolean) => void;
   answered: boolean;
   setIsExerciseReady: (ready: boolean) => void;
+  submitTrigger: number;
 }
 
-export function LogicConnectors({ data, onAnswer, answered, setIsExerciseReady }: LogicConnectorsProps) {
+export function LogicConnectors({ data, onAnswer, answered, setIsExerciseReady, submitTrigger }: LogicConnectorsProps) {
   const [selected, setSelected] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!answered) {
+      setIsExerciseReady(selected !== null);
+    } else {
+      setIsExerciseReady(false);
+    }
+  }, [selected, answered, setIsExerciseReady]);
+
+  useEffect(() => {
+    if (submitTrigger > 0 && !answered && selected !== null) {
+      onAnswer(selected === data.correctConnector);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [submitTrigger]);
 
   const handleSelect = (option: string) => {
     if (answered) return;
     setSelected(option);
-    onAnswer(option === data.correctConnector);
-    setIsExerciseReady(true);
   };
 
   return (
@@ -30,11 +44,11 @@ export function LogicConnectors({ data, onAnswer, answered, setIsExerciseReady }
           <p className="text-xl md:text-2xl font-display font-medium text-[var(--color-text-primary)] leading-tight">
             {data.partA}
           </p>
-          
+
           <div className="h-14 flex items-center justify-center">
             <div className={`px-6 py-2 rounded-full border-2 border-dashed transition-all duration-300 min-w-[120px] text-center ${
-              selected 
-                ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)] font-bold scale-110' 
+              selected
+                ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)] font-bold scale-110'
                 : 'border-white/20 text-transparent'
             }`}>
               {selected || '...'}
@@ -55,12 +69,14 @@ export function LogicConnectors({ data, onAnswer, answered, setIsExerciseReady }
         {data.options.map((option) => {
           const isSelected = selected === option;
           const isCorrect = option === data.correctConnector;
-          
+
           let stateStyles = "bg-white/5 ring-1 ring-white/10 hover:bg-white/10 active:scale-95";
           if (answered) {
             if (isCorrect) stateStyles = "bg-emerald-500/20 ring-1 ring-emerald-500/50 text-emerald-200 shadow-lg shadow-emerald-500/10";
             else if (isSelected) stateStyles = "bg-red-500/20 ring-1 ring-red-500/50 text-red-200";
             else stateStyles = "opacity-30 grayscale blur-[1px]";
+          } else if (isSelected) {
+            stateStyles = "bg-[var(--color-primary-light)] ring-1 ring-[var(--color-primary)]/50 text-[var(--color-primary)]";
           }
 
           return (

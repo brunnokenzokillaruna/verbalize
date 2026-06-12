@@ -7,6 +7,8 @@ import { generateGrammarBridge } from '@/app/actions/generateGrammarBridge';
 import { generatePracticeExercises } from '@/app/actions/generatePracticeExercises';
 import { getVerbConjugation } from '@/app/actions/getVerbConjugation';
 import { logLesson, updateLessonStats, upsertVocabularyItem } from '@/services/firestore';
+import { assemblePracticeSession, injectImageMatchIntoPool } from '@/utils/assemblePracticeExercises';
+import { buildImageMatchFromLessonVocab } from '@/utils/imageMatchBuilder';
 import type { GrammarBridgeResult, Exercise, LessonTag } from '@/types';
 import type { LessonPhase } from '@/store/lessonStore';
 
@@ -65,8 +67,14 @@ export function useLessonFlow({
   }, [store]);
 
   const buildClientExercises = useCallback((): Exercise[] => {
-    return [];
-  }, []);
+    if (!store.hook) return [];
+    const imageMatch = buildImageMatchFromLessonVocab({
+      hook: store.hook,
+      vocabImages: store.vocabImages,
+      vocabTranslations: store.vocabTranslations,
+    });
+    return imageMatch ? [imageMatch] : [];
+  }, [store.hook, store.vocabImages, store.vocabTranslations]);
 
   const advanceFromGrammar = useCallback(async () => {
     if (!store.lesson || !store.hook || store.isLoading) return;
@@ -77,9 +85,26 @@ export function useLessonFlow({
     const aiExercises = await (exercisesPrefetchRef.current ?? fetchAiExercises());
     exercisesPrefetchRef.current = null;
     console.log(`[Timing] Exercícios (${fromCache ? 'do cache' : 'gerados agora'}): ${(performance.now() - tEx).toFixed(0)}ms (${aiExercises?.length ?? 0} exercícios)`);
-    const clientExercises = buildClientExercises();
 
-    store.setExercises([...(aiExercises ?? []), ...clientExercises]);
+    const clientExercises = buildClientExercises();
+    const imageMatchForPool = clientExercises[0] ?? buildImageMatchFromLessonVocab({
+      hook: store.hook,
+      vocabImages: store.vocabImages,
+      vocabTranslations: store.vocabTranslations,
+    });
+
+    let merged = assemblePracticeSession(
+      aiExercises ?? [],
+      clientExercises,
+      store.lesson.tag,
+      store.bridgeQuizPassed,
+    );
+
+    if (store.lesson.tag !== 'VOC' || !clientExercises.length) {
+      merged = injectImageMatchIntoPool(merged, imageMatchForPool);
+    }
+
+    store.setExercises(merged);
     store.setPhase('practice');
   }, [store, exercisesPrefetchRef, fetchAiExercises, buildClientExercises]);
 
@@ -108,8 +133,6 @@ export function useLessonFlow({
 
   const advanceFromRolePlay = useCallback(() => {
     if (!store.lesson || !store.hook) return;
-    // Role-play closes the dialogue for MISS and hands off to practice,
-    // reusing the same exercise-fetch path as the hook phase.
     advanceFromGrammar();
   }, [store, advanceFromGrammar]);
 
@@ -177,9 +200,6 @@ export function useLessonFlow({
     if (store.hook.verbWord) {
       getVerbConjugation(store.hook.verbWord, language).catch(console.error);
     }
-    // Next-lesson pregen is triggered earlier from useLessonBootstrap when
-    // the user enters the 'practice' phase, giving the 3 background Gemini
-    // calls a ~60-180s head start over finishing the lesson.
   }, [user, profile, store, setProfile]);
 
   const skipLesson = useCallback(async () => {
@@ -196,7 +216,6 @@ export function useLessonFlow({
         setProfile({ ...profile, ...updates });
       }
 
-      // Skip the complete screen — go straight to dashboard
       exitingRef.current = true;
       store.reset();
       router.replace('/dashboard');

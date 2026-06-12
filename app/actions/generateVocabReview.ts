@@ -15,17 +15,32 @@ export interface VocabReviewItem {
 }
 
 interface GenerateVocabReviewParams {
-  words: Array<{ word: string; translation: string }>;
+  words: Array<{ word: string; translation: string; imageUrl?: string }>;
   language: SupportedLanguage;
   level: ProficiencyLevel;
   knownVocabulary?: string[];
 }
 
+type ReviewExerciseKind =
+  | 'context-choice'
+  | 'reverse-translation'
+  | 'word-bank-translation';
+
+function pickReviewType(
+  index: number,
+  word: { imageUrl?: string },
+  level: ProficiencyLevel,
+): ReviewExerciseKind {
+  const cycle: ReviewExerciseKind[] =
+    level === 'A1'
+      ? ['context-choice', 'context-choice', 'reverse-translation']
+      : ['context-choice', 'reverse-translation', 'word-bank-translation'];
+  return cycle[index % cycle.length];
+}
+
 /**
  * Generates one spaced-repetition exercise per vocabulary word (up to 8 words per session).
- * Alternates between context-choice (fill-in-blank with the word) and reverse-translation
- * (translate a PT-BR sentence that requires using the word).
- * Returns null on error.
+ * Cycles context-choice, reverse-translation, and word-bank-translation by level.
  */
 export async function generateVocabReview(
   params: GenerateVocabReviewParams,
@@ -42,31 +57,39 @@ export async function generateVocabReview(
 
   const exerciseDescriptions = reviewWords
     .map((w, i) => {
-      const type = i % 2 === 0 ? 'context-choice' : 'reverse-translation';
+      const type = pickReviewType(i, w, level);
       if (type === 'context-choice') {
         return `Item ${i + 1} — word: "${w.word}" (PT: ${w.translation}) — type "context-choice"
 - Write an ORIGINAL ${langLabel} sentence where "${w.word}" is the key word
 - "sentence": replace "${w.word}" with ___
 - "blankWord": "${w.word}"
-- "options": 4 items — "${w.word}" + 3 clearly wrong distractors from different semantic fields
+- "options": 4 items — "${w.word}" + 3 highly plausible distractors (same grammatical category or semantic field, but clearly wrong in this sentence context)
 - "translation": Brazilian Portuguese translation of the full sentence`;
-      } else {
-        return `Item ${i + 1} — word: "${w.word}" (PT: ${w.translation}) — type "reverse-translation"
+      }
+      if (type === 'word-bank-translation') {
+        return `Item ${i + 1} — word: "${w.word}" (PT: ${w.translation}) — type "word-bank-translation"
+- "portuguese_sentence": natural PT-BR sentence whose ${langLabel} translation uses "${w.word}"
+- "correctOrder": array of ${langLabel} words in correct order (must include "${w.word}")
+- "words": same words as correctOrder, shuffled
+- "acceptable_variants": [] or 1 alternative order`;
+      }
+      return `Item ${i + 1} — word: "${w.word}" (PT: ${w.translation}) — type "reverse-translation"
 - "portuguese_sentence": natural PT-BR sentence whose correct ${langLabel} translation uses "${w.word}"
 - "target_translation": ${langLabel} sentence containing "${w.word}"
 - "acceptable_variants": 1-2 alternative phrasings (or [])`;
-      }
     })
     .join('\n\n');
 
   const jsonTemplate = reviewWords
     .map((w, i) => {
-      const type = i % 2 === 0 ? 'context-choice' : 'reverse-translation';
+      const type = pickReviewType(i, w, level);
       if (type === 'context-choice') {
         return `  {"word":"${w.word}","exercise":{"type":"context-choice","data":{"sentence":"sentence with ___","blankWord":"${w.word}","options":["${w.word}","distractor1","distractor2","distractor3"],"translation":"PT translation"}}}`;
-      } else {
-        return `  {"word":"${w.word}","exercise":{"type":"reverse-translation","data":{"portuguese_sentence":"PT sentence","target_translation":"${langLabel} sentence with ${w.word}","acceptable_variants":[]}}}`;
       }
+      if (type === 'word-bank-translation') {
+        return `  {"word":"${w.word}","exercise":{"type":"word-bank-translation","data":{"portuguese_sentence":"PT sentence","correctOrder":["word1","${w.word}"],"words":["${w.word}","word1"],"acceptable_variants":[]}}}`;
+      }
+      return `  {"word":"${w.word}","exercise":{"type":"reverse-translation","data":{"portuguese_sentence":"PT sentence","target_translation":"${langLabel} sentence with ${w.word}","acceptable_variants":[]}}}`;
     })
     .join(',\n');
 
@@ -107,6 +130,14 @@ ${jsonTemplate}
           (d as Record<string, unknown>).acceptable_variants = [];
         }
         return true;
+      }
+      if (item.exercise.type === 'word-bank-translation') {
+        const d = item.exercise.data as {
+          portuguese_sentence?: string;
+          words?: string[];
+          correctOrder?: string[];
+        };
+        return !!d.portuguese_sentence && !!d.words?.length && !!d.correctOrder?.length;
       }
       return false;
     });

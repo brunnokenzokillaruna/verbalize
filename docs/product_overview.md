@@ -218,39 +218,39 @@ The project uses a stack that allows operation with zero cost.
 - **Hosting:** Vercel free tier
 
 ## Exercise Types
-The following exercise formats are supported.
+The following exercise formats are supported in lesson practice and vocabulary review.
 
-### Audio Dictation
-The learner listens to a sentence and writes what they hear.
-- **Goal:** Improve listening and spelling accuracy.
+### Core types
+- **Context Choice** — fill-in-the-blank with plausible distractors
+- **Sentence Builder** — arrange word blocks in correct order
+- **Error Correction** — fix a deliberate grammar mistake
+- **Reverse Translation** — translate PT-BR → target language (free writing)
+- **Word Bank Translation** — translate by assembling word tiles (guided production)
+- **Audio Dictation** — listen and type what you hear
+- **Speak & Repeat** — listen and repeat aloud (speech transcription)
+- **Listen & Select** — listen and pick the correct written transcription
 
-### Speak & Repeat
-The learner listens to a sentence and repeats it aloud. Speech recognition evaluates pronunciation.
-- **Goal:** Improve speaking fluency.
+### Dialogue & pragmatics
+- **Social Roleplay** — choose the best response in context
+- **Scrambled Conversation** — order dialogue lines logically
+- **Interactive Subtitles** — detect wrong words, then pick corrections
+- **Logic Connectors** — choose the correct connector (but, because, so…)
 
-### Sentence Builder
-The learner constructs a sentence by arranging word blocks in the correct order.
-- **Goal:** Understand sentence structure.
+### Portuguese Bridge (PT-BR interference)
+- **Grammar Trap** — pick the one correct sentence among Brazilian-error traps
+- **Bridge Choice** — MCQ focused on PT-BR interference patterns
 
-### Context Choice
-The learner chooses the correct word or phrase depending on the context.
-- **Goal:** Develop nuance recognition.
+### Pronunciation & verbs
+- **Minimal Pair** — discriminate similar sounds (PRON lessons)
+- **Conjugation Speed** — quick verb conjugation MCQ (VERB lessons)
 
-### Verb Conjugation Drill
-The learner completes missing forms in a verb conjugation table.
-- **Goal:** Strengthen verb conjugation recall.
+### Visual vocabulary
+- **Image Match (Word-to-Image)** — see the target word, pick the correct image from a 2×2 grid (review mode + VOC lessons when images are available)
 
-### Error Correction
-The learner receives a sentence containing a mistake and must correct it.
-- **Goal:** Develop grammar awareness.
-
-### Reverse Translation
-The learner translates a sentence from Portuguese to the target language.
-- **Goal:** Active language production.
-
-### Image Match
-The learner matches an image with the correct word.
-- **Goal:** Strengthen visual vocabulary association.
+### Review modes (vocabulary page)
+- **Flashcards** — recall with optional images
+- **In Context** — AI-generated context-choice, reverse-translation, word-bank exercises
+- **Visual** — image-match exercises from SRS session words
 
 ## Project Folder Structure
 ```text

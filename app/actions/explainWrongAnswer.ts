@@ -55,6 +55,35 @@ Dê em 1-2 frases simples uma dica de atenção (escrita ou pronúncia) nessa fr
 ${accessibilityRule}`;
       break;
     }
+    case 'bridge-choice':
+    case 'grammar-trap': {
+      const explanation =
+        exercise.type === 'bridge-choice'
+          ? exercise.data.explanation
+          : exercise.data.explanation;
+      return explanation?.slice(0, 200) ?? null;
+    }
+    case 'word-bank-translation': {
+      const { portuguese_sentence, correctOrder } = exercise.data;
+      prompt = `Um aluno errou ao montar a tradução em ${lang}.
+Frase em português: "${portuguese_sentence}"
+Ordem correta: "${correctOrder.join(' ')}"
+Explique em 1-2 frases a ordem natural das palavras.
+${accessibilityRule}`;
+      break;
+    }
+    case 'listen-and-select': {
+      const { audioText, translation } = exercise.data;
+      prompt = `Um aluno errou ao identificar o que ouviu em ${lang}.
+Frase correta: "${audioText}"
+Tradução: "${translation}"
+Dê uma dica rápida de escuta.
+${accessibilityRule}`;
+      break;
+    }
+    case 'image-match': {
+      return `A imagem certa era a de «${exercise.data.targetWord}» (${exercise.data.translation}).`;
+    }
     default:
       return null;
   }

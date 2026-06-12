@@ -60,6 +60,9 @@ interface LessonState {
   // Loading state
   isLoading: boolean;
 
+  /** True when the grammar bridge retention quiz was answered correctly. */
+  bridgeQuizPassed: boolean;
+
   // ── Actions ────────────────────────────────────────────────────────────────
 
   /** Initialise a new lesson session. */
@@ -76,6 +79,7 @@ interface LessonState {
   setVocabTranslation: (word: string, translation: string) => void;
   setExercises: (exercises: Exercise[]) => void;
   setIsLoading: (loading: boolean) => void;
+  setBridgeQuizPassed: (passed: boolean) => void;
   setDiscoveredVerbs: (verbs: string[]) => void;
 
   /** Record a correct answer for the current practice exercise. */
@@ -127,6 +131,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
   rolePlayTotalSpeakable: 0,
   rolePlayComplete: false,
   isLoading: false,
+  bridgeQuizPassed: false,
 
   // ── Actions ────────────────────────────────────────────────────────────────
 
@@ -154,10 +159,12 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       rolePlayTotalSpeakable: 0,
       rolePlayComplete: false,
       isLoading: true,
+      bridgeQuizPassed: false,
     }),
 
   setPhase: (phase) => set({ phase }),
   setIsLoading: (isLoading) => set({ isLoading }),
+  setBridgeQuizPassed: (bridgeQuizPassed) => set({ bridgeQuizPassed }),
   setKnownVocabulary: (knownVocabulary) => set({ knownVocabulary }),
 
   setHook: (hook) => set({
@@ -246,5 +253,6 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       rolePlayTotalSpeakable: 0,
       rolePlayComplete: false,
       isLoading: false,
+      bridgeQuizPassed: false,
     }),
 }));

@@ -9,10 +9,8 @@ import { getMistakeById, deleteLessonMistake, getUserVocabulary } from '@/servic
 import { generateMistakeReview } from '@/app/actions/generateMistakeReview';
 
 import { CheckButton } from '@/components/lesson/CheckButton';
+import { LessonPracticeScreen } from '@/components/lesson/LessonPracticeScreen';
 import { formatErrorCorrectionAnswer } from '@/utils/errorCorrection';
-import { ContextChoiceExercise } from '@/components/lesson/ContextChoiceExercise';
-import { ErrorCorrectionExercise } from '@/components/lesson/ErrorCorrectionExercise';
-import { ReverseTranslationInput } from '@/components/lesson/ReverseTranslationInput';
 import { useSoundEffects } from '@/hooks/useSoundEffects';
 
 import type { Exercise, LessonMistakeDocument } from '@/types';
@@ -356,40 +354,18 @@ function ReviewContent() {
 
       {/* Exercise */}
       <div className="px-5 pb-56 pt-6 mx-auto w-full max-w-lg md:max-w-2xl lg:max-w-4xl">
-        {currentExercise && (
+        {currentExercise && mistake && (
           <div key={currentIndex} className="animate-slide-up">
-            <p className="mb-4 text-xs" style={{ color: 'var(--color-text-muted)' }}>
-              Exercício {currentIndex + 1} / {exercises.length}
-            </p>
-
-            {currentExercise.type === 'context-choice' && (
-              <ContextChoiceExercise
-                data={currentExercise.data}
-                onAnswer={handleAnswer}
-                answered={exerciseAnswer !== null}
-                setIsExerciseReady={setIsExerciseReady}
-                submitTrigger={submitTrigger}
-              />
-            )}
-            {currentExercise.type === 'error-correction' && (
-              <ErrorCorrectionExercise
-                data={currentExercise.data}
-                onAnswer={handleAnswer}
-                answered={exerciseAnswer !== null}
-                setIsExerciseReady={setIsExerciseReady}
-                submitTrigger={submitTrigger}
-              />
-            )}
-            {currentExercise.type === 'reverse-translation' && (
-              <ReverseTranslationInput
-                data={currentExercise.data}
-                language={mistake?.language ?? 'fr'}
-                onAnswer={handleAnswer}
-                answered={exerciseAnswer !== null}
-                setIsExerciseReady={setIsExerciseReady}
-                submitTrigger={submitTrigger}
-              />
-            )}
+            <LessonPracticeScreen
+              exercises={exercises}
+              exerciseIndex={currentIndex}
+              currentExercise={currentExercise}
+              exerciseAnswer={exerciseAnswer}
+              language={mistake.language}
+              onAnswer={handleAnswer}
+              setIsExerciseReady={setIsExerciseReady}
+              submitTrigger={submitTrigger}
+            />
           </div>
         )}
       </div>

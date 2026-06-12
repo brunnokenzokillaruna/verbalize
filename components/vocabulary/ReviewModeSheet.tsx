@@ -1,12 +1,13 @@
 'use client';
 
 import React, { useRef, useEffect } from 'react';
-import { X, Layers, Brain, Clock } from 'lucide-react';
+import { X, Layers, Brain, Clock, ImageIcon } from 'lucide-react';
 interface ReviewModeSheetProps {
   sessionCount: number;
   totalDue: number;
   onSelectFlashcard: () => void;
   onSelectContext: () => void;
+  onSelectVisual: () => void;
   onClose: () => void;
 }
 
@@ -15,6 +16,7 @@ export function ReviewModeSheet({
   totalDue,
   onSelectFlashcard,
   onSelectContext,
+  onSelectVisual,
   onClose,
 }: ReviewModeSheetProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -143,6 +145,46 @@ export function ReviewModeSheet({
                 style={{ color: 'var(--color-text-muted)' }}
               >
                 <Clock size={11} /> ~5 min
+              </span>
+            </div>
+          </div>
+        </button>
+
+        <button
+          type="button"
+          onClick={onSelectVisual}
+          className="flex items-start gap-4 rounded-2xl p-5 text-left transition-all active:scale-[0.98] border-2"
+          style={{
+            backgroundColor: 'var(--color-surface)',
+            borderColor: 'var(--color-warning)',
+            boxShadow: '0 4px 0 rgba(245, 158, 11, 0.15)',
+          }}
+        >
+          <div
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl"
+            style={{ backgroundColor: 'var(--color-warning-bg)', color: 'var(--color-warning)' }}
+          >
+            <ImageIcon size={24} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-display text-lg font-bold" style={{ color: 'var(--color-text-primary)' }}>
+              Visual
+            </h3>
+            <p className="text-sm mt-1 leading-relaxed" style={{ color: 'var(--color-text-secondary)' }}>
+              Escolha a imagem que representa cada palavra.
+            </p>
+            <div className="flex items-center gap-2 mt-3">
+              <span
+                className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold"
+                style={{ backgroundColor: 'var(--color-warning-bg)', color: 'var(--color-warning)' }}
+              >
+                {sessionCount} palavras
+              </span>
+              <span
+                className="inline-flex items-center gap-1 text-[10px] font-semibold"
+                style={{ color: 'var(--color-text-muted)' }}
+              >
+                <Clock size={11} /> ~4 min
               </span>
             </div>
           </div>

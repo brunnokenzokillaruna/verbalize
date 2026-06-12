@@ -210,6 +210,14 @@ function normalizeHookResult(
     result.imageKeywords = ik;
   }
 
+  if (result.imageMatchOptions) {
+    const imo: typeof result.imageMatchOptions = {};
+    for (const [k, v] of Object.entries(result.imageMatchOptions)) {
+      imo[k.trim().toLowerCase()] = v;
+    }
+    result.imageMatchOptions = imo;
+  }
+
   if (result.vocabTranslations) {
     const vt: typeof result.vocabTranslations = {};
     for (const [k, v] of Object.entries(result.vocabTranslations)) vt[k.trim().toLowerCase()] = v;
@@ -413,6 +421,12 @@ Output ONLY this JSON object (no extra text):
     "<vocab word 1>": "short English Pexels search term (3-5 words, single object, neutral background)",
     "<vocab word 2>": "..."
   },
+  "imageMatchOptions": {
+    "<vocab word 1>": {
+      "distractors": ["<other vocab word>", "<word from different semantic field>", "<another distinct word>"],
+      "semanticFields": ["food", "transport", "object"]
+    }
+  },
   "vocabTranslations": {
     "<vocab word 1>": { "translation": "pt-BR word/phrase", "explanation": "dica de uso em PT-BR SIMPLES, ≤15 palavras — linguagem de amigo, sem jargão gramatical (nada de 'substantivo feminino', 'locução adverbial', 'distinção semântica'). Prefira exemplos concretos a termos técnicos.", "example": "one sentence in ${lang} using the word" },
     "<vocab word 2>": { "translation": "...", "explanation": "...", "example": "..." }
@@ -425,6 +439,7 @@ Rules:
 - dialogueVerbs: List EVERY verb used in the dialogue in its infinitive form.
 - NEVER include days of the week, months of the year, or proper nouns in newVocabulary.
 - imageKeywords: one concise English Pexels search term per vocabulary word.
+- imageMatchOptions: for each vocab word, 3 distractor words from VISUALLY DISTINCT semantic fields (not synonyms). semanticFields must all be different (e.g. food vs furniture vs transport).
 - vocabTranslations: provide for all 2 vocabulary words.`;
 
   try {

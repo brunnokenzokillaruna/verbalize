@@ -4,8 +4,9 @@ import { callGeminiJSON } from '@/services/gemini';
 import { getVerbConjugation } from '@/app/actions/getVerbConjugation';
 import { extractVerbOnlyForm, stripPronounPrefix } from '@/utils/conjugationHelper';
 import { sanitizeConjugationOptions } from '@/utils/verbDrillGenerator';
-import { isDeletionCorrection } from '@/utils/errorCorrection';
-import type { ConjugationSpeedData, Exercise, GrammarBridgeResult, SupportedLanguage, ProficiencyLevel, LessonTag } from '@/types';
+import { isValidErrorCorrectionExercise, normalizeErrorCorrectionData } from '@/utils/errorCorrection';
+import { enforceVariety, pinTagExclusiveFirst, varietyNeedsRegeneration } from '@/utils/exerciseVariety';
+import type { ConjugationSpeedData, ErrorCorrectionData, Exercise, GrammarBridgeResult, SupportedLanguage, ProficiencyLevel, LessonTag } from '@/types';
 
 const LANG_LABEL: Record<SupportedLanguage, string> = {
   fr: 'French',
@@ -25,6 +26,9 @@ type ExerciseTypeId =
   | 'context-choice'
   | 'error-correction'
   | 'reverse-translation'
+  | 'word-bank-translation'
+  | 'bridge-choice'
+  | 'listen-and-select'
   | 'audio-dictation'
   | 'speak-repeat'
   | 'sentence-builder'
@@ -51,6 +55,9 @@ const TIER_2_ADDITIONS: ExerciseTypeId[] = [
   'error-correction',
   'social-roleplay',
   'logic-connectors',
+  'word-bank-translation',
+  'bridge-choice',
+  'listen-and-select',
 ];
 
 const TIER_3_ADDITIONS: ExerciseTypeId[] = [
@@ -65,6 +72,12 @@ function getAllowedExerciseTypes(level: ProficiencyLevel, knownVocabCount: numbe
   if (level === 'A1' || (level === 'A2' && knownVocabCount < 60)) {
     return [...TIER_1_TYPES, ...TIER_2_ADDITIONS];
   }
+  // Tier 3 (free production) requires A2+ OR sufficient vocabulary
+  const tier3Eligible =
+    !['A1'].includes(level) || knownVocabCount >= 60;
+  if (!tier3Eligible) {
+    return [...TIER_1_TYPES, ...TIER_2_ADDITIONS];
+  }
   return [...TIER_1_TYPES, ...TIER_2_ADDITIONS, ...TIER_3_ADDITIONS];
 }
 
@@ -76,14 +89,37 @@ function buildTypeDescriptions(langLabel: string): Record<ExerciseTypeId, string
    - "translation" in PT-BR.`,
     'error-correction': `type "error-correction":
    - Write an ORIGINAL sentence with ONE deliberate error.
-   - "sentence_with_error", "error_word", "correct_word", "translation" (PT-BR: translation of the CORRECTED sentence), "explanation" (PT-BR).
-   - When the fix is to REMOVE the error word (e.g. an unnecessary preposition copied from Portuguese), set "correct_word" to "" (empty string). Do NOT use "---" or other placeholders.
-   - When the fix is to REPLACE the error word, set "correct_word" to the replacement word.
-   - "acceptable_answers" is an array of other valid options or empty.`,
+   - "sentence_with_error", "error_word", "correct_word", "corrected_sentence", "translation" (PT-BR: translation of corrected_sentence), "explanation" (PT-BR).
+   - "corrected_sentence" is ALWAYS required: the full sentence after fixing the error.
+   - "answer_mode": "replace" when the student only types the replacement word/phrase; "rewrite" when they must type the full corrected sentence (use for deletions, multi-word fixes, or redundant repetition like pronoun + noun).
+   - When the fix is to REMOVE a word (e.g. redundant "du pain" after "en"), set answer_mode to "rewrite", correct_word to the removed span, and corrected_sentence to the full fixed sentence. NEVER leave correct_word empty and NEVER ask the student to leave the answer blank.
+   - When the fix is to REPLACE one word, set answer_mode to "replace", correct_word to the replacement, and corrected_sentence to the full fixed sentence.
+   - CRITICAL: "error_word" must appear EXACTLY ONCE in "sentence_with_error". If the natural context repeats the phrase (e.g. question + answer both with "du pain"), isolate ONLY the clause with the error — e.g. use "Oui, j'en ai du pain." instead of "Tu as du pain ? Oui, j'en ai du pain."
+   - If error_word truly cannot be unique, set "error_span_start" to the 0-based character index where the erroneous occurrence begins.
+   - "acceptable_answers" is an array of other valid corrected sentences or replacement words, or empty.`,
     'reverse-translation': `type "reverse-translation":
    - "portuguese_sentence" (PT-BR) → "target_translation" (${langLabel}).
    - "acceptable_variants" (2-4 alternative phrasings).
    - "hint" (optional grammar tip in PT-BR).`,
+    'word-bank-translation': `type "word-bank-translation":
+   - "portuguese_sentence" (PT-BR sentence to translate).
+   - "correctOrder" (array of ${langLabel} words in correct order).
+   - "words" (EXACT same words as correctOrder, shuffled).
+   - "acceptable_variants" (0-2 alternative word orders as arrays).
+   - "hint" (optional PT-BR grammar tip).`,
+    'bridge-choice': `type "bridge-choice":
+   - MCQ testing Brazilian Portuguese interference on the lesson grammar focus.
+   - "scenario" (PT-BR, 1-2 sentences of context).
+   - "question" (PT-BR).
+   - "options" (3-4 complete sentences or phrases in ${langLabel}).
+   - "correctIndex" (0-based).
+   - "explanation" (PT-BR).
+   - "trapRule" (optional PT-BR, 1 sentence about the interference pattern).`,
+    'listen-and-select': `type "listen-and-select":
+   - "audioText" (${langLabel} sentence to be played via TTS).
+   - "options" (4 written transcriptions — 1 correct, 3 plausible but wrong).
+   - "correctIndex" (0-based).
+   - "translation" (PT-BR hint).`,
     'audio-dictation': `type "audio-dictation":
    - Short ORIGINAL sentence. "text" (${langLabel}), "translation" (PT-BR).`,
     'speak-repeat': `type "speak-repeat":
@@ -109,6 +145,7 @@ function buildTypeDescriptions(langLabel: string): Record<ExerciseTypeId, string
    - "correctText" (original sentence).
    - "errorText" (copy of correctText but with 1-2 words swapped for wrong ones or misspelled).
    - "wrongWords" (array of the words that are WRONG in errorText).
+   - "corrections" (array with ONE entry per wrong word): each { "wrong": "word in errorText", "correct": "replacement word", "options": [correct + 2 plausible distractors of same category] }.
    - "translations" (PT-BR).`,
     'logic-connectors': `type "logic-connectors":
     - "partA" (first half), "partB" (second half).
@@ -151,14 +188,14 @@ function buildTagGuidance(tag: LessonTag, allowed: Set<ExerciseTypeId>): string 
   const list = (items: ExerciseTypeId[]) => items.map((t) => `'${t}'`).join(', ');
 
   if (tag === 'PRON') {
-    const types = pick(['speak-repeat', 'audio-dictation', 'interactive-subtitles']);
+    const types = pick(['speak-repeat', 'audio-dictation', 'interactive-subtitles', 'listen-and-select']);
     return [
       `- The FIRST exercise (index 0) MUST be of type 'minimal-pair'. This is mandatory for PRON lessons.`,
       types.length ? `- The remaining 4 exercises should focus heavily on ${list(types)} (at least 3 out of 4).` : '',
     ].filter(Boolean).join('\n');
   }
   if (tag === 'GRAM') {
-    const types = pick(['error-correction', 'sentence-builder', 'context-choice']);
+    const types = pick(['error-correction', 'sentence-builder', 'context-choice', 'bridge-choice']);
     return [
       `- The FIRST exercise (index 0) MUST be of type 'grammar-trap'. This is mandatory for GRAM lessons.`,
       types.length ? `- The remaining 4 exercises should focus on ${list(types)} to reinforce the grammar structure.` : '',
@@ -182,15 +219,29 @@ function buildTagGuidance(tag: LessonTag, allowed: Set<ExerciseTypeId>): string 
   }
   if (tag === 'MISS') {
     const types = pick(['social-roleplay', 'scrambled-conversation', 'interactive-subtitles']);
-    return types.length
-      ? `- Focus on ${list(types)} to simulate real-world usage. Use scenarios a Brazilian would realistically encounter.`
-      : '';
+    return [
+      types.length
+        ? `- Focus on ${list(types)} to simulate real-world usage. Use scenarios a Brazilian would realistically encounter.`
+        : '',
+      `- MINI-STORY: All 5 exercise sentences MUST form a coherent micro-narrative. Sentence 2 must follow from sentence 1, sentence 3 from sentence 2, etc.`,
+    ].filter(Boolean).join('\n');
   }
   if (tag === 'EXPR') {
     const types = pick(['social-roleplay', 'context-choice', 'sentence-builder']);
-    return types.length
-      ? `- At least 2 out of 5 exercises MUST be 'social-roleplay' where the correct option uses the target expression naturally. The other options should be grammatically correct but less natural/idiomatic.\n- The remaining exercises should focus on ${list(types)}.`
-      : '';
+    return [
+      types.length
+        ? `- At least 2 out of 5 exercises MUST be 'social-roleplay' where the correct option uses the target expression naturally. The other options should be grammatically correct but less natural/idiomatic.\n- The remaining exercises should focus on ${list(types)}.`
+        : '',
+      `- MINI-STORY: All 5 exercise sentences MUST form a coherent micro-narrative. Sentence 2 must follow from sentence 1, sentence 3 from sentence 2, etc.`,
+    ].filter(Boolean).join('\n');
+  }
+  if (tag === 'CULT') {
+    const types = pick(['social-roleplay', 'context-choice', 'sentence-builder', 'logic-connectors']);
+    return [
+      `- At least 2 out of 5 exercises MUST be 'social-roleplay' testing cultural nuances (formality, taboos, gestures, social expectations).`,
+      types.length ? `- Include at least 1 'context-choice' about cultural vocabulary or register.\n- Remaining exercises from: ${list(types)}.` : '',
+      `- MINI-STORY: All 5 exercise sentences MUST form a coherent micro-narrative with cultural context.`,
+    ].filter(Boolean).join('\n');
   }
   if (tag === 'VERB') {
     const types = pick(['error-correction', 'sentence-builder', 'context-choice']);
@@ -349,6 +400,8 @@ ${grammarAccuracyBlock}
 
 Generate exactly 5 exercises as a JSON array. Choose varied types from the following pool for a balanced practice session. You MUST use ONLY the types listed below — any other type is forbidden.
 
+VARIETY RULE (mandatory): use at least 3 DIFFERENT exercise types; no type may appear more than twice.
+
 --- POOL OF EXERCISE TYPES (the ONLY types you may use) ---
 
 ${poolSection}
@@ -382,22 +435,13 @@ Example for social-roleplay:
         return false;
       }
       if (ex.type === 'error-correction') {
-        const { sentence_with_error, error_word, correct_word, translation } = ex.data as {
-          sentence_with_error: string;
-          error_word: string;
-          correct_word: string;
-          translation?: string;
-        };
-        const ok =
-          sentence_with_error &&
-          error_word &&
-          correct_word != null &&
-          !!translation &&
-          sentence_with_error.toLowerCase().includes(error_word.toLowerCase()) &&
-          (isDeletionCorrection(correct_word) ||
-            (correct_word.trim() !== '' &&
-              error_word.toLowerCase() !== correct_word.toLowerCase()));
-        if (!ok) console.warn('[generatePracticeExercises] Dropped malformed error-correction exercise');
+        const normalized = normalizeErrorCorrectionData(ex.data as ErrorCorrectionData);
+        const ok = isValidErrorCorrectionExercise(normalized);
+        if (ok) {
+          Object.assign(ex.data, normalized);
+        } else {
+          console.warn('[generatePracticeExercises] Dropped malformed error-correction exercise');
+        }
         return ok;
       }
       if (ex.type === 'audio-dictation' || ex.type === 'speak-repeat') {
@@ -458,13 +502,29 @@ Example for social-roleplay:
         return true;
       }
       if (ex.type === 'interactive-subtitles') {
-        const d = ex.data as any;
+        const d = ex.data as {
+          correctText?: string;
+          errorText?: string;
+          wrongWords?: string[];
+          translations?: string;
+          translation?: string;
+          corrections?: Array<{ wrong: string; correct: string; options: string[] }>;
+        };
         if (d.translation && !d.translations) {
           d.translations = d.translation;
         }
         if (!d.correctText || !d.errorText || !Array.isArray(d.wrongWords) || !d.translations) {
           console.warn('[generatePracticeExercises] Dropped malformed interactive-subtitles');
           return false;
+        }
+        if (!Array.isArray(d.corrections) || d.corrections.length !== d.wrongWords.length) {
+          console.warn('[generatePracticeExercises] Auto-fixing interactive-subtitles missing corrections');
+          d.corrections = d.wrongWords.map((wrong) => {
+            const correctWord = d.correctText!.split(/\s+/).find(
+              (w) => w.replace(/[.,!?;:'"]/g, '').toLowerCase() !== wrong.replace(/[.,!?;:'"]/g, '').toLowerCase(),
+            ) ?? wrong;
+            return { wrong, correct: correctWord, options: [correctWord, wrong, '...'] };
+          });
         }
         return true;
       }
@@ -518,6 +578,28 @@ Example for social-roleplay:
         }
         return true;
       }
+      if (ex.type === 'word-bank-translation') {
+        const d = ex.data as { words: string[]; correctOrder: string[]; portuguese_sentence?: string };
+        if (!d.portuguese_sentence || !d.words?.length || !d.correctOrder?.length) return false;
+        const sortedWords = [...d.words].map(w => w.trim()).sort();
+        const sortedCorrect = [...d.correctOrder].map(w => w.trim()).sort();
+        if (sortedWords.join(',') !== sortedCorrect.join(',')) {
+          (ex.data as { words: string[] }).words = [...d.correctOrder].sort(() => Math.random() - 0.5);
+        }
+        return true;
+      }
+      if (ex.type === 'bridge-choice') {
+        const d = ex.data as { scenario?: string; question?: string; options?: string[]; correctIndex?: number; explanation?: string };
+        if (!d.question || !d.explanation || !Array.isArray(d.options) || d.options.length < 3) return false;
+        if (typeof d.correctIndex !== 'number' || d.correctIndex < 0 || d.correctIndex >= d.options.length) return false;
+        return true;
+      }
+      if (ex.type === 'listen-and-select') {
+        const d = ex.data as { audioText?: string; options?: string[]; correctIndex?: number; translation?: string };
+        if (!d.audioText || !d.translation || !Array.isArray(d.options) || d.options.length < 3) return false;
+        if (typeof d.correctIndex !== 'number' || d.correctIndex < 0 || d.correctIndex >= d.options.length) return false;
+        return true;
+      }
       return true;
     });
 
@@ -536,15 +618,18 @@ Example for social-roleplay:
     }
 
     // For tag-exclusive exercises, ensure they are at index 0
-    if (tagExclusive) {
-      const exclusiveIdx = dedupedValidated.findIndex((ex) => ex.type === tagExclusive);
-      if (exclusiveIdx > 0) {
-        const [exclusive] = dedupedValidated.splice(exclusiveIdx, 1);
-        dedupedValidated.unshift(exclusive);
-      }
+    let finalExercises = pinTagExclusiveFirst(dedupedValidated, tagExclusive);
+    finalExercises = enforceVariety(
+      finalExercises,
+      [...allowedSet] as ExerciseTypeId[],
+      tagExclusive,
+    );
+
+    if (varietyNeedsRegeneration(finalExercises) && finalExercises.length >= 3) {
+      console.warn('[generatePracticeExercises] Variety insufficient after enforcement — returning best-effort set');
     }
 
-    return dedupedValidated;
+    return finalExercises.length > 0 ? finalExercises : null;
   } catch (err) {
     console.error('[generatePracticeExercises] Error:', err);
     return null;

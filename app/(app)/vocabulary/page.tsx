@@ -23,6 +23,7 @@ import { ReviewModeSheet } from '@/components/vocabulary/ReviewModeSheet';
 import { FlashcardReviewSession } from '@/components/vocabulary/FlashcardReviewSession';
 import { ContextReviewSession } from '@/components/vocabulary/ContextReviewSession';
 import { ContextReviewLoading } from '@/components/vocabulary/ContextReviewLoading';
+import { VisualReviewSession } from '@/components/vocabulary/VisualReviewSession';
 import type { ReviewResult } from '@/components/vocabulary/reviewTypes';
 import { AudioPlayerButton } from '@/components/lesson/AudioPlayerButton';
 import { SrsBar, SRS_BAR_COLOR, SRS_LABELS, formatNextReview } from '@/components/vocabulary/SrsBar';
@@ -141,6 +142,7 @@ export default function VocabularyPage() {
   const [showPicker, setShowPicker] = useState(false);
   const [sessionItems, setSessionItems] = useState<UserVocabularyDocument[]>([]);
   const [flashcardPhase, setFlashcardPhase] = useState<'ready' | 'running' | 'done' | null>(null);
+  const [visualPhase, setVisualPhase] = useState<'ready' | 'running' | 'done' | null>(null);
   const [contextPhase, setContextPhase] = useState<'running' | 'done' | null>(null);
   const [contextLoading, setContextLoading] = useState(false);
   const [reviewItems, setReviewItems] = useState<VocabReviewItem[]>([]);
@@ -237,13 +239,13 @@ export default function VocabularyPage() {
 
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && (showPicker || flashcardPhase || contextPhase || contextLoading)) {
+      if (e.key === 'Escape' && (showPicker || flashcardPhase || contextPhase || visualPhase || contextLoading)) {
         closeAllReview();
       }
     };
     window.addEventListener('keydown', handleGlobalKeyDown);
     return () => window.removeEventListener('keydown', handleGlobalKeyDown);
-  }, [showPicker, flashcardPhase, contextPhase, contextLoading]);
+  }, [showPicker, flashcardPhase, contextPhase, visualPhase, contextLoading]);
 
   const now = new Date();
   
@@ -310,6 +312,7 @@ export default function VocabularyPage() {
     setShowPicker(false);
     setFlashcardPhase(null);
     setContextPhase(null);
+    setVisualPhase(null);
     setContextLoading(false);
     setReviewItems([]);
     setCardIdx(0);
@@ -351,6 +354,50 @@ export default function VocabularyPage() {
     closeAllReview();
   }
 
+  function startVisualMode() {
+    setShowPicker(false);
+    setCardIdx(0);
+    setResults([]);
+    setAnswered(false);
+    setLastCorrect(null);
+    setVisualPhase('ready');
+  }
+
+  function beginVisualSession() {
+    setVisualPhase('running');
+  }
+
+  function handleVisualAnswer(correct: boolean) {
+    if (answered) return;
+    setAnswered(true);
+    setLastCorrect(correct);
+  }
+
+  function handleVisualContinue() {
+    if (!answered || lastCorrect === null) return;
+    const item = sessionItems[cardIdx];
+    const newResults = [...results, { word: item.word, correct: lastCorrect }];
+    setResults(newResults);
+    if (cardIdx + 1 >= sessionItems.length) {
+      setVisualPhase('done');
+    } else {
+      setCardIdx(cardIdx + 1);
+      setAnswered(false);
+      setLastCorrect(null);
+    }
+  }
+
+  async function finishVisualReview() {
+    if (!user) return;
+    setSavingResults(true);
+    await Promise.all(
+      results.map((r) => updateVocabSrsAfterReview(user.uid, r.word, language, r.correct)),
+    );
+    await loadVocabulary();
+    setSavingResults(false);
+    closeAllReview();
+  }
+
   async function startContextMode() {
     if (!user) return;
     setShowPicker(false);
@@ -369,7 +416,7 @@ export default function VocabularyPage() {
 
     try {
       const generated = await generateVocabReview({
-        words: sessionItems.map((v) => ({ word: v.word, translation: v.translation })),
+        words: sessionItems.map((v) => ({ word: v.word, translation: v.translation, imageUrl: v.imageUrl })),
         language,
         level,
         knownVocabulary,
@@ -949,6 +996,7 @@ export default function VocabularyPage() {
           totalDue={rawDueToday.length}
           onSelectFlashcard={startFlashcardMode}
           onSelectContext={startContextMode}
+          onSelectVisual={startVisualMode}
           onClose={closeAllReview}
         />
       )}
@@ -969,6 +1017,22 @@ export default function VocabularyPage() {
           onStart={beginFlashcardSession}
           onAnswer={handleFlashcardAnswer}
           onFinish={finishFlashcardReview}
+          onClose={closeAllReview}
+        />
+      )}
+      {visualPhase && (
+        <VisualReviewSession
+          state={visualPhase}
+          sessionItems={sessionItems}
+          currentIdx={cardIdx}
+          answered={answered}
+          lastCorrect={lastCorrect}
+          results={results}
+          savingResults={savingResults}
+          onStart={beginVisualSession}
+          onAnswer={handleVisualAnswer}
+          onContinue={handleVisualContinue}
+          onFinish={finishVisualReview}
           onClose={closeAllReview}
         />
       )}

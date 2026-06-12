@@ -245,7 +245,7 @@ export function ImageCacheManager() {
             type="button"
             onClick={handleApprove}
             disabled={approving}
-            aria-label="Aprovar imagem"
+            aria-label="Aprovar para exercícios visuais"
             className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border transition-all active:scale-95 disabled:opacity-50"
             style={{
               backgroundColor: 'var(--color-success-bg, #f0fdf4)',

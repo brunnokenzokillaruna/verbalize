@@ -335,6 +335,9 @@ export default function LessonPage() {
       case 'grammar-trap':     return activeExercise.data.options.find(o => o.isCorrect)?.sentence;
       case 'minimal-pair':     return activeExercise.data.correctWord;
       case 'conjugation-speed':return activeExercise.data.correctForm;
+      case 'bridge-choice':    return activeExercise.data.options[activeExercise.data.correctIndex];
+      case 'listen-and-select':return activeExercise.data.options[activeExercise.data.correctIndex];
+      case 'image-match':      return activeExercise.data.targetWord;
       default:                 return undefined;
     }
   })();
@@ -441,6 +444,9 @@ export default function LessonPage() {
             newVerbs={[...store.discoveredVerbs]}
             onWordClick={handleWordClick}
             onAdvanceToPractice={advanceFromGrammar}
+            onQuizCorrect={(correct) => {
+              if (correct) store.setBridgeQuizPassed(true);
+            }}
           />
         )}
 
@@ -480,6 +486,7 @@ export default function LessonPage() {
               currentExercise={currentExercise}
               exerciseAnswer={exerciseAnswer}
               language={store.lesson.language}
+              lessonTag={store.lesson.tag}
               onAnswer={handleAnswer}
               setIsExerciseReady={setIsExerciseReady}
               submitTrigger={submitTrigger}

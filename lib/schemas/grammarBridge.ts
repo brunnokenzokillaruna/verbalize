@@ -1,5 +1,6 @@
 import { z } from 'zod';
-import type { GrammarBridgeResult } from '@/types';
+import type { GrammarBridgeResult, SupportedLanguage } from '@/types';
+import { sanitizeBridgeExample } from '@/lib/grammarBridgeValidation';
 import { stripUndefinedDeep } from '@/utils/stripUndefined';
 
 const wordLimit = (max: number) =>
@@ -26,9 +27,15 @@ const brazilianTrapSchema = z.union([
   }),
 ]);
 
+const formulaExampleSchema = z.object({
+  target: z.string(),
+  portuguese: z.string(),
+});
+
 const structureFormulaItemSchema = z.object({
   label: z.string(),
   formula: z.string(),
+  example: formulaExampleSchema.optional(),
 });
 
 const retentionCheckSchema = z.object({
@@ -45,6 +52,7 @@ export const grammarBridgeSchema = z
     culturalNote: wordLimit(15).optional(),
     structureFormula: z.string().optional(),
     structureFormulas: z.array(structureFormulaItemSchema).optional(),
+    formulaExample: formulaExampleSchema.optional(),
     bridge: bridgeRowSchema.optional(),
     dialogueExample: z
       .object({
@@ -142,6 +150,7 @@ function normalizeTrap(
 /** Validates and normalizes AI-generated grammar bridge content. */
 export function normalizeGrammarBridgeResult(
   raw: GrammarBridgeResult | null | undefined,
+  language: SupportedLanguage = 'fr',
 ): GrammarBridgeResult | null {
   if (!raw) return null;
 
@@ -176,13 +185,14 @@ export function normalizeGrammarBridgeResult(
       ? retentionCheck
       : undefined;
 
-  return stripUndefinedDeep({
+  const normalized: GrammarBridgeResult = stripUndefinedDeep({
     insight: data.insight,
     explanation: toExplanationArray(data.explanation) ?? undefined,
     survivalTip: data.survivalTip,
     culturalNote: data.culturalNote,
     structureFormula: data.structureFormula,
     structureFormulas: data.structureFormulas,
+    formulaExample: data.formulaExample,
     bridge: data.bridge,
     dialogueExample: data.dialogueExample,
     additionalExamples: (data.additionalExamples ?? []).slice(0, 1),
@@ -199,4 +209,7 @@ export function normalizeGrammarBridgeResult(
     verbSpotlight: data.verbSpotlight,
     retentionCheck: safeRetention,
   }) as GrammarBridgeResult;
+
+  normalized.bridge = sanitizeBridgeExample(normalized, language);
+  return normalized;
 }
