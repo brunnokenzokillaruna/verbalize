@@ -13,7 +13,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { setUser, setProfile, setInitialized } = useAuthStore();
 
   useEffect(() => {
-    const unsubscribe = onAuthChange(async (user) => {
+    let unsubscribe: (() => void) | undefined;
+
+    void onAuthChange(async (user) => {
       setUser(user);
 
       if (user) {
@@ -24,9 +26,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       setInitialized(true);
+    }).then((unsub) => {
+      unsubscribe = unsub;
     });
 
-    return unsubscribe;
+    return () => unsubscribe?.();
   }, [setUser, setProfile, setInitialized]);
 
   return <>{children}</>;

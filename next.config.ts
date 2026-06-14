@@ -28,7 +28,17 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Content-Security-Policy',
-            value: "frame-ancestors 'none'; upgrade-insecure-requests;",
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://www.gstatic.com",
+              "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebase.googleapis.com wss://*.firebaseio.com",
+              "img-src 'self' data: blob: https:",
+              "style-src 'self' 'unsafe-inline'",
+              "font-src 'self' data:",
+              "frame-src 'self' https://accounts.google.com",
+              "frame-ancestors 'none'",
+              'upgrade-insecure-requests',
+            ].join('; '),
           },
         ],
       },

@@ -1,7 +1,5 @@
 import type { Metadata } from 'next';
 import { Fraunces, DM_Sans } from 'next/font/google';
-import { AuthProvider } from '@/components/AuthProvider';
-import { AuthModalProvider } from '@/components/auth/AuthModalProvider';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import './globals.css';
 
@@ -26,7 +24,7 @@ export const metadata: Metadata = {
     template: '%s | Verbalize',
   },
   description:
-    'Aprenda francês e inglês através de micro-histórias, pontes gramaticais e revisão espaçada — feito para falantes de português brasileiro. Lições de 5 minutos com o Método Ponte Português.',
+    'Aprenda francês e inglês com micro-histórias, pontes gramaticais e revisão espaçada. Método Ponte Português para brasileiros.',
   alternates: {
     canonical: '/',
   },
@@ -66,11 +64,7 @@ export default function RootLayout({
           >
             Pular para o conteúdo principal
           </a>
-          <AuthProvider>
-            <AuthModalProvider>
-              {children}
-            </AuthModalProvider>
-          </AuthProvider>
+          {children}
         </ThemeProvider>
       </body>
     </html>

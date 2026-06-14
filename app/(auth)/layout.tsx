@@ -1,3 +1,9 @@
+import { FirebaseProviders } from '@/components/FirebaseProviders';
+
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
-  return <main id="main-content">{children}</main>;
+  return (
+    <FirebaseProviders>
+      <main id="main-content">{children}</main>
+    </FirebaseProviders>
+  );
 }

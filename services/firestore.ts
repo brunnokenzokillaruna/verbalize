@@ -13,7 +13,7 @@ import {
   type DocumentData,
   Timestamp,
 } from 'firebase/firestore';
-import { db } from './firebase';
+import { getDb } from './firebase';
 import type { UserDocument, UserVocabularyDocument, ImageCacheDocument, VerbDocument, LessonMistakeDocument, PregeneratedLessonDocument, SupportedLanguage, ProficiencyLevel } from '@/types';
 import { calculateNextReview } from '@/lib/srs';
 import { getNextLessonId, getLessonsForLanguage } from '@/lib/curriculum';
@@ -23,12 +23,12 @@ import { stripUndefinedDeep } from '@/utils/stripUndefined';
 // ─── Users ────────────────────────────────────────────────────────────────────
 
 export async function getUser(uid: string): Promise<UserDocument | null> {
-  const snap = await getDoc(doc(db, 'users', uid));
+  const snap = await getDoc(doc(await getDb(), 'users', uid));
   return snap.exists() ? (snap.data() as UserDocument) : null;
 }
 
 export async function createUser(uid: string, data: Omit<UserDocument, 'uid' | 'createdAt' | 'lastLogin'>) {
-  await setDoc(doc(db, 'users', uid), {
+  await setDoc(doc(await getDb(), 'users', uid), {
     ...data,
     uid,
     createdAt: serverTimestamp(),
@@ -37,16 +37,16 @@ export async function createUser(uid: string, data: Omit<UserDocument, 'uid' | '
 }
 
 export async function updateUser(uid: string, data: Partial<UserDocument>) {
-  await updateDoc(doc(db, 'users', uid), data as DocumentData);
+  await updateDoc(doc(await getDb(), 'users', uid), data as DocumentData);
 }
 
 export async function deleteUserData(uid: string): Promise<void> {
-  await deleteDoc(doc(db, 'users', uid));
+  await deleteDoc(doc(await getDb(), 'users', uid));
 
-  const vocabSnap = await getDocs(query(collection(db, 'user_vocabulary'), where('uid', '==', uid)));
+  const vocabSnap = await getDocs(query(collection(await getDb(), 'user_vocabulary'), where('uid', '==', uid)));
   await Promise.all(vocabSnap.docs.map((d) => deleteDoc(d.ref)));
 
-  const logsSnap = await getDocs(query(collection(db, 'lesson_logs'), where('uid', '==', uid)));
+  const logsSnap = await getDocs(query(collection(await getDb(), 'lesson_logs'), where('uid', '==', uid)));
   await Promise.all(logsSnap.docs.map((d) => deleteDoc(d.ref)));
 }
 
@@ -58,7 +58,7 @@ export async function getVocabularyDueForReview(
 ): Promise<UserVocabularyDocument[]> {
   const now = new Date();
   const q = query(
-    collection(db, 'user_vocabulary'),
+    collection(await getDb(), 'user_vocabulary'),
     where('uid', '==', uid),
     where('language', '==', language),
     where('nextReview', '<=', now),
@@ -70,7 +70,7 @@ export async function getVocabularyDueForReview(
 export async function addVocabularyItem(
   data: Omit<UserVocabularyDocument, 'id'>,
 ): Promise<string> {
-  const ref = await addDoc(collection(db, 'user_vocabulary'), data);
+  const ref = await addDoc(collection(await getDb(), 'user_vocabulary'), data);
   return ref.id;
 }
 
@@ -90,7 +90,7 @@ export async function upsertVocabularyItem(
   wordType?: 'verb' | 'noun',
 ): Promise<void> {
   const q = query(
-    collection(db, 'user_vocabulary'),
+    collection(await getDb(), 'user_vocabulary'),
     where('uid', '==', uid),
     where('language', '==', language),
     where('word', '==', word),
@@ -100,7 +100,7 @@ export async function upsertVocabularyItem(
   if (snap.empty) {
     // First encounter — create at srsLevel 0
     const { newLevel, nextReview } = calculateNextReview(0, true);
-    await addDoc(collection(db, 'user_vocabulary'), {
+    await addDoc(collection(await getDb(), 'user_vocabulary'), {
       uid,
       language,
       word,
@@ -141,7 +141,7 @@ export async function logLesson(data: {
   language: SupportedLanguage;
   score: number;
 }): Promise<void> {
-  await addDoc(collection(db, 'lesson_logs'), {
+  await addDoc(collection(await getDb(), 'lesson_logs'), {
     ...data,
     completedAt: serverTimestamp(),
   });
@@ -229,7 +229,7 @@ export async function getUserVocabulary(
   language: SupportedLanguage,
 ): Promise<UserVocabularyDocument[]> {
   const q = query(
-    collection(db, 'user_vocabulary'),
+    collection(await getDb(), 'user_vocabulary'),
     where('uid', '==', uid),
     where('language', '==', language),
   );
@@ -248,7 +248,7 @@ export async function updateVocabTranslation(
   translation: string,
 ): Promise<void> {
   const q = query(
-    collection(db, 'user_vocabulary'),
+    collection(await getDb(), 'user_vocabulary'),
     where('uid', '==', uid),
     where('language', '==', language),
     where('word', '==', word),
@@ -270,7 +270,7 @@ export async function updateVocabImage(
   imageUrl: string,
 ): Promise<void> {
   const q = query(
-    collection(db, 'user_vocabulary'),
+    collection(await getDb(), 'user_vocabulary'),
     where('uid', '==', uid),
     where('language', '==', language),
     where('word', '==', word),
@@ -293,7 +293,7 @@ export async function updateVocabSrsAfterReview(
   correct: boolean,
 ): Promise<void> {
   const q = query(
-    collection(db, 'user_vocabulary'),
+    collection(await getDb(), 'user_vocabulary'),
     where('uid', '==', uid),
     where('language', '==', language),
     where('word', '==', word),
@@ -324,7 +324,7 @@ export async function getCachedVerb(
   language: SupportedLanguage,
 ): Promise<VerbDocument | null> {
   const id = `${infinitive.toLowerCase()}_${language}`;
-  const snap = await getDoc(doc(db, 'verbs', id));
+  const snap = await getDoc(doc(await getDb(), 'verbs', id));
   return snap.exists() ? (snap.data() as VerbDocument) : null;
 }
 
@@ -333,18 +333,18 @@ export async function getCachedVerb(
  */
 export async function saveVerbCache(data: VerbDocument): Promise<void> {
   const id = `${data.infinitive.toLowerCase()}_${data.language}`;
-  await setDoc(doc(db, 'verbs', id), data);
+  await setDoc(doc(await getDb(), 'verbs', id), data);
 }
 
 // ─── Image Cache ──────────────────────────────────────────────────────────────
 
 export async function getCachedImage(word: string): Promise<ImageCacheDocument | null> {
-  const snap = await getDoc(doc(db, 'image_cache', word));
+  const snap = await getDoc(doc(await getDb(), 'image_cache', word));
   return snap.exists() ? (snap.data() as ImageCacheDocument) : null;
 }
 
 export async function saveImageCache(word: string, data: Omit<ImageCacheDocument, 'word' | 'createdAt'>) {
-  await setDoc(doc(db, 'image_cache', word), {
+  await setDoc(doc(await getDb(), 'image_cache', word), {
     ...data,
     word,
     createdAt: serverTimestamp(),
@@ -352,7 +352,7 @@ export async function saveImageCache(word: string, data: Omit<ImageCacheDocument
 }
 
 export async function getAllImageCache(): Promise<ImageCacheDocument[]> {
-  const snap = await getDocs(collection(db, 'image_cache'));
+  const snap = await getDocs(collection(await getDb(), 'image_cache'));
   return snap.docs.map((d) => d.data() as ImageCacheDocument);
 }
 
@@ -361,15 +361,15 @@ export async function updateImageCache(
   imageUrl: string,
   photographer: string,
 ): Promise<void> {
-  await updateDoc(doc(db, 'image_cache', word), { imageUrl, photographer });
+  await updateDoc(doc(await getDb(), 'image_cache', word), { imageUrl, photographer });
 }
 
 export async function approveImageCache(word: string): Promise<void> {
-  await updateDoc(doc(db, 'image_cache', word), { approved: true });
+  await updateDoc(doc(await getDb(), 'image_cache', word), { approved: true });
 }
 
 export async function updateImageCacheTranslation(word: string, translation: string): Promise<void> {
-  await updateDoc(doc(db, 'image_cache', word), { translation });
+  await updateDoc(doc(await getDb(), 'image_cache', word), { translation });
 }
 
 // ─── Lesson Mistakes ──────────────────────────────────────────────────────────
@@ -388,7 +388,7 @@ export async function saveLessonMistake(
 ): Promise<void> {
   const safeKey = grammarFocus.toLowerCase().replace(/[^a-z0-9]+/g, '_').slice(0, 40);
   const docId = `${uid.slice(0, 20)}_${language}_${safeKey}`;
-  await setDoc(doc(db, 'lesson_mistakes', docId), {
+  await setDoc(doc(await getDb(), 'lesson_mistakes', docId), {
     uid,
     language,
     grammarFocus,
@@ -407,7 +407,7 @@ export async function getOldestMistake(
   uid: string,
   language: SupportedLanguage,
 ): Promise<LessonMistakeDocument | null> {
-  const snap = await getDocs(query(collection(db, 'lesson_mistakes'), where('uid', '==', uid)));
+  const snap = await getDocs(query(collection(await getDb(), 'lesson_mistakes'), where('uid', '==', uid)));
   const all = snap.docs
     .map((d) => ({ id: d.id, ...d.data() } as LessonMistakeDocument))
     .filter((m) => m.language === language);
@@ -422,11 +422,11 @@ export async function getOldestMistake(
 }
 
 export async function deleteLessonMistake(docId: string): Promise<void> {
-  await deleteDoc(doc(db, 'lesson_mistakes', docId));
+  await deleteDoc(doc(await getDb(), 'lesson_mistakes', docId));
 }
 
 export async function getMistakeById(docId: string): Promise<LessonMistakeDocument | null> {
-  const snap = await getDoc(doc(db, 'lesson_mistakes', docId));
+  const snap = await getDoc(doc(await getDb(), 'lesson_mistakes', docId));
   if (!snap.exists()) return null;
   return { id: snap.id, ...snap.data() } as LessonMistakeDocument;
 }
@@ -438,7 +438,7 @@ export async function getUserMistakes(
   uid: string,
   language?: SupportedLanguage,
 ): Promise<LessonMistakeDocument[]> {
-  const snap = await getDocs(query(collection(db, 'lesson_mistakes'), where('uid', '==', uid)));
+  const snap = await getDocs(query(collection(await getDb(), 'lesson_mistakes'), where('uid', '==', uid)));
   const all = snap.docs.map((d) => ({ id: d.id, ...d.data() } as LessonMistakeDocument));
   const filtered = language ? all.filter((m) => m.language === language) : all;
   filtered.sort((a, b) => {
@@ -461,7 +461,7 @@ function pregeneratedDocId(uid: string, lessonId: string) {
  */
 export async function startPregeneratingLesson(uid: string, lessonId: string): Promise<void> {
   const id = pregeneratedDocId(uid, lessonId);
-  await setDoc(doc(db, 'lesson_pregen', id), {
+  await setDoc(doc(await getDb(), 'lesson_pregen', id), {
     uid,
     lessonId,
     status: 'generating',
@@ -491,7 +491,7 @@ export async function savePregeneratedLesson(
     ...(payload.exercises && payload.exercises.length > 0 ? { exercises: payload.exercises } : {}),
     ...(payload.missionBriefing ? { missionBriefing: payload.missionBriefing } : {}),
   });
-  await setDoc(doc(db, 'lesson_pregen', id), data);
+  await setDoc(doc(await getDb(), 'lesson_pregen', id), data);
 }
 
 /**
@@ -500,7 +500,7 @@ export async function savePregeneratedLesson(
  */
 export async function abortPregeneratedLesson(uid: string, lessonId: string): Promise<void> {
   const id = pregeneratedDocId(uid, lessonId);
-  await setDoc(doc(db, 'lesson_pregen', id), {
+  await setDoc(doc(await getDb(), 'lesson_pregen', id), {
     uid,
     lessonId,
     status: 'failed',
@@ -515,7 +515,7 @@ export async function getPregeneratedLesson(
   uid: string,
   lessonId: string,
 ): Promise<PregeneratedLessonDocument | null> {
-  const snap = await getDoc(doc(db, 'lesson_pregen', pregeneratedDocId(uid, lessonId)));
+  const snap = await getDoc(doc(await getDb(), 'lesson_pregen', pregeneratedDocId(uid, lessonId)));
   return snap.exists() ? (snap.data() as PregeneratedLessonDocument) : null;
 }
 
@@ -523,5 +523,5 @@ export async function getPregeneratedLesson(
  * Deletes the pre-generated lesson entry after it has been consumed.
  */
 export async function deletePregeneratedLesson(uid: string, lessonId: string): Promise<void> {
-  await deleteDoc(doc(db, 'lesson_pregen', pregeneratedDocId(uid, lessonId)));
+  await deleteDoc(doc(await getDb(), 'lesson_pregen', pregeneratedDocId(uid, lessonId)));
 }

@@ -1,6 +1,5 @@
-// Prevent static generation — onboarding depends on client-side Firebase state
-export const dynamic = 'force-dynamic';
+import { FirebaseProviders } from '@/components/FirebaseProviders';
 
 export default function OnboardingLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return <FirebaseProviders>{children}</FirebaseProviders>;
 }

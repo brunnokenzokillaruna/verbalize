@@ -1,27 +1,35 @@
 import type { Metadata } from 'next';
+import { SITE_URL, withOgImage } from '@/lib/siteMetadata';
 
 const title = 'Criar conta grátis — Comece agora';
 const description =
-  'Cadastre-se no Verbalize e comece a aprender francês e inglês com micro-lições de 5 minutos, pontes gramaticais em português e revisão espaçada inteligente. Grátis para brasileiros.';
+  'Crie sua conta gratuita no Verbalize e aprenda francês e inglês com micro-lições, pontes gramaticais e revisão espaçada.';
 
-export const metadata: Metadata = {
-  title,
-  description,
-  alternates: {
-    canonical: '/signup',
-  },
-  openGraph: {
+export const metadata: Metadata = withOgImage(
+  {
     title,
     description,
-    url: 'https://verbalize-one.vercel.app/signup',
-    type: 'website',
+    alternates: {
+      canonical: '/signup',
+    },
+    openGraph: {
+      title,
+      description,
+      type: 'website',
+    },
+    twitter: {
+      title,
+      description,
+    },
   },
-  twitter: {
-    title,
-    description,
-  },
-};
+  `${SITE_URL}/signup`,
+);
 
 export default function SignupLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return (
+    <>
+      <link rel="preload" href="/logo.webp" as="image" type="image/webp" fetchPriority="high" />
+      {children}
+    </>
+  );
 }

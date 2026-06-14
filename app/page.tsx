@@ -6,7 +6,7 @@ import { LandingPageClient } from '@/components/landing/LandingPageClient';
 export const metadata: Metadata = {
   title: 'Verbalize — Aprenda francês e inglês com micro-histórias',
   description:
-    'Aprenda francês e inglês através de micro-histórias, pontes gramaticais e revisão espaçada — feito para falantes de português brasileiro. Lições de 5 minutos com o Método Ponte Português.',
+    'Aprenda francês e inglês com micro-histórias, pontes gramaticais e revisão espaçada. Método Ponte Português para brasileiros.',
   alternates: {
     canonical: '/',
   },
@@ -137,19 +137,26 @@ export default function LandingPage() {
           </p>
           <nav aria-label="Links legais" className="flex flex-wrap gap-4 pt-2 text-xs">
             <Link
+              href="/about"
+              className="font-semibold underline underline-offset-2 transition-opacity hover:opacity-70"
+              style={{ color: 'var(--color-text-primary)' }}
+            >
+              Sobre
+            </Link>
+            <Link
+              href="/contact"
+              className="font-semibold underline underline-offset-2 transition-opacity hover:opacity-70"
+              style={{ color: 'var(--color-text-primary)' }}
+            >
+              Contato
+            </Link>
+            <Link
               href="/privacy"
               className="font-semibold underline underline-offset-2 transition-opacity hover:opacity-70"
               style={{ color: 'var(--color-text-primary)' }}
             >
               Política de Privacidade
             </Link>
-            <a
-              href="mailto:contato@verbalize.app"
-              className="font-semibold underline underline-offset-2 transition-opacity hover:opacity-70"
-              style={{ color: 'var(--color-text-primary)' }}
-            >
-              Contato
-            </a>
           </nav>
         </div>
       </footer>
