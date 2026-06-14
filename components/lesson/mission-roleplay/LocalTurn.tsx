@@ -12,14 +12,14 @@ export function LocalTurn({ line, onReplay, onNext }: LocalTurnProps) {
     <div className="flex flex-row-reverse gap-3 animate-slide-up">
       <div
         className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-black text-white shadow-md"
-        style={{ backgroundColor: '#ec4899' }}
+        style={{ backgroundColor: 'var(--color-verb)' }}
       >
         {line.speaker.charAt(0).toUpperCase()}
       </div>
       <div className="flex-1">
         <p
           className="text-[10px] font-black uppercase tracking-widest mb-1.5 text-right"
-          style={{ color: '#ec4899' }}
+          style={{ color: 'var(--color-verb)' }}
         >
           {line.speaker}
         </p>
@@ -27,7 +27,7 @@ export function LocalTurn({ line, onReplay, onNext }: LocalTurnProps) {
           className="rounded-2xl p-4 text-right"
           style={{
             backgroundColor: 'var(--color-surface)',
-            border: '2px solid #ec489933',
+            border: '2px solid color-mix(in srgb, var(--color-verb) 20%, transparent)',
           }}
         >
           <p className="text-base font-medium leading-relaxed" style={{ color: 'var(--color-text-primary)' }}>
@@ -58,7 +58,7 @@ export function LocalTurn({ line, onReplay, onNext }: LocalTurnProps) {
             onClick={onNext}
             className="flex items-center gap-1.5 rounded-full px-4 py-1.5 text-[11px] font-black uppercase tracking-wider text-white transition active:scale-95"
             style={{
-              background: 'linear-gradient(135deg, var(--color-primary) 0%, #2563eb 100%)',
+              background: 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%)',
               boxShadow: '0 4px 12px rgba(29,94,212,0.3)',
             }}
           >

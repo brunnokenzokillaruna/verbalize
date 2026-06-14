@@ -22,35 +22,28 @@ const dmSans = DM_Sans({
 export const metadata: Metadata = {
   metadataBase: new URL('https://verbalize-one.vercel.app'),
   title: {
-    default: 'Verbalize | Aprenda o mundo',
+    default: 'Verbalize — Aprenda francês e inglês com micro-histórias',
     template: '%s | Verbalize',
   },
   description:
-    'Aprenda francês e inglês através de micro-histórias, pontes gramaticais e revisão espaçada — feito para falantes de português brasileiro.',
+    'Aprenda francês e inglês através de micro-histórias, pontes gramaticais e revisão espaçada — feito para falantes de português brasileiro. Lições de 5 minutos com o Método Ponte Português.',
   alternates: {
     canonical: '/',
   },
   openGraph: {
-    title: 'Verbalize | Aprenda o mundo',
-    description: 'Aprenda francês e inglês de forma interativa.',
+    title: 'Verbalize — Aprenda francês e inglês com micro-histórias',
+    description:
+      'Micro-lições de francês e inglês para brasileiros: histórias contextuais, pontes gramaticais e revisão espaçada inteligente.',
     url: 'https://verbalize-one.vercel.app',
     siteName: 'Verbalize',
     locale: 'pt_BR',
     type: 'website',
-    images: [
-      {
-        url: '/icon.png',
-        width: 512,
-        height: 512,
-        alt: 'Verbalize',
-      },
-    ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Verbalize | Aprenda o mundo',
-    description: 'Aprenda francês e inglês de forma interativa.',
-    images: ['/icon.png'],
+    title: 'Verbalize — Aprenda francês e inglês com micro-histórias',
+    description:
+      'Micro-lições de francês e inglês para brasileiros: histórias contextuais, pontes gramaticais e revisão espaçada inteligente.',
   },
 };
 
@@ -65,9 +58,6 @@ export default function RootLayout({
       className={`${fraunces.variable} ${dmSans.variable}`}
       suppressHydrationWarning
     >
-      <head>
-        <meta name="color-scheme" content="light dark" />
-      </head>
       <body>
         <ThemeProvider>
           <a

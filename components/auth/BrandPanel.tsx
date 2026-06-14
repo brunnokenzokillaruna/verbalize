@@ -77,7 +77,11 @@ export function BrandPanel() {
             border: '1px solid rgba(255,255,255,0.12)',
           }}
         >
-          <Logo size={64} className="w-full h-full object-cover rounded-2xl transform transition-transform duration-500 group-hover:scale-105" />
+          <Logo
+            size={64}
+            priority
+            className="w-full h-full object-cover rounded-2xl transform transition-transform duration-500 group-hover:scale-105"
+          />
         </div>
 
         <div>

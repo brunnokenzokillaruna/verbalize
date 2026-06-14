@@ -1,6 +1,16 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { LandingPageClient } from '@/components/landing/LandingPageClient';
+
+export const metadata: Metadata = {
+  title: 'Verbalize — Aprenda francês e inglês com micro-histórias',
+  description:
+    'Aprenda francês e inglês através de micro-histórias, pontes gramaticais e revisão espaçada — feito para falantes de português brasileiro. Lições de 5 minutos com o Método Ponte Português.',
+  alternates: {
+    canonical: '/',
+  },
+};
 
 export default function LandingPage() {
   return (
@@ -43,7 +53,7 @@ export default function LandingPage() {
 
       <main
         id="main-content"
-        className="relative w-full h-dvh flex flex-col items-center justify-center overflow-visible"
+        className="relative w-full min-h-dvh flex flex-col items-center justify-center overflow-visible"
       >
         <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden="true">
           <div
@@ -78,7 +88,13 @@ export default function LandingPage() {
           Verbalize — Aprenda francês e inglês com micro-histórias e revisão espaçada
         </h1>
 
-        <p className="absolute bottom-10 left-0 right-0 z-20 px-6 text-center text-sm text-[var(--color-text-secondary)] pointer-events-none max-w-xl mx-auto">
+        <p
+          className="absolute bottom-10 left-0 right-0 z-20 mx-auto max-w-xl px-6 text-center text-sm pointer-events-none rounded-xl py-2"
+          style={{
+            color: 'var(--color-text-primary)',
+            backgroundColor: 'color-mix(in srgb, var(--color-bg) 88%, transparent)',
+          }}
+        >
           Francês e inglês para falantes de português.{' '}
           <Link href="/login" className="pointer-events-auto underline hover:text-[var(--color-primary)]">
             Entrar
@@ -91,6 +107,52 @@ export default function LandingPage() {
 
         <LandingPageClient />
       </main>
+
+      <footer
+        className="relative z-20 w-full border-t px-6 py-12 md:px-16 lg:px-24"
+        style={{
+          borderColor: 'var(--color-border)',
+          backgroundColor: 'var(--color-surface)',
+        }}
+      >
+        <div className="mx-auto max-w-3xl space-y-6 text-sm leading-relaxed" style={{ color: 'var(--color-text-secondary)' }}>
+          <h2 className="font-display text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+            O que é o Verbalize?
+          </h2>
+          <p>
+            O Verbalize é um aplicativo de micro-aprendizado de idiomas criado para brasileiros que
+            querem dominar francês e inglês sem abandonar a rotina. Nosso Método Ponte Português
+            compara estruturas gramaticais com o que você já domina em português, acelerando a
+            compreensão e reduzindo a frustração típica de cursos tradicionais.
+          </p>
+          <p>
+            Cada lição dura de cinco a dez minutos e combina histórias contextuais, vocabulário
+            destacado por cores, áudio integrado e revisão espaçada inteligente. Você aprende
+            palavras dentro de frases reais, pratica com exercícios gerados por inteligência
+            artificial e retém o conhecimento com repetições calculadas no momento certo.
+          </p>
+          <p>
+            Comece gratuitamente, escolha seu idioma-alvo e evolua no seu ritmo — seja no celular
+            durante o intervalo do café ou no computador ao final do dia.
+          </p>
+          <nav aria-label="Links legais" className="flex flex-wrap gap-4 pt-2 text-xs">
+            <Link
+              href="/privacy"
+              className="font-semibold underline underline-offset-2 transition-opacity hover:opacity-70"
+              style={{ color: 'var(--color-text-primary)' }}
+            >
+              Política de Privacidade
+            </Link>
+            <a
+              href="mailto:contato@verbalize.app"
+              className="font-semibold underline underline-offset-2 transition-opacity hover:opacity-70"
+              style={{ color: 'var(--color-text-primary)' }}
+            >
+              Contato
+            </a>
+          </nav>
+        </div>
+      </footer>
     </div>
   );
 }

@@ -13,7 +13,7 @@ export function WordDiff({ target, transcript }: { target: string; transcript: s
             key={i}
             className="font-semibold"
             style={{
-              color: matched ? 'var(--color-success)' : '#ef4444',
+              color: matched ? 'var(--color-success)' : 'var(--color-error)',
               textDecoration: matched ? 'none' : 'underline',
               textDecorationStyle: matched ? undefined : 'wavy',
               textUnderlineOffset: '3px',

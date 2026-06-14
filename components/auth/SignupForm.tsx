@@ -2,11 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Mail, Lock, User, AlertCircle } from 'lucide-react';
 import { signUpWithEmail, signInWithGoogle } from '@/services/auth';
 import { useAuthStore } from '@/store/authStore';
 import { Input } from '@/components/ui/Input';
-import { useAuthModal } from './AuthModalProvider';
+import { Logo } from '@/components/ui/Logo';
+import { AuthPageFooter } from '@/components/auth/AuthPageFooter';
 
 const GoogleIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" className="shrink-0">
@@ -27,29 +29,50 @@ function PasswordStrength({ password }: { password: string }) {
   ];
   const passedCount = checks.filter((c) => c.ok).length;
 
-  const barColors = ['#ef4444', '#f59e0b', '#10b981'];
+  const barColors = ['var(--color-error)', 'var(--color-warning)', 'var(--color-success)'];
   const strengthLabel = ['Fraca', 'Média', 'Forte'];
-  const activeColor = barColors[passedCount - 1] ?? '#e5e7eb';
+  const activeColor = barColors[passedCount - 1] ?? 'var(--color-border)';
 
   return (
     <div className="flex flex-col gap-2.5 animate-fade-in">
       <div className="flex items-center gap-1.5">
         {[0, 1, 2].map((i) => (
-          <div key={i} className="h-1 flex-1 rounded-full transition-all duration-300" style={{ backgroundColor: i < passedCount ? activeColor : 'var(--color-border)' }} />
+          <div
+            key={i}
+            className="h-1 flex-1 rounded-full transition-all duration-300"
+            style={{
+              backgroundColor: i < passedCount ? activeColor : 'var(--color-border)',
+            }}
+          />
         ))}
         {passedCount > 0 && (
-          <span className="ml-1 text-xs font-semibold transition-colors duration-300" style={{ color: activeColor }}>
+          <span
+            className="ml-1 text-xs font-semibold transition-colors duration-300"
+            style={{ color: activeColor }}
+          >
             {strengthLabel[passedCount - 1]}
           </span>
         )}
       </div>
+
       <div className="flex flex-wrap gap-x-4 gap-y-1">
         {checks.map((c) => (
           <div key={c.label} className="flex items-center gap-1 text-xs">
-            <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full text-[9px] font-bold transition-all duration-200" style={{ backgroundColor: c.ok ? '#10b981' : 'var(--color-border)', color: c.ok ? '#fff' : 'var(--color-text-muted)' }}>
+            <span
+              className="flex h-3.5 w-3.5 items-center justify-center rounded-full text-[9px] font-bold transition-all duration-200"
+              style={{
+                backgroundColor: c.ok ? 'var(--color-success)' : 'var(--color-border)',
+                color: c.ok ? 'var(--color-text-inverse)' : 'var(--color-text-muted)',
+              }}
+            >
               {c.ok ? '✓' : '·'}
             </span>
-            <span className="transition-colors duration-200" style={{ color: c.ok ? 'var(--color-success)' : 'var(--color-text-muted)' }}>{c.label}</span>
+            <span
+              className="transition-colors duration-200"
+              style={{ color: c.ok ? 'var(--color-success)' : 'var(--color-text-muted)' }}
+            >
+              {c.label}
+            </span>
           </div>
         ))}
       </div>
@@ -60,7 +83,6 @@ function PasswordStrength({ password }: { password: string }) {
 export function SignupForm() {
   const router = useRouter();
   const { user, profile, initialized } = useAuthStore();
-  const { closeModal, openModal } = useAuthModal();
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -69,14 +91,12 @@ export function SignupForm() {
   const [loadingEmail, setLoadingEmail] = useState(false);
   const [loadingGoogle, setLoadingGoogle] = useState(false);
 
-  // Auto-redirect if logged in (for modal it might be weird, but consistent)
   useEffect(() => {
     if (initialized && user) {
-      closeModal();
       if (profile) router.replace('/dashboard');
-      else router.replace(`/onboarding?name=${encodeURIComponent(name)}`);
+      else router.replace(`/onboarding${name ? `?name=${encodeURIComponent(name)}` : ''}`);
     }
-  }, [initialized, user, profile, router, name, closeModal]);
+  }, [initialized, user, profile, router, name]);
 
   async function handleEmailSignup(e: React.FormEvent) {
     e.preventDefault();
@@ -88,27 +108,28 @@ export function SignupForm() {
     setLoadingEmail(true);
     try {
       await signUpWithEmail(email, password);
-      closeModal();
       router.replace(`/onboarding?name=${encodeURIComponent(name)}`);
     } catch (err: unknown) {
       const code = (err as { code?: string }).code;
-      console.error('Signup form error:', err);
-      
+
       switch (code) {
         case 'auth/email-already-in-use':
-          setError('Este e-mail já está cadastrado.');
+          setError('Este e-mail já está cadastrado. Tente fazer login.');
           break;
         case 'auth/invalid-email':
-          setError('E-mail inválido.');
+          setError('E-mail inválido. Verifique o formato digitado.');
           break;
         case 'auth/weak-password':
-          setError('Senha muito fraca.');
+          setError('Senha muito fraca. Tente uma senha mais complexa.');
           break;
         case 'auth/operation-not-allowed':
-          setError('Cadastro desativado.');
+          setError('O cadastro com e-mail não está ativado. Contate o suporte.');
+          break;
+        case 'auth/network-request-failed':
+          setError('Falha na rede. Verifique sua conexão.');
           break;
         default:
-          setError('Erro ao criar conta.');
+          setError('Erro ao criar conta. Tente novamente em instantes.');
       }
     } finally {
       setLoadingEmail(false);
@@ -120,7 +141,6 @@ export function SignupForm() {
     setLoadingGoogle(true);
     try {
       await signInWithGoogle();
-      closeModal();
       router.replace('/onboarding');
     } catch {
       setError('Erro ao entrar com Google. Tente novamente.');
@@ -129,69 +149,173 @@ export function SignupForm() {
     }
   }
 
+  if (initialized && user) return null;
+
   return (
-    <div className="w-full max-w-sm">
-      <div className="mb-8 animate-slide-up-spring delay-75">
-        <h2 className="font-display text-3xl font-semibold leading-tight" style={{ color: 'var(--color-text-primary)' }}>
-          Comece agora
-        </h2>
-        <p className="mt-2 text-base" style={{ color: 'var(--color-text-secondary)' }}>
-          Crie sua conta gratuitamente.
-        </p>
+    <div
+      className="relative flex min-h-dvh flex-col items-center justify-center px-6 py-12 overflow-hidden lg:min-h-full"
+      style={{ backgroundColor: 'var(--color-bg)' }}
+    >
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+        <div
+          className="absolute -top-24 -right-24 h-64 w-64 rounded-full blur-3xl opacity-60"
+          style={{ background: 'radial-gradient(circle, rgba(29,94,212,0.12) 0%, transparent 70%)' }}
+        />
+        <div
+          className="absolute bottom-0 -left-16 h-52 w-52 rounded-full blur-3xl opacity-50"
+          style={{ background: 'radial-gradient(circle, rgba(217,119,6,0.08) 0%, transparent 70%)' }}
+        />
       </div>
 
-      <div className="animate-slide-up-spring delay-150">
-        <button
-          type="button"
-          onClick={handleGoogleSignup}
-          disabled={loadingGoogle || loadingEmail}
-          className="card-lift flex w-full items-center justify-center gap-3 rounded-2xl px-5 py-3.5 text-sm font-semibold transition-all duration-150 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
-          style={{ backgroundColor: 'var(--color-surface)', border: '1.5px solid var(--color-border)', color: 'var(--color-text-primary)' }}
-        >
-          {loadingGoogle ? <span className="h-4 w-4 rounded-full border-2 border-current border-t-transparent animate-spin" /> : <GoogleIcon />}
-          Cadastrar com Google
-        </button>
-      </div>
-
-      <div className="my-6 flex items-center gap-3 animate-slide-up-spring delay-150">
-        <div className="h-px flex-1" style={{ backgroundColor: 'var(--color-border)' }} />
-        <span className="rounded-full px-3 py-1 text-xs font-medium" style={{ backgroundColor: 'var(--color-surface-raised)', color: 'var(--color-text-muted)' }}>
-          ou com e-mail
-        </span>
-        <div className="h-px flex-1" style={{ backgroundColor: 'var(--color-border)' }} />
-      </div>
-
-      <form onSubmit={handleEmailSignup} className="flex flex-col gap-4 animate-slide-up-spring delay-225">
-        <Input label="Nome" type="text" autoComplete="name" placeholder="Seu nome" icon={User} value={name} onChange={(e) => setName(e.target.value)} required />
-        <Input label="E-mail" type="email" autoComplete="email" placeholder="seu@email.com" icon={Mail} value={email} onChange={(e) => setEmail(e.target.value)} required />
-        <div className="flex flex-col gap-2.5">
-          <Input label="Senha" type="password" autoComplete="new-password" placeholder="••••••••" icon={Lock} value={password} onChange={(e) => setPassword(e.target.value)} required />
-          <PasswordStrength password={password} />
+      <div className="relative w-full max-w-sm">
+        <div className="mb-8 flex flex-col items-center lg:hidden animate-slide-up-spring">
+          <div className="relative w-14 h-14 rounded-2xl overflow-hidden shadow-md border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.08)] mb-3 select-none">
+            <Logo size={56} priority />
+          </div>
+          <p
+            className="font-display text-4xl font-bold tracking-tight"
+            style={{ color: 'var(--color-primary)' }}
+          >
+            Verbalize
+          </p>
+          <p className="mt-1.5 text-sm italic" style={{ color: 'var(--color-text-muted)' }}>
+            Aprenda o mundo.
+          </p>
         </div>
 
-        {error && (
-          <div className="flex items-center gap-2.5 rounded-2xl px-4 py-3 text-sm animate-scale-in" style={{ backgroundColor: 'var(--color-error-bg)', color: 'var(--color-error)', border: '1px solid', borderColor: 'rgba(220,38,38,0.2)' }}>
-            <AlertCircle size={16} className="shrink-0" />
-            {error}
+        <div className="mb-8 animate-slide-up-spring delay-75">
+          <h1
+            className="font-display text-3xl font-semibold leading-tight"
+            style={{ color: 'var(--color-text-primary)' }}
+          >
+            Comece agora
+          </h1>
+          <p className="mt-2 text-base" style={{ color: 'var(--color-text-secondary)' }}>
+            Crie sua conta gratuita e aprenda francês e inglês com o Método Ponte Português.
+          </p>
+        </div>
+
+        <div className="animate-slide-up-spring delay-150">
+          <button
+            type="button"
+            onClick={handleGoogleSignup}
+            disabled={loadingGoogle || loadingEmail}
+            className="card-lift flex w-full items-center justify-center gap-3 rounded-2xl px-5 py-3.5 text-sm font-semibold transition-all duration-150 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
+            style={{
+              backgroundColor: 'var(--color-surface)',
+              border: '1.5px solid var(--color-border)',
+              color: 'var(--color-text-primary)',
+            }}
+          >
+            {loadingGoogle ? (
+              <span className="h-4 w-4 rounded-full border-2 border-current border-t-transparent animate-spin" />
+            ) : (
+              <GoogleIcon />
+            )}
+            Cadastrar com Google
+          </button>
+        </div>
+
+        <div className="my-6 flex items-center gap-3 animate-slide-up-spring delay-150">
+          <div className="h-px flex-1" style={{ backgroundColor: 'var(--color-border)' }} />
+          <span
+            className="rounded-full px-3 py-1 text-xs font-medium"
+            style={{
+              backgroundColor: 'var(--color-surface-raised)',
+              color: 'var(--color-text-muted)',
+            }}
+          >
+            ou com e-mail
+          </span>
+          <div className="h-px flex-1" style={{ backgroundColor: 'var(--color-border)' }} />
+        </div>
+
+        <form onSubmit={handleEmailSignup} className="flex flex-col gap-4 animate-slide-up-spring delay-225">
+          <Input
+            label="Nome"
+            type="text"
+            autoComplete="name"
+            placeholder="Seu nome"
+            icon={User}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+          <Input
+            label="E-mail"
+            type="email"
+            autoComplete="email"
+            placeholder="seu@email.com"
+            icon={Mail}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <div className="flex flex-col gap-2.5">
+            <Input
+              label="Senha"
+              type="password"
+              autoComplete="new-password"
+              placeholder="••••••••"
+              icon={Lock}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <PasswordStrength password={password} />
           </div>
-        )}
 
-        <button
-          type="submit"
-          disabled={loadingEmail || loadingGoogle}
-          className="cta-shimmer relative mt-2 w-full overflow-hidden rounded-2xl py-3.5 text-sm font-bold text-white transition-all duration-150 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
-          style={{ background: 'linear-gradient(135deg, var(--color-primary) 0%, #2563eb 100%)', boxShadow: '0 6px 20px rgba(29,94,212,0.3)' }}
+          {error && (
+            <div
+              className="flex items-center gap-2.5 rounded-2xl px-4 py-3 text-sm animate-scale-in"
+              style={{
+                backgroundColor: 'var(--color-error-bg)',
+                color: 'var(--color-error)',
+                border: '1px solid',
+                borderColor: 'rgba(220,38,38,0.2)',
+              }}
+            >
+              <AlertCircle size={16} className="shrink-0" />
+              {error}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={loadingEmail || loadingGoogle}
+            className="cta-shimmer relative mt-2 w-full overflow-hidden rounded-2xl py-3.5 text-sm font-bold text-white transition-all duration-150 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
+            style={{
+              backgroundColor: 'var(--color-primary)',
+              boxShadow: '0 6px 20px rgba(29,94,212,0.3)',
+            }}
+          >
+            {loadingEmail ? (
+              <span className="flex items-center justify-center gap-2">
+                <span className="h-4 w-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                Criando conta…
+              </span>
+            ) : (
+              'Criar conta grátis'
+            )}
+          </button>
+        </form>
+
+        <p
+          className="mt-5 text-center text-sm animate-slide-up-spring delay-450"
+          style={{ color: 'var(--color-text-secondary)' }}
         >
-          {loadingEmail ? <span className="flex items-center justify-center gap-2"><span className="h-4 w-4 rounded-full border-2 border-white border-t-transparent animate-spin" />Criando conta…</span> : 'Criar conta grátis'}
-        </button>
-      </form>
+          Já tem uma conta?{' '}
+          <Link
+            href="/login"
+            className="font-bold transition-opacity hover:opacity-70"
+            style={{ color: 'var(--color-primary)' }}
+          >
+            Entrar →
+          </Link>
+        </p>
 
-      <p className="mt-5 text-center text-sm animate-slide-up-spring delay-450" style={{ color: 'var(--color-text-secondary)' }}>
-        Já tem uma conta?{' '}
-        <button type="button" onClick={() => openModal('login')} className="font-bold transition-opacity hover:opacity-70" style={{ color: 'var(--color-primary)' }}>
-          Entrar →
-        </button>
-      </p>
+        <AuthPageFooter />
+      </div>
     </div>
   );
 }

@@ -155,7 +155,7 @@ export function UserTurn({
                 onClick={onRecord}
                 className="flex w-full items-center justify-center gap-2.5 rounded-2xl py-3.5 text-sm font-black text-white transition active:scale-[0.98]"
                 style={{
-                  background: 'linear-gradient(135deg, var(--color-success) 0%, #059669 100%)',
+                  background: 'linear-gradient(135deg, var(--color-success) 0%, color-mix(in srgb, var(--color-success) 85%, black) 100%)',
                   boxShadow: '0 6px 18px rgba(16,185,129,0.35)',
                 }}
               >
@@ -196,7 +196,7 @@ export function UserTurn({
               onClick={onStopRecord}
               className="flex w-full items-center justify-center gap-3 rounded-2xl py-4 text-sm font-black text-white transition active:scale-[0.98]"
               style={{
-                background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                background: 'linear-gradient(135deg, var(--color-error) 0%, color-mix(in srgb, var(--color-error) 85%, black) 100%)',
                 boxShadow: '0 6px 18px rgba(239,68,68,0.35)',
               }}
             >
@@ -255,7 +255,7 @@ export function UserTurn({
                 onClick={onConfirm}
                 className="flex w-full items-center justify-center gap-2 rounded-2xl py-3.5 text-sm font-black text-white transition active:scale-[0.98]"
                 style={{
-                  background: 'linear-gradient(135deg, var(--color-success) 0%, #059669 100%)',
+                  background: 'linear-gradient(135deg, var(--color-success) 0%, color-mix(in srgb, var(--color-success) 85%, black) 100%)',
                   boxShadow: '0 6px 18px rgba(16,185,129,0.35)',
                 }}
               >
@@ -269,13 +269,13 @@ export function UserTurn({
               <div
                 className="flex items-start gap-3 rounded-2xl p-4"
                 style={{
-                  backgroundColor: 'rgba(239,68,68,0.06)',
-                  border: '2px solid rgba(239,68,68,0.4)',
+                  backgroundColor: 'var(--color-error-bg)',
+                  border: '2px solid color-mix(in srgb, var(--color-error) 40%, transparent)',
                 }}
               >
-                <XCircle size={20} style={{ color: '#ef4444' }} strokeWidth={2.5} />
+                <XCircle size={20} style={{ color: 'var(--color-error)' }} strokeWidth={2.5} />
                 <div>
-                  <p className="text-xs font-black" style={{ color: '#ef4444' }}>
+                  <p className="text-xs font-black" style={{ color: 'var(--color-error)' }}>
                     {intentMode ? 'Precisa melhorar' : `Quase lá (${Math.round(score * 100)}%)`}
                   </p>
                   <div className="mt-1.5">
@@ -286,7 +286,7 @@ export function UserTurn({
                     )}
                   </div>
                   {intentMode && evalCorrected && (
-                    <p className="mt-2 text-xs font-bold text-[#ef4444] opacity-90">
+                    <p className="mt-2 text-xs font-bold opacity-90" style={{ color: 'var(--color-error)' }}>
                       Tente dizer: {evalCorrected}
                     </p>
                   )}
