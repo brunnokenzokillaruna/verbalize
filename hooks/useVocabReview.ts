@@ -1,0 +1,239 @@
+import { useState, useCallback, useMemo } from 'react';
+import { generateVocabReview } from '@/app/actions/generateVocabReview';
+import type { VocabReviewItem } from '@/app/actions/generateVocabReview';
+import { updateVocabSrsAfterReview } from '@/services/firestore';
+import { getLessonById, getNextLesson } from '@/lib/curriculum';
+import { pickReviewSession } from '@/utils/reviewSession';
+import { isDueForReview } from '@/utils/vocabPageHelpers';
+import type { ReviewResult } from '@/components/vocabulary/reviewTypes';
+import type { UserVocabularyDocument, SupportedLanguage, UserDocument } from '@/types';
+import type { User } from 'firebase/auth';
+
+type ReviewPhase = 'ready' | 'running' | 'done' | null;
+
+export function useVocabReview(
+  user: User | null,
+  profile: UserDocument | null,
+  items: UserVocabularyDocument[],
+  language: SupportedLanguage,
+  loadVocabulary: () => Promise<void>,
+) {
+  const [showPicker, setShowPicker] = useState(false);
+  const [sessionItems, setSessionItems] = useState<UserVocabularyDocument[]>([]);
+  const [flashcardPhase, setFlashcardPhase] = useState<ReviewPhase>(null);
+  const [visualPhase, setVisualPhase] = useState<ReviewPhase>(null);
+  const [contextPhase, setContextPhase] = useState<'running' | 'done' | null>(null);
+  const [contextLoading, setContextLoading] = useState(false);
+  const [reviewItems, setReviewItems] = useState<VocabReviewItem[]>([]);
+  const [cardIdx, setCardIdx] = useState(0);
+  const [answered, setAnswered] = useState(false);
+  const [lastCorrect, setLastCorrect] = useState<boolean | null>(null);
+  const [results, setResults] = useState<ReviewResult[]>([]);
+  const [savingResults, setSavingResults] = useState(false);
+
+  const rawDueToday = useMemo(
+    () => items.filter((item) => isDueForReview(item)),
+    [items],
+  );
+
+  const wordImageMap = useMemo(
+    () => Object.fromEntries(items.filter((v) => v.imageUrl).map((v) => [v.word, v.imageUrl!])),
+    [items],
+  );
+
+  const isReviewActive =
+    showPicker || flashcardPhase !== null || contextPhase !== null || visualPhase !== null || contextLoading;
+
+  const closeAllReview = useCallback(() => {
+    setShowPicker(false);
+    setFlashcardPhase(null);
+    setContextPhase(null);
+    setVisualPhase(null);
+    setContextLoading(false);
+    setReviewItems([]);
+    setCardIdx(0);
+    setAnswered(false);
+    setLastCorrect(null);
+    setResults([]);
+  }, []);
+
+  const openReviewPicker = useCallback(() => {
+    if (!user || rawDueToday.length === 0) return;
+    setSessionItems(pickReviewSession(rawDueToday));
+    setResults([]);
+    setShowPicker(true);
+  }, [user, rawDueToday]);
+
+  const saveResults = useCallback(
+    async (reviewResults: ReviewResult[]) => {
+      if (!user) return;
+      setSavingResults(true);
+      await Promise.all(
+        reviewResults.map((r) => updateVocabSrsAfterReview(user.uid, r.word, language, r.correct)),
+      );
+      await loadVocabulary();
+      setSavingResults(false);
+      closeAllReview();
+    },
+    [user, language, loadVocabulary, closeAllReview],
+  );
+
+  const startFlashcardMode = useCallback(() => {
+    setShowPicker(false);
+    setCardIdx(0);
+    setResults([]);
+    setFlashcardPhase('ready');
+  }, []);
+
+  const beginFlashcardSession = useCallback(() => setFlashcardPhase('running'), []);
+
+  const handleFlashcardAnswer = useCallback(
+    (correct: boolean) => {
+      const item = sessionItems[cardIdx];
+      setResults((prev) => [...prev, { word: item.word, correct }]);
+      if (cardIdx + 1 >= sessionItems.length) {
+        setFlashcardPhase('done');
+      } else {
+        setCardIdx((i) => i + 1);
+      }
+    },
+    [sessionItems, cardIdx],
+  );
+
+  const finishFlashcardReview = useCallback(() => saveResults(results), [saveResults, results]);
+
+  const startVisualMode = useCallback(() => {
+    setShowPicker(false);
+    setCardIdx(0);
+    setResults([]);
+    setAnswered(false);
+    setLastCorrect(null);
+    setVisualPhase('ready');
+  }, []);
+
+  const beginVisualSession = useCallback(() => setVisualPhase('running'), []);
+
+  const handleVisualAnswer = useCallback(
+    (correct: boolean) => {
+      if (answered) return;
+      setAnswered(true);
+      setLastCorrect(correct);
+    },
+    [answered],
+  );
+
+  const handleVisualContinue = useCallback(() => {
+    if (!answered || lastCorrect === null) return;
+    const item = sessionItems[cardIdx];
+    const newResults = [...results, { word: item.word, correct: lastCorrect }];
+    setResults(newResults);
+    if (cardIdx + 1 >= sessionItems.length) {
+      setVisualPhase('done');
+    } else {
+      setCardIdx(cardIdx + 1);
+      setAnswered(false);
+      setLastCorrect(null);
+    }
+  }, [answered, lastCorrect, sessionItems, cardIdx, results]);
+
+  const finishVisualReview = useCallback(() => saveResults(results), [saveResults, results]);
+
+  const startContextMode = useCallback(async () => {
+    if (!user) return;
+    setShowPicker(false);
+    setContextLoading(true);
+    setCardIdx(0);
+    setResults([]);
+    setAnswered(false);
+    setLastCorrect(null);
+
+    const currentLessonId = profile?.lessonProgress?.[language];
+    const currentLesson =
+      (currentLessonId ? getLessonById(currentLessonId) : undefined) ??
+      getNextLesson(language, undefined);
+    const level = currentLesson?.level ?? 'A1';
+    const knownVocabulary = items.map((v) => v.word);
+
+    try {
+      const generated = await generateVocabReview({
+        words: sessionItems.map((v) => ({
+          word: v.word,
+          translation: v.translation,
+          imageUrl: v.imageUrl,
+        })),
+        language,
+        level,
+        knownVocabulary,
+      });
+
+      if (!generated || generated.length === 0) return;
+
+      setReviewItems(generated);
+      setContextPhase('running');
+    } catch (err) {
+      console.error('[startContextMode] Failed:', err);
+    } finally {
+      setContextLoading(false);
+    }
+  }, [user, profile, language, items, sessionItems]);
+
+  const handleContextAnswer = useCallback(
+    (correct: boolean) => {
+      if (answered) return;
+      setAnswered(true);
+      setLastCorrect(correct);
+    },
+    [answered],
+  );
+
+  const handleContextContinue = useCallback(() => {
+    if (!answered || lastCorrect === null) return;
+
+    const currentItem = reviewItems[cardIdx];
+    const newResults = [...results, { word: currentItem.word, correct: lastCorrect }];
+    setResults(newResults);
+
+    if (cardIdx + 1 >= reviewItems.length) {
+      setContextPhase('done');
+    } else {
+      setCardIdx(cardIdx + 1);
+      setAnswered(false);
+      setLastCorrect(null);
+    }
+  }, [answered, lastCorrect, reviewItems, cardIdx, results]);
+
+  const finishContextReview = useCallback(() => saveResults(results), [saveResults, results]);
+
+  return {
+    rawDueToday,
+    wordImageMap,
+    isReviewActive,
+    showPicker,
+    sessionItems,
+    flashcardPhase,
+    visualPhase,
+    contextPhase,
+    contextLoading,
+    reviewItems,
+    cardIdx,
+    answered,
+    lastCorrect,
+    results,
+    savingResults,
+    openReviewPicker,
+    closeAllReview,
+    startFlashcardMode,
+    beginFlashcardSession,
+    handleFlashcardAnswer,
+    finishFlashcardReview,
+    startVisualMode,
+    beginVisualSession,
+    handleVisualAnswer,
+    handleVisualContinue,
+    finishVisualReview,
+    startContextMode,
+    handleContextAnswer,
+    handleContextContinue,
+    finishContextReview,
+  };
+}
