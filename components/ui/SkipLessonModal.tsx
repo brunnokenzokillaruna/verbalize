@@ -63,7 +63,7 @@ export function SkipLessonModal({
         <p className="mt-3 text-base font-medium text-muted leading-relaxed">
           {lessonTitle ? (
             <>
-              Você vai marcar <span className="text-text-primary font-bold">"{lessonTitle}"</span> como concluída e avançar para o próximo tema.
+              Você vai marcar <span className="text-text-primary font-bold">&ldquo;{lessonTitle}&rdquo;</span> como concluída e avançar para o próximo tema.
             </>
           ) : (
             'Você vai marcar esta lição como concluída e avançar para o próximo tema.'

@@ -1,6 +1,6 @@
 'use client';
 
-import { Book, Zap, Mic, MessageSquare, Target, Loader2, CheckCircle2, ChevronRight, Repeat, Sparkles, BookOpen } from 'lucide-react';
+import { Book, Zap, Mic, MessageSquare, Target, Loader2, ChevronRight, Repeat, Sparkles, BookOpen } from 'lucide-react';
 import type { LessonTag, SupportedLanguage } from '@/types';
 
 const TAG_CONFIG: Record<LessonTag, {

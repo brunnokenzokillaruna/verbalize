@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   ChevronLeft, ChevronRight, LogOut, Trash2, Check,
-  AlertCircle, Loader2, Flame, BookOpen, Target, User,
+  Loader2, Flame, BookOpen, Target, User,
   Plane, Utensils, Music, Film, Briefcase, Laptop, Book, Palette,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';

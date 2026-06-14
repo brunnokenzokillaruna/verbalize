@@ -37,11 +37,20 @@ export const metadata: Metadata = {
     siteName: 'Verbalize',
     locale: 'pt_BR',
     type: 'website',
+    images: [
+      {
+        url: '/icon.png',
+        width: 512,
+        height: 512,
+        alt: 'Verbalize',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Verbalize | Aprenda o mundo',
     description: 'Aprenda francês e inglês de forma interativa.',
+    images: ['/icon.png'],
   },
 };
 
@@ -63,7 +72,7 @@ export default function RootLayout({
         <ThemeProvider>
           <a
             href="#main-content"
-            className="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 focus:z-50 focus:p-4 focus:bg-white focus:text-black focus:font-bold"
+            className="sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 focus:z-50 focus:p-4 focus:bg-surface focus:text-text-primary focus:font-bold focus:ring-2 focus:ring-primary"
           >
             Pular para o conteúdo principal
           </a>

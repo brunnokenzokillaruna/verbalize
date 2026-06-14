@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Lock, Check, ChevronRight, ChevronLeft } from 'lucide-react';
-import type { ProficiencyLevel, SupportedLanguage } from '@/types';
+import type { ProficiencyLevel } from '@/types';
 
 interface Lesson {
   id: string;
@@ -15,7 +15,7 @@ interface LessonBrowserProps {
   initialLevel: ProficiencyLevel;
 }
 
-function MarqueeText({ text, className, style }: { text: string; className?: string; style?: any }) {
+function MarqueeText({ text, className, style }: { text: string; className?: string; style?: React.CSSProperties }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLSpanElement>(null);
   const [scrollDist, setScrollDist] = useState(0);
@@ -55,7 +55,7 @@ function MarqueeText({ text, className, style }: { text: string; className?: str
         style={{
           animation: scrollDist < 0 ? `marquee-slide ${Math.abs(scrollDist) / 25 + 6}s linear infinite` : 'none',
           '--scroll-dist': `${scrollDist}px`,
-        } as any}
+        } as React.CSSProperties & { '--scroll-dist'?: string }}
       >
         {text}
       </span>

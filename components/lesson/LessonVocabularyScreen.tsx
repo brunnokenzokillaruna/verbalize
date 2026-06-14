@@ -16,8 +16,6 @@ interface LessonVocabularyScreenProps {
   level?: ProficiencyLevel;
 }
 
-const IMMERSIVE_LEVELS: ReadonlySet<ProficiencyLevel> = new Set(['A2', 'B1', 'B2', 'C1', 'C2']);
-
 export function LessonVocabularyScreen({
   isLoading,
   newVocabulary,
@@ -25,7 +23,6 @@ export function LessonVocabularyScreen({
   vocabTranslations,
   language,
   targetDefinitions,
-  level,
 }: LessonVocabularyScreenProps) {
   // Disable immersive mode on the vocabulary screen so translations are shown directly.
   const useImmersive = false;

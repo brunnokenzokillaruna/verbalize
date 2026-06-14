@@ -5,22 +5,21 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { VisualVocabCard } from '@/components/lesson/VisualVocabCard';
 import { SentenceBuilder } from '@/components/lesson/SentenceBuilder';
-import { AudioPlayerButton } from '@/components/lesson/AudioPlayerButton';
 import { LessonInfoModal } from '@/components/ui/LessonInfoModal';
 import { LessonProgressHeader } from '@/components/lesson/LessonProgressHeader';
 import { CheckButton, type CheckButtonState } from '@/components/lesson/CheckButton';
-import { Mail, Search, Bell, Settings, Play } from 'lucide-react';
+import { Mail, Search, Play } from 'lucide-react';
 import type { LessonDefinition, SentenceBuilderData } from '@/types';
 
 import { LessonCompleteScreen } from '@/components/lesson/LessonCompleteScreen';
 import { ClickableWord } from '@/components/lesson/ClickableWord';
-import { Trophy, ChevronRight } from 'lucide-react';
+import { Trophy } from 'lucide-react';
 
 export default function TestUIPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [completeOpen, setCompleteOpen] = useState(false);
   const [checkState, setCheckState] = useState<CheckButtonState>('idle');
-  const [isExerciseReady, setIsExerciseReady] = useState(false);
+  const [, setIsExerciseReady] = useState(false);
   
   // Mock data for SentenceBuilder
   const sentenceData: SentenceBuilderData = {

@@ -85,8 +85,8 @@ export function InteractiveSubtitles({ data, onAnswer, answered, setIsExerciseRe
     <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
 
       <div
-        className="rounded-2xl p-4.5 border border-dashed border-[var(--color-border)] backdrop-blur-sm"
-        style={{ backgroundColor: 'rgba(255, 255, 255, 0.01)' }}
+        className="rounded-2xl p-4.5 border border-dashed border-[var(--color-border)]"
+        style={{ backgroundColor: 'var(--color-surface)' }}
       >
         <div className="flex items-center gap-2 mb-2.5 text-[var(--color-text-muted)]">
           <Languages size={15} className="text-[var(--color-vocab)]" />
@@ -107,7 +107,10 @@ export function InteractiveSubtitles({ data, onAnswer, answered, setIsExerciseRe
           </span>
         </div>
 
-        <div className="flex flex-wrap gap-x-2 gap-y-3.5 p-6 rounded-2xl bg-white/5 border border-[var(--color-border)] backdrop-blur-md shadow-inner">
+        <div
+          className="flex flex-wrap gap-x-2 gap-y-3.5 p-6 rounded-2xl border border-[var(--color-border)] shadow-inner"
+          style={{ backgroundColor: 'var(--color-surface-raised)' }}
+        >
           {words.map((word, idx) => {
             const isSelected = selectedIndices.includes(idx);
             const isWrongWord = data.wrongWords.some(ww => cleanWord(ww) === cleanWord(word));

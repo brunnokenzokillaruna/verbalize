@@ -2,49 +2,54 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Loader2, Trophy, Volume2, VolumeX } from 'lucide-react';
+import dynamic from 'next/dynamic';
+import { Loader2 } from 'lucide-react';
 
 import { useAuthStore } from '@/store/authStore';
 import { useLessonStore } from '@/store/lessonStore';
-import { getNextLesson, getNextLessonId, getLessonById, getPreviousTopics } from '@/lib/curriculum';
 
-import { generateHook } from '@/app/actions/generateHook';
-import { synthesizeDialogue } from '@/app/actions/synthesizeSpeech';
-import { generateGrammarBridge } from '@/app/actions/generateGrammarBridge';
-import { getVocabImage } from '@/app/actions/getVocabImage';
-import { generatePracticeExercises } from '@/app/actions/generatePracticeExercises';
 import { generateMistakeReview } from '@/app/actions/generateMistakeReview';
 import { translateWord } from '@/app/actions/translateWord';
-import { getVerbConjugation } from '@/app/actions/getVerbConjugation';
-import { pregenerateNextLesson } from '@/app/actions/pregenerateNextLesson';
 import {
-  upsertVocabularyItem,
-  logLesson,
-  updateLessonStats,
   saveLessonMistake,
   getOldestMistake,
   deleteLessonMistake,
-  getPregeneratedLesson,
-  deletePregeneratedLesson,
-  getUserVocabulary,
 } from '@/services/firestore';
 
-import { LessonProgressHeader } from '@/components/lesson/LessonProgressHeader';
-import { ClickableSentence } from '@/components/lesson/ClickableSentence';
 import { TranslationTooltip } from '@/components/lesson/TranslationTooltip';
 import { CheckButton } from '@/components/lesson/CheckButton';
+import { LessonProgressHeader } from '@/components/lesson/LessonProgressHeader';
 import { formatErrorCorrectionAnswer } from '@/utils/errorCorrection';
 import { LessonLoadingScreen } from '@/components/lesson/LessonLoadingScreen';
 import { LessonErrorScreen } from '@/components/lesson/LessonErrorScreen';
-import { LessonCompleteScreen } from '@/components/lesson/LessonCompleteScreen';
-import { LessonMissionDebrief } from '@/components/lesson/LessonMissionDebrief';
-import { LessonMissionRolePlay } from '@/components/lesson/LessonMissionRolePlay';
-import { LessonVocabularyScreen } from '@/components/lesson/LessonVocabularyScreen';
-import { LessonHookScreen } from '@/components/lesson/LessonHookScreen';
-import { LessonGrammarScreen } from '@/components/lesson/LessonGrammarScreen';
-import { LessonPracticeScreen } from '@/components/lesson/LessonPracticeScreen';
-import { LessonMissionScreen } from '@/components/lesson/LessonMissionScreen';
-import { LessonPhoneticsScreen } from '@/components/lesson/LessonPhoneticsScreen';
+
+const LessonCompleteScreen = dynamic(() =>
+  import('@/components/lesson/LessonCompleteScreen').then((m) => m.LessonCompleteScreen),
+);
+const LessonMissionDebrief = dynamic(() =>
+  import('@/components/lesson/LessonMissionDebrief').then((m) => m.LessonMissionDebrief),
+);
+const LessonVocabularyScreen = dynamic(() =>
+  import('@/components/lesson/LessonVocabularyScreen').then((m) => m.LessonVocabularyScreen),
+);
+const LessonHookScreen = dynamic(() =>
+  import('@/components/lesson/LessonHookScreen').then((m) => m.LessonHookScreen),
+);
+const LessonGrammarScreen = dynamic(() =>
+  import('@/components/lesson/LessonGrammarScreen').then((m) => m.LessonGrammarScreen),
+);
+const LessonMissionScreen = dynamic(() =>
+  import('@/components/lesson/LessonMissionScreen').then((m) => m.LessonMissionScreen),
+);
+const LessonMissionRolePlay = dynamic(() =>
+  import('@/components/lesson/LessonMissionRolePlay').then((m) => m.LessonMissionRolePlay),
+);
+const LessonPhoneticsScreen = dynamic(() =>
+  import('@/components/lesson/LessonPhoneticsScreen').then((m) => m.LessonPhoneticsScreen),
+);
+const LessonPracticeScreen = dynamic(() =>
+  import('@/components/lesson/LessonPracticeScreen').then((m) => m.LessonPracticeScreen),
+);
 
 import { useLessonAudio } from './hooks/useLessonAudio';
 import { useLessonFlow } from './hooks/useLessonFlow';
@@ -52,7 +57,7 @@ import { useLessonBootstrap } from './hooks/useLessonBootstrap';
 import { useSoundEffects } from '@/hooks/useSoundEffects';
 import { buildMistakeContext, phaseToStage } from './utils';
 
-import type { LessonStage, GrammarBridgeResult, Exercise, LessonTag } from '@/types';
+import type { GrammarBridgeResult, Exercise, LessonTag } from '@/types';
 
 const TAGS_WITH_GRAMMAR_PHASE: ReadonlySet<LessonTag> = new Set(['GRAM', 'VERB', 'CULT', 'VOC', 'DIAL', 'EXPR']);
 import type { WordClickPayload } from '@/components/lesson/ClickableWord';
@@ -80,7 +85,7 @@ export default function LessonPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const requestedLessonId = searchParams.get('id') ?? undefined;
-  const { user, profile, setProfile } = useAuthStore();
+  const { user, profile } = useAuthStore();
   const store = useLessonStore();
 
   // Per-exercise answer state
@@ -102,7 +107,6 @@ export default function LessonPage() {
     playingLineIdx,
     isLoadingAudio,
     handleAudioButton,
-    stopAudio,
   } = useLessonAudio(store.phase, store.lesson, store.hook);
 
   // Set to true once the user deliberately navigates away so the bootstrap
@@ -129,7 +133,6 @@ export default function LessonPage() {
 
   const {
     fetchAiExercises,
-    advanceFromIntro,
     advanceFromMission,
     advanceFromVocabulary,
     advanceFromHook,
@@ -137,7 +140,6 @@ export default function LessonPage() {
     advanceFromPhonetics,
     advanceFromRolePlay,
     finishLesson,
-    skipLesson,
     exitLesson,
   } = useLessonFlow({
     exitingRef,
@@ -303,12 +305,6 @@ export default function LessonPage() {
     },
     [store.lesson, store.hook],
   );
-
-  const handleFastComplete = useCallback(async () => {
-    await finishLesson();
-    store.setPhase('complete');
-    playCompletionSound();
-  }, [finishLesson, store, playCompletionSound]);
 
   // ── Derived state ─────────────────────────────────────────────────────────
 

@@ -1,5 +1,33 @@
 @import 'tailwindcss';
 
+@theme inline {
+  --color-bg: var(--color-bg);
+  --color-surface: var(--color-surface);
+  --color-surface-raised: var(--color-surface-raised);
+  --color-primary: var(--color-primary);
+  --color-primary-light: var(--color-primary-light);
+  --color-primary-dark: var(--color-primary-dark);
+  --color-vocab: var(--color-vocab);
+  --color-vocab-bg: var(--color-vocab-bg);
+  --color-verb: var(--color-verb);
+  --color-verb-bg: var(--color-verb-bg);
+  --color-bridge: var(--color-bridge);
+  --color-bridge-bg: var(--color-bridge-bg);
+  --color-success: var(--color-success);
+  --color-success-bg: var(--color-success-bg);
+  --color-error: var(--color-error);
+  --color-error-bg: var(--color-error-bg);
+  --color-warning: var(--color-warning);
+  --color-warning-bg: var(--color-warning-bg);
+  --color-warning-border: var(--color-warning-border);
+  --color-text-primary: var(--color-text-primary);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-text-muted: var(--color-text-muted);
+  --color-text-inverse: var(--color-text-inverse);
+  --color-border: var(--color-border);
+  --color-border-strong: var(--color-border-strong);
+}
+
 /* ─── Light Mode Tokens ──────────────────────────────────────────────────────── */
 
 :root {
@@ -29,7 +57,7 @@
 
   --color-text-primary:  #1c1917;
   --color-text-secondary:#57534e;
-  --color-text-muted:    #a8a29e;
+  --color-text-muted:    #78716c;
   --color-text-inverse:  #ffffff;
 
   --color-border:        #e7e5e0;
@@ -200,14 +228,14 @@ body {
 }
 
 .animate-tooltip       { animation: tooltip-enter 150ms ease forwards; }
-.animate-correct       { animation: correct-bounce 400ms cubic-bezier(0.34, 1.56, 0.64, 1); }
+.animate-correct       { animation: correct-bounce 400ms cubic-bezier(0.22, 1, 0.36, 1); }
 .animate-stage         { animation: stage-enter 200ms ease forwards; }
 .animate-shake         { animation: shake 350ms ease; }
 .animate-fade-in       { animation: fade-in 300ms ease both; }
 .animate-slide-up      { animation: slide-up 350ms ease both; }
-.animate-slide-up-spring { animation: slide-up-spring 500ms cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.animate-slide-up-spring { animation: slide-up-spring 500ms cubic-bezier(0.22, 1, 0.36, 1) both; }
 .animate-slide-in      { animation: slide-in-right 300ms ease both; }
-.animate-scale-in      { animation: scale-in 250ms cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.animate-scale-in      { animation: scale-in 250ms cubic-bezier(0.22, 1, 0.36, 1) both; }
 .animate-float         { animation: float 4s ease-in-out infinite; }
 .animate-glow-amber    { animation: glow-amber 2.5s ease-in-out infinite; }
 .animate-marquee       { animation: marquee 30s linear infinite; }
@@ -368,4 +396,25 @@ body {
 @keyframes duo-tooltip-bounce {
   0%, 100% { transform: translateY(0); }
   50%      { transform: translateY(-4px); }
+}
+
+/* ─── Reduced motion ─────────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .animate-float,
+  .animate-glow-amber,
+  .animate-marquee,
+  .duo-tooltip,
+  .lesson-current-dot::before {
+    animation: none !important;
+  }
 }

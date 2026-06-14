@@ -119,10 +119,6 @@ const VOICE_POOLS: Record<SupportedLanguage, { female: string[]; male: string[] 
   },
 };
 
-const LANG_CODES: Record<SupportedLanguage, string> = {
-  fr: 'fr-FR',
-  en: 'en-US',
-};
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                           */

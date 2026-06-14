@@ -22,6 +22,7 @@ export function BottomNav() {
 
   return (
     <nav
+      aria-label="Navegação principal"
       className="fixed bottom-0 left-0 right-0 z-30 mx-auto w-full max-w-[600px] md:hidden"
       style={{
         backgroundColor: 'var(--color-bg)',
@@ -36,7 +37,8 @@ export function BottomNav() {
             <Link
               key={href}
               href={href}
-              className="flex flex-1 flex-col items-center justify-center gap-1 py-3 transition-opacity active:scale-95"
+              aria-current={isActive ? 'page' : undefined}
+              className="relative flex flex-1 flex-col items-center justify-center gap-1 py-3 min-h-[44px] transition-opacity active:scale-95"
             >
               <Icon
                 size={22}

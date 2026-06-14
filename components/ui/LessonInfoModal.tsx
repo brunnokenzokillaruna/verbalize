@@ -20,7 +20,6 @@ export function LessonInfoModal({
   onStart,
   lesson,
   isCompleted,
-  isCurrent,
   isLocked,
   tagLabel,
 }: LessonInfoModalProps) {

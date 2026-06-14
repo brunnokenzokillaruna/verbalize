@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Loader2, X, Timer, Zap, ChevronRight, Trophy } from 'lucide-react';
+import { Loader2, X, Timer, Zap, Trophy } from 'lucide-react';
 import { ConjugationSpeedExercise } from '@/components/lesson/ConjugationSpeedExercise';
 import { generateLocalDrill } from '@/utils/verbDrillGenerator';
 import { useSoundEffects } from '@/hooks/useSoundEffects';
@@ -19,7 +19,7 @@ export function VerbDrillSession({ verbs, onClose }: VerbDrillSessionProps) {
 
   const [currentDrill, setCurrentDrill] = useState<ConjugationSpeedData | null>(null);
   const [answered, setAnswered] = useState(false);
-  const [lastCorrect, setLastCorrect] = useState<boolean | null>(null);
+  const [, setLastCorrect] = useState<boolean | null>(null);
   const [combo, setCombo] = useState(0);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
 

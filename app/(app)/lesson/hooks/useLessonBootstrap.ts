@@ -32,7 +32,6 @@ export function useLessonBootstrap({
   lessonInitiatedRef,
   grammarBridgePrefetchRef,
   exercisesPrefetchRef,
-  fetchAiExercises
 }: UseLessonBootstrapProps) {
   const router = useRouter();
   const { user, profile } = useAuthStore();

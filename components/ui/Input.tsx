@@ -43,7 +43,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             id={inputId}
             type={resolvedType}
             className={[
-              'w-full rounded-2xl border px-4 py-3 text-base outline-none transition-all duration-150',
+              'w-full rounded-2xl border px-4 py-3 text-base outline-none transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:border-transparent',
               Icon ? 'pl-10' : '',
               isPasswordField ? 'pr-11' : '',
               className,

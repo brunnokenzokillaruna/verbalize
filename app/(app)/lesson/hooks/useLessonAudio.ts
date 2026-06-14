@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { synthesizeDialogue } from '@/app/actions/synthesizeSpeech';
 import { synthesizeDialogueElevenLabs } from '@/app/actions/synthesizeElevenLabs';
-import type { SupportedLanguage } from '@/types';
+import type { SupportedLanguage, HookResult, LessonDefinition } from '@/types';
 
 /**
  * Manages dialogue audio playback for the lesson hook screen.
@@ -17,15 +17,18 @@ import type { SupportedLanguage } from '@/types';
  *   • Client-side: `cachedChunksRef` below — once audio is fetched for
  *     the current dialogue, pressing "play" again never hits the server.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function useLessonAudio(phase: string, lesson: any, hook: any) {
+export function useLessonAudio(
+  phase: string,
+  lesson: LessonDefinition | null,
+  hook: HookResult | null | undefined,
+) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [playingLineIdx, setPlayingLineIdx] = useState(-1);
   const [isLoadingAudio, setIsLoadingAudio] = useState(false);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const cachedChunksRef = useRef<string[] | null>(null);
-  const lastHookRef = useRef<any>(null);
+  const lastHookRef = useRef<HookResult | null | undefined>(null);
   const playSessionRef = useRef(0);
   const fetchPromiseRef = useRef<Promise<string[]> | null>(null);
 

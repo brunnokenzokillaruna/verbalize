@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import {
   LogOut,
   Sun, Moon, Flame, Zap,
-  ArrowLeftRight, Lock, FastForward, X, Search, User,
+  ArrowLeftRight, Lock, FastForward, X, User,
   Volume2, VolumeX,
 } from 'lucide-react';
 import { LanguageSwitcherSheet } from '@/components/dashboard/LanguageSwitcherSheet';
@@ -30,13 +30,13 @@ const LANG_LABEL: Record<string, { name: string; flag: string; countryCode: stri
 const ALL_LEVELS: ProficiencyLevel[] = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
 
 const THEME_COLORS = [
-  ['#3b82f6', '#1d4ed8'], // Blue
-  ['#10b981', '#047857'], // Emerald
-  ['#8b5cf6', '#6d28d9'], // Violet
-  ['#f59e0b', '#b45309'], // Amber
-  ['#ec4899', '#be185d'], // Pink
-  ['#14b8a6', '#0f766e'], // Teal
-  ['#f43f5e', '#be123c'], // Rose
+  ['var(--color-primary)', 'var(--color-primary-dark)'],
+  ['var(--color-success)', 'var(--color-success)'],
+  ['var(--color-verb)', 'var(--color-verb)'],
+  ['var(--color-vocab)', 'var(--color-warning)'],
+  ['var(--color-error)', 'var(--color-error)'],
+  ['var(--color-primary-dark)', 'var(--color-primary)'],
+  ['var(--color-vocab)', 'var(--color-vocab)'],
 ];
 
 /* ── Sinusoidal path offset for each node index ───────────── */
@@ -273,15 +273,17 @@ export default function DashboardPage() {
         let cached = null;
         try {
           cached = await getPregeneratedLesson(user.uid, lessonId);
-        } catch (err) {
+        } catch {
           // Firestore security rules block reading non-existent docs by checking resource.data.uid,
           // which throws permission-denied. We catch this safely and treat it as a cache miss.
           console.log(`[Dashboard Pregen] Cache status check failed or document not found (treating as MISS).`);
         }
 
-        const isTimedOut = (createdAt: any) => {
+        const isTimedOut = (createdAt: { toMillis?: () => number; seconds?: number } | null | undefined) => {
           if (!createdAt) return true;
-          const createdMs = createdAt.toMillis ? createdAt.toMillis() : (createdAt.seconds * 1000);
+          const createdMs = createdAt.toMillis
+            ? createdAt.toMillis()
+            : (createdAt.seconds ?? 0) * 1000;
           return Date.now() - createdMs > 5 * 60 * 1000; // 5 minutes
         };
 
@@ -493,6 +495,24 @@ export default function DashboardPage() {
     }
   }
 
+  useEffect(() => {
+    if (!profile) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setVisibleThemeIdx(Number(entry.target.getAttribute('data-theme-idx') || 0));
+          }
+        });
+      },
+      { rootMargin: '-140px 0px -50% 0px', threshold: 0.1 },
+    );
+
+    document.querySelectorAll('.theme-section').forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, [profile, selectedLevel, allLessons.length, frontierIndex]);
+
   if (!profile) return null;
 
   const lang = LANG_LABEL[profile.currentTargetLanguage];
@@ -523,22 +543,6 @@ export default function DashboardPage() {
   const currentBannerColors = THEME_COLORS[currentThemeIdx % THEME_COLORS.length];
   const activeThemeTitle = themes[currentThemeIdx]?.title ?? `Nível ${selectedLevel}`;
   const activeLessonTitle = activeLessonObj?.uiTitle || activeLessonObj?.grammarFocus?.split(' — ')[0] || 'Carregando...';
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setVisibleThemeIdx(Number(entry.target.getAttribute('data-theme-idx') || 0));
-          }
-        });
-      },
-      { rootMargin: '-140px 0px -50% 0px', threshold: 0.1 }
-    );
-    
-    document.querySelectorAll('.theme-section').forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, [themes.length]);
 
   return (
     <div className="min-h-dvh animate-fade-in" style={{ backgroundColor: 'var(--color-bg)' }}>
@@ -640,7 +644,7 @@ export default function DashboardPage() {
                 style={{
                   backgroundColor: 'rgba(255,255,255,0.15)',
                   border: '1px solid rgba(255,255,255,0.25)',
-                  color: '#fff',
+                  color: 'var(--color-text-inverse)',
                   boxShadow: '0 2px 0 rgba(0,0,0,0.1)'
                 }}
                 title="Pular esta lição"
@@ -667,10 +671,10 @@ export default function DashboardPage() {
                     onClick={() => setSelectedLevel(level)}
                     className="shrink-0 rounded-xl px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-extrabold active:scale-95 transition-all disabled:cursor-not-allowed cursor-pointer active:translate-y-[1px]"
                     style={{
-                      backgroundColor: isSelected ? '#fff' : 'rgba(255,255,255,0.12)',
-                      color: isSelected ? 'var(--color-primary)' : '#fff',
+                      backgroundColor: isSelected ? 'var(--color-surface)' : 'rgba(255,255,255,0.12)',
+                      color: isSelected ? 'var(--color-primary)' : 'var(--color-text-inverse)',
                       border: '1px solid rgba(255,255,255,0.15)',
-                      boxShadow: isSelected ? '0 2px 0 #cbd5e1' : '0 2px 0 rgba(0,0,0,0.1)',
+                      boxShadow: isSelected ? '0 2px 0 var(--color-border-strong)' : '0 2px 0 rgba(0,0,0,0.1)',
                       opacity: !hasLessons ? 0.35 : 1,
                     }}
                   >
@@ -740,21 +744,21 @@ export default function DashboardPage() {
                       const iconSize = lesson.tag === 'MISS' ? 34 : 28;
                       const nodeIcon = getTagIcon(lesson.tag ?? 'GRAM', iconSize);
 
-                      const inactiveBg = theme === 'dark' ? '#334155' : '#e2e8f0';
-                      const inactiveShadow = theme === 'dark' ? '#1e293b' : '#cbd5e1';
-                      const inactiveIcon = theme === 'dark' ? '#475569' : '#94a3b8';
+                      const inactiveBg = 'var(--color-surface-raised)';
+                      const inactiveShadow = 'var(--color-border-strong)';
+                      const inactiveIcon = 'var(--color-text-muted)';
 
                       const nodeColors = isCompleted
                         ? {
-                            backgroundColor: '#10b981',
-                            color: '#fff',
-                            boxShadow: `inset 0 -4px 0 rgba(0,0,0,0.15), inset 0 4px 0 rgba(255,255,255,0.2), 0 8px 0 #059669`,
+                            backgroundColor: 'var(--color-success)',
+                            color: 'var(--color-text-inverse)',
+                            boxShadow: 'inset 0 -4px 0 rgba(0,0,0,0.15), inset 0 4px 0 rgba(255,255,255,0.2), 0 8px 0 var(--color-success)',
                             border: '2px solid rgba(255,255,255,0.1)',
                           }
                         : isCurrent
                           ? {
                               backgroundColor: 'var(--color-primary)', 
-                              color: '#fff',
+                              color: 'var(--color-text-inverse)',
                               boxShadow: `inset 0 -4px 0 rgba(0,0,0,0.15), inset 0 5px 0 rgba(255,255,255,0.25), 0 8px 0 var(--color-primary-dark), 0 8px 24px rgba(29,94,212,0.4)`,
                               border: '2px solid rgba(255,255,255,0.15)',
                             }
@@ -766,10 +770,10 @@ export default function DashboardPage() {
 
                       const isMission = lesson.tag === 'MISS';
                       const missionColors = {
-                        backgroundColor: isCompleted ? '#f59e0b' : isCurrent ? '#f59e0b' : inactiveBg,
-                        color: (isCompleted || isCurrent) ? '#fff' : inactiveIcon,
+                        backgroundColor: (isCompleted || isCurrent) ? 'var(--color-vocab)' : inactiveBg,
+                        color: (isCompleted || isCurrent) ? 'var(--color-text-inverse)' : inactiveIcon,
                         boxShadow: (isCompleted || isCurrent)
-                          ? `inset 0 -4px 0 rgba(0,0,0,0.15), inset 0 5px 0 rgba(255,255,255,0.25), 0 8px 0 #b45309, 0 8px 24px rgba(245,158,11,0.4)`
+                          ? 'inset 0 -4px 0 rgba(0,0,0,0.15), inset 0 5px 0 rgba(255,255,255,0.25), 0 8px 0 var(--color-warning), 0 8px 24px rgba(217,119,6,0.35)'
                           : `inset 0 -4px 0 rgba(0,0,0,0.1), inset 0 4px 0 rgba(255,255,255,0.06), 0 8px 0 ${inactiveShadow}`,
                         border: (isCompleted || isCurrent) ? '2px solid rgba(255,255,255,0.2)' : undefined,
                       };
@@ -809,7 +813,7 @@ export default function DashboardPage() {
                                 className="duo-tooltip mb-3 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest whitespace-nowrap border-2"
                                 style={{
                                   backgroundColor: 'var(--color-surface)',
-                                  color: isMission ? '#b45309' : 'var(--color-primary)',
+                                  color: isMission ? 'var(--color-warning)' : 'var(--color-primary)',
                                   borderColor: 'var(--color-border)',
                                   boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
                                   animation: 'float 2.5s ease-in-out infinite'
@@ -914,9 +918,9 @@ export default function DashboardPage() {
                                         : 'active:scale-95'
                                     }`}
                                     style={{
-                                      backgroundColor: isLocked ? 'var(--color-surface-raised)' : isMission ? '#f59e0b' : 'var(--color-primary)',
-                                      color: isLocked ? 'var(--color-text-muted)' : '#fff',
-                                      boxShadow: isLocked ? 'none' : isMission ? '0 3px 0 #b45309' : '0 3px 0 var(--color-primary-dark)',
+                                      backgroundColor: isLocked ? 'var(--color-surface-raised)' : isMission ? 'var(--color-vocab)' : 'var(--color-primary)',
+                                      color: isLocked ? 'var(--color-text-muted)' : 'var(--color-text-inverse)',
+                                      boxShadow: isLocked ? 'none' : isMission ? '0 3px 0 var(--color-warning)' : '0 3px 0 var(--color-primary-dark)',
                                     }}
                                   >
                                     {isLocked ? 'Bloqueado' : isCompleted ? 'Revisar' : 'Começar'}
@@ -945,13 +949,13 @@ export default function DashboardPage() {
           </p>
           <div
             className="h-2.5 w-40 mx-auto mt-2.5 rounded-full overflow-hidden"
-            style={{ backgroundColor: theme === 'dark' ? 'rgba(55,65,81,0.5)' : '#e5e3de' }}
+            style={{ backgroundColor: 'var(--color-surface-raised)' }}
           >
             <div
               className="h-full rounded-full transition-all duration-700"
               style={{
                 width: `${completionPct}%`,
-                background: 'linear-gradient(90deg, var(--color-primary), #60a5fa)',
+                background: 'linear-gradient(90deg, var(--color-primary), var(--color-primary-dark))',
               }}
             />
           </div>
@@ -1019,7 +1023,7 @@ export default function DashboardPage() {
               <div 
                 className="relative overflow-hidden rounded-2xl p-4 border border-primary-light mb-6 flex items-center gap-3.5"
                 style={{
-                  background: 'linear-gradient(to right, #0c1524 0%, #173870 100%)',
+                  background: 'linear-gradient(to right, var(--color-primary-dark) 0%, var(--color-primary) 100%)',
                   boxShadow: '0 4px 12px rgba(29, 94, 212, 0.1)',
                 }}
               >
@@ -1132,7 +1136,7 @@ export default function DashboardPage() {
               >
                 <div 
                   className="flex items-center justify-center gap-2 rounded-xl py-3.5 text-xs font-bold uppercase tracking-widest text-white transition-colors duration-200" 
-                  style={{ backgroundColor: 'var(--color-error)', borderBottom: '3px solid #b91c1c' }}
+                  style={{ backgroundColor: 'var(--color-error)', borderBottom: '3px solid var(--color-error)' }}
                 >
                   <LogOut size={16} />
                   Sair da Conta

@@ -55,8 +55,8 @@ export function ContextChoiceExercise({ data, onAnswer, answered, setIsExerciseR
       
       {/* 1. Elegant Translation Prompt Card */}
       <div 
-        className="rounded-2xl p-4.5 border border-dashed border-[var(--color-border)] backdrop-blur-sm"
-        style={{ backgroundColor: 'rgba(255, 255, 255, 0.01)' }}
+        className="rounded-2xl p-4.5 border border-dashed border-[var(--color-border)]"
+        style={{ backgroundColor: 'var(--color-surface)' }}
       >
         <div className="flex items-center gap-2 mb-2.5 text-[var(--color-text-muted)]">
           <Languages size={15} className="text-[var(--color-vocab)]" />

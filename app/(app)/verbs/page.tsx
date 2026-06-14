@@ -91,7 +91,7 @@ export default function VerbsPage() {
         setDrillState('idle');
         setError('Não foi possível carregar os verbos para o desafio.');
       }
-    } catch (err) {
+    } catch {
       setDrillState('idle');
       setError('Erro ao iniciar o desafio.');
     }

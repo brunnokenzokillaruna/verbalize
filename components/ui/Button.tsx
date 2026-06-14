@@ -90,6 +90,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           sizeStyles[size],
           fullWidth ? 'w-full' : '',
           isDisabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
           className,
         ]
           .filter(Boolean)

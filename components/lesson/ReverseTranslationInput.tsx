@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronDown, Loader2, Languages, Lightbulb, CheckCircle2, XCircle } from 'lucide-react';
+import { ChevronDown, Loader2, Languages, Lightbulb, XCircle } from 'lucide-react';
 import type { ReverseTranslationData } from '@/types';
 import { isAccentOnlyDiff } from '@/utils/accent';
 import { validateReverseTranslation } from '@/app/actions/validateAnswer';
@@ -114,8 +114,8 @@ export function ReverseTranslationInput({
       
       {/* 1. Elegant Translation Prompt Card */}
       <div 
-        className="rounded-2xl p-4.5 border border-dashed border-[var(--color-border)] backdrop-blur-sm"
-        style={{ backgroundColor: 'rgba(255, 255, 255, 0.01)' }}
+        className="rounded-2xl p-4.5 border border-dashed border-[var(--color-border)]"
+        style={{ backgroundColor: 'var(--color-surface)' }}
       >
         <div className="flex items-center gap-2 mb-2.5 text-[var(--color-text-muted)]">
           <Languages size={15} className="text-[var(--color-vocab)]" />
@@ -182,7 +182,10 @@ export function ReverseTranslationInput({
         
         {isSubmitting && (
           <div className="absolute inset-x-0 bottom-4 flex justify-center animate-in fade-in duration-300">
-            <div className="flex items-center gap-2 rounded-full bg-white/80 dark:bg-zinc-800/80 px-3.5 py-1 shadow-sm ring-1 ring-black/5 backdrop-blur-sm">
+            <div
+              className="flex items-center gap-2 rounded-full px-3.5 py-1 shadow-sm ring-1 ring-black/5"
+              style={{ backgroundColor: 'var(--color-surface)' }}
+            >
               <Loader2 size={12} className="animate-spin text-[var(--color-primary)]" />
               <span className="text-[10px] font-black uppercase tracking-widest text-[var(--color-text-muted)]">Verificando...</span>
             </div>

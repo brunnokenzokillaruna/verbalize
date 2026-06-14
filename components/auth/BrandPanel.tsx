@@ -16,6 +16,8 @@ const FLOATING_WORDS = [
   { text: 'lumière',     x: '83%', y: '46%', opacity: 0.08, rotate: -4,  size: '1.3rem', delay: '0.2s' },
 ];
 
+import { Logo } from '@/components/ui/Logo';
+
 export function BrandPanel() {
   return (
     <div
@@ -81,11 +83,11 @@ export function BrandPanel() {
             backdropFilter: 'blur(8px)',
           }}
         >
-          <img src="/logo.png" alt="Verbalize Icon" className="w-full h-full object-cover rounded-2xl transform transition-transform duration-500 group-hover:scale-105" />
+          <Logo size={64} className="w-full h-full object-cover rounded-2xl transform transition-transform duration-500 group-hover:scale-105" />
         </div>
         
         <div>
-          <h1
+          <p
             className="font-display text-5xl font-bold tracking-tight"
             style={{
               background: 'linear-gradient(135deg, #ffffff 0%, rgba(255,255,255,0.7) 100%)',
@@ -95,7 +97,7 @@ export function BrandPanel() {
             }}
           >
             Verbalize
-          </h1>
+          </p>
           <p
             className="mt-2 text-lg font-light italic"
             style={{ color: 'rgba(255,255,255,0.45)' }}

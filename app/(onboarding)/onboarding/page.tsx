@@ -164,7 +164,7 @@ function LanguageCard({
   );
 }
 
-function HeroIcon({ children, gradient, icon: Icon }: { children: React.ReactNode; gradient: string; icon: any }) {
+function HeroIcon({ children, gradient, icon: Icon }: { children: React.ReactNode; gradient: string; icon: React.ComponentType<{ size?: number; className?: string; style?: React.CSSProperties }> }) {
   return (
     <div className="relative mb-6 self-start">
       <div

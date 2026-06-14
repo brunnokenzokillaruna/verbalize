@@ -44,7 +44,7 @@ export function GrammarBridgeFlow({
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [quizAnswered, setQuizAnswered] = useState(false);
-  const [slideDirection, setSlideDirection] = useState<'left' | 'right' | null>(null);
+  const [, setSlideDirection] = useState<'left' | 'right' | null>(null);
 
   const currentStep = steps[currentIndex];
   const isLastStep = currentIndex >= steps.length - 1;

@@ -1,6 +1,6 @@
 'use client';
 
-import { X, Book, MessageSquare, Mic, Target, Zap, Repeat, Sparkles, BookOpen, Volume2, VolumeX } from 'lucide-react';
+import { X, Book, MessageSquare, Mic, Target, Zap, Repeat, Sparkles, BookOpen, Volume2, VolumeX, type LucideIcon } from 'lucide-react';
 import type { LessonStage, LessonTag } from '@/types';
 
 const STAGES_BY_TAG: Record<LessonTag, { key: LessonStage; label: string }[]> = {
@@ -54,7 +54,7 @@ const STAGES_BY_TAG: Record<LessonTag, { key: LessonStage; label: string }[]> = 
   ],
 };
 
-const TAG_CONFIG: Record<LessonTag, { label: string; icon: any; color: string; bg: string }> = {
+const TAG_CONFIG: Record<LessonTag, { label: string; icon: LucideIcon; color: string; bg: string }> = {
   GRAM: { label: 'Gramática',   icon: Book,          color: 'var(--color-primary)', bg: 'var(--color-primary-light)' },
   VOC:  { label: 'Vocabulário', icon: Zap,           color: 'var(--color-vocab)',   bg: 'var(--color-vocab-bg)' },
   DIAL: { label: 'Diálogo',     icon: MessageSquare, color: '#9333ea',              bg: '#f5f3ff' },

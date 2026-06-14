@@ -34,7 +34,6 @@ export function HighlightedText({ text, className }: { text: string; className: 
 
 export function TargetPhrase({
   text,
-  language,
   newVocabulary = [],
   newVerbs = [],
   onWordClick,

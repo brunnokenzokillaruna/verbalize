@@ -38,7 +38,6 @@ export function GrammarStepProgress({ step, allSteps }: GrammarStepProgressProps
 
       <div className="flex gap-1">
         {activePhases.map((phase) => {
-          const phaseSteps = allSteps.filter((s) => s.phase === phase);
           const isActive = step.phase === phase;
           const isPast =
             activePhases.indexOf(phase) < activePhases.indexOf(step.phase);

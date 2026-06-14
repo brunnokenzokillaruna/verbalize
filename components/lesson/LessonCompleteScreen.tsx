@@ -122,7 +122,7 @@ export function LessonCompleteScreen({
             <span className="bg-[var(--color-vocab-bg)] text-[var(--color-vocab)] px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider">{newVocabulary.length} palavras</span>
           </p>
           <div className="flex flex-wrap gap-2">
-            {newVocabulary.map((w, i) => (
+            {newVocabulary.map((w) => (
               <span
                 key={w}
                 className="rounded-xl px-3 py-1.5 text-sm font-bold border border-b-[2px] transition-all hover:scale-105"

@@ -71,10 +71,10 @@ export function GrammarTrapExercise({
       
       {/* Scenario / Radar banner with pulse animation */}
       <div
-        className="flex items-start gap-3.5 rounded-2xl p-4.5 border backdrop-blur-sm relative overflow-hidden"
+        className="flex items-start gap-3.5 rounded-2xl p-4.5 border relative overflow-hidden"
         style={{
-          backgroundColor: 'rgba(217, 119, 6, 0.02)',
-          borderColor: 'rgba(217, 119, 6, 0.15)',
+          backgroundColor: 'var(--color-vocab-bg)',
+          borderColor: 'var(--color-warning-border)',
         }}
       >
         <div

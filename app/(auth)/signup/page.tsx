@@ -8,6 +8,7 @@ import { signUpWithEmail, signInWithGoogle } from '@/services/auth';
 import { useAuthStore } from '@/store/authStore';
 import { BrandPanel } from '@/components/auth/BrandPanel';
 import { Input } from '@/components/ui/Input';
+import { Logo } from '@/components/ui/Logo';
 
 const GoogleIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" className="shrink-0">
@@ -179,26 +180,26 @@ export default function SignupPage() {
           {/* Mobile-only logo */}
           <div className="mb-8 flex flex-col items-center lg:hidden animate-slide-up-spring">
             <div className="relative w-14 h-14 rounded-2xl overflow-hidden shadow-md border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.08)] mb-3 select-none">
-              <img src="/logo.png" alt="Verbalize Logo" className="object-cover w-full h-full" />
+              <Logo size={56} priority />
             </div>
-            <h1
-              className="font-display text-4xl font-bold tracking-tight bg-gradient-to-r from-[var(--color-primary)] to-[#3b82f6] bg-clip-text text-transparent"
+            <p
+              className="font-display text-4xl font-bold tracking-tight"
+              style={{ color: 'var(--color-primary)' }}
             >
               Verbalize
-            </h1>
+            </p>
             <p className="mt-1.5 text-sm italic" style={{ color: 'var(--color-text-muted)' }}>
               Aprenda o mundo.
             </p>
           </div>
 
-          {/* Heading */}
           <div className="mb-8 animate-slide-up-spring delay-75">
-            <h2
+            <h1
               className="font-display text-3xl font-semibold leading-tight"
               style={{ color: 'var(--color-text-primary)' }}
             >
               Comece agora
-            </h2>
+            </h1>
             <p className="mt-2 text-base" style={{ color: 'var(--color-text-secondary)' }}>
               Crie sua conta gratuitamente.
             </p>
@@ -297,7 +298,7 @@ export default function SignupPage() {
               disabled={loadingEmail || loadingGoogle}
               className="cta-shimmer relative mt-2 w-full overflow-hidden rounded-2xl py-3.5 text-sm font-bold text-white transition-all duration-150 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
               style={{
-                background: 'linear-gradient(135deg, var(--color-primary) 0%, #2563eb 100%)',
+                backgroundColor: 'var(--color-primary)',
                 boxShadow: '0 6px 20px rgba(29,94,212,0.3)',
               }}
             >
