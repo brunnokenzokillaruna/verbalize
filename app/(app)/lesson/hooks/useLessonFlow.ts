@@ -1,3 +1,4 @@
+import { devLog } from '@/lib/devLog';
 import { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
@@ -84,7 +85,7 @@ export function useLessonFlow({
     const fromCache = !!exercisesPrefetchRef.current;
     const aiExercises = await (exercisesPrefetchRef.current ?? fetchAiExercises());
     exercisesPrefetchRef.current = null;
-    console.log(`[Timing] Exercícios (${fromCache ? 'do cache' : 'gerados agora'}): ${(performance.now() - tEx).toFixed(0)}ms (${aiExercises?.length ?? 0} exercícios)`);
+    devLog(`[Timing] Exercícios (${fromCache ? 'do cache' : 'gerados agora'}): ${(performance.now() - tEx).toFixed(0)}ms (${aiExercises?.length ?? 0} exercícios)`);
 
     const clientExercises = buildClientExercises();
     const imageMatchForPool = clientExercises[0] ?? buildImageMatchFromLessonVocab({
@@ -154,7 +155,7 @@ export function useLessonFlow({
           tag: store.lesson.tag,
         })
       );
-      console.log(`[Timing] Grammar bridge (${fromCache ? 'do cache' : 'gerado agora'}): ${(performance.now() - tBridge).toFixed(0)}ms`);
+      devLog(`[Timing] Grammar bridge (${fromCache ? 'do cache' : 'gerado agora'}): ${(performance.now() - tBridge).toFixed(0)}ms`);
       grammarBridgePrefetchRef.current = null;
       if (bridge) store.setGrammarBridge(bridge);
       else store.setIsLoading(false);

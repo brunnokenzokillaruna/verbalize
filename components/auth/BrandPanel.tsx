@@ -1,3 +1,5 @@
+import { Logo } from '@/components/ui/Logo';
+
 const FLOATING_WORDS = [
   { text: 'bonjour',     x: '8%',  y: '12%', opacity: 0.10, rotate: -14, size: '2rem',   delay: '0s' },
   { text: 'hello',       x: '62%', y: '7%',  opacity: 0.08, rotate: 6,   size: '1.6rem', delay: '0.6s' },
@@ -16,27 +18,23 @@ const FLOATING_WORDS = [
   { text: 'lumière',     x: '83%', y: '46%', opacity: 0.08, rotate: -4,  size: '1.3rem', delay: '0.2s' },
 ];
 
-import { Logo } from '@/components/ui/Logo';
-
 export function BrandPanel() {
   return (
     <div
       className="relative hidden overflow-hidden lg:flex lg:flex-col lg:justify-between lg:p-12"
-      style={{ backgroundColor: '#080f1e' }}
+      style={{ backgroundColor: 'var(--color-text-primary)' }}
     >
-      {/* ── Layered gradient mesh ── */}
       <div
         className="pointer-events-none absolute inset-0"
         style={{
           background: [
-            'radial-gradient(ellipse 60% 50% at 85% 85%, rgba(217,119,6,0.14) 0%, transparent 70%)',
-            'radial-gradient(ellipse 50% 60% at 15% 20%, rgba(29,94,212,0.20) 0%, transparent 65%)',
-            'radial-gradient(ellipse 40% 40% at 50% 50%, rgba(96,165,250,0.06) 0%, transparent 60%)',
+            'radial-gradient(ellipse 60% 50% at 85% 85%, color-mix(in srgb, var(--color-vocab) 14%, transparent) 0%, transparent 70%)',
+            'radial-gradient(ellipse 50% 60% at 15% 20%, color-mix(in srgb, var(--color-primary) 20%, transparent) 0%, transparent 65%)',
+            'radial-gradient(ellipse 40% 40% at 50% 50%, color-mix(in srgb, var(--color-primary-dark) 6%, transparent) 0%, transparent 60%)',
           ].join(', '),
         }}
       />
 
-      {/* ── Subtle grid lines ── */}
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.025]"
         style={{
@@ -48,7 +46,6 @@ export function BrandPanel() {
         }}
       />
 
-      {/* ── Floating words with float animation ── */}
       {FLOATING_WORDS.map((w) => (
         <span
           key={w.text}
@@ -59,7 +56,7 @@ export function BrandPanel() {
             opacity: w.opacity,
             transform: `rotate(${w.rotate}deg)`,
             fontSize: w.size,
-            color: '#ffffff',
+            color: 'var(--color-text-inverse)',
             fontStyle: 'italic',
             fontWeight: 600,
             letterSpacing: '-0.01em',
@@ -72,29 +69,21 @@ export function BrandPanel() {
         </span>
       ))}
 
-      {/* ── Top: Logo ── */}
       <div className="relative z-10 animate-fade-in flex flex-col items-start gap-4">
-        {/* Modern 3D/Glassmorphism Brand Icon */}
-        <div 
-          className="w-16 h-16 rounded-2xl p-0.5 shadow-2xl relative overflow-hidden group select-none flex items-center justify-center"
+        <div
+          className="w-16 h-16 rounded-2xl shadow-2xl relative overflow-hidden group select-none flex items-center justify-center"
           style={{
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.03) 100%)',
+            backgroundColor: 'rgba(255,255,255,0.08)',
             border: '1px solid rgba(255,255,255,0.12)',
-            backdropFilter: 'blur(8px)',
           }}
         >
           <Logo size={64} className="w-full h-full object-cover rounded-2xl transform transition-transform duration-500 group-hover:scale-105" />
         </div>
-        
+
         <div>
           <p
             className="font-display text-5xl font-bold tracking-tight"
-            style={{
-              background: 'linear-gradient(135deg, #ffffff 0%, rgba(255,255,255,0.7) 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-            }}
+            style={{ color: 'rgba(255,255,255,0.95)' }}
           >
             Verbalize
           </p>
@@ -107,7 +96,6 @@ export function BrandPanel() {
         </div>
       </div>
 
-      {/* ── Middle: Feature highlights ── */}
       <div className="relative z-10 flex flex-col gap-4 animate-fade-in delay-150">
         {[
           { icon: '🧠', title: 'Método Ponte Português', desc: 'Aprenda comparando com o que você já sabe.' },
@@ -129,7 +117,6 @@ export function BrandPanel() {
         ))}
       </div>
 
-      {/* ── Bottom: Quote ── */}
       <blockquote className="relative z-10 animate-fade-in delay-300">
         <div
           className="mb-4 h-px"

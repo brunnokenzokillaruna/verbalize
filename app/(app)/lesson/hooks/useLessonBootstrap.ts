@@ -1,3 +1,4 @@
+import { devLog } from '@/lib/devLog';
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
@@ -58,7 +59,7 @@ export function useLessonBootstrap({
     (async () => {
       store.setIsLoading(true);
       const t0 = performance.now();
-      console.log(`[Timing] ⏱ Lição iniciando: ${lesson.id}`);
+      devLog(`[Timing] ⏱ Lição iniciando: ${lesson.id}`);
       try {
         let hook = null;
         if (user) {
@@ -68,7 +69,7 @@ export function useLessonBootstrap({
             
             // Polling loop if lesson is currently generating
             if (pregenDoc?.status === 'generating') {
-              console.log(`[Timing] Lição está sendo gerada em background. Iniciando polling...`);
+              devLog(`[Timing] Lição está sendo gerada em background. Iniciando polling...`);
               let attempts = 0;
               const maxAttempts = 90; // 3 minutes — matches pregen runway for hook + grammar + exercises
               while (pregenDoc?.status === 'generating' && attempts < maxAttempts) {
@@ -76,7 +77,7 @@ export function useLessonBootstrap({
                 attempts++;
                 try {
                   pregenDoc = await getPregeneratedLesson(user.uid, lesson.id);
-                  console.log(`[Timing] Polling tentativa ${attempts}/${maxAttempts}: status = ${pregenDoc?.status ?? 'deleted'}`);
+                  devLog(`[Timing] Polling tentativa ${attempts}/${maxAttempts}: status = ${pregenDoc?.status ?? 'deleted'}`);
                 } catch {
                   // Catch errors (like permission-denied or deletion) safely
                   break;
@@ -99,10 +100,10 @@ export function useLessonBootstrap({
                 store.setMissionBriefing(pregenDoc.missionBriefing);
                 parts.push('missionBriefing');
               }
-              console.log(`[Timing] Cache pregen: ${(performance.now() - tPregen).toFixed(0)}ms — HIT ✅ [${parts.join(', ')}]`);
+              devLog(`[Timing] Cache pregen: ${(performance.now() - tPregen).toFixed(0)}ms — HIT ✅ [${parts.join(', ')}]`);
               deletePregeneratedLesson(user.uid, lesson.id).catch(console.error);
             } else {
-              console.log(`[Timing] Cache pregen: ${(performance.now() - tPregen).toFixed(0)}ms — MISS`);
+              devLog(`[Timing] Cache pregen: ${(performance.now() - tPregen).toFixed(0)}ms — MISS`);
             }
           } catch {
             // Permission error or network issue — fall through to normal generation
@@ -113,7 +114,7 @@ export function useLessonBootstrap({
         const vocabDocs = user ? await getUserVocabulary(user.uid, lesson.language) : [];
         const knownVocabulary = vocabDocs.map((v) => v.word.toLowerCase());
         store.setKnownVocabulary(knownVocabulary);
-        console.log(`[Timing] Vocabulário do usuário: ${(performance.now() - tVocab).toFixed(0)}ms (${knownVocabulary.length} palavras conhecidas)`);
+        devLog(`[Timing] Vocabulário do usuário: ${(performance.now() - tVocab).toFixed(0)}ms (${knownVocabulary.length} palavras conhecidas)`);
 
         // ── MISS fast-path: fire the briefing in parallel with the hook so the
         // mission screen renders as soon as the (shorter) briefing arrives,
@@ -122,7 +123,7 @@ export function useLessonBootstrap({
         let briefingPromise: Promise<MissionBriefingResult | null> | null = null;
         if (lesson.tag === 'MISS' && !hook) {
           const tBrief = performance.now();
-          console.log(`[Timing] 🚀 Prefetch mission briefing iniciado (em paralelo com hook)`);
+          devLog(`[Timing] 🚀 Prefetch mission briefing iniciado (em paralelo com hook)`);
           briefingPromise = generateMissionBriefing({
             grammarFocus: lesson.grammarFocus,
             theme: lesson.theme,
@@ -130,7 +131,7 @@ export function useLessonBootstrap({
             language: lesson.language,
           })
             .then((briefing) => {
-              console.log(`[Timing] ✅ Mission briefing pronto: ${(performance.now() - tBrief).toFixed(0)}ms`);
+              devLog(`[Timing] ✅ Mission briefing pronto: ${(performance.now() - tBrief).toFixed(0)}ms`);
               if (briefing) {
                 const s = useLessonStore.getState();
                 s.setMissionBriefing(briefing);
@@ -148,7 +149,7 @@ export function useLessonBootstrap({
 
         if (!hook) {
           const tHook = performance.now();
-          console.log(`[Timing] Gerando hook via Gemini...`);
+          devLog(`[Timing] Gerando hook via Gemini...`);
           hook = await generateHook({
             language: lesson.language,
             level: lesson.level,
@@ -159,7 +160,7 @@ export function useLessonBootstrap({
             grammarFocus: lesson.grammarFocus,
             knownVocabulary,
           });
-          console.log(`[Timing] generateHook: ${(performance.now() - tHook).toFixed(0)}ms`);
+          devLog(`[Timing] generateHook: ${(performance.now() - tHook).toFixed(0)}ms`);
         }
 
         if (hook) {
@@ -172,7 +173,7 @@ export function useLessonBootstrap({
             const initialPhase = getInitialPhase(lesson.tag);
             store.setPhase(initialPhase);
           }
-          console.log(`[Timing] ✅ Bootstrap total: ${(performance.now() - t0).toFixed(0)}ms → fase '${useLessonStore.getState().phase}'`);
+          devLog(`[Timing] ✅ Bootstrap total: ${(performance.now() - t0).toFixed(0)}ms → fase '${useLessonStore.getState().phase}'`);
 
           // Fire secondary AI calls in parallel — each merges into store as it resolves.
           // Skip when the pregen cache already supplied the field.
@@ -264,12 +265,12 @@ export function useLessonBootstrap({
     // Skipped when the pregen cache already supplied a ready Promise.
     if (TAGS_WITH_GRAMMAR_PHASE.has(lesson.tag)) {
       if (grammarBridgePrefetchRef.current) {
-        console.log(`[Timing] Grammar bridge: já vindo do pregen cache (0ms)`);
+        devLog(`[Timing] Grammar bridge: já vindo do pregen cache (0ms)`);
       } else if (hook.grammarBridge) {
         grammarBridgePrefetchRef.current = Promise.resolve(hook.grammarBridge);
       } else {
         const tBridge = performance.now();
-        console.log(`[Timing] 🚀 Prefetch grammar bridge iniciado`);
+        devLog(`[Timing] 🚀 Prefetch grammar bridge iniciado`);
         grammarBridgePrefetchRef.current = generateGrammarBridge({
           dialogue,
           grammarFocus: hook.grammarFocus,
@@ -277,7 +278,7 @@ export function useLessonBootstrap({
           tag: lesson.tag,
         })
           .then((result) => {
-            console.log(`[Timing] ✅ Prefetch grammar bridge terminou: ${(performance.now() - tBridge).toFixed(0)}ms`);
+            devLog(`[Timing] ✅ Prefetch grammar bridge terminou: ${(performance.now() - tBridge).toFixed(0)}ms`);
             return result;
           })
           .catch((err) => {
@@ -288,14 +289,14 @@ export function useLessonBootstrap({
 
       // Exercises prefetch chained after Grammar Bridge to avoid concurrency 429
       if (exercisesPrefetchRef.current) {
-        console.log(`[Timing] Exercícios: já vindo do pregen cache (0ms)`);
+        devLog(`[Timing] Exercícios: já vindo do pregen cache (0ms)`);
       } else {
-        console.log(`[Timing] 🚀 Prefetch exercícios encadeado após o Grammar Bridge`);
+        devLog(`[Timing] 🚀 Prefetch exercícios encadeado após o Grammar Bridge`);
         exercisesPrefetchRef.current = grammarBridgePrefetchRef.current!.then(async (bridge) => {
           // Wait 500ms cooling period to avoid rapid subsequent requests
           await new Promise((resolve) => setTimeout(resolve, 500));
           const tEx = performance.now();
-          console.log(`[Timing] 🚀 Prefetch exercícios iniciado`);
+          devLog(`[Timing] 🚀 Prefetch exercícios iniciado`);
           const result = await generatePracticeExercises({
             dialogue,
             newVocabulary: words,
@@ -310,7 +311,7 @@ export function useLessonBootstrap({
             previousTopics: getPreviousTopics(language, lesson.id),
             grammarBridge: bridge ?? hook.grammarBridge ?? null,
           });
-          console.log(`[Timing] ✅ Prefetch exercícios terminou: ${(performance.now() - tEx).toFixed(0)}ms (${result?.length ?? 0} exercícios)`);
+          devLog(`[Timing] ✅ Prefetch exercícios terminou: ${(performance.now() - tEx).toFixed(0)}ms (${result?.length ?? 0} exercícios)`);
           return result;
         }).catch((err) => {
           console.error('[Prefetch] exercises error:', err);
@@ -320,10 +321,10 @@ export function useLessonBootstrap({
     } else {
       // No grammar bridge, run exercises prefetch immediately
       if (exercisesPrefetchRef.current) {
-        console.log(`[Timing] Exercícios: já vindo do pregen cache (0ms)`);
+        devLog(`[Timing] Exercícios: já vindo do pregen cache (0ms)`);
       } else {
         const tEx = performance.now();
-        console.log(`[Timing] 🚀 Prefetch exercícios iniciado`);
+        devLog(`[Timing] 🚀 Prefetch exercícios iniciado`);
         exercisesPrefetchRef.current = generatePracticeExercises({
           dialogue,
           newVocabulary: words,
@@ -338,7 +339,7 @@ export function useLessonBootstrap({
           previousTopics: getPreviousTopics(language, lesson.id),
         })
           .then((result) => {
-            console.log(`[Timing] ✅ Prefetch exercícios terminou: ${(performance.now() - tEx).toFixed(0)}ms (${result?.length ?? 0} exercícios)`);
+            devLog(`[Timing] ✅ Prefetch exercícios terminou: ${(performance.now() - tEx).toFixed(0)}ms (${result?.length ?? 0} exercícios)`);
             return result;
           })
           .catch((err) => {
@@ -353,7 +354,7 @@ export function useLessonBootstrap({
         const result = hook.vocabTranslations![word];
         if (result?.translation) store.setVocabTranslation(word, result.translation);
       });
-      console.log(`[Timing] Traduções do vocabulário: vindas do hook (0ms)`);
+      devLog(`[Timing] Traduções do vocabulário: vindas do hook (0ms)`);
     } else {
       const tTrans = performance.now();
       (async () => {
@@ -361,26 +362,26 @@ export function useLessonBootstrap({
           const t = performance.now();
           const result = await translateWord(word, dialogue, language);
           if (result?.translation) store.setVocabTranslation(word, result.translation);
-          console.log(`[Timing] Tradução '${word}': ${(performance.now() - t).toFixed(0)}ms`);
+          devLog(`[Timing] Tradução '${word}': ${(performance.now() - t).toFixed(0)}ms`);
           await new Promise((resolve) => setTimeout(resolve, 300)); // small cooldown
         }
       })();
-      console.log(`[Timing] Traduções iniciadas sequencialmente (${words.length} palavras): ${(performance.now() - tTrans).toFixed(0)}ms`);
+      devLog(`[Timing] Traduções iniciadas sequencialmente (${words.length} palavras): ${(performance.now() - tTrans).toFixed(0)}ms`);
     }
 
     const tImages = performance.now();
-    console.log(`[Timing] Buscando imagens (${words.length} palavras)...`);
+    devLog(`[Timing] Buscando imagens (${words.length} palavras)...`);
     (async () => {
       const imagePromises = words.map(async (word) => {
         const t = performance.now();
         const precomputedKeyword = hook.imageKeywords?.[word];
         const result = await getVocabImage(word, dialogue, language, [], precomputedKeyword);
         store.setVocabImage(word, result);
-        console.log(`[Timing] Imagem '${word}': ${(performance.now() - t).toFixed(0)}ms`);
+        devLog(`[Timing] Imagem '${word}': ${(performance.now() - t).toFixed(0)}ms`);
         return { word, result };
       });
       const imageResults = await Promise.all(imagePromises);
-      console.log(`[Timing] ✅ Todas as imagens (paralelo): ${(performance.now() - tImages).toFixed(0)}ms`);
+      devLog(`[Timing] ✅ Todas as imagens (paralelo): ${(performance.now() - tImages).toFixed(0)}ms`);
 
       const usedUrls: string[] = [];
       const refetchWords: string[] = [];
@@ -435,7 +436,7 @@ export function useLessonBootstrap({
     const nextLesson = getLessonById(nextLessonId);
     if (!nextLesson) return;
 
-    console.log(`[Timing] 🔮 Pregen próxima lição disparado (background): ${nextLessonId}`);
+    devLog(`[Timing] 🔮 Pregen próxima lição disparado (background): ${nextLessonId}`);
     pregenerateNextLesson(user.uid, nextLesson, profile.interests ?? [], store.knownVocabulary).catch(console.error);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [store.phase]);

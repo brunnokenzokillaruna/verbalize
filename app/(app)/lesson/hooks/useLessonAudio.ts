@@ -1,3 +1,4 @@
+import { devLog } from '@/lib/devLog';
 import { useState, useRef, useEffect } from 'react';
 import { synthesizeDialogue } from '@/app/actions/synthesizeSpeech';
 import { synthesizeDialogueElevenLabs } from '@/app/actions/synthesizeElevenLabs';
@@ -83,7 +84,7 @@ export function useLessonAudio(
     try {
       const elChunks = await synthesizeDialogueElevenLabs(lines, language);
       if (elChunks.length === expectedLines) {
-        console.log(
+        devLog(
           '%c🎙️ [Audio Provider] SUCCESS: ElevenLabs premium dialogue voices generated successfully! ✓',
           'color: #10b981; font-weight: bold; background-color: #ecfdf5; padding: 4px 8px; border-radius: 4px; border: 1px solid #a7f3d0;'
         );
@@ -99,7 +100,7 @@ export function useLessonAudio(
     }
 
     // 2️⃣ Fallback to Google Cloud TTS
-    console.log(
+    devLog(
       '%c🎙️ [Audio Provider] FALLBACK: ElevenLabs unavailable or disabled. Using Google TTS (Studio/Chirp voices) instead.',
       'color: #d97706; font-weight: bold; background-color: #fffbeb; padding: 4px 8px; border-radius: 4px; border: 1px solid #fef3c7;'
     );
@@ -122,13 +123,13 @@ export function useLessonAudio(
     const language = lesson.language;
 
     if (!fetchPromiseRef.current && !cachedChunksRef.current) {
-      console.log(`[Audio Prefetch] 🚀 Iniciar prefetch de áudio em background para o diálogo...`);
+      devLog(`[Audio Prefetch] 🚀 Iniciar prefetch de áudio em background para o diálogo...`);
       setIsLoadingAudio(true);
       fetchPromiseRef.current = fetchDialogueAudio(lines, language)
         .then((chunks) => {
           cachedChunksRef.current = chunks;
           setIsLoadingAudio(false);
-          console.log(`[Audio Prefetch] ✅ Prefetch concluído e cacheado no cliente.`);
+          devLog(`[Audio Prefetch] ✅ Prefetch concluído e cacheado no cliente.`);
           return chunks;
         })
         .catch((err) => {
@@ -144,7 +145,7 @@ export function useLessonAudio(
     if (!hook || !lesson) return;
 
     if (cachedChunksRef.current) {
-      console.log(
+      devLog(
         '%c⚡ [Audio Cache] Client Cache Hit! Replaying current dialogue audio instantly without server requests (0 credits used)',
         'color: #0284c7; font-weight: bold; background-color: #f0f9ff; padding: 4px 8px; border-radius: 4px; border: 1px solid #bae6fd;'
       );
@@ -153,7 +154,7 @@ export function useLessonAudio(
     }
 
     if (fetchPromiseRef.current) {
-      console.log(`[Audio Play] Aguardando prefetch em andamento finalizar...`);
+      devLog(`[Audio Play] Aguardando prefetch em andamento finalizar...`);
       setIsLoadingAudio(true);
       fetchPromiseRef.current.then((chunks) => {
         setIsLoadingAudio(false);
@@ -173,10 +174,10 @@ export function useLessonAudio(
     if (!hook || !lesson) return;
 
     if (cachedChunksRef.current) {
-      console.log(`[Audio Auto-Play] Cache hit! Tocando diálogo instantaneamente.`);
+      devLog(`[Audio Auto-Play] Cache hit! Tocando diálogo instantaneamente.`);
       startAudio(cachedChunksRef.current);
     } else if (fetchPromiseRef.current) {
-      console.log(`[Audio Auto-Play] Aguardando prefetch em andamento para auto-play...`);
+      devLog(`[Audio Auto-Play] Aguardando prefetch em andamento para auto-play...`);
       setIsLoadingAudio(true);
       fetchPromiseRef.current.then((chunks) => {
         setIsLoadingAudio(false);

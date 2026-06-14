@@ -108,7 +108,7 @@ export function LessonProgressHeader({
           <button
             type="button"
             onClick={onExit}
-            className="group flex h-11 w-11 items-center justify-center rounded-xl transition-all duration-100 active:translate-y-[2px] active:border-b-[1px] bg-[var(--color-surface)] border border-[var(--color-border)] border-b-[3px] hover:bg-[var(--color-surface-raised)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#f59e0b] focus-visible:ring-offset-2"
+            className="group flex h-11 w-11 items-center justify-center rounded-xl transition-all duration-100 active:translate-y-[2px] active:border-b-[1px] bg-[var(--color-surface)] border border-[var(--color-border)] border-b-[3px] hover:bg-[var(--color-surface-raised)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary focus-visible:ring-offset-2"
             title="Sair da lição"
             aria-label="Sair da lição"
           >
@@ -119,7 +119,7 @@ export function LessonProgressHeader({
             <button
               type="button"
               onClick={onToggleMute}
-              className="group flex h-11 w-11 items-center justify-center rounded-xl transition-all duration-100 active:translate-y-[2px] active:border-b-[1px] bg-[var(--color-surface)] border border-[var(--color-border)] border-b-[3px] hover:bg-[var(--color-surface-raised)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#f59e0b] focus-visible:ring-offset-2"
+              className="group flex h-11 w-11 items-center justify-center rounded-xl transition-all duration-100 active:translate-y-[2px] active:border-b-[1px] bg-[var(--color-surface)] border border-[var(--color-border)] border-b-[3px] hover:bg-[var(--color-surface-raised)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary focus-visible:ring-offset-2"
               title={isMuted ? 'Ativar som' : 'Desativar som'}
               aria-label={isMuted ? 'Ativar som' : 'Desativar som'}
             >

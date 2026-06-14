@@ -170,7 +170,7 @@ export function TranslationTooltip({
           <button
             onClick={onClose}
             aria-label="Fechar"
-            className="ml-4 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-all duration-100 active:translate-y-[2px] active:border-b-[1px] bg-[var(--color-surface-raised)] border border-[var(--color-border)] border-b-[3px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-[#f59e0b]"
+            className="ml-4 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-all duration-100 active:translate-y-[2px] active:border-b-[1px] bg-[var(--color-surface-raised)] border border-[var(--color-border)] border-b-[3px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-primary"
           >
             <X size={16} className="text-[var(--color-text-muted)]" />
           </button>

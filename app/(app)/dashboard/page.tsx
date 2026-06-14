@@ -1,5 +1,6 @@
 'use client';
 
+import { devLog } from '@/lib/devLog';
 import { useState, useEffect, useRef } from 'react';
 import {
   LogOut,
@@ -276,7 +277,7 @@ export default function DashboardPage() {
         } catch {
           // Firestore security rules block reading non-existent docs by checking resource.data.uid,
           // which throws permission-denied. We catch this safely and treat it as a cache miss.
-          console.log(`[Dashboard Pregen] Cache status check failed or document not found (treating as MISS).`);
+          devLog(`[Dashboard Pregen] Cache status check failed or document not found (treating as MISS).`);
         }
 
         const isTimedOut = (createdAt: { toMillis?: () => number; seconds?: number } | null | undefined) => {
@@ -292,7 +293,7 @@ export default function DashboardPage() {
           cached.status === 'failed' ||
           (cached.status === 'generating' && isTimedOut(cached.createdAt))
         ) {
-          console.log(`[Dashboard Pregen] 🔮 Active lesson ${lessonId} is a cache MISS. Pregenerating in background...`);
+          devLog(`[Dashboard Pregen] 🔮 Active lesson ${lessonId} is a cache MISS. Pregenerating in background...`);
           const userVocabulary = await getUserVocabulary(user.uid, language);
           const knownVocabulary = userVocabulary.map((v) => v.word.toLowerCase());
           const ok = await pregenerateNextLesson(
@@ -302,14 +303,14 @@ export default function DashboardPage() {
             knownVocabulary
           );
           if (ok) {
-            console.log(`[Dashboard Pregen] ✅ Active lesson ${lessonId} pregeneration complete.`);
+            devLog(`[Dashboard Pregen] ✅ Active lesson ${lessonId} pregeneration complete.`);
           } else {
             console.warn(`[Dashboard Pregen] ⚠️ Active lesson ${lessonId} pregeneration failed.`);
           }
         } else if (cached.status === 'generating') {
-          console.log(`[Dashboard Pregen] ⏳ Active lesson ${lessonId} is already generating in background (HIT).`);
+          devLog(`[Dashboard Pregen] ⏳ Active lesson ${lessonId} is already generating in background (HIT).`);
         } else {
-          console.log(`[Dashboard Pregen] ✅ Active lesson ${lessonId} is already cached (HIT).`);
+          devLog(`[Dashboard Pregen] ✅ Active lesson ${lessonId} is already cached (HIT).`);
         }
       } catch (err) {
         console.error('[Dashboard Pregen] Error pregenerating active lesson:', err);

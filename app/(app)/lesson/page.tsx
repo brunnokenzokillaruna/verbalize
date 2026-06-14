@@ -522,7 +522,7 @@ export default function LessonPage() {
               }
               className={[
                 "cta-shimmer relative flex w-full max-w-sm mx-auto items-center justify-center gap-2.5 overflow-hidden rounded-2xl px-6 py-4 text-base font-bold",
-                "transition-all duration-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-[#f59e0b]",
+                "transition-all duration-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-primary",
                 (store.isLoading || (phase === 'role-play' && !store.rolePlayComplete))
                   ? "cursor-not-allowed border border-[var(--color-border)]"
                   : "cursor-pointer active:translate-y-[2px] active:border-b-[2px]"

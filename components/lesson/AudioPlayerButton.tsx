@@ -31,7 +31,7 @@ export function AudioPlayerButton({
       onClick={() => toggle(text, language)}
       disabled={isLoading}
       aria-label={isPlaying ? 'Parar áudio' : 'Ouvir pronúncia'}
-      className="relative flex items-center justify-center rounded-full transition-transform duration-150 active:scale-90 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-[#f59e0b]"
+      className="relative flex items-center justify-center rounded-full transition-transform duration-150 active:scale-90 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-primary"
       style={{
         width: s.btn,
         height: s.btn,

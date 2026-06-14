@@ -1,48 +1,8 @@
-'use client';
-
 import Link from 'next/link';
-import dynamic from 'next/dynamic';
-import { ArrowRight, Loader2, Sparkles } from 'lucide-react';
-import { useAuthStore } from '@/store/authStore';
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-
-const SplineRobot = dynamic(() => import('@/components/landing/SplineRobot'), {
-  ssr: false,
-  loading: () => <div className="w-full h-full" aria-hidden="true" />,
-});
+import { ArrowRight, Sparkles } from 'lucide-react';
+import { LandingPageClient } from '@/components/landing/LandingPageClient';
 
 export default function LandingPage() {
-  const { user, initialized } = useAuthStore();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (initialized && user) {
-      router.replace('/dashboard');
-    }
-  }, [initialized, user, router]);
-
-  if (!initialized) {
-    return (
-      <div
-        className="flex min-h-dvh items-center justify-center"
-        style={{ backgroundColor: 'var(--color-bg)' }}
-        aria-busy="true"
-        aria-label="Carregando"
-      >
-        <Loader2
-          size={28}
-          className="animate-spin"
-          style={{ color: 'var(--color-primary)' }}
-        />
-      </div>
-    );
-  }
-
-  if (user) {
-    return null;
-  }
-
   return (
     <div
       className="relative min-h-dvh overflow-x-hidden flex flex-col items-center selection:bg-[var(--color-primary)] selection:text-white"
@@ -81,7 +41,10 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      <main className="relative w-full h-dvh flex flex-col items-center justify-center overflow-visible">
+      <main
+        id="main-content"
+        className="relative w-full h-dvh flex flex-col items-center justify-center overflow-visible"
+      >
         <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden="true">
           <div
             className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full opacity-10 blur-[120px]"
@@ -111,7 +74,7 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <h1 className="sr-only">
+        <h1 className="absolute bottom-24 left-0 right-0 z-20 px-6 text-center text-base sm:text-lg font-display font-bold text-[var(--color-text-primary)] max-w-xl mx-auto pointer-events-none">
           Verbalize — Aprenda francês e inglês com micro-histórias e revisão espaçada
         </h1>
 
@@ -126,11 +89,7 @@ export default function LandingPage() {
           </Link>
         </p>
 
-        <div className="relative z-10 w-full h-full max-w-6xl flex items-center justify-center pointer-events-auto">
-          <div className="w-full h-full flex items-center justify-center">
-            <SplineRobot />
-          </div>
-        </div>
+        <LandingPageClient />
       </main>
     </div>
   );
