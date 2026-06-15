@@ -1,5 +1,3 @@
-import { AlertCircle } from 'lucide-react';
-
 export const MISTAKE_REVIEW_TOTAL = 5;
 export const MISTAKE_REVIEW_MIN = 3;
 
