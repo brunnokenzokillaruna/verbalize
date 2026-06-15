@@ -1,13 +1,40 @@
 'use client';
 
-import React, { Suspense, useRef, useState, useEffect } from 'react';
+import React, { Suspense, useRef, useState, useEffect, Component, type ReactNode } from 'react';
 import dynamic from 'next/dynamic';
 import type { Application } from '@splinetool/runtime';
 import { Sparkles } from 'lucide-react';
+import {
+  hideSplineDomWatermark,
+  hideSplineSceneWatermark,
+} from '@/utils/splineWatermark';
+
+const SPLINE_SCENE_URL =
+  'https://prod.spline.design/Lid0QTY4Wf0IjJ4l/scene.splinecode';
 
 const Spline = dynamic(() => import('@splinetool/react-spline'), {
   ssr: false,
 });
+
+class SplineErrorBoundary extends Component<
+  { children: ReactNode; fallback: ReactNode },
+  { hasError: boolean }
+> {
+  state = { hasError: false };
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: unknown) {
+    console.warn('[SplineRobot] Failed to load scene:', error);
+  }
+
+  render() {
+    if (this.state.hasError) return this.props.fallback;
+    return this.props.children;
+  }
+}
 
 function usePrefersReducedMotion() {
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
@@ -50,16 +77,38 @@ function StaticFallback() {
 
 export default function SplineRobot() {
   const splineRef = useRef<Application | null>(null);
+  const sceneRef = useRef<HTMLDivElement | null>(null);
   const [mounted, setMounted] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [loadFailed, setLoadFailed] = useState(false);
   const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  useEffect(() => {
+    if (!mounted || prefersReducedMotion || loadFailed) return;
+
+    let cancelled = false;
+
+    fetch(SPLINE_SCENE_URL, { method: 'HEAD' })
+      .then((res) => {
+        if (!cancelled && !res.ok) setLoadFailed(true);
+      })
+      .catch(() => {
+        if (!cancelled) setLoadFailed(true);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [mounted, prefersReducedMotion, loadFailed]);
+
   function onLoad(spline: Application) {
     splineRef.current = spline;
+    hideSplineSceneWatermark(spline);
+    hideSplineDomWatermark(sceneRef.current);
     setIsLoaded(true);
 
     const cursor = spline.findObjectByName('Cursor');
@@ -68,6 +117,21 @@ export default function SplineRobot() {
       cursor.position.y = 0;
     }
   }
+
+  useEffect(() => {
+    if (!mounted || prefersReducedMotion || !isLoaded) return;
+
+    hideSplineDomWatermark(sceneRef.current);
+    const observer = new MutationObserver(() => {
+      hideSplineDomWatermark(sceneRef.current);
+    });
+
+    if (sceneRef.current) {
+      observer.observe(sceneRef.current, { childList: true, subtree: true });
+    }
+
+    return () => observer.disconnect();
+  }, [isLoaded, mounted, prefersReducedMotion]);
 
   useEffect(() => {
     if (!mounted || prefersReducedMotion) return;
@@ -93,7 +157,7 @@ export default function SplineRobot() {
     return <div className="w-full h-full bg-transparent" />;
   }
 
-  if (prefersReducedMotion) {
+  if (prefersReducedMotion || loadFailed) {
     return (
       <div className="relative w-full h-full flex items-center justify-center">
         <StaticFallback />
@@ -102,29 +166,39 @@ export default function SplineRobot() {
   }
 
   return (
-    <div className="relative w-full h-full flex items-center justify-center overflow-hidden pointer-events-auto">
-      <div className="relative w-full h-[105%] -bottom-[5%] pointer-events-auto">
-        <Suspense
-          fallback={
-            <div className="flex items-center justify-center w-full h-full">
-              <div className="w-12 h-12 border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
-            </div>
-          }
-        >
-          <div
-            className={`w-full h-full transition-all duration-1000 ${isLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}
+    <div className="relative w-full h-full flex items-center justify-center overflow-hidden pointer-events-auto spline-robot-scene">
+      <div
+        ref={sceneRef}
+        className="relative w-full h-[105%] -bottom-[5%] pointer-events-auto"
+      >
+        <SplineErrorBoundary fallback={<StaticFallback />}>
+          <Suspense
+            fallback={
+              <div className="flex items-center justify-center w-full h-full">
+                <div className="w-12 h-12 border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
+              </div>
+            }
           >
-            <Spline
-              scene="https://prod.spline.design/Lid0QTY4Wf0IjJ4l/scene.splinecode"
-              onLoad={onLoad}
-              className="w-full h-full"
-            />
-          </div>
-        </Suspense>
+            <div
+              className={`w-full h-full transition-all duration-1000 ${isLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}
+            >
+              <Spline
+                scene={SPLINE_SCENE_URL}
+                onLoad={onLoad}
+                className="w-full h-full"
+              />
+            </div>
+          </Suspense>
+        </SplineErrorBoundary>
       </div>
 
       <div className="absolute inset-x-0 bottom-0 h-40 pointer-events-none bg-gradient-to-t from-[var(--color-bg)] to-transparent z-10" />
       <div className="absolute inset-x-0 top-0 h-40 pointer-events-none bg-gradient-to-b from-[var(--color-bg)] to-transparent z-10" />
+      <div
+        className="absolute bottom-0 right-0 z-20 h-14 w-44 pointer-events-none"
+        style={{ backgroundColor: 'var(--color-bg)' }}
+        aria-hidden="true"
+      />
     </div>
   );
 }

@@ -150,15 +150,27 @@ function stripSpeakerPrefix(line: string): string {
   return line.replace(/^[^:]+:\s*/, '').trim();
 }
 
+function escapeSsml(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
 /**
  * Converts plain text to a TTS `input` object.
- * Prepends a 250ms break to prevent browser audio device latency clipping the first syllable.
- * If the text contains "/" (e.g. "il/elle"), uses SSML so each alternative
- * is pronounced separately with a short pause — instead of reading "slash".
+ * Prepends a short break to avoid clipping the first syllable.
+ * Adds a final period when missing so the engine closes the phrase cleanly.
  */
 function buildTTSInput(text: string): { ssml: string } {
-  const ssmlContent = text.replace(/\s*\/\s*/g, '<break time="350ms"/>');
-  return { ssml: `<speak><break time="250ms"/>${ssmlContent}</speak>` };
+  const trimmed = text.trim();
+  const withEnding = /[.!?…]$/.test(trimmed) ? trimmed : `${trimmed}.`;
+  const ssmlContent = escapeSsml(withEnding).replace(/\s*\/\s*/g, '<break time="300ms"/>');
+  return {
+    ssml: `<speak><break time="120ms"/>${ssmlContent}<break time="80ms"/></speak>`,
+  };
 }
 
 async function callTTS(
@@ -173,7 +185,11 @@ async function callTTS(
       body: JSON.stringify({
         input: buildTTSInput(text),
         voice,
-        audioConfig: { audioEncoding: 'MP3', speakingRate: 0.88 },
+        audioConfig: {
+          audioEncoding: 'MP3',
+          speakingRate: 0.92,
+          sampleRateHertz: 24000,
+        },
       }),
     });
 
@@ -209,7 +225,7 @@ const STUDIO_VOICES: Record<SupportedLanguage, string[]> = {
  * text length. Otherwise a random voice is picked (original behaviour).
  *
  * Chirp-HD / Chirp3-HD voices require full sentences and fail silently on
- * single words, so short texts (≤ 3 words) always use Studio voices
+ * single words, so short texts (≤ 4 words) always use Studio voices
  * when no fixed voice is specified.
  */
 export async function synthesizeSpeech(
@@ -229,7 +245,7 @@ export async function synthesizeSpeech(
   }
 
   const wordCount = text.trim().split(/\s+/).length;
-  const isShort = wordCount <= 3;
+  const isShort = wordCount <= 4;
 
   const candidateNames = isShort
     ? STUDIO_VOICES[language]

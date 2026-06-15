@@ -1,68 +1,122 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Loader2, X, Timer, Zap, Trophy } from 'lucide-react';
+import { Loader2, X, Zap, Trophy, Sparkles, BookOpen } from 'lucide-react';
 import { ConjugationSpeedExercise } from '@/components/lesson/ConjugationSpeedExercise';
-import { generateLocalDrill } from '@/utils/verbDrillGenerator';
+import { DrillTimerRing } from '@/components/verbs/DrillTimerRing';
+import { generateLocalDrill, SPRINT_TENSE_KEYS } from '@/utils/verbDrillGenerator';
+import { saveBestSprintScore, readBestSprintScore } from '@/utils/verbChallengeStorage';
 import { useSoundEffects } from '@/hooks/useSoundEffects';
-import type { VerbDocument, ConjugationSpeedData } from '@/types';
+import type { VerbDocument, ConjugationSpeedData, SupportedLanguage } from '@/types';
+
+const DRILL_DURATION = 60;
+const COUNTDOWN_SECONDS = 3;
+
+type MissedEntry = {
+  verb: string;
+  pronoun: string;
+  tense: string;
+  correctForm: string;
+};
 
 interface VerbDrillSessionProps {
   verbs: VerbDocument[];
+  language: SupportedLanguage;
+  uid: string;
   onClose: () => void;
+  onReviewVerb?: (word: string) => void;
 }
 
-export function VerbDrillSession({ verbs, onClose }: VerbDrillSessionProps) {
-  const [gameState, setGameState] = useState<'ready' | 'playing' | 'done'>('ready');
-  const [timeLeft, setTimeLeft] = useState(60);
+export function VerbDrillSession({
+  verbs,
+  language,
+  uid,
+  onClose,
+  onReviewVerb,
+}: VerbDrillSessionProps) {
+  const [gameState, setGameState] = useState<'countdown' | 'playing' | 'done'>('countdown');
+  const [countdown, setCountdown] = useState(COUNTDOWN_SECONDS);
+  const [timeLeft, setTimeLeft] = useState(DRILL_DURATION);
   const [score, setScore] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
   const [totalAttempted, setTotalAttempted] = useState(0);
+  const [bestScore, setBestScore] = useState(0);
+  const [isNewRecord, setIsNewRecord] = useState(false);
 
   const [currentDrill, setCurrentDrill] = useState<ConjugationSpeedData | null>(null);
   const [answered, setAnswered] = useState(false);
-  const [, setLastCorrect] = useState<boolean | null>(null);
   const [combo, setCombo] = useState(0);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
+  const [missedVerbs, setMissedVerbs] = useState<MissedEntry[]>([]);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const sessionEndPlayedRef = useRef(false);
+  const gameStateRef = useRef(gameState);
+  const timeLeftRef = useRef(timeLeft);
+  const comboRef = useRef(combo);
+  const scoreRef = useRef(score);
 
   const { play: playSound } = useSoundEffects();
 
-  // Generate a new question
+  gameStateRef.current = gameState;
+  timeLeftRef.current = timeLeft;
+  comboRef.current = combo;
+  scoreRef.current = score;
+
   const nextQuestion = useCallback(() => {
     if (verbs.length === 0) return;
     const randomVerb = verbs[Math.floor(Math.random() * verbs.length)];
-    const drill = generateLocalDrill(randomVerb);
+    const drill = generateLocalDrill(randomVerb, { allowedTenses: SPRINT_TENSE_KEYS });
     setCurrentDrill(drill);
     setAnswered(false);
-    setLastCorrect(null);
   }, [verbs]);
 
-  // Start the game
-  function startGame() {
-    setGameState('playing');
-    setTimeLeft(60);
+  function resetRound() {
+    setGameState('countdown');
+    setCountdown(COUNTDOWN_SECONDS);
+    setTimeLeft(DRILL_DURATION);
     setScore(0);
     setCorrectCount(0);
     setTotalAttempted(0);
     setCombo(0);
+    setMissedVerbs([]);
     setShowExitConfirm(false);
     sessionEndPlayedRef.current = false;
-    nextQuestion();
+    setIsNewRecord(false);
+    setCurrentDrill(null);
+    setAnswered(false);
   }
 
-  // Timer logic
+  function finishRound(finalScore: number) {
+    const previousBest = readBestSprintScore(uid, language) ?? 0;
+    const best = saveBestSprintScore(uid, language, finalScore);
+    setBestScore(best);
+    setIsNewRecord(finalScore > previousBest && finalScore > 0);
+    setGameState('done');
+  }
+
+  // Countdown before play
+  useEffect(() => {
+    if (gameState !== 'countdown') return;
+    if (countdown <= 0) {
+      setGameState('playing');
+      nextQuestion();
+      return;
+    }
+    const timer = setTimeout(() => setCountdown((c) => c - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [gameState, countdown, nextQuestion]);
+
+  // Game timer
   useEffect(() => {
     if (gameState !== 'playing' || showExitConfirm) return;
     if (timeLeft <= 0) {
-      setGameState('done');
+      finishRound(scoreRef.current);
       return;
     }
     const timer = setInterval(() => {
       setTimeLeft((t) => t - 1);
     }, 1000);
     return () => clearInterval(timer);
-  }, [gameState, timeLeft, showExitConfirm]);
+  }, [gameState, timeLeft, showExitConfirm, uid, language]);
 
   useEffect(() => {
     if (gameState === 'done' && !sessionEndPlayedRef.current) {
@@ -71,17 +125,17 @@ export function VerbDrillSession({ verbs, onClose }: VerbDrillSessionProps) {
     }
   }, [gameState, playSound]);
 
-  // Handle answer
   function handleAnswer(correct: boolean) {
     if (answered) return;
     setAnswered(true);
-    setLastCorrect(correct);
     setTotalAttempted((t) => t + 1);
+
+    const drill = currentDrill;
 
     if (correct) {
       setCorrectCount((c) => c + 1);
-      const nextCombo = combo + 1;
-      const points = 10 + (combo * 2);
+      const nextCombo = comboRef.current + 1;
+      const points = 10 + comboRef.current * 2;
       setScore((s) => s + points);
       setCombo(nextCombo);
       if (nextCombo >= 3) {
@@ -92,17 +146,31 @@ export function VerbDrillSession({ verbs, onClose }: VerbDrillSessionProps) {
     } else {
       setCombo(0);
       playSound('incorrect');
+      if (drill) {
+        setMissedVerbs((prev) => {
+          const exists = prev.some((m) => m.verb === drill.verb && m.correctForm === drill.correctForm);
+          if (exists) return prev;
+          return [
+            ...prev,
+            {
+              verb: drill.verb,
+              pronoun: drill.pronoun,
+              tense: drill.tense,
+              correctForm: drill.correctForm,
+            },
+          ];
+        });
+      }
     }
 
-    // Auto-advance after short delay
+    const delay = correct ? 650 : 1800;
     setTimeout(() => {
-      if (gameState === 'playing' && timeLeft > 0) {
+      if (gameStateRef.current === 'playing' && timeLeftRef.current > 0) {
         nextQuestion();
       }
-    }, 800);
+    }, delay);
   }
 
-  // Handle exit confirmation request
   function handleCloseRequest() {
     if (gameState === 'playing') {
       setShowExitConfirm(true);
@@ -111,7 +179,6 @@ export function VerbDrillSession({ verbs, onClose }: VerbDrillSessionProps) {
     }
   }
 
-  // Listen for Escape key down
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -126,24 +193,19 @@ export function VerbDrillSession({ verbs, onClose }: VerbDrillSessionProps) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [gameState, showExitConfirm]);
 
-  // Focus trap
   useEffect(() => {
-    if (gameState !== 'ready' && gameState !== 'playing' && gameState !== 'done') return;
     const container = containerRef.current;
     if (!container) return;
 
-    const getFocusable = () => {
-      return Array.from(
+    const getFocusable = () =>
+      Array.from(
         container.querySelectorAll<HTMLElement>(
-          'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
-        )
+          'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
       ).filter((el) => el.offsetWidth > 0 || el.offsetHeight > 0);
-    };
 
     const focusable = getFocusable();
-    if (focusable.length > 0) {
-      focusable[0].focus();
-    }
+    focusable[0]?.focus();
 
     const handleFocusTrap = (e: KeyboardEvent) => {
       if (e.key !== 'Tab') return;
@@ -161,154 +223,148 @@ export function VerbDrillSession({ verbs, onClose }: VerbDrillSessionProps) {
           last.focus();
           e.preventDefault();
         }
-      } else {
-        if (active === last || !focusableElements.includes(active)) {
-          first.focus();
-          e.preventDefault();
-        }
+      } else if (active === last || !focusableElements.includes(active)) {
+        first.focus();
+        e.preventDefault();
       }
     };
 
     container.addEventListener('keydown', handleFocusTrap);
     return () => container.removeEventListener('keydown', handleFocusTrap);
-  }, [gameState, showExitConfirm, currentDrill, answered, timeLeft]);
+  }, [gameState, showExitConfirm, currentDrill, answered, timeLeft, countdown]);
 
-  // ── Ready Screen ─────────────────────────────────────────────────────────────
-  if (gameState === 'ready') {
+  // ── Countdown ────────────────────────────────────────────────────────────────
+  if (gameState === 'countdown') {
     return (
-      <div 
+      <div
         ref={containerRef}
         className="fixed inset-0 z-50 flex flex-col animate-fade-in"
         style={{ backgroundColor: 'var(--color-bg)' }}
       >
         <div className="flex justify-end p-5">
-          <button 
-            onClick={onClose} 
-            className="flex h-9 w-9 items-center justify-center rounded-full transition-all focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-[#f59e0b] active:scale-95"
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex h-9 w-9 items-center justify-center rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-verb active:scale-95"
             style={{ backgroundColor: 'var(--color-surface-raised)', border: '1.5px solid var(--color-border)' }}
-            aria-label="Fechar desafio"
+            aria-label="Fechar sprint"
           >
-            <X size={18} style={{ color: 'var(--color-text-muted)' }} />
+            <X size={18} className="text-text-muted" />
           </button>
         </div>
-        <div className="flex-1 flex flex-col items-center justify-center p-6 text-center max-w-sm mx-auto w-full">
-          <div 
-            className="w-24 h-24 rounded-3xl flex items-center justify-center mb-6 animate-float"
-            style={{ 
-              backgroundColor: 'var(--color-verb)', 
-              boxShadow: '0 12px 32px rgba(124, 58, 237, 0.35)',
-              color: '#fff'
-            }}
-          >
-            <Zap size={44} />
-          </div>
-          <h1 
-            className="font-display text-3xl font-black mb-2"
-            style={{ color: 'var(--color-text-primary)' }}
-          >
-            Desafio de Verbos
-          </h1>
-          <p 
-            className="text-sm font-semibold mb-8 leading-relaxed"
-            style={{ color: 'var(--color-text-secondary)' }}
-          >
-            Você tem 60 segundos para acertar o maior número de conjugações. O combo de acertos multiplica seus pontos!
+        <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
+          <p className="text-xs font-bold uppercase tracking-widest text-text-muted mb-4">
+            Sprint de Conjugação
           </p>
-          <button
-            onClick={startGame}
-            className="w-full py-4 rounded-2xl text-white font-extrabold text-base transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-[#f59e0b]"
-            style={{ 
-              backgroundColor: 'var(--color-verb)',
-              boxShadow: '0 4px 16px rgba(124, 58, 237, 0.3)'
-            }}
+          <div
+            className="font-display text-8xl font-black tabular-nums animate-scale-in"
+            style={{ color: 'var(--color-verb)' }}
           >
-            Começar Desafio
-          </button>
+            {countdown || 'Go!'}
+          </div>
+          <p className="mt-4 text-sm text-text-secondary max-w-xs">
+            Escolha a forma correta o mais rápido que puder. Combos valem pontos extras.
+          </p>
         </div>
       </div>
     );
   }
 
-  // ── Done Screen ──────────────────────────────────────────────────────────────
+  // ── Done ─────────────────────────────────────────────────────────────────────
   if (gameState === 'done') {
     const accuracy = totalAttempted > 0 ? Math.round((correctCount / totalAttempted) * 100) : 0;
+    const headline =
+      accuracy >= 80 ? 'Excelente sprint!' : accuracy >= 50 ? 'Bom treino!' : 'Continue praticando!';
+
     return (
-      <div 
+      <div
         ref={containerRef}
-        className="fixed inset-0 z-50 flex flex-col animate-fade-in"
+        className="fixed inset-0 z-50 flex flex-col overflow-y-auto animate-fade-in"
         style={{ backgroundColor: 'var(--color-bg)' }}
       >
-        <div className="flex-1 flex flex-col items-center justify-center p-6 text-center max-w-sm mx-auto w-full">
-          <div 
-            className="w-24 h-24 rounded-full flex items-center justify-center mb-6"
-            style={{ 
-              backgroundColor: 'var(--color-warning-bg)', 
-              border: '2px solid var(--color-warning-border)',
-              color: 'var(--color-warning)',
-              boxShadow: '0 12px 32px rgba(245, 158, 11, 0.2)'
+        <div className="flex flex-col items-center p-6 text-center max-w-md mx-auto w-full py-10">
+          <div
+            className="w-20 h-20 rounded-full flex items-center justify-center mb-5"
+            style={{
+              backgroundColor: isNewRecord ? 'var(--color-warning-bg)' : 'var(--color-verb-bg)',
+              border: `2px solid ${isNewRecord ? 'var(--color-warning)' : 'var(--color-verb)'}`,
+              color: isNewRecord ? 'var(--color-warning)' : 'var(--color-verb)',
             }}
           >
-            <Trophy size={40} />
+            <Trophy size={36} />
           </div>
-          <h2 
-            className="text-lg font-black uppercase tracking-widest"
-            style={{ color: 'var(--color-warning)' }}
-          >
-            Tempo Esgotado!
-          </h2>
-          <p 
-            className="font-display text-5xl font-black mt-2 mb-8"
-            style={{ color: 'var(--color-text-primary)' }}
-          >
-            {score} <span className="text-xl font-bold" style={{ color: 'var(--color-text-muted)' }}>pts</span>
+
+          <h2 className="font-display text-xl font-black text-text-primary">{headline}</h2>
+          {isNewRecord && (
+            <p className="mt-1 text-xs font-bold uppercase tracking-widest text-warning flex items-center gap-1 justify-center">
+              <Sparkles size={12} />
+              Novo recorde!
+            </p>
+          )}
+
+          <p className="font-display text-5xl font-black mt-3 text-text-primary">
+            {score}
+            <span className="text-lg font-bold text-text-muted ml-1">pts</span>
           </p>
-          
-          <div className="grid grid-cols-2 gap-4 w-full mb-8">
-            <div 
-              className="rounded-2xl p-4 text-center"
-              style={{ 
-                backgroundColor: 'var(--color-surface)', 
-                border: '1.5px solid var(--color-border)' 
-              }}
-            >
-              <p className="text-xs font-black uppercase tracking-wider mb-1" style={{ color: 'var(--color-text-muted)' }}>Acertos</p>
-              <p className="text-2xl font-black" style={{ color: 'var(--color-success)' }}>
-                {correctCount} <span className="text-xs font-semibold" style={{ color: 'var(--color-text-muted)' }}>/ {totalAttempted}</span>
+          {bestScore > 0 && (
+            <p className="text-xs text-text-muted mt-1">Recorde: {bestScore} pts</p>
+          )}
+
+          <div className="grid grid-cols-2 gap-3 w-full mt-6 mb-6">
+            <div className="rounded-2xl p-4 text-center bg-surface border border-border">
+              <p className="text-[10px] font-black uppercase tracking-wider mb-1 text-text-muted">Acertos</p>
+              <p className="text-2xl font-black text-success">
+                {correctCount}
+                <span className="text-xs font-semibold text-text-muted"> / {totalAttempted}</span>
               </p>
             </div>
-            <div 
-              className="rounded-2xl p-4 text-center"
-              style={{ 
-                backgroundColor: 'var(--color-surface)', 
-                border: '1.5px solid var(--color-border)' 
-              }}
-            >
-              <p className="text-xs font-black uppercase tracking-wider mb-1" style={{ color: 'var(--color-text-muted)' }}>Precisão</p>
-              <p className="text-2xl font-black" style={{ color: 'var(--color-verb)' }}>
-                {accuracy}%
-              </p>
+            <div className="rounded-2xl p-4 text-center bg-surface border border-border">
+              <p className="text-[10px] font-black uppercase tracking-wider mb-1 text-text-muted">Precisão</p>
+              <p className="text-2xl font-black text-verb">{accuracy}%</p>
             </div>
           </div>
 
+          {missedVerbs.length > 0 && (
+            <div className="w-full mb-6 text-left rounded-2xl border border-border bg-surface p-4">
+              <p className="text-xs font-bold uppercase tracking-widest text-text-muted mb-3 flex items-center gap-1.5">
+                <BookOpen size={12} />
+                Revisar depois
+              </p>
+              <ul className="flex flex-col gap-2">
+                {missedVerbs.slice(0, 5).map((m) => (
+                  <li key={`${m.verb}-${m.correctForm}`}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onReviewVerb?.(m.verb);
+                        onClose();
+                      }}
+                      className="w-full flex items-center justify-between gap-2 rounded-xl px-3 py-2.5 text-left transition-all active:scale-[0.99] cursor-pointer border border-border bg-surface-raised hover:border-verb/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-verb"
+                    >
+                      <span className="text-sm font-bold text-text-primary">{m.verb}</span>
+                      <span className="text-xs text-text-muted shrink-0">
+                        {m.pronoun} → <span className="font-semibold text-verb">{m.correctForm}</span>
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           <div className="flex flex-col gap-3 w-full">
             <button
-              onClick={startGame}
-              className="w-full py-4 rounded-2xl text-white font-extrabold text-base transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-[#f59e0b]"
-              style={{ 
-                backgroundColor: 'var(--color-verb)',
-                boxShadow: '0 4px 16px rgba(124, 58, 237, 0.3)'
-              }}
+              type="button"
+              onClick={resetRound}
+              className="w-full py-4 rounded-2xl text-white font-extrabold text-base transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-verb"
+              style={{ backgroundColor: 'var(--color-verb)', boxShadow: '0 4px 0 #6d28d9' }}
             >
-              Desafiar Novamente
+              Sprint de novo
             </button>
             <button
+              type="button"
               onClick={onClose}
-              className="w-full py-4 rounded-2xl font-extrabold text-base transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-[#f59e0b]"
-              style={{ 
-                backgroundColor: 'var(--color-surface-raised)',
-                border: '1.5px solid var(--color-border)',
-                color: 'var(--color-text-primary)'
-              }}
+              className="w-full py-4 rounded-2xl font-extrabold text-base transition-all active:scale-[0.98] border border-border bg-surface-raised text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-verb"
             >
               Voltar para Verbos
             </button>
@@ -318,46 +374,48 @@ export function VerbDrillSession({ verbs, onClose }: VerbDrillSessionProps) {
     );
   }
 
-  // ── Playing Screen ───────────────────────────────────────────────────────────
+  // ── Playing ──────────────────────────────────────────────────────────────────
   return (
-    <div 
+    <div
       ref={containerRef}
-      className="fixed inset-0 z-50 flex flex-col overflow-y-auto animate-fade-in" 
+      className="fixed inset-0 z-50 flex flex-col overflow-y-auto animate-fade-in"
       style={{ backgroundColor: 'var(--color-bg)' }}
     >
-      {/* HUD Header */}
-      <div className="flex items-center justify-between p-4 border-b" style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}>
-        <button 
-          onClick={handleCloseRequest} 
-          className="flex h-9 w-9 items-center justify-center rounded-full transition-all focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-[#f59e0b] active:scale-95" 
+      <div
+        className="flex items-center justify-between p-4 border-b bg-surface border-border"
+      >
+        <button
+          type="button"
+          onClick={handleCloseRequest}
+          className="flex h-9 w-9 items-center justify-center rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-verb active:scale-95"
           style={{ backgroundColor: 'var(--color-surface-raised)', border: '1.5px solid var(--color-border)' }}
-          aria-label="Sair do desafio"
+          aria-label="Sair do sprint"
         >
-          <X size={18} style={{ color: 'var(--color-text-muted)' }} />
+          <X size={18} className="text-text-muted" />
         </button>
-        
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1.5 px-3 py-1 bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 rounded-full font-bold">
-            <Timer size={16} />
-            <span className="tabular-nums" style={{ color: timeLeft <= 10 ? 'var(--color-error)' : '' }}>0:{timeLeft.toString().padStart(2, '0')}</span>
-          </div>
-          <div className="text-right">
-            <p className="text-[10px] font-bold uppercase tracking-wider mb-0.5" style={{ color: 'var(--color-text-muted)' }}>Pontos</p>
-            <p className="text-xl font-black leading-none tabular-nums" style={{ color: 'var(--color-text-primary)' }}>{score}</p>
+
+        <p className="text-[10px] font-black uppercase tracking-widest text-text-muted hidden sm:block">
+          Sprint de Conjugação
+        </p>
+
+        <div className="flex items-center gap-3">
+          <DrillTimerRing timeLeft={timeLeft} totalSeconds={DRILL_DURATION} />
+          <div className="text-right min-w-[3rem]">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-text-muted">Pontos</p>
+            <p className="text-xl font-black leading-none tabular-nums text-text-primary">{score}</p>
           </div>
         </div>
       </div>
 
-      {/* Main Game Area */}
       <div className="flex-1 flex flex-col p-5 max-w-lg mx-auto w-full">
-        {/* Combo Multiplier indicator */}
-        <div className="flex justify-center mb-4 h-6">
+        <div className="flex justify-center mb-4 h-7">
           {combo >= 2 && (
-            <div 
-              className="px-3 py-0.5 rounded-full text-xs font-black uppercase tracking-widest animate-in zoom-in spin-in-12 duration-300"
+            <div
+              className="px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest animate-scale-in flex items-center gap-1"
               style={{ backgroundColor: 'var(--color-warning-bg)', color: 'var(--color-warning)' }}
             >
-              {combo}x Combo!
+              <Zap size={12} fill="currentColor" />
+              {combo}x combo
             </div>
           )}
         </div>
@@ -365,7 +423,8 @@ export function VerbDrillSession({ verbs, onClose }: VerbDrillSessionProps) {
         {currentDrill ? (
           <ConjugationSpeedExercise
             data={currentDrill}
-            language={verbs[0]?.language}
+            language={language}
+            variant="drill"
             onAnswer={handleAnswer}
             answered={answered}
             setIsExerciseReady={() => {}}
@@ -373,45 +432,36 @@ export function VerbDrillSession({ verbs, onClose }: VerbDrillSessionProps) {
           />
         ) : (
           <div className="flex-1 flex items-center justify-center">
-            <Loader2 className="animate-spin" size={32} style={{ color: 'var(--color-verb)' }} />
+            <Loader2 className="animate-spin text-verb" size={32} />
           </div>
         )}
       </div>
 
-      {/* Action Blocked Overlay (prevents double clicking while advancing) */}
-      {answered && (
-        <div className="absolute inset-0 z-10" />
-      )}
+      {answered && <div className="absolute inset-0 z-10" aria-hidden />}
 
-      {/* Exit Confirmation Modal Overlay */}
       {showExitConfirm && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-          <div 
-            className="w-full max-w-sm rounded-3xl p-6 text-center animate-scale-in"
-            style={{ backgroundColor: 'var(--color-surface)', border: '2px solid var(--color-border)' }}
-          >
-            <h3 className="font-display text-xl font-black mb-2" style={{ color: 'var(--color-text-primary)' }}>
-              Sair do Desafio?
+          <div className="w-full max-w-sm rounded-3xl p-6 text-center animate-scale-in bg-surface border-2 border-border">
+            <h3 className="font-display text-xl font-black mb-2 text-text-primary">
+              Sair do sprint?
             </h3>
-            <p className="text-sm font-semibold mb-6 leading-relaxed" style={{ color: 'var(--color-text-secondary)' }}>
-              Seu progresso e pontuação acumulados nesta rodada serão perdidos. Tem certeza?
+            <p className="text-sm font-semibold mb-6 leading-relaxed text-text-secondary">
+              Sua pontuação desta rodada será perdida.
             </p>
             <div className="flex gap-3">
               <button
                 type="button"
                 onClick={() => setShowExitConfirm(false)}
-                className="flex-1 py-3 rounded-xl font-extrabold text-sm border-2 border-[var(--color-border)] transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-[#f59e0b]"
-                style={{ backgroundColor: 'var(--color-surface-raised)', color: 'var(--color-text-primary)' }}
+                className="flex-1 py-3 rounded-xl font-extrabold text-sm border-2 border-border bg-surface-raised text-text-primary active:scale-95"
               >
-                Voltar
+                Continuar
               </button>
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 py-3 rounded-xl font-extrabold text-sm text-white transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-[#f59e0b]"
-                style={{ backgroundColor: 'var(--color-error)' }}
+                className="flex-1 py-3 rounded-xl font-extrabold text-sm text-white bg-error active:scale-95"
               >
-                Sair do Jogo
+                Sair
               </button>
             </div>
           </div>

@@ -60,7 +60,7 @@ export function LessonNodePopover({
         }`}
         style={{
           backgroundColor: isLocked ? 'var(--color-surface-raised)' : isMission ? 'var(--color-vocab)' : 'var(--color-primary)',
-          color: isLocked ? 'var(--color-text-muted)' : 'var(--color-text-inverse)',
+          color: isLocked ? 'var(--color-text-muted)' : 'var(--color-on-accent)',
           boxShadow: isLocked ? 'none' : isMission ? '0 3px 0 var(--color-warning)' : '0 3px 0 var(--color-primary-dark)',
         }}
       >

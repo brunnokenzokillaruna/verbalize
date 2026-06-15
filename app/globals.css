@@ -24,6 +24,7 @@
   --color-text-secondary: var(--color-text-secondary);
   --color-text-muted: var(--color-text-muted);
   --color-text-inverse: var(--color-text-inverse);
+  --color-on-accent: var(--color-on-accent);
   --color-border: var(--color-border);
   --color-border-strong: var(--color-border-strong);
 }
@@ -59,6 +60,7 @@
   --color-text-secondary:#57534e;
   --color-text-muted:    #78716c;
   --color-text-inverse:  #ffffff;
+  --color-on-accent:     #ffffff;
 
   --color-border:        #e7e5e0;
   --color-border-strong: #c7c4be;
@@ -96,6 +98,7 @@
   --color-text-secondary:#d1d5db;
   --color-text-muted:    #6b7280;
   --color-text-inverse:  #111827;
+  --color-on-accent:     #ffffff;
 
   --color-border:        #374151;
   --color-border-strong: #4b5563;
@@ -132,6 +135,21 @@ body {
 .lesson-text {
   font-size: 18px;
   line-height: 1.7;
+}
+
+.dialogue-french {
+  font-size: clamp(1.0625rem, 4.2vw, 1.1875rem);
+  line-height: 1.65;
+  letter-spacing: 0.01em;
+  font-weight: 600;
+}
+
+.dialogue-translation {
+  font-size: clamp(0.9375rem, 3.8vw, 1.0625rem);
+  line-height: 1.6;
+  letter-spacing: 0.01em;
+  color: var(--color-text-secondary);
+  font-weight: 500;
 }
 
 .bridge-text {
@@ -417,4 +435,12 @@ body {
   .lesson-current-dot::before {
     animation: none !important;
   }
+}
+
+/* Landing: hide Spline free-tier badge if runtime injects it as DOM */
+.spline-robot-scene a[href*='spline.design'] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }

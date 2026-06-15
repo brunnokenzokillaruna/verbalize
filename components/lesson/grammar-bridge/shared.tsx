@@ -6,11 +6,6 @@ import { ClickableSentence } from '../ClickableSentence';
 import type { WordClickPayload } from '../ClickableWord';
 import type { GrammarBridgeResult, SupportedLanguage } from '@/types';
 
-export const LANG_LABEL: Record<SupportedLanguage, string> = {
-  fr: 'FR',
-  en: 'EN',
-};
-
 export function stripHighlights(text: string): string {
   return text.replace(/\^\^/g, '');
 }

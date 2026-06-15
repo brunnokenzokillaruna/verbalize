@@ -9,6 +9,20 @@ const LANG_LABEL: Record<SupportedLanguage, string> = {
   en: 'English',
 };
 
+const MIN_EXERCISES = 3;
+
+function prepareErrorCorrectionForValidation(data: ErrorCorrectionData): ErrorCorrectionData {
+  const normalized = normalizeErrorCorrectionData(data);
+  if (normalized.translation?.trim()) return normalized;
+
+  const fallback =
+    normalized.explanation?.trim() ||
+    normalized.corrected_sentence?.trim() ||
+    'Tradução da frase corrigida';
+
+  return { ...normalized, translation: fallback };
+}
+
 interface GenerateMistakeReviewParams {
   grammarFocus: string;
   mistakeContext: string;
@@ -104,6 +118,7 @@ Exercise 2 — type "error-correction":
 - "corrected_sentence" is ALWAYS required: the full sentence after fixing the error
 - "answer_mode": "replace" for single-word swaps; "rewrite" when the student must type the full corrected sentence (deletions, redundant repetition, multi-word fixes)
 - "acceptable_answers" is an array of OTHER valid corrected sentences or replacement words. If none exist, use an empty array.
+- "translation" is the Brazilian Portuguese translation of "corrected_sentence" (NOT the explanation)
 - "explanation" is a brief explanation in Brazilian Portuguese of why the error is wrong and what the correct form should be
 - CRITICAL: "error_word" must appear EXACTLY ONCE in "sentence_with_error". If context naturally repeats the phrase, isolate ONLY the clause with the error (e.g. "Oui, j'en ai du pain." not "Tu as du pain ? Oui, j'en ai du pain.").
 - NEVER ask the student to leave the answer blank. For deletions, use answer_mode "rewrite" and corrected_sentence as the full fixed sentence.
@@ -139,6 +154,7 @@ Output format (exactly this structure, ${isFive ? 5 : 3} items):
       "corrected_sentence": "full sentence after fix",
       "answer_mode": "replace",
       "acceptable_answers": ["other_valid_word1"],
+      "translation": "Tradução em português da frase corrigida",
       "explanation": "Explicação em português"
     }
   },
@@ -153,27 +169,49 @@ Output format (exactly this structure, ${isFive ? 5 : 3} items):
   }${extraJson}
 ]`;
 
-    const exercises = await callGeminiJSON<Exercise[]>(prompt, systemPrompt, isFive ? 1800 : 1200);
+    const targetCount = isFive ? 5 : 3;
+    const maxAttempts = 2;
+    let validated: Exercise[] = [];
 
-    if (!Array.isArray(exercises) || exercises.length < 3) {
-      console.error('[generateMistakeReview] Unexpected response shape');
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      const exercises = await callGeminiJSON<Exercise[]>(
+        prompt,
+        systemPrompt,
+        isFive ? 1800 : 1200,
+      );
+
+      if (!Array.isArray(exercises) || exercises.length < MIN_EXERCISES) {
+        console.error('[generateMistakeReview] Unexpected response shape');
+        if (attempt === maxAttempts - 1) return null;
+        continue;
+      }
+
+      validated = exercises.filter((ex) => {
+        if (ex.type !== 'error-correction') return true;
+        const prepared = prepareErrorCorrectionForValidation(ex.data as ErrorCorrectionData);
+        const ok = isValidErrorCorrectionExercise(prepared);
+        if (ok) {
+          Object.assign(ex.data, prepared);
+        } else {
+          console.warn('[generateMistakeReview] Dropped malformed error-correction exercise');
+        }
+        return ok;
+      });
+
+      if (validated.length >= targetCount) break;
+      console.warn(
+        `[generateMistakeReview] Only ${validated.length}/${targetCount} valid exercises — retrying`,
+      );
+    }
+
+    if (validated.length < MIN_EXERCISES) {
+      console.error(
+        `[generateMistakeReview] Insufficient valid exercises (${validated.length}/${targetCount})`,
+      );
       return null;
     }
 
-    // Structural validation: drop malformed error-correction exercises
-    const validated = exercises.filter((ex) => {
-      if (ex.type !== 'error-correction') return true;
-      const normalized = normalizeErrorCorrectionData(ex.data as ErrorCorrectionData);
-      const ok = isValidErrorCorrectionExercise(normalized);
-      if (ok) {
-        Object.assign(ex.data, normalized);
-      } else {
-        console.warn('[generateMistakeReview] Dropped malformed error-correction exercise');
-      }
-      return ok;
-    });
-
-    return validated.slice(0, isFive ? 5 : 3);
+    return validated.slice(0, targetCount);
   } catch (err) {
     console.error('[generateMistakeReview] Error:', err);
     return null;

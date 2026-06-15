@@ -2,7 +2,7 @@
 
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Loader2, X, Trophy, RefreshCw } from 'lucide-react';
+import { Loader2, AlertCircle } from 'lucide-react';
 
 import { useAuthStore } from '@/store/authStore';
 import { getMistakeById, deleteLessonMistake, getUserVocabulary } from '@/services/firestore';
@@ -12,12 +12,18 @@ import { CheckButton } from '@/components/lesson/CheckButton';
 import { LessonPracticeScreen } from '@/components/lesson/LessonPracticeScreen';
 import { formatErrorCorrectionAnswer } from '@/utils/errorCorrection';
 import { useSoundEffects } from '@/hooks/useSoundEffects';
+import { MistakeReviewShell } from '@/components/mistakes/MistakeReviewShell';
+import { MistakeReviewIntro } from '@/components/mistakes/MistakeReviewIntro';
+import { MistakeReviewComplete } from '@/components/mistakes/MistakeReviewComplete';
+import {
+  MISTAKE_REVIEW_MIN,
+  MISTAKE_REVIEW_TOTAL,
+  MISTAKE_THEME,
+} from '@/components/mistakes/mistakeTheme';
 
 import type { Exercise, LessonMistakeDocument } from '@/types';
 
-const TOTAL = 5;
-
-type Phase = 'loading' | 'practice' | 'complete' | 'error';
+type Phase = 'loading' | 'ready' | 'practice' | 'complete' | 'error';
 
 function ReviewContent() {
   const router = useRouter();
@@ -35,10 +41,10 @@ function ReviewContent() {
   const [knownVocab, setKnownVocab] = useState<string[]>([]);
   const [isExerciseReady, setIsExerciseReady] = useState(false);
   const [submitTrigger, setSubmitTrigger] = useState(0);
+  const [finishing, setFinishing] = useState(false);
 
   const { play: playSound } = useSoundEffects();
 
-  // Load mistake + generate exercises
   useEffect(() => {
     if (!mistakeId) {
       router.replace('/profile');
@@ -55,7 +61,6 @@ function ReviewContent() {
       if (cancelled) return;
       setMistake(doc);
 
-      // Fetch known vocabulary in parallel with nothing (sequential is fine — fast Firestore read)
       const vocabItems = user ? await getUserVocabulary(user.uid, doc.language) : [];
       const knownVocabulary = vocabItems.map((v) => v.word);
       if (!cancelled) setKnownVocab(knownVocabulary);
@@ -65,24 +70,26 @@ function ReviewContent() {
         mistakeContext: doc.mistakeContext,
         language: doc.language,
         level: doc.level,
-        count: TOTAL,
+        count: MISTAKE_REVIEW_TOTAL,
         knownVocabulary,
       });
 
       if (cancelled) return;
-      if (!exs || exs.length < TOTAL) {
+      if (!exs || exs.length < MISTAKE_REVIEW_MIN) {
         setPhase('error');
         return;
       }
       setExercises(exs);
-      setPhase('practice');
+      setPhase('ready');
     }
 
     load().catch(() => {
       if (!cancelled) setPhase('error');
     });
 
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [mistakeId, router, user]);
 
   function handleAnswer(correct: boolean) {
@@ -104,9 +111,8 @@ function ReviewContent() {
       setCurrentIndex((i) => i + 1);
       return;
     }
-    const allCorrect = correctCount >= TOTAL;
     setPhase('complete');
-    playSound(allCorrect ? 'perfect' : 'complete');
+    playSound(correctCount >= exercises.length ? 'perfect' : 'complete');
   }
 
   function handleCheck() {
@@ -114,9 +120,8 @@ function ReviewContent() {
   }
 
   async function handleComplete() {
-    // exerciseAnswer holds result of last exercise; correctCount may not include it yet
-    const finalCorrect = correctCount;
-    const allCorrect = finalCorrect >= TOTAL;
+    setFinishing(true);
+    const allCorrect = correctCount >= exercises.length;
     if (allCorrect && mistake?.id) {
       await deleteLessonMistake(mistake.id).catch(console.error);
     }
@@ -136,51 +141,65 @@ function ReviewContent() {
       mistakeContext: mistake.mistakeContext,
       language: mistake.language,
       level: mistake.level,
-      count: TOTAL,
+      count: MISTAKE_REVIEW_TOTAL,
       knownVocabulary: knownVocab,
     });
-    if (!exs || exs.length < TOTAL) {
+    if (!exs || exs.length < MISTAKE_REVIEW_MIN) {
       setPhase('error');
       return;
     }
     setExercises(exs);
-    setPhase('practice');
+    setPhase('ready');
   }
 
-  // Correct answer for CheckButton banner (inline exercises handle it themselves)
   const currentExercise = exercises[currentIndex];
   const correctAnswerForBanner: string | undefined = (() => {
     if (!currentExercise || exerciseAnswer !== false) return undefined;
     switch (currentExercise.type) {
-      case 'context-choice':   return currentExercise.data.blankWord;
-      case 'error-correction': return formatErrorCorrectionAnswer(currentExercise.data);
-      default:                 return undefined;
+      case 'context-choice':
+        return currentExercise.data.blankWord;
+      case 'error-correction':
+        return formatErrorCorrectionAnswer(currentExercise.data);
+      default:
+        return undefined;
     }
   })();
 
   const checkState = (() => {
     if (exerciseAnswer !== null) {
-      return exerciseAnswer ? 'correct' as const : 'incorrect' as const;
+      return exerciseAnswer ? ('correct' as const) : ('incorrect' as const);
     }
-    return isExerciseReady ? 'idle' as const : 'disabled' as const;
+    return isExerciseReady ? ('idle' as const) : ('disabled' as const);
   })();
 
-  // ── Loading ────────────────────────────────────────────────────────────────
+  const goProfile = () => router.push('/profile');
+
   if (phase === 'loading') {
     return (
       <div
-        className="flex min-h-dvh flex-col items-center justify-center gap-4"
+        className="flex min-h-dvh flex-col items-center justify-center gap-6 px-6"
         style={{ backgroundColor: 'var(--color-bg)' }}
       >
-        <Loader2 size={36} className="animate-spin" style={{ color: 'var(--color-primary)' }} />
-        <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
-          Gerando exercícios de revisão…
-        </p>
+        <div
+          className="pointer-events-none fixed inset-0"
+          style={{ background: MISTAKE_THEME.ambient }}
+          aria-hidden
+        />
+        <div className="relative flex flex-col items-center gap-4 text-center">
+          <Loader2 size={36} className="animate-spin text-error" />
+          <div>
+            <p className="font-display text-lg font-bold text-text-primary">
+              Preparando revisão…
+            </p>
+            <p className="text-sm text-text-muted mt-1 max-w-xs">
+              Gerando {MISTAKE_REVIEW_TOTAL} exercícios personalizados para este erro
+            </p>
+          </div>
+        </div>
       </div>
     );
   }
 
-  // ── Error ──────────────────────────────────────────────────────────────────
   if (phase === 'error') {
     return (
       <div
@@ -188,32 +207,31 @@ function ReviewContent() {
         style={{ backgroundColor: 'var(--color-bg)' }}
       >
         <div
-          className="flex h-16 w-16 items-center justify-center rounded-full text-3xl"
-          style={{ backgroundColor: 'var(--color-error-bg)' }}
+          className="flex h-16 w-16 items-center justify-center rounded-2xl"
+          style={{ backgroundColor: MISTAKE_THEME.accentLight }}
         >
-          ⚠️
+          <AlertCircle size={32} className="text-error" />
         </div>
         <div>
-          <h2 className="font-display text-xl font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+          <h2 className="font-display text-xl font-bold text-text-primary">
             Erro ao gerar revisão
           </h2>
-          <p className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--color-text-muted)' }}>
+          <p className="mt-2 text-sm leading-relaxed text-text-muted max-w-sm">
             Não foi possível conectar ao servidor de IA. Verifique sua conexão e tente novamente.
           </p>
         </div>
         <button
           type="button"
           onClick={handleRetry}
-          className="rounded-2xl px-8 py-4 text-base font-semibold transition-all active:scale-95"
-          style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-text-inverse)' }}
+          className="rounded-2xl px-8 py-4 text-base font-bold text-white cursor-pointer active:scale-[0.98]"
+          style={{ backgroundColor: MISTAKE_THEME.accent }}
         >
           Tentar novamente
         </button>
         <button
           type="button"
-          onClick={() => router.push('/profile')}
-          className="text-sm transition-opacity hover:opacity-70"
-          style={{ color: 'var(--color-text-muted)' }}
+          onClick={goProfile}
+          className="text-sm font-semibold text-text-muted hover:text-text-primary transition-colors cursor-pointer"
         >
           Voltar ao perfil
         </button>
@@ -221,140 +239,63 @@ function ReviewContent() {
     );
   }
 
-  // ── Complete ───────────────────────────────────────────────────────────────
-  if (phase === 'complete') {
-    const finalCorrect = correctCount;
-    const allCorrect = finalCorrect >= TOTAL;
-    const pct = Math.round((finalCorrect / TOTAL) * 100);
+  if (!mistake) return null;
 
+  if (phase === 'ready') {
     return (
-      <div
-        className="flex min-h-dvh flex-col items-center justify-center gap-6 px-5 py-12 text-center"
-        style={{ backgroundColor: 'var(--color-bg)' }}
+      <MistakeReviewShell
+        current={0}
+        total={exercises.length || MISTAKE_REVIEW_TOTAL}
+        grammarFocus={mistake.grammarFocus}
+        onClose={goProfile}
       >
-        <div
-          className="flex h-20 w-20 items-center justify-center rounded-full"
-          style={{
-            backgroundColor: allCorrect
-              ? 'var(--color-success-bg)'
-              : 'var(--color-primary-light)',
-          }}
-        >
-          {allCorrect
-            ? <Trophy size={40} style={{ color: 'var(--color-success)' }} />
-            : <RefreshCw size={40} style={{ color: 'var(--color-primary)' }} />}
-        </div>
-
-        <div>
-          <h1
-            className="font-display text-3xl font-bold"
-            style={{ color: allCorrect ? 'var(--color-success)' : 'var(--color-text-primary)' }}
-          >
-            {allCorrect ? 'Erro revisado!' : `${pct}% de acerto`}
-          </h1>
-          <p className="mt-2 text-base" style={{ color: 'var(--color-text-secondary)' }}>
-            {allCorrect
-              ? 'Você acertou todos os exercícios. Este erro foi removido do seu perfil.'
-              : `Você acertou ${finalCorrect} de ${TOTAL} exercícios. Continue praticando!`}
-          </p>
-        </div>
-
-        {mistake && (
-          <div
-            className="w-full max-w-sm rounded-2xl px-4 py-3 text-left"
-            style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
-          >
-            <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--color-text-muted)' }}>
-              Tópico revisado
-            </p>
-            <p className="mt-1 text-sm font-semibold" style={{ color: 'var(--color-text-primary)' }}>
-              {mistake.grammarFocus}
-            </p>
-          </div>
-        )}
-
-        <div className="flex w-full max-w-sm flex-col gap-3">
-          {!allCorrect && (
-            <button
-              type="button"
-              onClick={handleRetry}
-              className="rounded-2xl px-6 py-4 text-base font-semibold transition-all active:scale-95"
-              style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-text-inverse)' }}
-            >
-              Tentar novamente
-            </button>
-          )}
-          <button
-            type="button"
-            onClick={handleComplete}
-            className="rounded-2xl px-6 py-4 text-base font-semibold transition-all active:scale-95"
-            style={{
-              backgroundColor: allCorrect ? 'var(--color-success)' : 'var(--color-surface)',
-              color: allCorrect ? 'var(--color-text-inverse)' : 'var(--color-text-primary)',
-              border: allCorrect ? 'none' : '1px solid var(--color-border)',
-            }}
-          >
-            {allCorrect ? 'Voltar ao perfil' : 'Voltar ao perfil'}
-          </button>
-        </div>
-      </div>
+        <MistakeReviewIntro
+          mistake={mistake}
+          totalExercises={exercises.length}
+          onStart={() => setPhase('practice')}
+          onClose={goProfile}
+        />
+      </MistakeReviewShell>
     );
   }
 
-  // ── Practice ───────────────────────────────────────────────────────────────
-  return (
-    <div
-      className="flex min-h-dvh flex-col"
-      style={{ backgroundColor: 'var(--color-bg)' }}
-    >
-      {/* Header */}
-      <div
-        className="sticky top-0 z-10 flex items-center gap-3 px-5 pt-5 pb-3"
-        style={{ borderBottom: '1px solid var(--color-border)', backgroundColor: 'var(--color-bg)' }}
+  if (phase === 'complete') {
+    return (
+      <MistakeReviewShell
+        current={exercises.length}
+        total={exercises.length}
+        grammarFocus={mistake.grammarFocus}
+        onClose={goProfile}
       >
-        <button
-          type="button"
-          onClick={() => router.push('/profile')}
-          aria-label="Voltar ao perfil"
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-all active:scale-90"
-          style={{ backgroundColor: 'var(--color-surface-raised)', color: 'var(--color-text-muted)' }}
-        >
-          <X size={18} />
-        </button>
+        <MistakeReviewComplete
+          mistake={mistake}
+          correctCount={correctCount}
+          totalExercises={exercises.length}
+          onRetry={handleRetry}
+          onFinish={handleComplete}
+          finishing={finishing}
+        />
+      </MistakeReviewShell>
+    );
+  }
 
-        <div className="flex-1 min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-widest truncate" style={{ color: 'var(--color-error)' }}>
-            Revisão de erros
-          </p>
-          {mistake && (
-            <p className="text-xs truncate" style={{ color: 'var(--color-text-muted)' }}>
-              {mistake.grammarFocus}
-            </p>
-          )}
-        </div>
-
-        {/* Progress dots */}
-        <div className="flex gap-1 shrink-0">
-          {exercises.map((_, i) => (
-            <div
-              key={i}
-              className="h-1.5 w-6 rounded-full transition-colors duration-300"
-              style={{
-                backgroundColor:
-                  i < currentIndex
-                    ? 'var(--color-success)'
-                    : i === currentIndex
-                      ? 'var(--color-error)'
-                      : 'var(--color-border)',
-              }}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* Exercise */}
-      <div className="px-5 pb-56 pt-6 mx-auto w-full max-w-lg md:max-w-2xl lg:max-w-4xl">
-        {currentExercise && mistake && (
+  return (
+    <MistakeReviewShell
+      current={currentIndex + 1}
+      total={exercises.length}
+      grammarFocus={mistake.grammarFocus}
+      onClose={goProfile}
+      footer={
+        <CheckButton
+          state={checkState}
+          correctAnswer={correctAnswerForBanner}
+          onCheck={handleCheck}
+          onContinue={handleContinue}
+        />
+      }
+    >
+      <div className="px-5 pt-4 pb-4 mx-auto w-full max-w-lg md:max-w-2xl flex flex-col gap-4">
+        {currentExercise && (
           <div key={currentIndex} className="animate-slide-up">
             <LessonPracticeScreen
               exercises={exercises}
@@ -369,15 +310,7 @@ function ReviewContent() {
           </div>
         )}
       </div>
-
-      {/* CheckButton */}
-      <CheckButton
-        state={checkState}
-        correctAnswer={correctAnswerForBanner}
-        onCheck={handleCheck}
-        onContinue={handleContinue}
-      />
-    </div>
+    </MistakeReviewShell>
   );
 }
 
@@ -389,7 +322,7 @@ export default function ReviewPage() {
           className="flex min-h-dvh items-center justify-center"
           style={{ backgroundColor: 'var(--color-bg)' }}
         >
-          <Loader2 size={36} className="animate-spin" style={{ color: 'var(--color-primary)' }} />
+          <Loader2 size={36} className="animate-spin text-error" />
         </div>
       }
     >

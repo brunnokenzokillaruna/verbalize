@@ -7,6 +7,13 @@ import {
 
 const DISTRACTOR_SUFFIXES = ['s', 'ent', 'ons', 'ez', 'ai', 'ais', 'ait', 'ions'];
 
+/** Tempos mais comuns no sprint — evita cair em subjuntivo cedo demais. */
+export const SPRINT_TENSE_KEYS = ['present', 'past', 'imperfect', 'future', 'conditional'] as const;
+
+export type GenerateLocalDrillOptions = {
+  allowedTenses?: readonly string[];
+};
+
 /**
  * Ensures exactly 4 unique options: 1 correct form + 3 distinct distractors.
  * Returns null when not enough unique distractors can be built.
@@ -74,8 +81,15 @@ function pickExampleForDrill(
   };
 }
 
-export function generateLocalDrill(verbDoc: VerbDocument): ConjugationSpeedData {
-  const tenses = Object.keys(verbDoc.conjugations);
+export function generateLocalDrill(
+  verbDoc: VerbDocument,
+  config: GenerateLocalDrillOptions = {},
+): ConjugationSpeedData {
+  const allowed = config.allowedTenses ?? SPRINT_TENSE_KEYS;
+  const availableTenses = Object.keys(verbDoc.conjugations).filter((t) =>
+    allowed.includes(t),
+  );
+  const tenses = availableTenses.length > 0 ? availableTenses : Object.keys(verbDoc.conjugations);
   const randomTense = tenses[Math.floor(Math.random() * tenses.length)];
   const rawForms = (verbDoc.conjugations as Record<string, Record<string, string>>)[randomTense];
 

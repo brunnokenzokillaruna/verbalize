@@ -61,7 +61,7 @@ export function LessonVocabularyScreen({
       )}
 
       {/* Vocabulary Card Grid - Balanced 2-column Grid */}
-      <div className="grid grid-cols-2 gap-4 pb-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 pb-4">
         {[...new Set(newVocabulary)].map((word, idx) => {
           const img = vocabImages[word];
           const translation = vocabTranslations[word] ?? word;

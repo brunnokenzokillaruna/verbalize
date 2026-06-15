@@ -2,6 +2,7 @@
 
 import { Volume2, Square, Loader2 } from 'lucide-react';
 import { useAudio } from '@/hooks/useAudio';
+import { getStudioVoiceName } from '@/lib/voiceConfig';
 import type { SupportedLanguage } from '@/types';
 
 interface AudioPlayerButtonProps {
@@ -21,7 +22,7 @@ export function AudioPlayerButton({
   language,
   size = 'md',
 }: AudioPlayerButtonProps) {
-  const { toggle, isPlaying, isLoading } = useAudio();
+  const { toggle, isPlaying, isLoading } = useAudio(getStudioVoiceName(language));
   const s = SIZE[size];
   const busy = isPlaying || isLoading;
 

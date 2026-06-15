@@ -2,7 +2,8 @@
 
 import { ArrowRight } from 'lucide-react';
 import { AudioPlayerButton } from '../../AudioPlayerButton';
-import { HighlightedText, LANG_LABEL, stripHighlights, TargetPhrase } from '../shared';
+import { HighlightedText, stripHighlights, TargetPhrase } from '../shared';
+import { LanguageFlag } from '@/components/LanguageFlag';
 import type { RegraStep } from '@/lib/grammarBridgeSteps';
 import type { SupportedLanguage } from '@/types';
 import type { WordClickPayload } from '../../ClickableWord';
@@ -66,7 +67,7 @@ export function RegraStepView({
           <div className="p-3.5 bg-[var(--color-primary-light)]/10 rounded-b-2xl">
             <div className="flex items-center justify-between gap-2 mb-1.5">
               <span className="text-[9px] font-black text-[var(--color-primary)] uppercase tracking-wider">
-                {LANG_LABEL[language]}
+              <LanguageFlag language={language} size="xs" />
               </span>
               <AudioPlayerButton text={stripHighlights(bridge.target)} language={language} size="sm" />
             </div>

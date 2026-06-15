@@ -12,6 +12,8 @@ import {
   approveImageCacheEntry,
 } from '@/app/actions/adminImages';
 import type { ImageCacheDocument } from '@/types';
+import { LanguageFlag } from '@/components/LanguageFlag';
+import type { SupportedLanguage } from '@/types';
 
 export function ImageCacheManager() {
   const [entries, setEntries] = useState<ImageCacheDocument[]>([]);
@@ -176,10 +178,11 @@ export function ImageCacheManager() {
         </p>
         {langSuffix && (
           <span
-            className="rounded-full px-2 py-0.5 text-xs font-medium"
+            className="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium"
             style={{ backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)' }}
           >
-            {langSuffix === 'fr' ? '🇫🇷 FR' : '🇬🇧 EN'}
+            <LanguageFlag language={langSuffix as SupportedLanguage} size="xs" />
+            {langSuffix === 'fr' ? 'Francês' : 'Inglês'}
           </span>
         )}
       </div>

@@ -15,6 +15,8 @@ interface ConjugationSpeedExerciseProps {
   answered: boolean;
   setIsExerciseReady: (ready: boolean) => void;
   submitTrigger: number;
+  /** 'drill' hides lesson header and uses verb accent colors */
+  variant?: 'lesson' | 'drill';
 }
 
 export function ConjugationSpeedExercise({
@@ -24,6 +26,7 @@ export function ConjugationSpeedExercise({
   answered,
   setIsExerciseReady,
   submitTrigger,
+  variant = 'lesson',
 }: ConjugationSpeedExerciseProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
@@ -73,53 +76,61 @@ export function ConjugationSpeedExercise({
     onAnswer(shuffledOptions[index].text === correctVerbForm);
   }
 
+  const isDrill = variant === 'drill';
+  const accent = isDrill ? 'var(--color-verb)' : '#6366f1';
+  const accentBg = isDrill ? 'var(--color-verb-bg)' : 'rgba(99,102,241,0.08)';
+  const accentBorder = isDrill ? 'rgba(124, 58, 237, 0.25)' : 'rgba(99,102,241,0.25)';
+  const accentSoft = isDrill ? 'rgba(124, 58, 237, 0.08)' : 'rgba(99,102,241,0.06)';
+  const accentSoftEnd = isDrill ? 'rgba(124, 58, 237, 0.04)' : 'rgba(139,92,246,0.06)';
+
   return (
     <div className="flex flex-col gap-7">
-      {/* Header badge */}
-      <div
-        className="flex items-start gap-3 rounded-xl p-4"
-        style={{
-          backgroundColor: 'rgba(99,102,241,0.08)',
-          border: '1px solid rgba(99,102,241,0.25)',
-        }}
-      >
+      {!isDrill && (
         <div
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-base"
-          style={{ backgroundColor: 'rgba(99,102,241,0.15)' }}
+          className="flex items-start gap-3 rounded-xl p-4"
+          style={{
+            backgroundColor: accentBg,
+            border: `1px solid ${accentBorder}`,
+          }}
         >
-          ⚡
-        </div>
-        <div className="flex flex-col gap-1">
-          <span
-            className="text-[9px] font-black uppercase tracking-[0.2em]"
-            style={{ color: '#6366f1' }}
+          <div
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-base"
+            style={{ backgroundColor: isDrill ? 'rgba(124,58,237,0.15)' : 'rgba(99,102,241,0.15)' }}
           >
-            Conjugação Relâmpago
-          </span>
-          <p
-            className="text-sm font-medium leading-relaxed"
-            style={{ color: 'var(--color-text-primary)' }}
-          >
-            Conjugue o verbo rapidamente!
-          </p>
+            ⚡
+          </div>
+          <div className="flex flex-col gap-1">
+            <span
+              className="text-[9px] font-black uppercase tracking-[0.2em]"
+              style={{ color: accent }}
+            >
+              Conjugação Relâmpago
+            </span>
+            <p
+              className="text-sm font-medium leading-relaxed"
+              style={{ color: 'var(--color-text-primary)' }}
+            >
+              Conjugue o verbo rapidamente!
+            </p>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Verb + pronoun challenge card */}
       <div
         className="rounded-2xl p-6 text-center"
         style={{
-          background: 'linear-gradient(135deg, rgba(99,102,241,0.06) 0%, rgba(139,92,246,0.06) 100%)',
-          border: '2px solid rgba(99,102,241,0.2)',
+          background: `linear-gradient(135deg, ${accentSoft} 0%, ${accentSoftEnd} 100%)`,
+          border: `2px solid ${accentBorder}`,
         }}
       >
         <p className="text-[10px] font-black uppercase tracking-[0.25em] mb-3 opacity-60" style={{ color: 'var(--color-text-muted)' }}>
           {tenseLabel}
         </p>
-        <div className="flex items-baseline justify-center gap-3">
+        <div className="flex items-baseline justify-center gap-3 flex-wrap">
           <span
             className="text-2xl font-black"
-            style={{ color: '#6366f1' }}
+            style={{ color: accent }}
           >
             {data.pronoun}
           </span>

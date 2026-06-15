@@ -1,18 +1,29 @@
 'use client';
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
-import { RotateCw, X as XIcon, Check as CheckIcon } from 'lucide-react';
+import {
+  RotateCw,
+  X as XIcon,
+  Check as CheckIcon,
+  ArrowLeft,
+  ArrowRight,
+  Flame,
+} from 'lucide-react';
 import { AudioPlayerButton } from '@/components/lesson/AudioPlayerButton';
 import { ReviewSessionShell } from './ReviewSessionShell';
 import { ReviewResultsScreen } from './ReviewResultsScreen';
+import { REVIEW_THEMES } from './reviewThemes';
 import type { UserVocabularyDocument, SupportedLanguage } from '@/types';
 import type { ReviewResult } from './reviewTypes';
 import { isMissingTranslation } from '@/utils/vocabHelpers';
 
 type CardDirection = 'fr-to-pt' | 'pt-to-fr';
+type CardExit = 'none' | 'left' | 'right';
 
-const FLIP_DURATION_MS = 500;
+const FLIP_DURATION_MS = 480;
+const EXIT_DURATION_MS = 320;
+const THEME = REVIEW_THEMES.flashcard;
 
 interface FlashcardReviewSessionProps {
   state: 'ready' | 'running' | 'done';
@@ -21,6 +32,7 @@ interface FlashcardReviewSessionProps {
   results: ReviewResult[];
   language: SupportedLanguage;
   savingResults: boolean;
+  hasMoreDue?: boolean;
   onStart: () => void;
   onAnswer: (correct: boolean) => void;
   onFinish: () => void;
@@ -40,6 +52,7 @@ export function FlashcardReviewSession({
   results,
   language,
   savingResults,
+  hasMoreDue,
   onStart,
   onAnswer,
   onFinish,
@@ -47,9 +60,11 @@ export function FlashcardReviewSession({
 }: FlashcardReviewSessionProps) {
   const [isFlipped, setIsFlipped] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [cardExit, setCardExit] = useState<CardExit>('none');
   const [streak, setStreak] = useState(0);
   const touchStartX = useRef<number | null>(null);
   const flipTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const exitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const total = items.length;
   const currentItem = state === 'running' ? items[currentIdx] : null;
 
@@ -61,21 +76,24 @@ export function FlashcardReviewSession({
   useEffect(() => {
     setIsFlipped(false);
     setIsAnimating(false);
+    setCardExit('none');
   }, [currentIdx, state]);
 
   useEffect(() => {
     return () => {
       if (flipTimerRef.current) clearTimeout(flipTimerRef.current);
+      if (exitTimerRef.current) clearTimeout(exitTimerRef.current);
     };
   }, []);
 
   if (state === 'done') {
     return (
       <ReviewResultsScreen
-        title="Cartões concluídos"
+        theme={THEME}
         results={results}
         sessionItems={items}
         savingResults={savingResults}
+        hasMoreDue={hasMoreDue}
         correctLabel="Lembrei"
         incorrectLabel="Esqueci"
         onFinish={onFinish}
@@ -86,59 +104,42 @@ export function FlashcardReviewSession({
 
   if (state === 'ready') {
     return (
-      <ReviewSessionShell
-        modeLabel="Cartões"
-        current={0}
-        total={total}
-        onCloseRequest={onClose}
-      >
+      <ReviewSessionShell theme={THEME} current={0} total={total} onCloseRequest={onClose}>
         <div className="flex-1 flex flex-col items-center justify-center px-6 py-8 mx-auto max-w-lg w-full text-center gap-8">
           <div>
-            <h2 className="font-display text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
-              Pronto para revisar?
+            <h2 className="font-display text-2xl font-bold text-text-primary">
+              Baralho pronto
             </h2>
-            <p className="text-sm mt-2" style={{ color: 'var(--color-text-secondary)' }}>
-              {total} cartões nesta sessão
+            <p className="text-sm mt-2 text-text-secondary">
+              {total} cartões · vire, ouça e avalie sua memória
             </p>
           </div>
 
-          <div className="flex flex-col gap-4 w-full">
-            {[
-              { step: '1', text: 'Veja a palavra ou tradução' },
-              { step: '2', text: 'Toque para revelar a resposta' },
-              { step: '3', text: 'Avalie se você lembrou' },
-            ].map((item) => (
+          <div className="relative w-full max-w-[220px] aspect-[3/4]">
+            {[2, 1, 0].map((layer) => (
               <div
-                key={item.step}
-                className="flex items-center gap-4 rounded-xl px-4 py-3 border"
+                key={layer}
+                className="absolute inset-0 rounded-2xl border-2 border-primary/20"
                 style={{
                   backgroundColor: 'var(--color-surface)',
-                  borderColor: 'var(--color-border)',
+                  transform: `translateY(${layer * -6}px) rotate(${layer * -2}deg)`,
+                  zIndex: layer,
+                  boxShadow: layer === 0 ? '0 12px 32px rgba(29,94,212,0.12)' : undefined,
                 }}
-              >
-                <span
-                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold"
-                  style={{ backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)' }}
-                >
-                  {item.step}
-                </span>
-                <span className="text-sm font-semibold" style={{ color: 'var(--color-text-primary)' }}>
-                  {item.text}
-                </span>
-              </div>
+              />
             ))}
           </div>
 
           <button
             type="button"
             onClick={onStart}
-            className="w-full rounded-2xl px-6 py-4 text-base font-semibold text-white transition-all active:scale-[0.98]"
+            className="w-full rounded-2xl px-6 py-4 text-base font-bold text-white transition-all active:scale-[0.98] cursor-pointer"
             style={{
-              backgroundColor: 'var(--color-primary)',
-              boxShadow: '0 4px 16px rgba(29, 94, 212, 0.3)',
+              backgroundColor: THEME.accent,
+              boxShadow: `0 3px 0 ${THEME.accentDark}`,
             }}
           >
-            Começar cartões
+            Virar primeiro cartão
           </button>
         </div>
       </ReviewSessionShell>
@@ -148,91 +149,102 @@ export function FlashcardReviewSession({
   if (!currentItem) return null;
 
   const direction = directions[currentIdx];
-  const targetLangLabel = language === 'fr' ? 'francês' : 'inglês';
+  const targetLangLabel = language === 'fr' ? 'FR' : 'EN';
+  const directionLabel =
+    direction === 'fr-to-pt' ? `${targetLangLabel} → PT` : `PT → ${targetLangLabel}`;
   const promptText =
-    direction === 'fr-to-pt' ? 'Qual é a tradução?' : `Como se diz em ${targetLangLabel}?`;
-  const frontText =
-    direction === 'fr-to-pt' ? currentItem.word : currentItem.translation;
-  const backWord = currentItem.word;
-  const backTranslation = currentItem.translation;
-  const audioText = direction === 'fr-to-pt' ? currentItem.word : currentItem.word;
+    direction === 'fr-to-pt' ? 'Qual é a tradução?' : 'Como se diz no idioma alvo?';
+  const frontText = direction === 'fr-to-pt' ? currentItem.word : currentItem.translation;
+
+  function advanceAfterExit(correct: boolean) {
+    exitTimerRef.current = setTimeout(() => {
+      setCardExit('none');
+      setIsAnimating(false);
+      onAnswer(correct);
+    }, EXIT_DURATION_MS);
+  }
 
   function handleAnswer(correct: boolean) {
-    if (isAnimating) return;
+    if (isAnimating || cardExit !== 'none') return;
 
     if (correct) setStreak((s) => s + 1);
     else setStreak(0);
 
-    // Flip back to the front before advancing — avoids showing the next card's answer mid-animation
+    setIsAnimating(true);
+    setCardExit(correct ? 'right' : 'left');
+
     if (isFlipped) {
-      setIsAnimating(true);
       setIsFlipped(false);
       flipTimerRef.current = setTimeout(() => {
-        setIsAnimating(false);
-        onAnswer(correct);
+        advanceAfterExit(correct);
       }, FLIP_DURATION_MS);
       return;
     }
 
-    onAnswer(correct);
+    advanceAfterExit(correct);
   }
 
   function handleTouchStart(e: React.TouchEvent) {
+    if (!isFlipped) return;
     touchStartX.current = e.touches[0].clientX;
   }
 
   function handleTouchEnd(e: React.TouchEvent) {
     if (!isFlipped || touchStartX.current === null) return;
     const delta = e.changedTouches[0].clientX - touchStartX.current;
-    if (delta > 60) handleAnswer(true);
-    else if (delta < -60) handleAnswer(false);
+    if (delta > 50) handleAnswer(true);
+    else if (delta < -50) handleAnswer(false);
     touchStartX.current = null;
   }
 
+  const exitTransform =
+    cardExit === 'left'
+      ? 'translateX(-120%) rotate(-12deg)'
+      : cardExit === 'right'
+        ? 'translateX(120%) rotate(12deg)'
+        : 'translateX(0) rotate(0)';
+
   const footer = (
     <div
-      className="px-5 pt-3 flex gap-4 transition-all duration-300"
+      className="px-5 pt-2 flex gap-3 transition-all duration-300"
       style={{
-        opacity: isFlipped && !isAnimating ? 1 : 0,
-        pointerEvents: isFlipped && !isAnimating ? 'auto' : 'none',
-        paddingBottom: 'max(2rem, env(safe-area-inset-bottom))',
+        opacity: isFlipped && !isAnimating && cardExit === 'none' ? 1 : 0,
+        pointerEvents: isFlipped && !isAnimating && cardExit === 'none' ? 'auto' : 'none',
+        paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom))',
       }}
     >
       <button
         type="button"
         onClick={() => handleAnswer(false)}
-        className="flex-1 flex flex-col items-center justify-center gap-2 rounded-2xl py-5 transition-all active:scale-[0.98]"
+        className="flex-1 flex items-center justify-center gap-2 rounded-2xl py-4 font-bold text-sm transition-all active:scale-[0.97] cursor-pointer border-2"
         style={{
           backgroundColor: 'var(--color-error-bg)',
-          border: '2px solid rgba(239, 68, 68, 0.3)',
+          borderColor: 'rgba(239, 68, 68, 0.35)',
+          color: 'var(--color-error)',
+          boxShadow: '0 3px 0 rgba(220, 38, 38, 0.2)',
         }}
       >
-        <div className="flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: '#ef4444' }}>
-          <XIcon size={24} color="#fff" strokeWidth={3} />
-        </div>
-        <span className="text-sm font-bold" style={{ color: '#ef4444' }}>Esqueci</span>
+        <ArrowLeft size={18} />
+        Esqueci
       </button>
-
       <button
         type="button"
         onClick={() => handleAnswer(true)}
-        className="flex-1 flex flex-col items-center justify-center gap-2 rounded-2xl py-5 transition-all active:scale-[0.98]"
+        className="flex-1 flex items-center justify-center gap-2 rounded-2xl py-4 font-bold text-sm text-white transition-all active:scale-[0.97] cursor-pointer"
         style={{
-          backgroundColor: 'var(--color-success-bg)',
-          border: '2px solid rgba(16, 185, 129, 0.3)',
+          backgroundColor: 'var(--color-success)',
+          boxShadow: '0 3px 0 #047857',
         }}
       >
-        <div className="flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: 'var(--color-success)' }}>
-          <CheckIcon size={24} color="#fff" strokeWidth={3} />
-        </div>
-        <span className="text-sm font-bold" style={{ color: 'var(--color-success)' }}>Lembrei</span>
+        Lembrei
+        <ArrowRight size={18} />
       </button>
     </div>
   );
 
   return (
     <ReviewSessionShell
-      modeLabel="Cartões"
+      theme={THEME}
       current={currentIdx + 1}
       total={total}
       onCloseRequest={onClose}
@@ -241,112 +253,159 @@ export function FlashcardReviewSession({
       <div className="flex-1 px-5 py-4 mx-auto max-w-lg w-full flex flex-col items-center justify-center">
         {streak >= 2 && (
           <div
-            className="mb-4 px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest animate-in zoom-in"
+            className="mb-4 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest animate-scale-in"
             style={{ backgroundColor: 'var(--color-warning-bg)', color: 'var(--color-warning)' }}
           >
-            {streak} em sequência!
+            <Flame size={13} fill="currentColor" />
+            {streak} seguidos
           </div>
         )}
 
-        <div
-          className="relative w-full aspect-[3/4] max-h-[58vh] transition-all duration-500 rounded-3xl"
-          style={{
-            perspective: '1000px',
-            transformStyle: 'preserve-3d',
-            cursor: !isFlipped && !isAnimating ? 'pointer' : 'default',
-          }}
-          onClick={() => {
-            if (!isFlipped && !isAnimating) setIsFlipped(true);
-          }}
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
-        >
-          {/* Front */}
+        <div className="relative w-full max-w-sm">
+          {/* Deck stack behind */}
           <div
-            className="absolute inset-0 flex flex-col rounded-3xl overflow-hidden"
-            style={{
-              backgroundColor: 'var(--color-surface)',
-              border: '2px solid var(--color-primary)',
-              boxShadow: '0 12px 40px rgba(29, 94, 212, 0.15)',
-              backfaceVisibility: 'hidden',
-              transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
-              transition: `transform ${FLIP_DURATION_MS}ms cubic-bezier(0.4, 0.0, 0.2, 1)`,
-            }}
-          >
-            {currentItem.imageUrl && (
-              <div className="relative w-full h-[45%] shrink-0">
-                <Image
-                  src={currentItem.imageUrl}
-                  alt={currentItem.word}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, 400px"
-                />
-                <div
-                  className="absolute inset-0"
-                  style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.35) 0%, transparent 50%)' }}
-                />
-              </div>
-            )}
+            className="absolute inset-0 rounded-3xl border border-border translate-y-3 scale-[0.96] opacity-50"
+            style={{ backgroundColor: 'var(--color-surface)' }}
+            aria-hidden
+          />
+          <div
+            className="absolute inset-0 rounded-3xl border border-border translate-y-1.5 scale-[0.98] opacity-70"
+            style={{ backgroundColor: 'var(--color-surface)' }}
+            aria-hidden
+          />
 
-            <div className="flex flex-col items-center justify-center flex-1 p-6 gap-4">
-              <p
-                className="text-xs font-bold uppercase tracking-widest"
-                style={{ color: 'var(--color-primary)' }}
+          {/* Swipe hints */}
+          {isFlipped && cardExit === 'none' && (
+            <>
+              <div
+                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 z-20 flex flex-col items-center gap-1 opacity-40 pointer-events-none"
+                aria-hidden
               >
-                {promptText}
-              </p>
-              <p
-                className="font-display text-4xl font-bold text-center break-words w-full"
-                style={{ color: 'var(--color-text-primary)' }}
+                <XIcon size={16} className="text-error" />
+                <span className="text-[9px] font-bold text-error">esqueci</span>
+              </div>
+              <div
+                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1 z-20 flex flex-col items-center gap-1 opacity-40 pointer-events-none"
+                aria-hidden
               >
-                {frontText}
-              </p>
-              {direction === 'fr-to-pt' && (
-                <AudioPlayerButton text={audioText} language={language} size="lg" />
+                <CheckIcon size={16} className="text-success" />
+                <span className="text-[9px] font-bold text-success">lembrei</span>
+              </div>
+            </>
+          )}
+
+          <div
+            className="relative w-full aspect-[3/4] max-h-[56vh] transition-transform duration-300 ease-out outline-none"
+            style={{
+              perspective: '1100px',
+              transform: exitTransform,
+              transitionDuration: cardExit !== 'none' ? `${EXIT_DURATION_MS}ms` : undefined,
+              cursor: !isFlipped && !isAnimating && cardExit === 'none' ? 'pointer' : 'default',
+            }}
+            tabIndex={isFlipped && cardExit === 'none' ? 0 : -1}
+            onKeyDown={(e) => {
+              if (!isFlipped || isAnimating || cardExit !== 'none') return;
+              if (e.key === 'ArrowLeft') handleAnswer(false);
+              if (e.key === 'ArrowRight') handleAnswer(true);
+            }}
+            onClick={() => {
+              if (!isFlipped && !isAnimating && cardExit === 'none') setIsFlipped(true);
+            }}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          >
+            {/* Front */}
+            <div
+              className="absolute inset-0 flex flex-col rounded-3xl overflow-hidden"
+              style={{
+                backgroundColor: 'var(--color-surface)',
+                border: `2px solid ${THEME.accent}`,
+                boxShadow: '0 16px 40px rgba(29, 94, 212, 0.18)',
+                backfaceVisibility: 'hidden',
+                transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
+                transition: `transform ${FLIP_DURATION_MS}ms cubic-bezier(0.4, 0, 0.2, 1)`,
+              }}
+            >
+              <div
+                className="flex items-center justify-between px-4 py-2.5 border-b border-border"
+                style={{ backgroundColor: THEME.accentLight }}
+              >
+                <span
+                  className="text-[10px] font-extrabold uppercase tracking-widest px-2 py-0.5 rounded-full"
+                  style={{ backgroundColor: THEME.accent, color: '#fff' }}
+                >
+                  {directionLabel}
+                </span>
+                <span className="text-[10px] font-bold text-text-muted">
+                  {currentIdx + 1} de {total}
+                </span>
+              </div>
+
+              {currentItem.imageUrl && (
+                <div className="relative w-full h-[42%] shrink-0">
+                  <Image
+                    src={currentItem.imageUrl}
+                    alt={currentItem.word}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 400px"
+                  />
+                  <div
+                    className="absolute inset-0"
+                    style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 55%)' }}
+                  />
+                </div>
+              )}
+
+              <div className="flex flex-col items-center justify-center flex-1 p-6 gap-3">
+                <p className="text-[10px] font-extrabold uppercase tracking-widest text-primary">
+                  {promptText}
+                </p>
+                <p className="font-display text-4xl font-bold text-center break-words w-full text-text-primary">
+                  {frontText}
+                </p>
+                {direction === 'fr-to-pt' && (
+                  <AudioPlayerButton text={currentItem.word} language={language} size="lg" />
+                )}
+              </div>
+
+              {!isFlipped && (
+                <div className="flex justify-center pb-5">
+                  <div
+                    className="flex items-center gap-2 px-4 py-2 rounded-full"
+                    style={{ backgroundColor: THEME.accentLight }}
+                  >
+                    <RotateCw size={14} className="text-primary" />
+                    <span className="text-xs font-bold text-primary">Toque para revelar</span>
+                  </div>
+                </div>
               )}
             </div>
 
-            {!isFlipped && (
-              <div className="flex justify-center pb-6">
-                <div
-                  className="flex items-center gap-2 px-4 py-2 rounded-full animate-bounce"
-                  style={{ backgroundColor: 'var(--color-primary-light)' }}
-                >
-                  <RotateCw size={14} style={{ color: 'var(--color-primary)' }} />
-                  <span className="text-xs font-semibold" style={{ color: 'var(--color-primary)' }}>
-                    Toque para virar
-                  </span>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Back */}
-          <div
-            className="absolute inset-0 flex flex-col items-center justify-center p-8 rounded-3xl"
-            style={{
-              backgroundColor: 'var(--color-surface)',
-              border: '2px solid var(--color-border)',
-              boxShadow: '0 8px 30px rgba(0, 0, 0, 0.05)',
-              backfaceVisibility: 'hidden',
-              transform: isFlipped ? 'rotateY(0deg)' : 'rotateY(-180deg)',
-              transition: `transform ${FLIP_DURATION_MS}ms cubic-bezier(0.4, 0.0, 0.2, 1)`,
-            }}
-          >
-            <p className="font-display text-xl font-bold mb-1 text-center" style={{ color: 'var(--color-text-muted)' }}>
-              {backWord}
-            </p>
-            <div className="w-12 h-1 rounded-full mb-4" style={{ backgroundColor: 'var(--color-border)' }} />
-            <p className="text-3xl font-semibold text-center mb-4" style={{ color: 'var(--color-vocab)' }}>
-              {backTranslation}
-            </p>
-            <AudioPlayerButton text={backWord} language={language} size="md" />
-            {isFlipped && (
-              <p className="text-[10px] mt-6 font-medium" style={{ color: 'var(--color-text-muted)' }}>
-                Deslize ← esqueci · lembrei →
+            {/* Back */}
+            <div
+              className="absolute inset-0 flex flex-col items-center justify-center p-8 rounded-3xl"
+              style={{
+                background: `linear-gradient(160deg, var(--color-surface) 0%, ${THEME.accentLight} 100%)`,
+                border: `2px solid ${THEME.accent}`,
+                boxShadow: '0 12px 32px rgba(29, 94, 212, 0.12)',
+                backfaceVisibility: 'hidden',
+                transform: isFlipped ? 'rotateY(0deg)' : 'rotateY(-180deg)',
+                transition: `transform ${FLIP_DURATION_MS}ms cubic-bezier(0.4, 0, 0.2, 1)`,
+              }}
+            >
+              <p className="font-display text-lg font-bold text-text-muted">{currentItem.word}</p>
+              <div className="w-10 h-0.5 rounded-full my-3 bg-border" />
+              <p className="font-display text-3xl font-bold text-center text-vocab">
+                {currentItem.translation}
               </p>
-            )}
+              <div className="mt-5">
+                <AudioPlayerButton text={currentItem.word} language={language} size="md" />
+              </div>
+              <p className="text-[10px] mt-6 font-medium text-text-muted text-center">
+                Deslize ou use ← → para avaliar
+              </p>
+            </div>
           </div>
         </div>
       </div>

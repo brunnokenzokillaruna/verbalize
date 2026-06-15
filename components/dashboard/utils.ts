@@ -23,7 +23,7 @@ export function getLessonNodeColors(
   const nodeColors: NodeStyle = isCompleted
     ? {
         backgroundColor: 'var(--color-success)',
-        color: 'var(--color-text-inverse)',
+        color: 'var(--color-on-accent)',
         boxShadow:
           'inset 0 -4px 0 rgba(0,0,0,0.15), inset 0 4px 0 rgba(255,255,255,0.2), 0 8px 0 var(--color-success)',
         border: '2px solid rgba(255,255,255,0.1)',
@@ -31,7 +31,7 @@ export function getLessonNodeColors(
     : isCurrent
       ? {
           backgroundColor: 'var(--color-primary)',
-          color: 'var(--color-text-inverse)',
+          color: 'var(--color-on-accent)',
           boxShadow:
             'inset 0 -4px 0 rgba(0,0,0,0.15), inset 0 5px 0 rgba(255,255,255,0.25), 0 8px 0 var(--color-primary-dark), 0 8px 24px rgba(29,94,212,0.4)',
           border: '2px solid rgba(255,255,255,0.15)',
@@ -46,7 +46,7 @@ export function getLessonNodeColors(
 
   return {
     backgroundColor: isCompleted || isCurrent ? 'var(--color-vocab)' : inactiveBg,
-    color: isCompleted || isCurrent ? 'var(--color-text-inverse)' : inactiveIcon,
+    color: isCompleted || isCurrent ? 'var(--color-on-accent)' : inactiveIcon,
     boxShadow:
       isCompleted || isCurrent
         ? 'inset 0 -4px 0 rgba(0,0,0,0.15), inset 0 5px 0 rgba(255,255,255,0.25), 0 8px 0 var(--color-warning), 0 8px 24px rgba(217,119,6,0.35)'

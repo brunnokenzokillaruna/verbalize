@@ -9,6 +9,8 @@ import type { ReviewResult } from '@/components/vocabulary/reviewTypes';
 import type { UserVocabularyDocument, SupportedLanguage, UserDocument } from '@/types';
 import type { User } from 'firebase/auth';
 
+export type ReviewMode = 'flashcard' | 'context' | 'visual';
+
 type ReviewPhase = 'ready' | 'running' | 'done' | null;
 
 export function useVocabReview(
@@ -20,6 +22,7 @@ export function useVocabReview(
 ) {
   const [showPicker, setShowPicker] = useState(false);
   const [sessionItems, setSessionItems] = useState<UserVocabularyDocument[]>([]);
+  const [sessionSeed, setSessionSeed] = useState(0);
   const [flashcardPhase, setFlashcardPhase] = useState<ReviewPhase>(null);
   const [visualPhase, setVisualPhase] = useState<ReviewPhase>(null);
   const [contextPhase, setContextPhase] = useState<'running' | 'done' | null>(null);
@@ -34,6 +37,11 @@ export function useVocabReview(
   const rawDueToday = useMemo(
     () => items.filter((item) => isDueForReview(item)),
     [items],
+  );
+
+  const sessionPreview = useMemo(
+    () => pickReviewSession(rawDueToday),
+    [rawDueToday, sessionSeed],
   );
 
   const wordImageMap = useMemo(
@@ -57,12 +65,25 @@ export function useVocabReview(
     setResults([]);
   }, []);
 
+  const reshuffleSession = useCallback(() => {
+    setSessionSeed((s) => s + 1);
+  }, []);
+
+  const prepareSession = useCallback(() => {
+    const session = pickReviewSession(rawDueToday);
+    setSessionItems(session);
+    setResults([]);
+    setCardIdx(0);
+    setAnswered(false);
+    setLastCorrect(null);
+    return session;
+  }, [rawDueToday]);
+
   const openReviewPicker = useCallback(() => {
     if (!user || rawDueToday.length === 0) return;
-    setSessionItems(pickReviewSession(rawDueToday));
-    setResults([]);
+    prepareSession();
     setShowPicker(true);
-  }, [user, rawDueToday]);
+  }, [user, rawDueToday.length, prepareSession]);
 
   const saveResults = useCallback(
     async (reviewResults: ReviewResult[]) => {
@@ -73,9 +94,71 @@ export function useVocabReview(
       );
       await loadVocabulary();
       setSavingResults(false);
+    },
+    [user, language, loadVocabulary],
+  );
+
+  const startReview = useCallback(
+    async (mode: ReviewMode) => {
+      if (!user || rawDueToday.length === 0) return;
+
+      const session = sessionPreview.length > 0 ? sessionPreview : prepareSession();
+      setSessionItems(session);
+      setResults([]);
+      setCardIdx(0);
+      setAnswered(false);
+      setLastCorrect(null);
+      setShowPicker(false);
+
+      if (mode === 'flashcard') {
+        setFlashcardPhase('running');
+        return;
+      }
+
+      if (mode === 'visual') {
+        setVisualPhase('running');
+        return;
+      }
+
+      setContextLoading(true);
+      const currentLessonId = profile?.lessonProgress?.[language];
+      const currentLesson =
+        (currentLessonId ? getLessonById(currentLessonId) : undefined) ??
+        getNextLesson(language, undefined);
+      const level = currentLesson?.level ?? 'A1';
+      const knownVocabulary = items.map((v) => v.word);
+
+      try {
+        const generated = await generateVocabReview({
+          words: session.map((v) => ({
+            word: v.word,
+            translation: v.translation,
+            imageUrl: v.imageUrl,
+          })),
+          language,
+          level,
+          knownVocabulary,
+        });
+
+        if (!generated || generated.length === 0) return;
+
+        setReviewItems(generated);
+        setContextPhase('running');
+      } catch (err) {
+        console.error('[startReview:context] Failed:', err);
+      } finally {
+        setContextLoading(false);
+      }
+    },
+    [user, rawDueToday.length, sessionPreview, prepareSession, profile, language, items],
+  );
+
+  const finishAndClose = useCallback(
+    async (reviewResults: ReviewResult[]) => {
+      await saveResults(reviewResults);
       closeAllReview();
     },
-    [user, language, loadVocabulary, closeAllReview],
+    [saveResults, closeAllReview],
   );
 
   const startFlashcardMode = useCallback(() => {
@@ -100,7 +183,7 @@ export function useVocabReview(
     [sessionItems, cardIdx],
   );
 
-  const finishFlashcardReview = useCallback(() => saveResults(results), [saveResults, results]);
+  const finishFlashcardReview = useCallback(() => finishAndClose(results), [finishAndClose, results]);
 
   const startVisualMode = useCallback(() => {
     setShowPicker(false);
@@ -136,7 +219,7 @@ export function useVocabReview(
     }
   }, [answered, lastCorrect, sessionItems, cardIdx, results]);
 
-  const finishVisualReview = useCallback(() => saveResults(results), [saveResults, results]);
+  const finishVisualReview = useCallback(() => finishAndClose(results), [finishAndClose, results]);
 
   const startContextMode = useCallback(async () => {
     if (!user) return;
@@ -202,10 +285,11 @@ export function useVocabReview(
     }
   }, [answered, lastCorrect, reviewItems, cardIdx, results]);
 
-  const finishContextReview = useCallback(() => saveResults(results), [saveResults, results]);
+  const finishContextReview = useCallback(() => finishAndClose(results), [finishAndClose, results]);
 
   return {
     rawDueToday,
+    sessionPreview,
     wordImageMap,
     isReviewActive,
     showPicker,
@@ -222,6 +306,8 @@ export function useVocabReview(
     savingResults,
     openReviewPicker,
     closeAllReview,
+    reshuffleSession,
+    startReview,
     startFlashcardMode,
     beginFlashcardSession,
     handleFlashcardAnswer,

@@ -52,11 +52,11 @@ export function ClickableWord({
         role="button"
         tabIndex={0}
         onKeyDown={(e) => e.key === 'Enter' && handleClick(e as never)}
-        className="relative inline-block cursor-pointer select-none rounded-[4px] px-1 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-primary"
+        className="relative inline-block cursor-pointer select-none rounded-[4px] px-0.5 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-primary"
         style={{
           color: mainColor,
-          borderBottom: `1.5px solid ${ripple ? mainColor : rippleBorderColor}`,
-          fontWeight: 600,
+          borderBottom: `2px solid ${ripple ? mainColor : rippleBorderColor}`,
+          fontWeight: 700,
           backgroundColor: ripple ? bgColor : 'transparent',
         }}
         aria-label={`Traduzir: ${word}`}

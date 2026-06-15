@@ -34,75 +34,84 @@ export function VisualVocabCard({
   return (
     <div
       className={[
-        "group relative overflow-hidden rounded-2xl transition-all duration-150 border border-[var(--color-border)] border-b-[4px] shadow-[0_4px_10px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_10px_rgba(0,0,0,0.2)] bg-[var(--color-surface)]",
-        "hover:translate-y-[1px] hover:border-b-[3px] active:translate-y-[2px] active:border-b-[1px]",
-        immersive && !revealed ? "cursor-pointer" : ""
-      ].filter(Boolean).join(" ")}
-      onClick={() => { if (immersive && !revealed) setRevealed(true); }}
+        'group flex flex-col overflow-hidden rounded-2xl border border-border border-b-[3px] bg-surface shadow-sm transition-all duration-150',
+        'hover:translate-y-[1px] hover:border-b-[2px] active:translate-y-[2px] active:border-b-[1px]',
+        immersive && !revealed ? 'cursor-pointer' : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+      onClick={() => {
+        if (immersive && !revealed) setRevealed(true);
+      }}
       role={immersive && !revealed ? 'button' : undefined}
     >
-      {/* Image area with refined treatment */}
       <div
         className="relative w-full overflow-hidden"
-        style={{ aspectRatio: '16/10', backgroundColor: 'var(--color-surface-raised)' }}
+        style={{ aspectRatio: '1 / 1', backgroundColor: 'var(--color-surface-raised)' }}
       >
         {imageUrl ? (
           <Image
             src={imageUrl}
             alt={imageAlt ?? word}
             fill
-            className="object-cover transition-transform duration-700 group-hover:scale-105"
-            sizes="(max-width: 640px) 100vw, 400px"
+            className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+            sizes="(max-width: 640px) 45vw, 220px"
           />
         ) : (
-          <div
-            className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[var(--color-primary-light)] to-transparent opacity-40"
-          >
-            <span className="text-3xl grayscale filter group-hover:scale-110 transition-transform duration-500" role="img" aria-label={word}>
+          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[var(--color-surface-raised)] to-transparent">
+            <span
+              className="text-3xl opacity-60"
+              role="img"
+              aria-label={word}
+            >
               🖼️
             </span>
           </div>
         )}
+      </div>
 
-        {/* Delicate Gradient Overlay */}
-        <div
-          className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent opacity-70 transition-opacity duration-500"
-        />
-
-        {/* Word Overlay with sophisticated typography */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 z-10">
-          <div className="flex flex-col gap-0.5 transform transition-transform duration-300 group-hover:translate-x-0.5">
-            <h3
-              className="font-serif text-2xl font-black italic tracking-tight text-white"
+      <div className="flex flex-col gap-2 px-3 py-3 border-t border-border bg-surface">
+        <div className="flex items-center justify-between gap-2">
+          <div className="min-w-0 flex-1">
+            <p
+              className="font-display text-base sm:text-lg font-bold leading-tight truncate"
+              style={{ color: 'var(--color-vocab)' }}
             >
               {word}
-            </h3>
+            </p>
             {showImmersive ? (
-              <p className="mt-0.5 text-xs font-semibold text-white/80 italic tracking-wide">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setRevealed(true);
+                }}
+                className="mt-0.5 text-left text-[11px] font-medium italic leading-snug text-text-secondary line-clamp-2"
+              >
                 {targetDefinition}
-                <span className="ml-1.5 text-[8px] font-black uppercase text-white/40 not-italic tracking-widest bg-black/35 px-1.5 py-0.5 rounded">toque</span>
-              </p>
+                <span className="ml-1 text-[8px] font-black uppercase not-italic tracking-widest text-text-muted">
+                  · toque
+                </span>
+              </button>
             ) : (
-              <p className="mt-0.5 text-xs font-semibold text-white/95 italic tracking-wide">
+              <p className="mt-0.5 text-xs font-semibold leading-snug text-text-secondary truncate">
                 {translation}
               </p>
             )}
           </div>
-        </div>
-      </div>
-
-      {/* Audio control */}
-      <div className="relative px-4 py-2.5 bg-[var(--color-surface)] border-t border-[var(--color-border)]/50">
-        <div className={`flex items-center gap-3 ${exampleSentence ? 'justify-between' : 'justify-end'}`}>
-          {exampleSentence && (
-            <p className="flex-1 min-w-0 text-[11px] font-medium leading-relaxed text-[var(--color-text-secondary)] opacity-75 italic line-clamp-2 group-hover:opacity-100 transition-opacity">
-              &quot;{exampleSentence}&quot;
-            </p>
-          )}
-          <div className="shrink-0 transition-transform duration-200 hover:scale-105 active:scale-95">
+          <div
+            className="shrink-0"
+            onClick={(e) => e.stopPropagation()}
+          >
             <AudioPlayerButton text={word} language={language} size="sm" />
           </div>
         </div>
+
+        {exampleSentence && (
+          <p className="text-[10px] font-medium leading-relaxed text-text-muted italic line-clamp-2 border-t border-border/60 pt-2">
+            &ldquo;{exampleSentence}&rdquo;
+          </p>
+        )}
       </div>
     </div>
   );

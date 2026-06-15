@@ -7,6 +7,7 @@ import { useAuthStore } from '@/store/authStore';
 import { createUser } from '@/services/firestore';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { LanguageFlag } from '@/components/LanguageFlag';
 import type { SupportedLanguage } from '@/types';
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
@@ -97,14 +98,12 @@ function SelectPill({
 
 function LanguageCard({
   lang,
-  flag,
   title,
   description,
   selected,
   onClick,
 }: {
   lang: SupportedLanguage;
-  flag: string;
   title: string;
   description: string;
   selected: boolean;
@@ -125,9 +124,7 @@ function LanguageCard({
       }}
     >
       <div className="flex items-center justify-between mb-3">
-        <span className="text-3xl transition-transform duration-300 group-hover:scale-110" role="img" aria-label={lang === 'fr' ? 'Bandeira da França' : 'Bandeira do Reino Unido'}>
-          {flag}
-        </span>
+        <LanguageFlag language={lang} size="2xl" className="transition-transform duration-300 group-hover:scale-110" />
         {selected && (
           <div
             className="flex h-6 w-6 items-center justify-center rounded-full animate-scale-in"
@@ -465,7 +462,6 @@ export default function OnboardingPage() {
             <div className="flex flex-col gap-3 animate-slide-up delay-150 fill-mode-both">
               <LanguageCard
                 lang="fr"
-                flag="🇫🇷"
                 title="Francês"
                 description="Arte, romance e alta cultura."
                 selected={language === 'fr'}
@@ -473,7 +469,6 @@ export default function OnboardingPage() {
               />
               <LanguageCard
                 lang="en"
-                flag="🇬🇧"
                 title="Inglês"
                 description="Carreira e conexões globais."
                 selected={language === 'en'}

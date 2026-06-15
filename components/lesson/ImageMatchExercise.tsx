@@ -10,6 +10,9 @@ interface ImageMatchExerciseProps {
   answered: boolean;
   setIsExerciseReady: (ready: boolean) => void;
   submitTrigger: number;
+  variant?: 'default' | 'gallery';
+  hidePrompt?: boolean;
+  accentColor?: string;
 }
 
 export function ImageMatchExercise({
@@ -18,6 +21,9 @@ export function ImageMatchExercise({
   answered,
   setIsExerciseReady,
   submitTrigger,
+  variant = 'default',
+  hidePrompt = false,
+  accentColor = 'var(--color-primary)',
 }: ImageMatchExerciseProps) {
   const [selectedWord, setSelectedWord] = useState<string | null>(null);
 
@@ -41,27 +47,31 @@ export function ImageMatchExercise({
     setSelectedWord(word);
   }
 
+  const isGallery = variant === 'gallery';
+
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2 px-1">
-        <p className="text-xs font-medium italic text-[var(--color-text-muted)]">
-          Qual imagem representa esta palavra?
-        </p>
-        <p className="text-2xl font-display font-bold text-[var(--color-text-primary)]">
-          {data.targetWord}
-        </p>
-        <p className="text-sm text-[var(--color-text-secondary)] italic">
-          {data.translation}
-        </p>
-        {data.contextSentence && (
-          <p className="text-sm text-[var(--color-text-muted)] mt-1">
-            &ldquo;{data.contextSentence}&rdquo;
+      {!hidePrompt && (
+        <div className="flex flex-col gap-2 px-1">
+          <p className="text-xs font-medium italic text-[var(--color-text-muted)]">
+            Qual imagem representa esta palavra?
           </p>
-        )}
-      </div>
+          <p className="text-2xl font-display font-bold text-[var(--color-text-primary)]">
+            {data.targetWord}
+          </p>
+          <p className="text-sm text-[var(--color-text-secondary)] italic">
+            {data.translation}
+          </p>
+          {data.contextSentence && (
+            <p className="text-sm text-[var(--color-text-muted)] mt-1">
+              &ldquo;{data.contextSentence}&rdquo;
+            </p>
+          )}
+        </div>
+      )}
 
-      <div className="grid grid-cols-2 gap-3">
-        {data.options.map((option) => {
+      <div className={`grid grid-cols-2 gap-3 ${isGallery ? 'gap-4' : ''}`}>
+        {data.options.map((option, idx) => {
           const isSelected = selectedWord === option.word;
           const isCorrect = option.word === data.correctWord;
 
@@ -74,9 +84,11 @@ export function ImageMatchExercise({
             border = 'var(--color-error)';
             ring = 'rgba(239, 68, 68, 0.2)';
           } else if (isSelected) {
-            border = 'var(--color-primary)';
-            ring = 'rgba(29, 94, 212, 0.2)';
+            border = accentColor;
+            ring = isGallery ? 'rgba(217, 119, 6, 0.25)' : 'rgba(29, 94, 212, 0.2)';
           }
+
+          const galleryRotate = isGallery ? (idx % 2 === 0 ? -2 : 2) : 0;
 
           return (
             <button
@@ -84,11 +96,23 @@ export function ImageMatchExercise({
               type="button"
               disabled={answered}
               onClick={() => handlePick(option.word)}
-              className="relative overflow-hidden rounded-xl border-2 transition-all active:scale-[0.98] disabled:cursor-default"
+              className={`relative overflow-hidden transition-all active:scale-[0.98] disabled:cursor-default ${
+                isGallery
+                  ? 'rounded-sm border-[10px] border-b-[28px] border-white shadow-md'
+                  : 'rounded-xl border-2'
+              }`}
               style={{
-                borderColor: border,
-                boxShadow: isSelected || (answered && isCorrect) ? `0 0 0 4px ${ring}` : undefined,
+                borderColor: isGallery ? '#fff' : border,
+                outline: !isGallery && (isSelected || (answered && isCorrect)) ? `3px solid ${ring}` : undefined,
+                boxShadow: isGallery
+                  ? isSelected || (answered && isCorrect)
+                    ? `0 0 0 3px ${ring}, 0 8px 20px rgba(0,0,0,0.12)`
+                    : '0 4px 12px rgba(0,0,0,0.08)'
+                  : isSelected || (answered && isCorrect)
+                    ? `0 0 0 4px ${ring}`
+                    : undefined,
                 aspectRatio: '4/3',
+                transform: `rotate(${galleryRotate}deg)`,
               }}
             >
               <Image
@@ -98,13 +122,24 @@ export function ImageMatchExercise({
                 className="object-cover"
                 sizes="(max-width: 640px) 45vw, 200px"
               />
+              {isGallery && isSelected && !answered && (
+                <div
+                  className="absolute bottom-[-22px] left-0 right-0 text-center text-[9px] font-bold truncate px-1"
+                  style={{ color: accentColor }}
+                >
+                  selecionada
+                </div>
+              )}
             </button>
           );
         })}
       </div>
 
       {answered && (
-        <p className="text-center text-sm font-semibold text-[var(--color-primary)]">
+        <p
+          className="text-center text-sm font-semibold"
+          style={{ color: accentColor }}
+        >
           {data.targetWord} — {data.translation}
         </p>
       )}

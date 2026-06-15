@@ -44,7 +44,6 @@ export function DashboardTopBar({
           className="h-4 w-auto rounded-[2px] sm:h-5 sm:rounded-[3px]"
         />
         <span className="hidden xs:inline">{langName}</span>
-        <span className="xs:hidden">{countryCode.toUpperCase()}</span>
         <ArrowLeftRight size={10} style={{ color: 'var(--color-text-muted)' }} className="sm:w-3 sm:h-3" />
       </button>
 
@@ -53,7 +52,7 @@ export function DashboardTopBar({
           className="flex items-center gap-1.5 rounded-xl px-2.5 py-1.5 border border-border bg-surface"
           style={{ boxShadow: '0 2px 0 var(--color-border)' }}
         >
-          <Flame size={16} className="sm:w-5 sm:h-5 text-amber-500 animate-float" />
+          <Flame size={16} className="sm:w-5 sm:h-5 text-amber-500" />
           <span className="text-xs font-extrabold tabular-nums sm:text-sm text-amber-500">
             {currentStreak}
           </span>
@@ -63,7 +62,7 @@ export function DashboardTopBar({
           className="flex items-center gap-1.5 rounded-xl px-2.5 py-1.5 border border-border bg-surface"
           style={{ boxShadow: '0 2px 0 var(--color-border)' }}
         >
-          <Zap size={16} className="sm:w-[18px] sm:h-[18px] text-primary animate-float" style={{ animationDelay: '0.3s' }} />
+          <Zap size={16} className="sm:w-[18px] sm:h-[18px] text-primary" />
           <span className="text-xs font-extrabold tabular-nums sm:text-sm text-primary">
             {totalLessonsCompleted}
           </span>

@@ -12,8 +12,6 @@ import { buildPracticeExercisePrompt } from '@/lib/practiceExercises/promptBuild
 import type { GeneratePracticeParams } from '@/lib/practiceExercises/types';
 import { validateAndSanitizeExercises } from '@/lib/practiceExercises/validateGeneratedExercises';
 
-export type { GeneratePracticeParams } from '@/lib/practiceExercises/types';
-
 /**
  * Generates exactly 5 practice exercises via Gemini.
  * The types are chosen randomly and variedly from the available pool.

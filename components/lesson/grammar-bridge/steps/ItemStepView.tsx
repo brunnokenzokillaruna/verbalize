@@ -1,7 +1,7 @@
 'use client';
 
 import { AudioPlayerButton } from '../../AudioPlayerButton';
-import { LANG_LABEL } from '../shared';
+import { LanguageFlag } from '@/components/LanguageFlag';
 import type { ItemStep } from '@/lib/grammarBridgeSteps';
 import type { SupportedLanguage } from '@/types';
 
@@ -23,7 +23,7 @@ export function ItemStepView({
         <div className="flex items-center justify-between px-5 py-4">
           <div className="flex items-center gap-3 min-w-0">
             <span className="shrink-0 text-[10px] font-black tracking-wider text-[var(--color-primary)] bg-[var(--color-primary-light)]/30 px-1.5 py-0.5 rounded uppercase">
-              {LANG_LABEL[language]}
+            <LanguageFlag language={language} size="xs" />
             </span>
             <p className="font-display text-base font-bold tracking-tight text-[var(--color-text-primary)]">
               {target}

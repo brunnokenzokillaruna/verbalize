@@ -1,9 +1,10 @@
 import { FastForward, Lock } from 'lucide-react';
 import { ALL_LEVELS } from '@/components/dashboard/constants';
-import type { ProficiencyLevel } from '@/types';
+import { LanguageFlag } from '@/components/LanguageFlag';
+import type { ProficiencyLevel, SupportedLanguage } from '@/types';
 
 type DashboardBannerProps = {
-  langFlag: string;
+  language: SupportedLanguage;
   selectedLevel: ProficiencyLevel;
   activeThemeTitle: string;
   activeLessonTitle: string;
@@ -15,7 +16,7 @@ type DashboardBannerProps = {
 };
 
 export function DashboardBanner({
-  langFlag,
+  language,
   selectedLevel,
   activeThemeTitle,
   activeLessonTitle,
@@ -36,8 +37,9 @@ export function DashboardBanner({
       >
         <div className="flex items-center justify-between">
           <div className="flex-1 min-w-0 pr-2">
-            <p className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest transition-colors duration-500 line-clamp-1 text-white/85">
-              {langFlag} SEÇÃO {selectedLevel} · {activeThemeTitle}
+            <p className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest transition-colors duration-500 line-clamp-1 text-white/85 flex items-center gap-1.5">
+              <LanguageFlag language={language} size="sm" className="ring-1 ring-white/20" />
+              <span>SEÇÃO {selectedLevel} · {activeThemeTitle}</span>
             </p>
             <h1 className="font-display text-lg sm:text-[1.4rem] leading-tight font-black mt-1 text-white line-clamp-2">
               {activeLessonTitle}
@@ -51,7 +53,7 @@ export function DashboardBanner({
             style={{
               backgroundColor: 'rgba(255,255,255,0.15)',
               border: '1px solid rgba(255,255,255,0.25)',
-              color: 'var(--color-text-inverse)',
+              color: 'var(--color-on-accent)',
               boxShadow: '0 2px 0 rgba(0,0,0,0.1)',
             }}
             title="Pular esta lição"
@@ -77,10 +79,12 @@ export function DashboardBanner({
                 onClick={() => onSelectLevel(level)}
                 className="shrink-0 rounded-xl px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-extrabold active:scale-95 transition-all disabled:cursor-not-allowed cursor-pointer active:translate-y-[1px]"
                 style={{
-                  backgroundColor: isSelected ? 'var(--color-surface)' : 'rgba(255,255,255,0.12)',
-                  color: isSelected ? 'var(--color-primary)' : 'var(--color-text-inverse)',
-                  border: '1px solid rgba(255,255,255,0.15)',
-                  boxShadow: isSelected ? '0 2px 0 var(--color-border-strong)' : '0 2px 0 rgba(0,0,0,0.1)',
+                  backgroundColor: isSelected ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.12)',
+                  color: isSelected ? bannerColors[1] : 'var(--color-on-accent)',
+                  border: isSelected
+                    ? '1px solid rgba(255,255,255,0.55)'
+                    : '1px solid rgba(255,255,255,0.15)',
+                  boxShadow: isSelected ? '0 2px 0 rgba(0,0,0,0.12)' : '0 2px 0 rgba(0,0,0,0.1)',
                   opacity: !hasLessons ? 0.35 : 1,
                 }}
               >

@@ -1,7 +1,8 @@
 'use client';
 
 import { AudioPlayerButton } from '../../AudioPlayerButton';
-import { LANG_LABEL, TargetPhrase } from '../shared';
+import { TargetPhrase } from '../shared';
+import { LanguageFlag } from '@/components/LanguageFlag';
 import type { TransferStep } from '@/lib/grammarBridgeSteps';
 import type { SupportedLanguage } from '@/types';
 import type { WordClickPayload } from '../../ClickableWord';
@@ -35,8 +36,8 @@ export function TransferStepView({
       </div>
       <div className="flex flex-col gap-3 w-full">
         <div className="flex items-end gap-2.5 self-start max-w-[90%]">
-          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--color-primary)] text-white text-[10px] font-bold shadow-sm shrink-0">
-            {LANG_LABEL[language]}
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--color-primary)] shadow-sm shrink-0 overflow-hidden">
+            <LanguageFlag language={language} size="sm" className="h-full w-full rounded-none object-cover" />
           </div>
           <div className="flex items-center gap-2 rounded-2xl rounded-bl-none bg-[var(--color-primary-light)]/20 px-4 py-3 border border-[var(--color-primary)]/10 shadow-sm min-w-0">
             <TargetPhrase

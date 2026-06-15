@@ -259,7 +259,7 @@ export default function DashboardPage() {
         />
 
         <DashboardBanner
-          langFlag={lang.flag}
+          language={profile.currentTargetLanguage as SupportedLanguage}
           selectedLevel={selectedLevel}
           activeThemeTitle={activeThemeTitle}
           activeLessonTitle={activeLessonTitle}

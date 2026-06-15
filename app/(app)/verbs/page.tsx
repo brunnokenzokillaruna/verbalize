@@ -1,15 +1,26 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { Search, Loader2, BookMarked, Sparkles, Languages, AlertCircle, X, Timer, Zap } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { Search, Loader2, BookMarked, Languages, AlertCircle } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { getVerbConjugation } from '@/app/actions/getVerbConjugation';
 import { getUserVocabulary } from '@/services/firestore';
-import { AudioPlayerButton } from '@/components/lesson/AudioPlayerButton';
 import type { VerbDocument, SupportedLanguage } from '@/types';
 import { LANG_META } from './data';
-import { VerbTenseList } from './components';
+import { VerbTenseList } from '@/components/verbs/VerbTenseList';
+import { VerbResultHero } from '@/components/verbs/VerbResultHero';
+import { VerbExamplesSection } from '@/components/verbs/VerbExamplesSection';
 import { VerbDrillSession } from '@/components/verbs/VerbDrillSession';
+import { VerbChallengeCard } from '@/components/verbs/VerbChallengeCard';
+import { LearnedVerbsSection } from '@/components/verbs/LearnedVerbsSection';
+import { LanguageFlag } from '@/components/LanguageFlag';
+import {
+  readVerbFromCache,
+  writeVerbToCache,
+  readBestSprintScore,
+} from '@/utils/verbChallengeStorage';
+
+const SPRINT_POOL_SIZE = 10;
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
@@ -20,15 +31,15 @@ export default function VerbsPage() {
   const [verb, setVerb] = useState<VerbDocument | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [openTenses, setOpenTenses] = useState<Set<string>>(new Set(['present']));
-  const [learnedVerbs, setLearnedVerbs] = useState<string[]>([]);
+  const [learnedVerbs, setLearnedVerbs] = useState<{ word: string; firstSeen: number }[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  // Search filter for learned verbs list
-  const [learnedSearch, setLearnedSearch] = useState('');
 
   // Drill state
   const [drillState, setDrillState] = useState<'idle' | 'loading' | 'running'>('idle');
   const [drillVerbs, setDrillVerbs] = useState<VerbDocument[]>([]);
+  const [bestSprintScore, setBestSprintScore] = useState<number | null>(null);
+
+  const verbCacheRef = useRef<Map<string, VerbDocument>>(new Map());
 
   const language = (profile?.currentTargetLanguage ?? 'fr') as SupportedLanguage;
   const langMeta = LANG_META[language];
@@ -36,9 +47,35 @@ export default function VerbsPage() {
   useEffect(() => {
     if (!profile?.uid) return;
     getUserVocabulary(profile.uid, language).then((items) => {
-      setLearnedVerbs(items.filter((i) => i.wordType === 'verb').map((i) => i.word));
+      setLearnedVerbs(
+        items
+          .filter((i) => i.wordType === 'verb')
+          .map((i) => ({
+            word: i.word,
+            firstSeen: i.firstSeen?.toMillis?.() ?? 0,
+          })),
+      );
     });
   }, [profile?.uid, language]);
+
+  useEffect(() => {
+    if (!profile?.uid) return;
+    setBestSprintScore(readBestSprintScore(profile.uid, language));
+  }, [profile?.uid, language]);
+
+  function cacheVerb(doc: VerbDocument) {
+    verbCacheRef.current.set(doc.infinitive.toLowerCase(), doc);
+    writeVerbToCache(language, doc);
+  }
+
+  function getCachedVerb(word: string): VerbDocument | undefined {
+    const key = word.toLowerCase();
+    return (
+      verbCacheRef.current.get(key) ??
+      readVerbFromCache(language, word) ??
+      undefined
+    );
+  }
 
   async function handleSearch(infinitive: string) {
     const clean = infinitive.trim();
@@ -55,9 +92,18 @@ export default function VerbsPage() {
     if (!result) {
       setError('Não foi possível encontrar o verbo. Verifique a ortografia e tente novamente.');
     } else {
+      cacheVerb(result);
       setVerb(result);
       setOpenTenses(new Set(['present']));
     }
+  }
+
+  function clearVerbResult() {
+    setVerb(null);
+    setInput('');
+    setError(null);
+    setOpenTenses(new Set(['present']));
+    inputRef.current?.focus();
   }
 
   function toggleTense(tense: string) {
@@ -69,38 +115,60 @@ export default function VerbsPage() {
     });
   }
 
-  async function startDrill() {
-    if (learnedVerbs.length === 0) return;
+  const startDrill = useCallback(async () => {
+    if (learnedVerbs.length === 0 || !profile?.uid) return;
     setDrillState('loading');
-    
-    // Pick up to 5 random verbs to avoid hitting limits if they need generating
-    const shuffled = [...learnedVerbs].sort(() => 0.5 - Math.random());
-    const subset = shuffled.slice(0, 5);
-    
+    setError(null);
+
+    const poolSize = Math.min(SPRINT_POOL_SIZE, learnedVerbs.length);
+    const shuffled = [...learnedVerbs].sort(() => 0.5 - Math.random()).slice(0, poolSize);
+    const docs: VerbDocument[] = [];
+    const toFetch: string[] = [];
+
+    for (const { word } of shuffled) {
+      const cached = getCachedVerb(word);
+      if (cached) {
+        docs.push(cached);
+        verbCacheRef.current.set(word.toLowerCase(), cached);
+      } else {
+        toFetch.push(word);
+      }
+    }
+
     try {
-      const docs = await Promise.all(
-        subset.map(v => getVerbConjugation(v, language))
-      );
-      
-      const validDocs = docs.filter((d): d is VerbDocument => d !== null);
-      
-      if (validDocs.length > 0) {
-        setDrillVerbs(validDocs);
+      if (toFetch.length > 0) {
+        const fetched = await Promise.all(toFetch.map((w) => getVerbConjugation(w, language)));
+        for (const doc of fetched) {
+          if (doc) {
+            cacheVerb(doc);
+            docs.push(doc);
+          }
+        }
+      }
+
+      if (docs.length > 0) {
+        setDrillVerbs(docs);
         setDrillState('running');
       } else {
         setDrillState('idle');
-        setError('Não foi possível carregar os verbos para o desafio.');
+        setError('Não foi possível carregar os verbos para o sprint.');
       }
     } catch {
       setDrillState('idle');
-      setError('Erro ao iniciar o desafio.');
+      setError('Erro ao iniciar o sprint.');
+    }
+  }, [learnedVerbs, language, profile?.uid, verbCacheRef]);
+
+  function handleDrillClose() {
+    setDrillState('idle');
+    if (profile?.uid) {
+      setBestSprintScore(readBestSprintScore(profile.uid, language));
     }
   }
 
-  // Filtered learned verbs list
-  const filteredLearned = learnedVerbs.filter(v =>
-    v.toLowerCase().includes(learnedSearch.toLowerCase())
-  );
+  function handleReviewFromDrill(word: string) {
+    handleSearch(word);
+  }
 
   return (
     <div className="min-h-dvh pb-24 md:pb-10" style={{ backgroundColor: 'var(--color-bg)' }}>
@@ -117,7 +185,7 @@ export default function VerbsPage() {
       >
         <div className="mx-auto max-w-lg md:max-w-2xl lg:max-w-4xl">
           <div className="flex items-center gap-2 mb-0.5">
-            <span className="text-lg">{langMeta.flag}</span>
+            <LanguageFlag language={language} size="lg" />
             <span
               className="text-xs font-bold uppercase tracking-widest"
               style={{ color: 'var(--color-text-muted)' }}
@@ -136,213 +204,86 @@ export default function VerbsPage() {
 
       <main className="mx-auto max-w-lg md:max-w-2xl lg:max-w-4xl px-5 pt-5 flex flex-col gap-6">
 
-        {/* ── Search bar ── */}
-        <form
-          onSubmit={(e) => { e.preventDefault(); handleSearch(input); }}
-          className="flex gap-3 animate-slide-up-spring"
-        >
-          <div className="relative flex-1">
-            <Search
-              size={17}
-              className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-text-muted"
-            />
-            <input
-              ref={inputRef}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder={langMeta.placeholder}
-              aria-label="Digite um verbo para conjugar"
-              className="w-full rounded-2xl py-3.5 pl-11 pr-4 text-base outline-none border transition-all duration-150 text-text-primary bg-surface border-border focus-visible:ring-2 focus-visible:ring-primary focus-visible:border-transparent"
-            />
+        {/* ── Search card ── */}
+        <div className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-5 animate-slide-up-spring">
+          <div className="flex items-start gap-3">
+            <div
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
+              style={{
+                background: 'linear-gradient(135deg, var(--color-primary-light), var(--color-surface-raised))',
+                border: '1px solid var(--color-border)',
+              }}
+            >
+              <BookMarked size={20} className="text-primary" />
+            </div>
+            <div className="min-w-0">
+              <p className="font-display text-base font-semibold text-text-primary">
+                Pesquise qualquer verbo
+              </p>
+              <p className="mt-0.5 text-sm text-text-muted">
+                Conjugação completa com exemplos em contexto.
+              </p>
+            </div>
           </div>
-          <button
-            type="submit"
-            disabled={loading || !input.trim()}
-            className="cta-shimmer shrink-0 relative overflow-hidden rounded-2xl px-6 py-3.5 text-sm font-bold transition-all active:scale-95 active:translate-y-[2px]"
-            style={{
-              background: loading || !input.trim()
-                ? 'var(--color-surface-raised)'
-                : 'var(--color-primary)',
-              color: loading || !input.trim()
-                ? 'var(--color-text-muted)'
-                : '#fff',
-              boxShadow: loading || !input.trim()
-                ? 'none'
-                : '0 3px 0 var(--color-primary-dark)',
-              cursor: loading || !input.trim() ? 'not-allowed' : 'pointer'
-            }}
+
+          <form
+            onSubmit={(e) => { e.preventDefault(); handleSearch(input); }}
+            className="flex gap-3"
           >
-            {loading
-              ? <Loader2 size={16} className="animate-spin" />
-              : 'Conjugar'}
-          </button>
-        </form>
+            <div className="relative flex-1">
+              <Search
+                size={16}
+                className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted"
+              />
+              <input
+                ref={inputRef}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder={langMeta.placeholder}
+                aria-label="Digite um verbo para conjugar"
+                className="w-full rounded-xl py-2.5 pl-10 pr-4 text-sm outline-none border transition-all duration-150 text-text-primary bg-surface-raised border-border focus-visible:ring-2 focus-visible:ring-primary focus-visible:border-transparent"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={loading || !input.trim()}
+              className="cta-shimmer shrink-0 relative overflow-hidden rounded-xl px-5 py-2.5 text-sm font-bold transition-all active:scale-95 active:translate-y-[2px]"
+              style={{
+                background: loading || !input.trim()
+                  ? 'var(--color-surface-raised)'
+                  : 'var(--color-primary)',
+                color: loading || !input.trim()
+                  ? 'var(--color-text-muted)'
+                  : '#fff',
+                boxShadow: loading || !input.trim()
+                  ? 'none'
+                  : '0 3px 0 var(--color-primary-dark)',
+                cursor: loading || !input.trim() ? 'not-allowed' : 'pointer',
+              }}
+            >
+              {loading
+                ? <Loader2 size={16} className="animate-spin" />
+                : 'Conjugar'}
+            </button>
+          </form>
+        </div>
 
         {/* ── Idle state (no result yet) ── */}
         {!verb && !loading && (
           <div className="flex flex-col gap-6 animate-slide-up-spring delay-75">
-
-            {/* Time attack CTA */}
             {learnedVerbs.length > 0 && (
-              <div 
-                className="rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4 animate-slide-up-spring border-2"
-                style={{
-                  background: 'linear-gradient(to right, var(--color-surface), var(--color-surface-raised))',
-                  borderColor: 'var(--color-verb)',
-                  boxShadow: '0 4px 0 var(--color-verb-bg), 0 8px 16px rgba(124, 58, 237, 0.05)',
-                }}
-              >
-                <div className="flex items-center gap-4 w-full sm:w-auto flex-1">
-                  <div 
-                    className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-white animate-float"
-                    style={{
-                      backgroundColor: 'var(--color-verb)',
-                      boxShadow: '0 3px 0 #6d28d9'
-                    }}
-                  >
-                    <Timer size={22} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-base font-bold text-text-primary flex items-center gap-1.5">
-                      <span>Desafio de Verbos</span>
-                      <span className="px-2 py-0.5 rounded-full text-xs font-extrabold bg-verb-bg text-verb">
-                        {learnedVerbs.length}
-                      </span>
-                    </h3>
-                    <p className="text-xs text-text-muted mt-0.5">
-                      Treine sua velocidade de conjugação e fixação dos tempos gramaticais!
-                    </p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={startDrill}
-                  disabled={drillState === 'loading'}
-                  className="w-full sm:w-auto shrink-0 flex items-center justify-center gap-1.5 rounded-xl px-5 py-3 text-sm font-bold transition-all active:scale-95 text-white active:translate-y-[2px]"
-                  style={{
-                    backgroundColor: 'var(--color-verb)',
-                    boxShadow: '0 3px 0 #6d28d9',
-                    cursor: drillState === 'loading' ? 'wait' : 'pointer',
-                  }}
-                >
-                  {drillState === 'loading' ? (
-                    <Loader2 size={14} className="animate-spin" />
-                  ) : (
-                    <>
-                      Começar Desafio
-                      <Zap size={14} fill="currentColor" />
-                    </>
-                  )}
-                </button>
-              </div>
+              <VerbChallengeCard
+                bestScore={bestSprintScore}
+                loading={drillState === 'loading'}
+                onStart={startDrill}
+              />
             )}
 
-            {/* Learned verbs section */}
-            {learnedVerbs.length > 0 && (
-              <div className="flex flex-col gap-4 p-5 rounded-2xl border border-border bg-surface shadow-sm">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                  <div className="flex items-center gap-2">
-                    <Sparkles size={13} className="text-text-muted" />
-                    <p className="text-xs font-bold uppercase tracking-widest text-text-muted">
-                      Seus verbos aprendidos ({learnedVerbs.length})
-                    </p>
-                  </div>
-
-                  {/* Learned Verbs Search Input */}
-                  <div className="relative w-full sm:w-60 shrink-0">
-                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
-                    <input
-                      type="text"
-                      value={learnedSearch}
-                      onChange={(e) => setLearnedSearch(e.target.value)}
-                      placeholder="Filtrar verbos..."
-                      className="w-full pl-9 pr-8 py-1.5 rounded-xl border border-border text-text-primary text-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-transparent transition-all"
-                      style={{ backgroundColor: 'var(--color-bg)' }}
-                    />
-                    {learnedSearch && (
-                      <button
-                        onClick={() => setLearnedSearch('')}
-                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary"
-                      >
-                        <X size={12} />
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                {filteredLearned.length > 0 ? (
-                  <div className="flex flex-wrap gap-2.5 pt-2">
-                    {filteredLearned.map((v) => (
-                      <button
-                        key={v}
-                        type="button"
-                        onClick={() => handleSearch(v)}
-                        className="rounded-xl px-4 py-2.5 text-sm font-semibold transition-all active:scale-95 active:translate-y-[2px] active:shadow-none cursor-pointer"
-                        style={{
-                          backgroundColor: 'var(--color-primary-light)',
-                          border: '1.5px solid rgba(29, 94, 212, 0.25)',
-                          boxShadow: '0 3px 0 rgba(29, 94, 212, 0.15)',
-                          color: 'var(--color-primary)',
-                        }}
-                      >
-                        {v}
-                      </button>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-xs text-text-muted italic py-2">
-                    Nenhum verbo correspondente a &ldquo;{learnedSearch}&rdquo;.
-                  </p>
-                )}
-              </div>
-            )}
-
-            {/* Empty illustration */}
-            <div className="mt-4 flex flex-col items-center gap-4 text-center py-8">
-              <div
-                className="relative flex h-20 w-20 items-center justify-center rounded-3xl"
-                style={{
-                  background: 'linear-gradient(135deg, var(--color-primary-light), var(--color-surface-raised))',
-                  border: '1.5px solid var(--color-border)',
-                }}
-              >
-                <BookMarked size={32} style={{ color: 'var(--color-primary)' }} />
-                <span
-                  className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full text-xs animate-bounce"
-                  style={{ backgroundColor: 'var(--color-vocab-bg)', color: 'var(--color-vocab)' }}
-                >
-                  ✦
-                </span>
-              </div>
-              <div>
-                <p
-                  className="font-display text-lg font-semibold"
-                  style={{ color: 'var(--color-text-primary)' }}
-                >
-                  Pesquise qualquer verbo
-                </p>
-                <p className="mt-1 text-sm max-w-xs" style={{ color: 'var(--color-text-muted)' }}>
-                  Veja a conjugação completa com exemplos de uso em contexto.
-                </p>
-              </div>
-
-              {/* Suggestion chips */}
-              <div className="flex flex-wrap justify-center gap-2 mt-2">
-                {(language === 'fr'
-                  ? ['être', 'avoir', 'aller', 'faire', 'pouvoir']
-                  : ['to be', 'to have', 'to go', 'to make', 'to know']
-                ).map((v) => (
-                  <button
-                    key={v}
-                    type="button"
-                    onClick={() => handleSearch(v)}
-                    className="rounded-xl px-3.5 py-1.5 text-sm font-medium transition-all active:scale-95 hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary border cursor-pointer bg-surface border-border text-text-secondary"
-                  >
-                    {v}
-                  </button>
-                ))}
-              </div>
-            </div>
+            {/* Learned verbs — collapsed preview with optional full library */}
+            <LearnedVerbsSection
+              verbs={learnedVerbs}
+              onSelectVerb={handleSearch}
+            />
           </div>
         )}
 
@@ -397,49 +338,15 @@ export default function VerbsPage() {
         {/* ── Verb result ── */}
         {verb && !loading && (
           <div className="flex flex-col gap-5 animate-slide-up-spring">
+            <VerbResultHero
+              infinitive={verb.infinitive}
+              translation={verb.translation}
+              language={language}
+              langLabel={langMeta.label}
+              onClear={clearVerbResult}
+            />
 
-            {/* Verb hero card */}
-            <div
-              className="relative overflow-hidden rounded-3xl p-6 border-2 border-primary-light"
-              style={{
-                background: 'linear-gradient(to right, #0c1524 0%, #173870 100%)',
-                boxShadow: '0 8px 24px rgba(29, 94, 212, 0.1)',
-              }}
-            >
-              {/* Ambient glow */}
-              <div className="absolute top-0 right-0 h-32 w-32 bg-primary/20 rounded-full blur-3xl pointer-events-none" />
-
-              <div className="relative flex items-start justify-between gap-4">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-base">{langMeta.flag}</span>
-                    <span
-                      className="text-[10px] font-extrabold uppercase tracking-widest text-white/50"
-                    >
-                      {langMeta.label} · Infinitivo
-                    </span>
-                  </div>
-                  <h2
-                    className="font-display text-4xl sm:text-5xl font-extrabold leading-tight text-white tracking-tight drop-shadow-sm"
-                  >
-                    {verb.infinitive}
-                  </h2>
-                  <p
-                    className="mt-2 text-base sm:text-lg italic font-medium text-white/70"
-                  >
-                    {verb.translation}
-                  </p>
-                </div>
-                <div className="shrink-0 rounded-full p-1 bg-white/10 backdrop-blur-sm shadow-sm border border-white/15">
-                  <AudioPlayerButton text={verb.infinitive} language={language} size="md" />
-                </div>
-              </div>
-            </div>
-
-            {/* Content: tenses + examples */}
-            <div className="flex flex-col gap-5 lg:grid lg:grid-cols-2 lg:items-start lg:gap-6">
-
-              {/* Conjugation tenses */}
+            <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:items-start lg:gap-8">
               <VerbTenseList
                 verb={verb}
                 openTenses={openTenses}
@@ -447,52 +354,11 @@ export default function VerbsPage() {
                 language={language}
               />
 
-              {/* Example sentences */}
-              {verb.exampleSentences?.length > 0 && (
-                <div className="flex flex-col gap-3">
-                  <div className="flex items-center gap-1.5">
-                    <Sparkles size={13} className="text-text-muted" />
-                    <p className="text-xs font-bold uppercase tracking-widest text-text-muted">
-                      Exemplos em contexto
-                    </p>
-                  </div>
-                  <div className="flex flex-col gap-3.5">
-                    {verb.exampleSentences.slice(0, 3).map((ex, i) => (
-                      <div
-                        key={i}
-                        className="card-lift rounded-2xl p-4.5 animate-slide-up bg-surface border border-border"
-                        style={{
-                          animationDelay: `${i * 80}ms`,
-                          animationFillMode: 'both',
-                        }}
-                      >
-                        <div className="flex items-start gap-4">
-                          {/* Number badge */}
-                          <span
-                            className="flex h-6.5 w-6.5 shrink-0 items-center justify-center rounded-full text-xs font-extrabold mt-0.5 text-white"
-                            style={{
-                              background: 'linear-gradient(135deg, var(--color-primary), #60a5fa)',
-                              boxShadow: '0 2px 4px rgba(29, 94, 212, 0.15)'
-                            }}
-                          >
-                            {i + 1}
-                          </span>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-base font-bold leading-snug text-text-primary">
-                              {ex.target}
-                            </p>
-                            <p className="mt-1.5 text-sm italic leading-snug text-text-secondary">
-                              {ex.portuguese}
-                            </p>
-                          </div>
-                          <div className="shrink-0">
-                            <AudioPlayerButton text={ex.target} language={language} size="sm" />
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+              {verb.exampleSentences && verb.exampleSentences.length > 0 && (
+                <VerbExamplesSection
+                  examples={verb.exampleSentences}
+                  language={language}
+                />
               )}
             </div>
           </div>
@@ -500,10 +366,13 @@ export default function VerbsPage() {
       </main>
 
       {/* ── Drill Session Overlay ── */}
-      {drillState === 'running' && (
+      {drillState === 'running' && profile?.uid && (
         <VerbDrillSession
           verbs={drillVerbs}
-          onClose={() => setDrillState('idle')}
+          language={language}
+          uid={profile.uid}
+          onClose={handleDrillClose}
+          onReviewVerb={handleReviewFromDrill}
         />
       )}
     </div>
