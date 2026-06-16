@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
@@ -41,7 +42,9 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
           />
         </div>
         <noscript>
-          <a href="/?auth=login" className="sr-only">Abrir modal de login</a>
+          <Link href="/?auth=login" className="sr-only">
+            Abrir modal de login
+          </Link>
         </noscript>
       </main>
     );

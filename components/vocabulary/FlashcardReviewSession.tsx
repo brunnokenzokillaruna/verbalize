@@ -208,7 +208,7 @@ export function FlashcardReviewSession({
   }
 
   function handleFlip() {
-    if (isFlipped || isAnimating || cardExit !== 'none') return;
+    if (isFlipped || isAnimating || cardExit !== 'none' || !currentItem) return;
     playTap();
     setIsFlipped(true);
     speak(currentItem.word, language).catch(() => {});
