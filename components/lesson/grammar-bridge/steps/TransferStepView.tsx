@@ -1,8 +1,7 @@
 'use client';
 
 import { AudioPlayerButton } from '../../AudioPlayerButton';
-import { TargetPhrase } from '../shared';
-import { LanguageFlag } from '@/components/LanguageFlag';
+import { GrammarFlagAvatar, TargetPhrase } from '../shared';
 import type { TransferStep } from '@/lib/grammarBridgeSteps';
 import type { SupportedLanguage } from '@/types';
 import type { WordClickPayload } from '../../ClickableWord';
@@ -25,38 +24,44 @@ export function TransferStepView({
   const { target, portuguese } = step.data;
 
   return (
-    <div className="flex flex-col items-center justify-center gap-4 px-2 w-full max-w-md mx-auto">
+    <div className="flex flex-col gap-4 w-full max-w-lg mx-auto px-1">
       <div className="text-center">
-        <span className="text-[10px] font-black uppercase tracking-[0.15em] text-[var(--color-text-muted)]">
-          Generalize
-        </span>
-        <p className="text-xs text-[var(--color-text-secondary)] mt-1 max-w-xs mx-auto">
+        <span className="grammar-step-label">Generalize</span>
+        <p className="grammar-secondary mt-2 max-w-sm mx-auto">
           A mesma regra vale com outras palavras — veja como soa na prática:
         </p>
       </div>
-      <div className="flex flex-col gap-3 w-full">
-        <div className="flex items-end gap-2.5 self-start max-w-[90%]">
-          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--color-primary)] shadow-sm shrink-0 overflow-hidden">
-            <LanguageFlag language={language} size="sm" className="h-full w-full rounded-none object-cover" />
-          </div>
-          <div className="flex items-center gap-2 rounded-2xl rounded-bl-none bg-[var(--color-primary-light)]/20 px-4 py-3 border border-[var(--color-primary)]/10 shadow-sm min-w-0">
-            <TargetPhrase
-              text={target}
-              language={language}
-              newVocabulary={newVocabulary}
-              newVerbs={newVerbs}
-              onWordClick={onWordClick}
-              className="text-sm font-semibold text-[var(--color-text-primary)] leading-relaxed"
-            />
-            <AudioPlayerButton text={target} language={language} size="sm" />
+
+      <div className="flex flex-col gap-3 sm:gap-4">
+        <div className="flex items-start gap-2.5 sm:gap-3">
+          <GrammarFlagAvatar variant="target" language={language} />
+          <div
+            className="min-w-0 flex-1 rounded-2xl rounded-tl-md border px-3.5 py-3 sm:px-4 sm:py-3.5"
+            style={{
+              backgroundColor: 'var(--color-primary-light)',
+              borderColor: 'color-mix(in srgb, var(--color-primary) 20%, transparent)',
+            }}
+          >
+            <div className="flex items-start justify-between gap-2">
+              <TargetPhrase
+                text={target}
+                language={language}
+                newVocabulary={newVocabulary}
+                newVerbs={newVerbs}
+                onWordClick={onWordClick}
+                className="grammar-body font-semibold text-text-primary text-left leading-relaxed"
+              />
+              <div className="shrink-0">
+                <AudioPlayerButton text={target} language={language} size="sm" />
+              </div>
+            </div>
           </div>
         </div>
-        <div className="flex items-end gap-2.5 self-end max-w-[90%]">
-          <div className="rounded-2xl rounded-br-none bg-[var(--color-surface)] px-4 py-3 border border-[var(--color-border)]/80 shadow-sm">
-            <p className="text-xs text-[var(--color-text-muted)] italic leading-relaxed">{portuguese}</p>
-          </div>
-          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--color-surface-raised)] border border-[var(--color-border)] text-[10px] font-black text-[var(--color-text-muted)] shrink-0">
-            PT
+
+        <div className="flex items-start gap-2.5 sm:gap-3 flex-row-reverse ml-auto w-full max-w-[calc(100%-0.5rem)] sm:max-w-[92%]">
+          <GrammarFlagAvatar variant="pt-br" />
+          <div className="min-w-0 flex-1 rounded-2xl rounded-tr-md border border-border bg-surface px-3.5 py-3 sm:px-4 sm:py-3.5">
+            <p className="grammar-secondary text-left">{portuguese}</p>
           </div>
         </div>
       </div>

@@ -4,13 +4,14 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import {
   RotateCw,
-  X as XIcon,
-  Check as CheckIcon,
   ArrowLeft,
   ArrowRight,
   Flame,
 } from 'lucide-react';
 import { AudioPlayerButton } from '@/components/lesson/AudioPlayerButton';
+import { useAudio } from '@/hooks/useAudio';
+import { useReviewSoundFeedback } from '@/hooks/useReviewSoundFeedback';
+import { getStudioVoiceName } from '@/lib/voiceConfig';
 import { ReviewSessionShell } from './ReviewSessionShell';
 import { ReviewResultsScreen } from './ReviewResultsScreen';
 import { REVIEW_THEMES } from './reviewThemes';
@@ -65,6 +66,8 @@ export function FlashcardReviewSession({
   const touchStartX = useRef<number | null>(null);
   const flipTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const exitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { speak, stop: stopAudio } = useAudio(getStudioVoiceName(language));
+  const { playAnswer, playCombo, playTap } = useReviewSoundFeedback();
   const total = items.length;
   const currentItem = state === 'running' ? items[currentIdx] : null;
 
@@ -77,14 +80,16 @@ export function FlashcardReviewSession({
     setIsFlipped(false);
     setIsAnimating(false);
     setCardExit('none');
-  }, [currentIdx, state]);
+    stopAudio();
+  }, [currentIdx, state, stopAudio]);
 
   useEffect(() => {
     return () => {
       if (flipTimerRef.current) clearTimeout(flipTimerRef.current);
       if (exitTimerRef.current) clearTimeout(exitTimerRef.current);
+      stopAudio();
     };
-  }, []);
+  }, [stopAudio]);
 
   if (state === 'done') {
     return (
@@ -149,9 +154,6 @@ export function FlashcardReviewSession({
   if (!currentItem) return null;
 
   const direction = directions[currentIdx];
-  const targetLangLabel = language === 'fr' ? 'FR' : 'EN';
-  const directionLabel =
-    direction === 'fr-to-pt' ? `${targetLangLabel} → PT` : `PT → ${targetLangLabel}`;
   const promptText =
     direction === 'fr-to-pt' ? 'Qual é a tradução?' : 'Como se diz no idioma alvo?';
   const frontText = direction === 'fr-to-pt' ? currentItem.word : currentItem.translation;
@@ -167,8 +169,16 @@ export function FlashcardReviewSession({
   function handleAnswer(correct: boolean) {
     if (isAnimating || cardExit !== 'none') return;
 
-    if (correct) setStreak((s) => s + 1);
-    else setStreak(0);
+    stopAudio();
+    if (correct) {
+      const nextStreak = streak + 1;
+      setStreak(nextStreak);
+      playAnswer(true);
+      if (nextStreak >= 2) playCombo(nextStreak);
+    } else {
+      setStreak(0);
+      playAnswer(false);
+    }
 
     setIsAnimating(true);
     setCardExit(correct ? 'right' : 'left');
@@ -197,6 +207,13 @@ export function FlashcardReviewSession({
     touchStartX.current = null;
   }
 
+  function handleFlip() {
+    if (isFlipped || isAnimating || cardExit !== 'none') return;
+    playTap();
+    setIsFlipped(true);
+    speak(currentItem.word, language).catch(() => {});
+  }
+
   const exitTransform =
     cardExit === 'left'
       ? 'translateX(-120%) rotate(-12deg)'
@@ -204,43 +221,7 @@ export function FlashcardReviewSession({
         ? 'translateX(120%) rotate(12deg)'
         : 'translateX(0) rotate(0)';
 
-  const footer = (
-    <div
-      className="px-5 pt-2 flex gap-3 transition-all duration-300"
-      style={{
-        opacity: isFlipped && !isAnimating && cardExit === 'none' ? 1 : 0,
-        pointerEvents: isFlipped && !isAnimating && cardExit === 'none' ? 'auto' : 'none',
-        paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom))',
-      }}
-    >
-      <button
-        type="button"
-        onClick={() => handleAnswer(false)}
-        className="flex-1 flex items-center justify-center gap-2 rounded-2xl py-4 font-bold text-sm transition-all active:scale-[0.97] cursor-pointer border-2"
-        style={{
-          backgroundColor: 'var(--color-error-bg)',
-          borderColor: 'rgba(239, 68, 68, 0.35)',
-          color: 'var(--color-error)',
-          boxShadow: '0 3px 0 rgba(220, 38, 38, 0.2)',
-        }}
-      >
-        <ArrowLeft size={18} />
-        Esqueci
-      </button>
-      <button
-        type="button"
-        onClick={() => handleAnswer(true)}
-        className="flex-1 flex items-center justify-center gap-2 rounded-2xl py-4 font-bold text-sm text-white transition-all active:scale-[0.97] cursor-pointer"
-        style={{
-          backgroundColor: 'var(--color-success)',
-          boxShadow: '0 3px 0 #047857',
-        }}
-      >
-        Lembrei
-        <ArrowRight size={18} />
-      </button>
-    </div>
-  );
+  const canAnswer = isFlipped && !isAnimating && cardExit === 'none';
 
   return (
     <ReviewSessionShell
@@ -248,9 +229,8 @@ export function FlashcardReviewSession({
       current={currentIdx + 1}
       total={total}
       onCloseRequest={onClose}
-      footer={footer}
     >
-      <div className="flex-1 px-5 py-4 mx-auto max-w-lg w-full flex flex-col items-center justify-center">
+      <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-5 py-3 mx-auto max-w-lg w-full pb-[max(0.75rem,env(safe-area-inset-bottom))]">
         {streak >= 2 && (
           <div
             className="mb-4 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest animate-scale-in"
@@ -261,7 +241,7 @@ export function FlashcardReviewSession({
           </div>
         )}
 
-        <div className="relative w-full max-w-sm">
+        <div className="relative w-full max-w-sm overflow-hidden">
           {/* Deck stack behind */}
           <div
             className="absolute inset-0 rounded-3xl border border-border translate-y-3 scale-[0.96] opacity-50"
@@ -274,28 +254,8 @@ export function FlashcardReviewSession({
             aria-hidden
           />
 
-          {/* Swipe hints */}
-          {isFlipped && cardExit === 'none' && (
-            <>
-              <div
-                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 z-20 flex flex-col items-center gap-1 opacity-40 pointer-events-none"
-                aria-hidden
-              >
-                <XIcon size={16} className="text-error" />
-                <span className="text-[9px] font-bold text-error">esqueci</span>
-              </div>
-              <div
-                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1 z-20 flex flex-col items-center gap-1 opacity-40 pointer-events-none"
-                aria-hidden
-              >
-                <CheckIcon size={16} className="text-success" />
-                <span className="text-[9px] font-bold text-success">lembrei</span>
-              </div>
-            </>
-          )}
-
           <div
-            className="relative w-full aspect-[3/4] max-h-[56vh] transition-transform duration-300 ease-out outline-none"
+            className="relative w-full aspect-[3/4] max-h-[min(58dvh,calc(100dvh-15rem))] transition-transform duration-300 ease-out outline-none"
             style={{
               perspective: '1100px',
               transform: exitTransform,
@@ -308,9 +268,7 @@ export function FlashcardReviewSession({
               if (e.key === 'ArrowLeft') handleAnswer(false);
               if (e.key === 'ArrowRight') handleAnswer(true);
             }}
-            onClick={() => {
-              if (!isFlipped && !isAnimating && cardExit === 'none') setIsFlipped(true);
-            }}
+            onClick={handleFlip}
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
           >
@@ -327,15 +285,9 @@ export function FlashcardReviewSession({
               }}
             >
               <div
-                className="flex items-center justify-between px-4 py-2.5 border-b border-border"
+                className="flex items-center justify-end px-4 py-2.5 border-b border-border"
                 style={{ backgroundColor: THEME.accentLight }}
               >
-                <span
-                  className="text-[10px] font-extrabold uppercase tracking-widest px-2 py-0.5 rounded-full"
-                  style={{ backgroundColor: THEME.accent, color: '#fff' }}
-                >
-                  {directionLabel}
-                </span>
                 <span className="text-[10px] font-bold text-text-muted">
                   {currentIdx + 1} de {total}
                 </span>
@@ -361,7 +313,7 @@ export function FlashcardReviewSession({
                 <p className="text-[10px] font-extrabold uppercase tracking-widest text-primary">
                   {promptText}
                 </p>
-                <p className="font-display text-4xl font-bold text-center break-words w-full text-text-primary">
+                <p className="font-display text-[clamp(1.75rem,7vw,2.25rem)] font-bold text-center break-words w-full text-text-primary">
                   {frontText}
                 </p>
                 {direction === 'fr-to-pt' && (
@@ -384,7 +336,7 @@ export function FlashcardReviewSession({
 
             {/* Back */}
             <div
-              className="absolute inset-0 flex flex-col items-center justify-center p-8 rounded-3xl"
+              className="absolute inset-0 flex flex-col items-center justify-center p-5 sm:p-8 rounded-3xl"
               style={{
                 background: `linear-gradient(160deg, var(--color-surface) 0%, ${THEME.accentLight} 100%)`,
                 border: `2px solid ${THEME.accent}`,
@@ -394,18 +346,86 @@ export function FlashcardReviewSession({
                 transition: `transform ${FLIP_DURATION_MS}ms cubic-bezier(0.4, 0, 0.2, 1)`,
               }}
             >
-              <p className="font-display text-lg font-bold text-text-muted">{currentItem.word}</p>
+              <p className="font-display text-base sm:text-lg font-bold text-text-muted">{currentItem.word}</p>
               <div className="w-10 h-0.5 rounded-full my-3 bg-border" />
-              <p className="font-display text-3xl font-bold text-center text-vocab">
+              <p className="font-display text-[clamp(1.5rem,6vw,1.875rem)] font-bold text-center text-vocab px-2">
                 {currentItem.translation}
               </p>
               <div className="mt-5">
                 <AudioPlayerButton text={currentItem.word} language={language} size="md" />
               </div>
-              <p className="text-[10px] mt-6 font-medium text-text-muted text-center">
-                Deslize ou use ← → para avaliar
-              </p>
+              <div className="mt-6 px-6 text-center">
+                <p className="text-[11px] font-bold text-text-secondary leading-snug">
+                  ← Esqueci · Lembrei →
+                </p>
+                <p className="text-[10px] mt-1 font-medium text-text-muted leading-relaxed">
+                  Toque nas laterais, deslize o cartão ou use as setas do teclado
+                </p>
+              </div>
             </div>
+
+            {canAnswer && (
+              <>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleAnswer(false);
+                  }}
+                  className="absolute inset-y-0 left-0 z-20 flex w-[42%] items-center justify-start rounded-l-3xl pl-3 transition-transform active:scale-[0.98] cursor-pointer"
+                  style={{
+                    background:
+                      'linear-gradient(90deg, rgba(239, 68, 68, 0.24) 0%, rgba(239, 68, 68, 0.08) 55%, transparent 100%)',
+                  }}
+                  aria-label="Esqueci"
+                >
+                  <div className="flex flex-col items-center gap-1.5 animate-swipe-hint-left pointer-events-none">
+                    <div
+                      className="flex h-11 w-11 items-center justify-center rounded-xl border-2"
+                      style={{
+                        backgroundColor: 'var(--color-error-bg)',
+                        borderColor: 'rgba(239, 68, 68, 0.4)',
+                        boxShadow: '0 3px 0 rgba(220, 38, 38, 0.18)',
+                      }}
+                    >
+                      <ArrowLeft size={18} strokeWidth={2.5} className="text-error" />
+                    </div>
+                    <span className="text-[10px] font-extrabold uppercase tracking-wide text-error max-[380px]:hidden">
+                      Esqueci
+                    </span>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleAnswer(true);
+                  }}
+                  className="absolute inset-y-0 right-0 z-20 flex w-[42%] items-center justify-end rounded-r-3xl pr-3 transition-transform active:scale-[0.98] cursor-pointer"
+                  style={{
+                    background:
+                      'linear-gradient(270deg, rgba(16, 185, 129, 0.24) 0%, rgba(16, 185, 129, 0.08) 55%, transparent 100%)',
+                  }}
+                  aria-label="Lembrei"
+                >
+                  <div className="flex flex-col items-center gap-1.5 animate-swipe-hint-right pointer-events-none">
+                    <div
+                      className="flex h-11 w-11 items-center justify-center rounded-xl"
+                      style={{
+                        backgroundColor: 'var(--color-success)',
+                        boxShadow: '0 3px 0 #047857',
+                      }}
+                    >
+                      <ArrowRight size={18} strokeWidth={2.5} className="text-white" />
+                    </div>
+                    <span className="text-[10px] font-extrabold uppercase tracking-wide text-success max-[380px]:hidden">
+                      Lembrei
+                    </span>
+                  </div>
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>

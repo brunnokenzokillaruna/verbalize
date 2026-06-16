@@ -29,17 +29,17 @@ export function LessonGrammarScreen({
   onQuizCorrect,
 }: LessonGrammarScreenProps) {
   return (
-    <div className="flex flex-col gap-6 animate-slide-up-spring">
-      <div className="flex flex-col gap-1.5 animate-slide-up">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] border-b-[3px] text-lg shadow-sm">
+    <div className="flex flex-col gap-5 sm:gap-6 animate-slide-up-spring">
+      <div className="flex flex-col gap-1.5">
+        <div className="flex items-start gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-surface border border-border border-b-[3px] text-lg shadow-sm">
             🧠
           </div>
-          <div className="flex flex-col">
-            <h2 className="font-serif text-2xl font-black italic tracking-tight text-[var(--color-text-primary)]">
+          <div className="flex flex-col min-w-0">
+            <h2 className="font-display text-xl sm:text-2xl font-black italic tracking-tight text-text-primary leading-tight">
               Ponte Gramatical
             </h2>
-            <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-[0.2em] mt-0.5">
+            <p className="text-xs font-semibold text-text-muted mt-1 leading-snug">
               {grammarFocus ? grammarFocus : 'Entenda a lógica por trás'}
             </p>
           </div>

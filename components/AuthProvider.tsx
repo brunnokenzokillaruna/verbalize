@@ -2,15 +2,16 @@
 
 import { useEffect } from 'react';
 import { onAuthChange } from '@/services/auth';
-import { getUser } from '@/services/firestore';
+import { syncUserProfile } from '@/services/firestore';
 import { useAuthStore } from '@/store/authStore';
+import { shouldShowCurriculumNotice } from '@/components/dashboard/CurriculumSyncNotice';
 
 /**
  * Mounts once in the root layout. Subscribes to Firebase auth state and
  * syncs both the User object and their Firestore profile into Zustand.
  */
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const { setUser, setProfile, setInitialized } = useAuthStore();
+  const { setUser, setProfile, setCurriculumSyncNotice, setInitialized } = useAuthStore();
 
   useEffect(() => {
     let unsubscribe: (() => void) | undefined;
@@ -19,10 +20,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(user);
 
       if (user) {
-        const profile = await getUser(user.uid);
-        setProfile(profile);
+        const result = await syncUserProfile(user.uid);
+        setProfile(result?.profile ?? null);
+        setCurriculumSyncNotice(
+          result?.notice && shouldShowCurriculumNotice(result.notice) ? result.notice : null,
+        );
       } else {
         setProfile(null);
+        setCurriculumSyncNotice(null);
       }
 
       setInitialized(true);
@@ -31,7 +36,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     return () => unsubscribe?.();
-  }, [setUser, setProfile, setInitialized]);
+  }, [setUser, setProfile, setCurriculumSyncNotice, setInitialized]);
 
   return <>{children}</>;
 }

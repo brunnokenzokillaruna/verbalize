@@ -92,11 +92,12 @@ function findEnvelopeTailCut(
     minBetween = Math.min(minBetween, rms[i]);
   }
 
+  // Only trim very short trailing blips (clicks / repeated syllables), not real clauses.
   if (
     minBetween <= valleyThreshold &&
-    gapSec >= 0.03 &&
-    tailSec <= 0.55 &&
-    tailRatio <= 0.5
+    gapSec >= 0.06 &&
+    tailSec <= 0.18 &&
+    tailRatio <= 0.15
   ) {
     return Math.min(data.length, (prev.end + 1) * hop + hop);
   }
@@ -118,6 +119,18 @@ function copyTrimmedBuffer(buffer: AudioBuffer, cutEnd: number): AudioBuffer {
   return trimmed;
 }
 
+/** Never remove more than this fraction of the clip (guards against mid-sentence cuts). */
+const MAX_TRIM_FRACTION = 0.12;
+
+function isSpuriousTailBlock(
+  gapSec: number,
+  tailSec: number,
+  tailRatio: number,
+): boolean {
+  // Real speech after a natural pause is usually >200ms; artifacts are brief blips.
+  return gapSec >= 0.06 && tailSec <= 0.18 && tailRatio <= 0.15;
+}
+
 /**
  * Trims trailing TTS junk: silence followed by a short groan / syllable repeat
  * common in neural voices and MP3 tails.
@@ -137,12 +150,7 @@ export function trimTrailingTtsArtifact(buffer: AudioBuffer): AudioBuffer {
     const tailSec = last.duration / sampleRate;
     const tailRatio = last.duration / Math.max(prev.duration, 1);
 
-    // Main phrase → pause → short spurious tail (repeat / breath)
-    if (
-      gapSec >= 0.04 &&
-      tailSec <= 0.55 &&
-      (tailRatio <= 0.45 || tailSec <= 0.22)
-    ) {
+    if (isSpuriousTailBlock(gapSec, tailSec, tailRatio)) {
       cutEnd = prev.end;
     } else {
       cutEnd = last.end;
@@ -157,6 +165,9 @@ export function trimTrailingTtsArtifact(buffer: AudioBuffer): AudioBuffer {
   }
 
   cutEnd = Math.min(buffer.length, cutEnd + Math.floor(sampleRate * 0.03));
+
+  const trimmedFraction = 1 - cutEnd / buffer.length;
+  if (trimmedFraction > MAX_TRIM_FRACTION) return buffer;
 
   if (cutEnd >= buffer.length - 48) return buffer;
 

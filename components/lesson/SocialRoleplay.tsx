@@ -1,6 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { CheckCircle2, XCircle, MapPin, Lightbulb } from 'lucide-react';
 import { SocialRoleplayData } from '@/types';
+import {
+  buildOriginalToDisplayLetter,
+  remapPositionalExplanation,
+} from '@/utils/remapPositionalExplanation';
 
 interface SocialRoleplayProps {
   data: SocialRoleplayData;
@@ -50,14 +54,23 @@ function getInterlocutorRole(context: string): { label: string; avatar: string }
 export function SocialRoleplay({ data, onAnswer, answered, setIsExerciseReady, submitTrigger }: SocialRoleplayProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
-  const shuffledOptions = React.useMemo(() => {
-    const indexed = data.options.map((opt, i) => ({ text: opt, isCorrect: i === data.correctIndex }));
+  const shuffledOptions = useMemo(() => {
+    const indexed = data.options.map((opt, i) => ({
+      text: opt,
+      originalIndex: i,
+      isCorrect: i === data.correctIndex,
+    }));
     for (let i = indexed.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [indexed[i], indexed[j]] = [indexed[j], indexed[i]];
     }
     return indexed;
   }, [data.options, data.correctIndex]);
+
+  const displayExplanation = useMemo(() => {
+    const letterMap = buildOriginalToDisplayLetter(shuffledOptions);
+    return remapPositionalExplanation(data.explanation, letterMap);
+  }, [data.explanation, shuffledOptions]);
 
   useEffect(() => {
     if (!answered) {
@@ -196,7 +209,7 @@ export function SocialRoleplay({ data, onAnswer, answered, setIsExerciseReady, s
             </span>
           </div>
           <p className="text-sm font-medium leading-relaxed text-[var(--color-text-secondary)]">
-            {data.explanation}
+            {displayExplanation}
           </p>
         </div>
       )}

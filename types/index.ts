@@ -22,6 +22,17 @@ export interface UserDocument {
 
   // Per-language lesson progress: maps language → ID of the next lesson to study
   lessonProgress?: Partial<Record<SupportedLanguage, string>>;
+
+  /** Bumped when the lesson catalog changes in a breaking way (see lessonIdMigration). */
+  curriculumVersion?: number;
+
+  /** Audit trail for the most recent curriculum migration applied to this user. */
+  curriculumMigrationMeta?: {
+    version: number;
+    fromVersion: number;
+    progressChanges: Array<{ language: SupportedLanguage; from: string; to: string }>;
+    migratedAt?: Timestamp;
+  };
 }
 
 // ─── Vocabulary & SRS ─────────────────────────────────────────────────────────

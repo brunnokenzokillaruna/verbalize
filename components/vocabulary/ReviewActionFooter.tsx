@@ -1,6 +1,7 @@
 'use client';
 
 import { CheckCircle2, XCircle, ChevronRight } from 'lucide-react';
+import { useReviewSoundFeedback } from '@/hooks/useReviewSoundFeedback';
 import type { ReviewTheme } from './reviewThemes';
 
 type ReviewActionFooterProps = {
@@ -26,6 +27,17 @@ export function ReviewActionFooter({
   onSubmit,
   onContinue,
 }: ReviewActionFooterProps) {
+  const { playTap } = useReviewSoundFeedback();
+
+  function handlePrimaryAction() {
+    if (answered) {
+      onContinue();
+      return;
+    }
+    playTap();
+    onSubmit();
+  }
+
   return (
     <div style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
       {answered && (
@@ -54,7 +66,7 @@ export function ReviewActionFooter({
         <button
           type="button"
           disabled={!answered && !isExerciseReady}
-          onClick={answered ? onContinue : onSubmit}
+          onClick={handlePrimaryAction}
           className="flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-4 text-base font-bold transition-all duration-150 active:scale-[0.98] cursor-pointer focus-visible:outline-none focus-visible:ring-2 disabled:cursor-not-allowed"
           style={{
             backgroundColor: !answered

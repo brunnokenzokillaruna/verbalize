@@ -136,7 +136,7 @@ Example for social-roleplay:
     "promptLine": "Bonjour ! Vous désirez ?",
     "options": ["Je voudrais um café, s'il vous plaît.", "Je suis un café.", "Merci beaucoup !"],
     "correctIndex": 0,
-    "explanation": "A primeira opção é a forma polida de pedir algo."
+    "explanation": "Use 'Je voudrais' para pedir algo de forma polida; 'Je suis' significa 'eu sou', não um pedido."
   }
 }
 `;

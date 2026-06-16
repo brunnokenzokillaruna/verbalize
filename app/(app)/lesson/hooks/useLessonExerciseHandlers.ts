@@ -71,6 +71,7 @@ export function useLessonExerciseHandlers(
   const resetExerciseState = useCallback(() => {
     setExerciseAnswer(null);
     setIsExerciseReady(false);
+    setSubmitTrigger(0);
   }, []);
 
   const handleAnswer = useCallback(

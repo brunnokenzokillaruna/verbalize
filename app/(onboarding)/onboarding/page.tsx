@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { ChevronRight, ChevronLeft, Check, Sparkles, Globe2, Target, User } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { createUser } from '@/services/firestore';
+import { CURRICULUM_VERSION } from '@/lib/curriculum/lessonIdMigration';
+import { INITIAL_LESSON_PROGRESS } from '@/lib/curriculum/lessonProgress';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { LanguageFlag } from '@/components/LanguageFlag';
@@ -201,7 +203,7 @@ export default function OnboardingPage() {
   // Guard: redirect if not authenticated
   useEffect(() => {
     if (initialized && !user) {
-      router.replace('/login');
+      router.replace('/?auth=login');
       return;
     }
     
@@ -244,11 +246,12 @@ export default function OnboardingPage() {
         currentTargetLanguage: language,
         currentStreak: 0,
         totalLessonsCompleted: 0,
+        lessonProgress: INITIAL_LESSON_PROGRESS,
+        curriculumVersion: CURRICULUM_VERSION,
       });
-      // Re-fetch profile and store it
-      const { getUser } = await import('@/services/firestore');
-      const profile = await getUser(user.uid);
-      setProfile(profile);
+      const { syncUserProfile } = await import('@/services/firestore');
+      const result = await syncUserProfile(user.uid);
+      setProfile(result?.profile ?? null);
       router.replace('/dashboard');
     } catch {
       setSaving(false);

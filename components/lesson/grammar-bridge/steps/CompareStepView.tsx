@@ -41,10 +41,10 @@ function CompareSide({
         newVocabulary={newVocabulary}
         newVerbs={newVerbs}
         onWordClick={onWordClick}
-        className="text-sm font-black text-[var(--color-text-primary)] text-center leading-snug"
+        className="text-sm sm:text-base font-black text-text-primary text-center leading-snug"
         highlightClassName="bg-[var(--color-primary)] text-white px-1 py-0.5 rounded font-bold"
       />
-      <p className="text-[11px] italic text-[var(--color-text-secondary)] text-center">
+      <p className="grammar-secondary text-center">
         <HighlightedText
           text={side.portuguese}
           className="text-[var(--color-text-primary)] font-bold not-italic"
@@ -65,10 +65,8 @@ export function CompareStepView({
 
   return (
     <div className="flex flex-col gap-3 px-1 w-full max-w-lg mx-auto">
-      <span className="text-[10px] font-black uppercase tracking-[0.15em] text-[var(--color-text-muted)] text-center">
-        Compare os padrões
-      </span>
-      <div className="flex flex-col sm:flex-row gap-2.5 items-stretch">
+      <span className="grammar-step-label text-center block">Compare os padrões</span>
+      <div className="flex flex-col sm:flex-row gap-3 items-stretch">
         <CompareSide
           side={left}
           language={language}

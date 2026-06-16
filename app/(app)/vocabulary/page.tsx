@@ -102,12 +102,14 @@ export default function VocabularyPage() {
     results,
     savingResults,
     wordImageMap,
+    visualImagePool,
     reshuffleSession,
     startReview,
     beginFlashcardSession,
     handleFlashcardAnswer,
     finishFlashcardReview,
     beginVisualSession,
+    skipVisualItem,
     handleVisualAnswer,
     handleVisualContinue,
     finishVisualReview,
@@ -241,6 +243,7 @@ export default function VocabularyPage() {
         <VisualReviewSession
           state={visualPhase}
           sessionItems={sessionItems}
+          imagePool={visualImagePool}
           currentIdx={cardIdx}
           answered={answered}
           lastCorrect={lastCorrect}
@@ -251,6 +254,7 @@ export default function VocabularyPage() {
           onStart={beginVisualSession}
           onAnswer={handleVisualAnswer}
           onContinue={handleVisualContinue}
+          onSkipUnavailable={skipVisualItem}
           onFinish={finishVisualReview}
           onClose={closeAllReview}
         />

@@ -17,15 +17,22 @@ import { useSoundEffects } from '@/hooks/useSoundEffects';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { useDashboardPregen } from '@/hooks/useDashboardPregen';
 import { logOut } from '@/services/auth';
-import { updateUser, getUser, logLesson, updateLessonStats } from '@/services/firestore';
+import { updateUser, syncUserProfile, logLesson, updateLessonStats } from '@/services/firestore';
 import { SkipLessonModal } from '@/components/ui/SkipLessonModal';
 import type { LessonDefinition } from '@/types';
 import { getLessonsForLanguage } from '@/lib/curriculum';
+import { resolveFrontierLessonId } from '@/lib/curriculum/lessonProgress';
+import {
+  CurriculumSyncNoticeBanner,
+  markCurriculumNoticeDismissed,
+  shouldShowCurriculumNotice,
+} from '@/components/dashboard/CurriculumSyncNotice';
 import { getEffectiveStreak } from '@/lib/stats';
 import type { ProficiencyLevel, SupportedLanguage } from '@/types';
 
 export default function DashboardPage() {
-  const { profile, user, setProfile, reset } = useAuthStore();
+  const { profile, user, setProfile, reset, curriculumSyncNotice, setCurriculumSyncNotice } =
+    useAuthStore();
   const { theme, toggleTheme } = useTheme();
   const { isMuted, toggleMute } = useSoundEffects();
   const router = useRouter();
@@ -34,7 +41,10 @@ export default function DashboardPage() {
     () => (profile ? getLessonsForLanguage(profile.currentTargetLanguage) : []),
     [profile],
   );
-  const frontierLessonId = profile?.lessonProgress?.[profile.currentTargetLanguage ?? 'fr'];
+  const rawFrontierLessonId = profile?.lessonProgress?.[profile.currentTargetLanguage ?? 'fr'];
+  const frontierLessonId = profile
+    ? resolveFrontierLessonId(profile.currentTargetLanguage ?? 'fr', rawFrontierLessonId)
+    : undefined;
   let frontierIndex = frontierLessonId
     ? allLessons.findIndex((l) => l.id === frontierLessonId)
     : 0;
@@ -119,9 +129,13 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!user) return;
-    getUser(user.uid)
-      .then((fresh) => {
-        if (fresh) setProfile(fresh);
+    syncUserProfile(user.uid)
+      .then((result) => {
+        if (!result) return;
+        setProfile(result.profile);
+        if (result.notice && shouldShowCurriculumNotice(result.notice)) {
+          setCurriculumSyncNotice(result.notice);
+        }
       })
       .catch(console.error);
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -245,6 +259,13 @@ export default function DashboardPage() {
   const activeLessonTitle =
     activeLessonObj?.uiTitle || activeLessonObj?.grammarFocus?.split(' — ')[0] || 'Carregando...';
 
+  function handleDismissCurriculumNotice() {
+    if (curriculumSyncNotice) {
+      markCurriculumNoticeDismissed(curriculumSyncNotice.reportVersion);
+    }
+    setCurriculumSyncNotice(null);
+  }
+
   return (
     <div className="min-h-dvh animate-fade-in" style={{ backgroundColor: 'var(--color-bg)' }}>
       <div className="relative w-full max-w-lg mx-auto md:max-w-2xl lg:max-w-4xl px-0 sm:px-4">
@@ -257,6 +278,15 @@ export default function DashboardPage() {
           onOpenLanguageSheet={() => setShowLangSheet(true)}
           onOpenProfile={() => setShowProfileDrawer(true)}
         />
+
+        {curriculumSyncNotice && (
+          <div className="px-4 pt-3">
+            <CurriculumSyncNoticeBanner
+              notice={curriculumSyncNotice}
+              onDismiss={handleDismissCurriculumNotice}
+            />
+          </div>
+        )}
 
         <DashboardBanner
           language={profile.currentTargetLanguage as SupportedLanguage}

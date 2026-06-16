@@ -102,6 +102,7 @@ export function LessonPhaseContent({
           dialogue={store.hook.dialogue}
           dialogueTranslations={store.hook.dialogueTranslations}
           language={store.lesson.language}
+          briefing={store.missionBriefing}
           intentMode={['B1', 'B2', 'C1', 'C2'].includes(store.lesson.level)}
           onComplete={(spoken, total) => store.completeRolePlay(spoken, total)}
         />

@@ -116,7 +116,7 @@ export function GrammarBridgeFlow({
 
   return (
     <div
-      className="group/card relative rounded-[1.5rem] overflow-hidden transition-all duration-500 shadow-md flex flex-col gap-0"
+      className="group/card relative rounded-2xl sm:rounded-[1.5rem] overflow-hidden transition-all duration-500 shadow-md flex flex-col"
       style={{
         backgroundColor: 'var(--color-surface)',
         border: '1px solid var(--color-border)',
@@ -124,7 +124,7 @@ export function GrammarBridgeFlow({
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >
-      <div className="flex flex-col p-5 gap-4">
+      <div className="flex flex-col p-4 sm:p-5 gap-4 sm:gap-5">
         <GrammarStepProgress step={currentStep} allSteps={steps} />
 
         <div
@@ -146,16 +146,16 @@ export function GrammarBridgeFlow({
           />
         </div>
 
-        <div className="flex items-center justify-between gap-3 pt-1">
+        <div className="flex items-center justify-between gap-3 pt-1 sm:pt-2">
           <button
             type="button"
             onClick={goPrev}
             disabled={isFirstStep}
             className={[
-              'flex items-center gap-1 rounded-xl px-3 py-2.5 text-xs font-bold uppercase tracking-wide border transition-all',
+              'flex items-center gap-1 rounded-xl px-3 py-2.5 sm:py-3 text-xs sm:text-sm font-bold border transition-all min-h-[44px]',
               isFirstStep
                 ? 'opacity-0 pointer-events-none border-transparent'
-                : 'border-[var(--color-border)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-raised)]',
+                : 'border-border text-text-secondary hover:bg-surface-raised',
             ].join(' ')}
             aria-label="Voltar"
           >
@@ -167,7 +167,7 @@ export function GrammarBridgeFlow({
             <button
               type="button"
               onClick={handleAdvanceToPractice}
-              className="flex items-center gap-1 rounded-xl px-5 py-2.5 text-xs font-black uppercase tracking-wide bg-[var(--color-primary)] text-white border border-b-[3px] border-[var(--color-primary-dark)] active:translate-y-[1px] active:border-b-[1px] transition-all"
+              className="flex items-center gap-1 rounded-xl px-4 sm:px-5 py-2.5 sm:py-3 text-xs sm:text-sm font-black bg-primary text-white border border-b-[3px] border-primary-dark active:translate-y-[1px] active:border-b-[1px] transition-all min-h-[44px]"
             >
               Praticar agora 💪
             </button>
@@ -177,17 +177,17 @@ export function GrammarBridgeFlow({
               onClick={handlePrimaryAction}
               disabled={!canContinue}
               className={[
-                'flex items-center gap-1 rounded-xl px-5 py-2.5 text-xs font-black uppercase tracking-wide transition-all',
+                'flex items-center gap-1 rounded-xl px-4 sm:px-5 py-2.5 sm:py-3 text-xs sm:text-sm font-black transition-all min-h-[44px]',
                 canContinue
-                  ? 'bg-[var(--color-primary)] text-white border border-b-[3px] border-[var(--color-primary-dark)] active:translate-y-[1px] active:border-b-[1px]'
-                  : 'bg-[var(--color-surface-raised)] text-[var(--color-text-muted)] border border-[var(--color-border)] cursor-not-allowed',
+                  ? 'bg-primary text-white border border-b-[3px] border-primary-dark active:translate-y-[1px] active:border-b-[1px]'
+                  : 'bg-surface-raised text-text-muted border border-border cursor-not-allowed',
               ].join(' ')}
             >
               Continuar
               <ChevronRight size={16} />
             </button>
           ) : (
-            <span className="text-[10px] font-semibold text-[var(--color-text-muted)] uppercase tracking-wider text-center flex-1">
+            <span className="text-xs font-semibold text-text-muted text-center flex-1">
               {canContinue ? 'Pronto para praticar!' : 'Responda o teste para continuar'}
             </span>
           )}

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { X } from 'lucide-react';
 import { LoginForm } from './LoginForm';
 import { SignupForm } from './SignupForm';
@@ -21,21 +21,48 @@ export function AuthModalProvider({ children }: { children: ReactNode }) {
   const openModal = (type: ModalType) => setModalType(type);
   const closeModal = () => setModalType(null);
 
+  useEffect(() => {
+    if (!modalType) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeModal();
+    };
+    window.addEventListener('keydown', handleEscape);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', handleEscape);
+    };
+  }, [modalType]);
+
   return (
     <AuthModalContext.Provider value={{ modalType, openModal, closeModal }}>
       {children}
-      
+
       {modalType && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in">
-          <div className="relative flex w-full max-w-lg flex-col items-center justify-center p-6 lg:p-12 animate-scale-in bg-white dark:bg-neutral-900 rounded-3xl"
-              style={{ backgroundColor: 'var(--color-bg)' }}>
-                
+        <div
+          className="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in p-4"
+          onClick={closeModal}
+          role="presentation"
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label={modalType === 'login' ? 'Entrar na conta' : 'Criar conta'}
+            className="relative w-full max-w-md max-h-[min(90dvh,720px)] overflow-y-auto overscroll-contain scrollbar-hide animate-scale-in rounded-2xl sm:rounded-3xl shadow-2xl px-4 pt-12 pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:px-8 sm:pt-12 sm:pb-8 lg:px-10 [-webkit-overflow-scrolling:touch]"
+            style={{ backgroundColor: 'var(--color-bg)' }}
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
+              type="button"
               onClick={closeModal}
-              className="absolute right-4 top-4 p-2 rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors"
-              aria-label="Close modal"
+              className="absolute right-3 top-3 sm:right-4 sm:top-4 z-10 p-2 rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors"
+              aria-label="Fechar modal"
             >
-              <X size={24} style={{ color: 'var(--color-text-primary)' }} />
+              <X size={22} style={{ color: 'var(--color-text-primary)' }} />
             </button>
 
             {modalType === 'login' ? <LoginForm /> : <SignupForm />}

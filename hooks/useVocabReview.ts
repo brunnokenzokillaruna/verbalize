@@ -4,7 +4,12 @@ import type { VocabReviewItem } from '@/app/actions/generateVocabReview';
 import { updateVocabSrsAfterReview } from '@/services/firestore';
 import { getLessonById, getNextLesson } from '@/lib/curriculum';
 import { pickReviewSession } from '@/utils/reviewSession';
+import {
+  getVisualReviewPlayableItems,
+  MIN_VISUAL_REVIEW_ITEMS,
+} from '@/utils/imageMatchBuilder';
 import { isDueForReview } from '@/utils/vocabPageHelpers';
+import { useReviewSoundFeedback } from '@/hooks/useReviewSoundFeedback';
 import type { ReviewResult } from '@/components/vocabulary/reviewTypes';
 import type { UserVocabularyDocument, SupportedLanguage, UserDocument } from '@/types';
 import type { User } from 'firebase/auth';
@@ -33,6 +38,7 @@ export function useVocabReview(
   const [lastCorrect, setLastCorrect] = useState<boolean | null>(null);
   const [results, setResults] = useState<ReviewResult[]>([]);
   const [savingResults, setSavingResults] = useState(false);
+  const { playAnswer } = useReviewSoundFeedback();
 
   const rawDueToday = useMemo(
     () => items.filter((item) => isDueForReview(item)),
@@ -47,6 +53,22 @@ export function useVocabReview(
   const wordImageMap = useMemo(
     () => Object.fromEntries(items.filter((v) => v.imageUrl).map((v) => [v.word, v.imageUrl!])),
     [items],
+  );
+
+  const visualImagePool = useMemo(
+    () =>
+      items.map((item) => ({
+        word: item.word,
+        translation: item.translation,
+        imageUrl: item.imageUrl,
+      })),
+    [items],
+  );
+
+  const prepareVisualSession = useCallback(
+    (session: UserVocabularyDocument[]) =>
+      getVisualReviewPlayableItems(session, visualImagePool),
+    [visualImagePool],
   );
 
   const isReviewActive =
@@ -116,6 +138,9 @@ export function useVocabReview(
       }
 
       if (mode === 'visual') {
+        const visualSession = prepareVisualSession(session);
+        if (visualSession.length === 0) return;
+        setSessionItems(visualSession);
         setVisualPhase('running');
         return;
       }
@@ -150,7 +175,7 @@ export function useVocabReview(
         setContextLoading(false);
       }
     },
-    [user, rawDueToday.length, sessionPreview, prepareSession, profile, language, items],
+    [user, rawDueToday.length, sessionPreview, prepareSession, prepareVisualSession, profile, language, items],
   );
 
   const finishAndClose = useCallback(
@@ -186,23 +211,40 @@ export function useVocabReview(
   const finishFlashcardReview = useCallback(() => finishAndClose(results), [finishAndClose, results]);
 
   const startVisualMode = useCallback(() => {
+    const session = sessionItems.length > 0 ? sessionItems : prepareSession();
+    const visualSession = prepareVisualSession(session);
     setShowPicker(false);
+    setSessionItems(visualSession);
     setCardIdx(0);
     setResults([]);
     setAnswered(false);
     setLastCorrect(null);
     setVisualPhase('ready');
-  }, []);
+  }, [sessionItems, prepareSession, prepareVisualSession]);
 
-  const beginVisualSession = useCallback(() => setVisualPhase('running'), []);
+  const beginVisualSession = useCallback(() => {
+    if (sessionItems.length === 0) return;
+    setVisualPhase('running');
+  }, [sessionItems.length]);
+
+  const skipVisualItem = useCallback(() => {
+    if (cardIdx + 1 >= sessionItems.length) {
+      setVisualPhase('done');
+      return;
+    }
+    setCardIdx((index) => index + 1);
+    setAnswered(false);
+    setLastCorrect(null);
+  }, [cardIdx, sessionItems.length]);
 
   const handleVisualAnswer = useCallback(
     (correct: boolean) => {
       if (answered) return;
       setAnswered(true);
       setLastCorrect(correct);
+      playAnswer(correct);
     },
-    [answered],
+    [answered, playAnswer],
   );
 
   const handleVisualContinue = useCallback(() => {
@@ -265,8 +307,9 @@ export function useVocabReview(
       if (answered) return;
       setAnswered(true);
       setLastCorrect(correct);
+      playAnswer(correct);
     },
-    [answered],
+    [answered, playAnswer],
   );
 
   const handleContextContinue = useCallback(() => {
@@ -291,6 +334,8 @@ export function useVocabReview(
     rawDueToday,
     sessionPreview,
     wordImageMap,
+    visualImagePool,
+    minVisualReviewItems: MIN_VISUAL_REVIEW_ITEMS,
     isReviewActive,
     showPicker,
     sessionItems,
@@ -314,6 +359,7 @@ export function useVocabReview(
     finishFlashcardReview,
     startVisualMode,
     beginVisualSession,
+    skipVisualItem,
     handleVisualAnswer,
     handleVisualContinue,
     finishVisualReview,

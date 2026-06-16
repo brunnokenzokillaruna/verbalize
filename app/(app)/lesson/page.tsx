@@ -53,7 +53,7 @@ export default function LessonPage() {
 
   useEffect(() => {
     if (!user || !profile) {
-      router.replace('/login');
+      router.replace('/?auth=login');
     }
   }, [user, profile, router]);
 

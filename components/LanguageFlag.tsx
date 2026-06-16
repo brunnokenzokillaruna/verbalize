@@ -14,9 +14,34 @@ const SIZE_CLASS = {
   '2xl': 'h-8 w-auto rounded-[4px]',
 } as const;
 
+type FlagSize = keyof typeof SIZE_CLASS;
+
+type CountryFlagProps = {
+  countryCode: string;
+  size?: FlagSize;
+  className?: string;
+  alt: string;
+};
+
+export function CountryFlag({
+  countryCode,
+  size = 'md',
+  className = '',
+  alt,
+}: CountryFlagProps) {
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={`https://flagcdn.com/w40/${countryCode}.png`}
+      alt={alt}
+      className={`inline-block shrink-0 object-cover ${SIZE_CLASS[size]} ${className}`}
+    />
+  );
+}
+
 type LanguageFlagProps = {
   language: SupportedLanguage;
-  size?: keyof typeof SIZE_CLASS;
+  size?: FlagSize;
   className?: string;
   alt?: string;
 };
@@ -30,11 +55,25 @@ export function LanguageFlag({
   const countryCode = LANGUAGE_COUNTRY_CODE[language];
 
   return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={`https://flagcdn.com/w40/${countryCode}.png`}
+    <CountryFlag
+      countryCode={countryCode}
+      size={size}
+      className={className}
       alt={alt ?? (language === 'fr' ? 'Bandeira da França' : 'Bandeira do Reino Unido')}
-      className={`inline-block shrink-0 object-cover ${SIZE_CLASS[size]} ${className}`}
     />
   );
+}
+
+type BrazilFlagProps = {
+  size?: FlagSize;
+  className?: string;
+  alt?: string;
+};
+
+export function BrazilFlag({
+  size = 'md',
+  className = '',
+  alt = 'Bandeira do Brasil',
+}: BrazilFlagProps) {
+  return <CountryFlag countryCode="br" size={size} className={className} alt={alt} />;
 }

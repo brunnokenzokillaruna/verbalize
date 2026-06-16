@@ -1073,7 +1073,25 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "fr-a2-120",
+    "level": "A2",
+    "tag": "PRON",
+    "uiTitle": "O Som do EU e do U",
+    "grammarFocus": "Vogais Fechadas: EU e U (feu / tu)",
+    "theme": "Tema 9: Minha Casa, Minha Rotina",
+    "language": "fr",
+    "id": "fr-a2-120"
+  },
+  {
+    "level": "A2",
+    "tag": "PRON",
+    "uiTitle": "O R Francês",
+    "grammarFocus": "O Som Vibrante do R (Uvular e Liaison com R)",
+    "theme": "Tema 9: Minha Casa, Minha Rotina",
+    "language": "fr",
+    "id": "fr-a2-121"
+  },
+  {
+    "id": "fr-a2-122",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1082,7 +1100,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "fr-a2-121",
+    "id": "fr-a2-123",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1091,7 +1109,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "fr-a2-122",
+    "id": "fr-a2-124",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1100,7 +1118,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "fr-a2-123",
+    "id": "fr-a2-125",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1109,7 +1127,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "fr-a2-124",
+    "id": "fr-a2-126",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1118,7 +1136,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "fr-a2-125",
+    "id": "fr-a2-127",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1127,7 +1145,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "fr-a2-126",
+    "id": "fr-a2-128",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1136,7 +1154,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "fr-a2-127",
+    "id": "fr-a2-129",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1145,7 +1163,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "fr-a2-128",
+    "id": "fr-a2-130",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1154,7 +1172,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "fr-a2-129",
+    "id": "fr-a2-131",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1163,7 +1181,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
-    "id": "fr-a2-130",
+    "id": "fr-a2-132",
     "language": "fr",
     "level": "A2",
     "tag": "MISS",
@@ -1172,7 +1190,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
-    "id": "fr-a2-131",
+    "id": "fr-a2-133",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1181,7 +1199,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
-    "id": "fr-a2-132",
+    "id": "fr-a2-134",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1190,7 +1208,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
-    "id": "fr-a2-133",
+    "id": "fr-a2-135",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1199,7 +1217,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
-    "id": "fr-a2-134",
+    "id": "fr-a2-136",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1208,7 +1226,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
-    "id": "fr-a2-135",
+    "id": "fr-a2-137",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1217,7 +1235,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
-    "id": "fr-a2-136",
+    "id": "fr-a2-138",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1226,7 +1244,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
-    "id": "fr-a2-137",
+    "id": "fr-a2-139",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1235,7 +1253,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
-    "id": "fr-a2-138",
+    "id": "fr-a2-140",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1244,7 +1262,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
-    "id": "fr-a2-139",
+    "id": "fr-a2-141",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1253,7 +1271,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
-    "id": "fr-a2-140",
+    "id": "fr-a2-142",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1262,7 +1280,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
-    "id": "fr-a2-141",
+    "id": "fr-a2-143",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1271,7 +1289,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
-    "id": "fr-a2-142",
+    "id": "fr-a2-144",
     "language": "fr",
     "level": "A2",
     "tag": "MISS",
@@ -1280,7 +1298,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "fr-a2-143",
+    "id": "fr-a2-145",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1289,7 +1307,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "fr-a2-144",
+    "id": "fr-a2-146",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1298,7 +1316,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "fr-a2-145",
+    "id": "fr-a2-147",
     "language": "fr",
     "level": "A2",
     "tag": "VOC",
@@ -1307,7 +1325,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "fr-a2-146",
+    "id": "fr-a2-148",
     "language": "fr",
     "level": "A2",
     "tag": "DIAL",
@@ -1316,7 +1334,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "fr-a2-147",
+    "id": "fr-a2-149",
     "language": "fr",
     "level": "A2",
     "tag": "MISS",
@@ -1325,7 +1343,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "fr-a2-148",
+    "id": "fr-a2-150",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1334,7 +1352,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "fr-a2-149",
+    "id": "fr-a2-151",
     "language": "fr",
     "level": "A2",
     "tag": "VOC",
@@ -1343,7 +1361,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "fr-a2-150",
+    "id": "fr-a2-152",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1352,7 +1370,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "fr-a2-151",
+    "id": "fr-a2-153",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1361,7 +1379,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "fr-a2-152",
+    "id": "fr-a2-154",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1370,7 +1388,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "fr-a2-153",
+    "id": "fr-a2-155",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1379,7 +1397,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "fr-a2-154",
+    "id": "fr-a2-156",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1388,7 +1406,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "fr-a2-155",
+    "id": "fr-a2-157",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1397,7 +1415,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "fr-a2-156",
+    "id": "fr-a2-158",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1406,7 +1424,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "fr-a2-157",
+    "id": "fr-a2-159",
     "language": "fr",
     "level": "A2",
     "tag": "MISS",
@@ -1415,7 +1433,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "fr-a2-158",
+    "id": "fr-a2-160",
     "language": "fr",
     "level": "A2",
     "tag": "VOC",
@@ -1424,7 +1442,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "fr-a2-159",
+    "id": "fr-a2-161",
     "language": "fr",
     "level": "A2",
     "tag": "VOC",
@@ -1433,7 +1451,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "fr-a2-160",
+    "id": "fr-a2-162",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1442,7 +1460,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "fr-a2-161",
+    "id": "fr-a2-163",
     "language": "fr",
     "level": "A2",
     "tag": "EXPR",
@@ -1451,7 +1469,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "fr-a2-162",
+    "id": "fr-a2-164",
     "language": "fr",
     "level": "A2",
     "tag": "VOC",
@@ -1460,7 +1478,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "fr-a2-163",
+    "id": "fr-a2-165",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1469,7 +1487,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "fr-a2-164",
+    "id": "fr-a2-166",
     "language": "fr",
     "level": "A2",
     "tag": "EXPR",
@@ -1478,7 +1496,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "fr-a2-165",
+    "id": "fr-a2-167",
     "language": "fr",
     "level": "A2",
     "tag": "VOC",
@@ -1487,7 +1505,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "fr-a2-166",
+    "id": "fr-a2-168",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1496,7 +1514,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "fr-a2-167",
+    "id": "fr-a2-169",
     "language": "fr",
     "level": "A2",
     "tag": "VOC",
@@ -1505,7 +1523,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "fr-a2-168",
+    "id": "fr-a2-170",
     "language": "fr",
     "level": "A2",
     "tag": "VOC",
@@ -1514,7 +1532,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "fr-a2-169",
+    "id": "fr-a2-171",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1523,7 +1541,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "fr-a2-170",
+    "id": "fr-a2-172",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1532,7 +1550,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "fr-a2-171",
+    "id": "fr-a2-173",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1541,7 +1559,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "fr-a2-172",
+    "id": "fr-a2-174",
     "language": "fr",
     "level": "A2",
     "tag": "EXPR",
@@ -1550,7 +1568,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
-    "id": "fr-a2-173",
+    "id": "fr-a2-175",
     "language": "fr",
     "level": "A2",
     "tag": "DIAL",
@@ -1559,7 +1577,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
-    "id": "fr-a2-174",
+    "id": "fr-a2-176",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1568,7 +1586,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
-    "id": "fr-a2-175",
+    "id": "fr-a2-177",
     "language": "fr",
     "level": "A2",
     "tag": "MISS",
@@ -1577,7 +1595,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
-    "id": "fr-a2-176",
+    "id": "fr-a2-178",
     "language": "fr",
     "level": "A2",
     "tag": "DIAL",
@@ -1586,7 +1604,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
-    "id": "fr-a2-177",
+    "id": "fr-a2-179",
     "language": "fr",
     "level": "A2",
     "tag": "VOC",
@@ -1595,7 +1613,16 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
-    "id": "fr-a2-178",
+    "level": "A2",
+    "tag": "VOC",
+    "uiTitle": "Preços Grandes",
+    "grammarFocus": "Números Grandes: Cent, Mille e Million",
+    "theme": "Tema 13: Clima, Natureza e Passeios",
+    "language": "fr",
+    "id": "fr-a2-180"
+  },
+  {
+    "id": "fr-a2-181",
     "language": "fr",
     "level": "A2",
     "tag": "MISS",
@@ -1604,7 +1631,16 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
-    "id": "fr-a2-179",
+    "level": "A2",
+    "tag": "MISS",
+    "uiTitle": "Comprando o Bilhete",
+    "grammarFocus": "Metro, RER e Navigo: Bilhetes e Correspondance",
+    "theme": "Tema 13: Clima, Natureza e Passeios",
+    "language": "fr",
+    "id": "fr-a2-182"
+  },
+  {
+    "id": "fr-a2-183",
     "language": "fr",
     "level": "A2",
     "tag": "DIAL",
@@ -1613,7 +1649,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
-    "id": "fr-a2-180",
+    "id": "fr-a2-184",
     "language": "fr",
     "level": "A2",
     "tag": "VOC",
@@ -1622,7 +1658,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
-    "id": "fr-a2-181",
+    "id": "fr-a2-185",
     "language": "fr",
     "level": "A2",
     "tag": "VOC",
@@ -1631,7 +1667,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
-    "id": "fr-a2-182",
+    "id": "fr-a2-186",
     "language": "fr",
     "level": "A2",
     "tag": "VOC",
@@ -1640,7 +1676,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
-    "id": "fr-a2-183",
+    "id": "fr-a2-187",
     "language": "fr",
     "level": "A2",
     "tag": "VOC",
@@ -1649,7 +1685,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
-    "id": "fr-a2-184",
+    "id": "fr-a2-188",
     "language": "fr",
     "level": "A2",
     "tag": "VOC",
@@ -1658,7 +1694,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
-    "id": "fr-a2-185",
+    "id": "fr-a2-189",
     "language": "fr",
     "level": "A2",
     "tag": "VOC",
@@ -1667,7 +1703,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
-    "id": "fr-a2-186",
+    "id": "fr-a2-190",
     "language": "fr",
     "level": "A2",
     "tag": "MISS",
@@ -1676,7 +1712,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 14: Rotina do Escritório e da Cidade"
   },
   {
-    "id": "fr-a2-187",
+    "id": "fr-a2-191",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1685,7 +1721,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 14: Rotina do Escritório e da Cidade"
   },
   {
-    "id": "fr-a2-188",
+    "id": "fr-a2-192",
     "language": "fr",
     "level": "A2",
     "tag": "PRON",
@@ -1694,7 +1730,16 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 14: Rotina do Escritório e da Cidade"
   },
   {
-    "id": "fr-a2-189",
+    "level": "A2",
+    "tag": "PRON",
+    "uiTitle": "Liaison Obrigatória",
+    "grammarFocus": "Liaison Avançada: Obrigatória vs Proibida",
+    "theme": "Tema 14: Rotina do Escritório e da Cidade",
+    "language": "fr",
+    "id": "fr-a2-193"
+  },
+  {
+    "id": "fr-a2-194",
     "language": "fr",
     "level": "A2",
     "tag": "MISS",
@@ -1703,7 +1748,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 14: Rotina do Escritório e da Cidade"
   },
   {
-    "id": "fr-a2-190",
+    "id": "fr-a2-195",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1712,7 +1757,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 14: Rotina do Escritório e da Cidade"
   },
   {
-    "id": "fr-a2-191",
+    "id": "fr-a2-196",
     "language": "fr",
     "level": "A2",
     "tag": "PRON",
@@ -1721,7 +1766,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 14: Rotina do Escritório e da Cidade"
   },
   {
-    "id": "fr-a2-192",
+    "id": "fr-a2-197",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1730,7 +1775,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 14: Rotina do Escritório e da Cidade"
   },
   {
-    "id": "fr-a2-193",
+    "id": "fr-a2-198",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1739,7 +1784,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 14: Rotina do Escritório e da Cidade"
   },
   {
-    "id": "fr-a2-194",
+    "id": "fr-a2-199",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1748,7 +1793,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 14: Rotina do Escritório e da Cidade"
   },
   {
-    "id": "fr-a2-195",
+    "id": "fr-a2-200",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
@@ -1757,7 +1802,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 14: Rotina do Escritório e da Cidade"
   },
   {
-    "id": "fr-a2-196",
+    "id": "fr-a2-201",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1766,7 +1811,25 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 15: Saúde e Farmácia"
   },
   {
-    "id": "fr-a2-197",
+    "level": "A2",
+    "tag": "DIAL",
+    "uiTitle": "Na Consulta Médica",
+    "grammarFocus": "5 Frases para Consultas: Rendez-vous, Symptômes e Ordonnance",
+    "theme": "Tema 15: Saúde e Farmácia",
+    "language": "fr",
+    "id": "fr-a2-202"
+  },
+  {
+    "level": "A2",
+    "tag": "VOC",
+    "uiTitle": "Abrir uma Conta",
+    "grammarFocus": "Vocabulário: Banque, Compte, RIB e Préfecture",
+    "theme": "Tema 15: Saúde e Farmácia",
+    "language": "fr",
+    "id": "fr-a2-203"
+  },
+  {
+    "id": "fr-a2-204",
     "language": "fr",
     "level": "A2",
     "tag": "MISS",
@@ -1775,7 +1838,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 15: Saúde e Farmácia"
   },
   {
-    "id": "fr-a2-198",
+    "id": "fr-a2-205",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1784,7 +1847,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 15: Saúde e Farmácia"
   },
   {
-    "id": "fr-a2-199",
+    "id": "fr-a2-206",
     "language": "fr",
     "level": "A2",
     "tag": "MISS",
@@ -1793,7 +1856,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 15: Saúde e Farmácia"
   },
   {
-    "id": "fr-a2-200",
+    "id": "fr-a2-207",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1802,7 +1865,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 15: Saúde e Farmácia"
   },
   {
-    "id": "fr-a2-201",
+    "id": "fr-a2-208",
     "language": "fr",
     "level": "A2",
     "tag": "MISS",
@@ -1811,7 +1874,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 15: Saúde e Farmácia"
   },
   {
-    "id": "fr-a2-202",
+    "id": "fr-a2-209",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1820,7 +1883,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 15: Saúde e Farmácia"
   },
   {
-    "id": "fr-a2-203",
+    "id": "fr-a2-210",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1829,7 +1892,16 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 15: Saúde e Farmácia"
   },
   {
-    "id": "fr-a2-204",
+    "level": "A2",
+    "tag": "GRAM",
+    "uiTitle": "Ação em Andamento",
+    "grammarFocus": "Gérondif e Être en train de + Infinitif",
+    "theme": "Tema 15: Saúde e Farmácia",
+    "language": "fr",
+    "id": "fr-a2-211"
+  },
+  {
+    "id": "fr-a2-212",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1838,7 +1910,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 15: Saúde e Farmácia"
   },
   {
-    "id": "fr-a2-205",
+    "id": "fr-a2-213",
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
@@ -1847,7 +1919,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 15: Saúde e Farmácia"
   },
   {
-    "id": "fr-b1-206",
+    "id": "fr-b1-214",
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
@@ -1856,7 +1928,16 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "fr-b1-207",
+    "level": "B1",
+    "tag": "PRON",
+    "uiTitle": "Entonação e Ritmo",
+    "grammarFocus": "Intonação em Perguntas, Negação e Ênfase",
+    "theme": "Tema 16: Relembrando a Infância",
+    "language": "fr",
+    "id": "fr-b1-215"
+  },
+  {
+    "id": "fr-b1-216",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -1865,7 +1946,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "fr-b1-208",
+    "id": "fr-b1-217",
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
@@ -1874,7 +1955,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "fr-b1-209",
+    "id": "fr-b1-218",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -1883,7 +1964,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "fr-b1-210",
+    "id": "fr-b1-219",
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
@@ -1892,7 +1973,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "fr-b1-211",
+    "id": "fr-b1-220",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -1901,7 +1982,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "fr-b1-212",
+    "id": "fr-b1-221",
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
@@ -1910,7 +1991,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "fr-b1-213",
+    "id": "fr-b1-222",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -1919,7 +2000,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "fr-b1-214",
+    "id": "fr-b1-223",
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
@@ -1928,7 +2009,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "fr-b1-215",
+    "id": "fr-b1-224",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -1937,7 +2018,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "fr-b1-216",
+    "id": "fr-b1-225",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -1946,7 +2027,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "fr-b1-217",
+    "id": "fr-b1-226",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -1955,7 +2036,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "fr-b1-218",
+    "id": "fr-b1-227",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -1964,7 +2045,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "fr-b1-219",
+    "id": "fr-b1-228",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -1973,7 +2054,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "fr-b1-220",
+    "id": "fr-b1-229",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -1982,7 +2063,16 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "fr-b1-221",
+    "level": "B1",
+    "tag": "DIAL",
+    "uiTitle": "Ligação Telefônica",
+    "grammarFocus": "5 Frases para Telefone: Appels, Messages et Rendez-vous",
+    "theme": "Tema 17: Fofocas e Histórias Indiretas",
+    "language": "fr",
+    "id": "fr-b1-230"
+  },
+  {
+    "id": "fr-b1-231",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -1991,7 +2081,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "fr-b1-222",
+    "id": "fr-b1-232",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -2000,7 +2090,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "fr-b1-223",
+    "id": "fr-b1-233",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -2009,7 +2099,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "fr-b1-224",
+    "id": "fr-b1-234",
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
@@ -2018,7 +2108,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
-    "id": "fr-b1-225",
+    "id": "fr-b1-235",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -2027,7 +2117,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
-    "id": "fr-b1-226",
+    "id": "fr-b1-236",
     "language": "fr",
     "level": "B1",
     "tag": "MISS",
@@ -2036,7 +2126,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
-    "id": "fr-b1-227",
+    "id": "fr-b1-237",
     "language": "fr",
     "level": "B1",
     "tag": "VOC",
@@ -2045,7 +2135,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
-    "id": "fr-b1-228",
+    "id": "fr-b1-238",
     "language": "fr",
     "level": "B1",
     "tag": "EXPR",
@@ -2054,7 +2144,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
-    "id": "fr-b1-229",
+    "id": "fr-b1-239",
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
@@ -2063,7 +2153,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
-    "id": "fr-b1-230",
+    "id": "fr-b1-240",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -2072,7 +2162,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
-    "id": "fr-b1-231",
+    "id": "fr-b1-241",
     "language": "fr",
     "level": "B1",
     "tag": "VOC",
@@ -2081,7 +2171,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
-    "id": "fr-b1-232",
+    "id": "fr-b1-242",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -2090,7 +2180,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
-    "id": "fr-b1-233",
+    "id": "fr-b1-243",
     "language": "fr",
     "level": "B1",
     "tag": "VOC",
@@ -2099,7 +2189,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
-    "id": "fr-b1-234",
+    "id": "fr-b1-244",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -2108,7 +2198,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
-    "id": "fr-b1-235",
+    "id": "fr-b1-245",
     "language": "fr",
     "level": "B1",
     "tag": "VOC",
@@ -2117,7 +2207,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
-    "id": "fr-b1-236",
+    "id": "fr-b1-246",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -2126,7 +2216,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
-    "id": "fr-b1-237",
+    "id": "fr-b1-247",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -2135,7 +2225,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
-    "id": "fr-b1-238",
+    "id": "fr-b1-248",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -2144,7 +2234,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
-    "id": "fr-b1-239",
+    "id": "fr-b1-249",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -2153,7 +2243,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
-    "id": "fr-b1-240",
+    "id": "fr-b1-250",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -2162,7 +2252,25 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
-    "id": "fr-b1-241",
+    "level": "B1",
+    "tag": "MISS",
+    "uiTitle": "Jantar Reservado",
+    "grammarFocus": "Au Restaurant: Réservation, Menu, Addition et Pourboire",
+    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro",
+    "language": "fr",
+    "id": "fr-b1-251"
+  },
+  {
+    "level": "B1",
+    "tag": "CULT",
+    "uiTitle": "Carte Vitale e Mutuelle",
+    "grammarFocus": "Système de Santé Français: Carte Vitale et Mutuelle",
+    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro",
+    "language": "fr",
+    "id": "fr-b1-252"
+  },
+  {
+    "id": "fr-b1-253",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -2171,7 +2279,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
-    "id": "fr-b1-242",
+    "id": "fr-b1-254",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -2180,7 +2288,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
-    "id": "fr-b1-243",
+    "id": "fr-b1-255",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -2189,7 +2297,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
-    "id": "fr-b1-244",
+    "id": "fr-b1-256",
     "language": "fr",
     "level": "B1",
     "tag": "EXPR",
@@ -2198,7 +2306,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "fr-b1-245",
+    "id": "fr-b1-257",
     "language": "fr",
     "level": "B1",
     "tag": "MISS",
@@ -2207,7 +2315,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "fr-b1-246",
+    "id": "fr-b1-258",
     "language": "fr",
     "level": "B1",
     "tag": "CULT",
@@ -2216,7 +2324,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "fr-b1-247",
+    "id": "fr-b1-259",
     "language": "fr",
     "level": "B1",
     "tag": "VOC",
@@ -2225,7 +2333,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "fr-b1-248",
+    "id": "fr-b1-260",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -2234,7 +2342,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "fr-b1-249",
+    "id": "fr-b1-261",
     "language": "fr",
     "level": "B1",
     "tag": "EXPR",
@@ -2243,7 +2351,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "fr-b1-250",
+    "id": "fr-b1-262",
     "language": "fr",
     "level": "B1",
     "tag": "MISS",
@@ -2252,7 +2360,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "fr-b1-251",
+    "id": "fr-b1-263",
     "language": "fr",
     "level": "B1",
     "tag": "VOC",
@@ -2261,7 +2369,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "fr-b1-252",
+    "id": "fr-b1-264",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -2270,7 +2378,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "fr-b1-253",
+    "id": "fr-b1-265",
     "language": "fr",
     "level": "B1",
     "tag": "EXPR",
@@ -2279,7 +2387,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "fr-b1-254",
+    "id": "fr-b1-266",
     "language": "fr",
     "level": "B1",
     "tag": "MISS",
@@ -2288,7 +2396,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "fr-b1-255",
+    "id": "fr-b1-267",
     "language": "fr",
     "level": "B1",
     "tag": "VOC",
@@ -2297,7 +2405,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "fr-b1-256",
+    "id": "fr-b1-268",
     "language": "fr",
     "level": "B1",
     "tag": "EXPR",
@@ -2306,7 +2414,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "fr-b1-257",
+    "id": "fr-b1-269",
     "language": "fr",
     "level": "B1",
     "tag": "MISS",
@@ -2315,7 +2423,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "fr-b1-258",
+    "id": "fr-b1-270",
     "language": "fr",
     "level": "B1",
     "tag": "EXPR",
@@ -2324,7 +2432,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "fr-b1-259",
+    "id": "fr-b1-271",
     "language": "fr",
     "level": "B1",
     "tag": "MISS",
@@ -2333,7 +2441,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "fr-b1-260",
+    "id": "fr-b1-272",
     "language": "fr",
     "level": "B1",
     "tag": "EXPR",
@@ -2342,7 +2450,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "fr-b1-261",
+    "id": "fr-b1-273",
     "language": "fr",
     "level": "B1",
     "tag": "MISS",
@@ -2351,7 +2459,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "fr-b1-262",
+    "id": "fr-b1-274",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -2360,7 +2468,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
-    "id": "fr-b1-263",
+    "id": "fr-b1-275",
     "language": "fr",
     "level": "B1",
     "tag": "DIAL",
@@ -2369,7 +2477,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
-    "id": "fr-b1-264",
+    "id": "fr-b1-276",
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
@@ -2378,7 +2486,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
-    "id": "fr-b1-265",
+    "id": "fr-b1-277",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -2387,7 +2495,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
-    "id": "fr-b1-266",
+    "id": "fr-b1-278",
     "language": "fr",
     "level": "B1",
     "tag": "DIAL",
@@ -2396,7 +2504,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
-    "id": "fr-b1-267",
+    "id": "fr-b1-279",
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
@@ -2405,7 +2513,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
-    "id": "fr-b1-268",
+    "id": "fr-b1-280",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -2414,7 +2522,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
-    "id": "fr-b1-269",
+    "id": "fr-b1-281",
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
@@ -2423,7 +2531,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
-    "id": "fr-b1-270",
+    "id": "fr-b1-282",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -2432,7 +2540,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
-    "id": "fr-b1-271",
+    "id": "fr-b1-283",
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
@@ -2441,7 +2549,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
-    "id": "fr-b1-272",
+    "id": "fr-b1-284",
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
@@ -2450,7 +2558,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
-    "id": "fr-b1-273",
+    "id": "fr-b1-285",
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
@@ -2459,7 +2567,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
-    "id": "fr-b1-274",
+    "id": "fr-b1-286",
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
@@ -2468,7 +2576,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
-    "id": "fr-b1-275",
+    "id": "fr-b1-287",
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
@@ -2477,7 +2585,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
-    "id": "fr-b1-276",
+    "id": "fr-b1-288",
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
@@ -2486,7 +2594,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
-    "id": "fr-b1-277",
+    "id": "fr-b1-289",
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
@@ -2495,7 +2603,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
-    "id": "fr-b1-278",
+    "id": "fr-b1-290",
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
@@ -2504,7 +2612,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
-    "id": "fr-b1-279",
+    "id": "fr-b1-291",
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
@@ -2513,7 +2621,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
-    "id": "fr-b1-280",
+    "id": "fr-b1-292",
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
@@ -2522,7 +2630,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
-    "id": "fr-b1-281",
+    "id": "fr-b1-293",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -2531,7 +2639,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
-    "id": "fr-b1-282",
+    "id": "fr-b1-294",
     "language": "fr",
     "level": "B1",
     "tag": "MISS",
@@ -2540,7 +2648,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
-    "id": "fr-b1-283",
+    "id": "fr-b1-295",
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
@@ -2549,7 +2657,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
-    "id": "fr-b1-284",
+    "id": "fr-b1-296",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -2558,7 +2666,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
-    "id": "fr-b1-285",
+    "id": "fr-b1-297",
     "language": "fr",
     "level": "B1",
     "tag": "MISS",
@@ -2567,7 +2675,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
-    "id": "fr-b1-286",
+    "id": "fr-b1-298",
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
@@ -2576,7 +2684,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
-    "id": "fr-b1-287",
+    "id": "fr-b1-299",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -2585,7 +2693,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
-    "id": "fr-b1-288",
+    "id": "fr-b1-300",
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
@@ -2594,7 +2702,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
-    "id": "fr-b1-289",
+    "id": "fr-b1-301",
     "language": "fr",
     "level": "B1",
     "tag": "GRAM",
@@ -2603,7 +2711,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
-    "id": "fr-b1-290",
+    "id": "fr-b1-302",
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
@@ -2612,7 +2720,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
-    "id": "fr-b1-291",
+    "id": "fr-b1-303",
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
@@ -2621,7 +2729,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
-    "id": "fr-b1-292",
+    "id": "fr-b1-304",
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
@@ -2630,7 +2738,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
-    "id": "fr-b1-293",
+    "id": "fr-b1-305",
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
@@ -2639,7 +2747,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
-    "id": "fr-b1-294",
+    "id": "fr-b1-306",
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
@@ -2648,7 +2756,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
-    "id": "fr-b1-295",
+    "id": "fr-b1-307",
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
@@ -2657,7 +2765,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
-    "id": "fr-b1-296",
+    "id": "fr-b1-308",
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
@@ -2666,7 +2774,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
-    "id": "fr-b1-297",
+    "id": "fr-b1-309",
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
@@ -2675,7 +2783,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
-    "id": "fr-b2-298",
+    "id": "fr-b2-310",
     "language": "fr",
     "level": "B2",
     "tag": "VERB",
@@ -2684,7 +2792,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 21: O Mundo das Emoções"
   },
   {
-    "id": "fr-b2-299",
+    "id": "fr-b2-311",
     "language": "fr",
     "level": "B2",
     "tag": "GRAM",
@@ -2693,7 +2801,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 21: O Mundo das Emoções"
   },
   {
-    "id": "fr-b2-300",
+    "id": "fr-b2-312",
     "language": "fr",
     "level": "B2",
     "tag": "VERB",
@@ -2702,7 +2810,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 21: O Mundo das Emoções"
   },
   {
-    "id": "fr-b2-301",
+    "id": "fr-b2-313",
     "language": "fr",
     "level": "B2",
     "tag": "GRAM",
@@ -2711,7 +2819,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 21: O Mundo das Emoções"
   },
   {
-    "id": "fr-b2-302",
+    "id": "fr-b2-314",
     "language": "fr",
     "level": "B2",
     "tag": "VERB",
@@ -2720,7 +2828,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 21: O Mundo das Emoções"
   },
   {
-    "id": "fr-b2-303",
+    "id": "fr-b2-315",
     "language": "fr",
     "level": "B2",
     "tag": "GRAM",
@@ -2729,7 +2837,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 21: O Mundo das Emoções"
   },
   {
-    "id": "fr-b2-304",
+    "id": "fr-b2-316",
     "language": "fr",
     "level": "B2",
     "tag": "VERB",
@@ -2738,7 +2846,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 21: O Mundo das Emoções"
   },
   {
-    "id": "fr-b2-305",
+    "id": "fr-b2-317",
     "language": "fr",
     "level": "B2",
     "tag": "VERB",
@@ -2747,7 +2855,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 21: O Mundo das Emoções"
   },
   {
-    "id": "fr-b2-306",
+    "id": "fr-b2-318",
     "language": "fr",
     "level": "B2",
     "tag": "VERB",
@@ -2756,7 +2864,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 21: O Mundo das Emoções"
   },
   {
-    "id": "fr-b2-307",
+    "id": "fr-b2-319",
     "language": "fr",
     "level": "B2",
     "tag": "VERB",
@@ -2765,7 +2873,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 21: O Mundo das Emoções"
   },
   {
-    "id": "fr-b2-308",
+    "id": "fr-b2-320",
     "language": "fr",
     "level": "B2",
     "tag": "VERB",
@@ -2774,7 +2882,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 21: O Mundo das Emoções"
   },
   {
-    "id": "fr-b2-309",
+    "id": "fr-b2-321",
     "language": "fr",
     "level": "B2",
     "tag": "VERB",
@@ -2783,7 +2891,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 21: O Mundo das Emoções"
   },
   {
-    "id": "fr-b2-310",
+    "id": "fr-b2-322",
     "language": "fr",
     "level": "B2",
     "tag": "VERB",
@@ -2792,7 +2900,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 21: O Mundo das Emoções"
   },
   {
-    "id": "fr-b2-311",
+    "id": "fr-b2-323",
     "language": "fr",
     "level": "B2",
     "tag": "VERB",
@@ -2801,7 +2909,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 21: O Mundo das Emoções"
   },
   {
-    "id": "fr-b2-312",
+    "id": "fr-b2-324",
     "language": "fr",
     "level": "B2",
     "tag": "VERB",
@@ -2810,7 +2918,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 21: O Mundo das Emoções"
   },
   {
-    "id": "fr-b2-313",
+    "id": "fr-b2-325",
     "language": "fr",
     "level": "B2",
     "tag": "GRAM",
@@ -2819,7 +2927,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
-    "id": "fr-b2-314",
+    "id": "fr-b2-326",
     "language": "fr",
     "level": "B2",
     "tag": "VERB",
@@ -2828,7 +2936,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
-    "id": "fr-b2-315",
+    "id": "fr-b2-327",
     "language": "fr",
     "level": "B2",
     "tag": "GRAM",
@@ -2837,7 +2945,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
-    "id": "fr-b2-316",
+    "id": "fr-b2-328",
     "language": "fr",
     "level": "B2",
     "tag": "VOC",
@@ -2846,7 +2954,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
-    "id": "fr-b2-317",
+    "id": "fr-b2-329",
     "language": "fr",
     "level": "B2",
     "tag": "GRAM",
@@ -2855,7 +2963,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
-    "id": "fr-b2-318",
+    "id": "fr-b2-330",
     "language": "fr",
     "level": "B2",
     "tag": "GRAM",
@@ -2864,7 +2972,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
-    "id": "fr-b2-319",
+    "id": "fr-b2-331",
     "language": "fr",
     "level": "B2",
     "tag": "GRAM",
@@ -2873,7 +2981,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
-    "id": "fr-b2-320",
+    "id": "fr-b2-332",
     "language": "fr",
     "level": "B2",
     "tag": "GRAM",
@@ -2882,7 +2990,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
-    "id": "fr-b2-321",
+    "id": "fr-b2-333",
     "language": "fr",
     "level": "B2",
     "tag": "GRAM",
@@ -2891,7 +2999,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
-    "id": "fr-b2-322",
+    "id": "fr-b2-334",
     "language": "fr",
     "level": "B2",
     "tag": "GRAM",
@@ -2900,7 +3008,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
-    "id": "fr-b2-323",
+    "id": "fr-b2-335",
     "language": "fr",
     "level": "B2",
     "tag": "GRAM",
@@ -2909,7 +3017,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
-    "id": "fr-b2-324",
+    "id": "fr-b2-336",
     "language": "fr",
     "level": "B2",
     "tag": "VERB",
@@ -2918,7 +3026,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
-    "id": "fr-b2-325",
+    "id": "fr-b2-337",
     "language": "fr",
     "level": "B2",
     "tag": "GRAM",
@@ -2927,7 +3035,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
-    "id": "fr-b2-326",
+    "id": "fr-b2-338",
     "language": "fr",
     "level": "B2",
     "tag": "MISS",
@@ -2936,7 +3044,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
-    "id": "fr-b2-327",
+    "id": "fr-b2-339",
     "language": "fr",
     "level": "B2",
     "tag": "GRAM",
@@ -2945,7 +3053,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
-    "id": "fr-b2-328",
+    "id": "fr-b2-340",
     "language": "fr",
     "level": "B2",
     "tag": "GRAM",
@@ -2954,7 +3062,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
-    "id": "fr-b2-329",
+    "id": "fr-b2-341",
     "language": "fr",
     "level": "B2",
     "tag": "GRAM",
@@ -2963,7 +3071,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 23: Literatura e Situações Hipotéticas"
   },
   {
-    "id": "fr-b2-330",
+    "id": "fr-b2-342",
     "language": "fr",
     "level": "B2",
     "tag": "VOC",
@@ -2972,7 +3080,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 23: Literatura e Situações Hipotéticas"
   },
   {
-    "id": "fr-b2-331",
+    "id": "fr-b2-343",
     "language": "fr",
     "level": "B2",
     "tag": "EXPR",
@@ -2981,7 +3089,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 23: Literatura e Situações Hipotéticas"
   },
   {
-    "id": "fr-b2-332",
+    "id": "fr-b2-344",
     "language": "fr",
     "level": "B2",
     "tag": "MISS",
@@ -2990,7 +3098,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 23: Literatura e Situações Hipotéticas"
   },
   {
-    "id": "fr-b2-333",
+    "id": "fr-b2-345",
     "language": "fr",
     "level": "B2",
     "tag": "CULT",
@@ -2999,7 +3107,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 23: Literatura e Situações Hipotéticas"
   },
   {
-    "id": "fr-b2-334",
+    "id": "fr-b2-346",
     "language": "fr",
     "level": "B2",
     "tag": "EXPR",
@@ -3008,7 +3116,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 23: Literatura e Situações Hipotéticas"
   },
   {
-    "id": "fr-b2-335",
+    "id": "fr-b2-347",
     "language": "fr",
     "level": "B2",
     "tag": "MISS",
@@ -3017,7 +3125,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 23: Literatura e Situações Hipotéticas"
   },
   {
-    "id": "fr-b2-336",
+    "id": "fr-b2-348",
     "language": "fr",
     "level": "B2",
     "tag": "CULT",
@@ -3026,7 +3134,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 23: Literatura e Situações Hipotéticas"
   },
   {
-    "id": "fr-b2-337",
+    "id": "fr-b2-349",
     "language": "fr",
     "level": "B2",
     "tag": "EXPR",
@@ -3035,7 +3143,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 23: Literatura e Situações Hipotéticas"
   },
   {
-    "id": "fr-b2-338",
+    "id": "fr-b2-350",
     "language": "fr",
     "level": "B2",
     "tag": "MISS",
@@ -3044,7 +3152,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 23: Literatura e Situações Hipotéticas"
   },
   {
-    "id": "fr-b2-339",
+    "id": "fr-b2-351",
     "language": "fr",
     "level": "B2",
     "tag": "EXPR",
@@ -3053,7 +3161,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 23: Literatura e Situações Hipotéticas"
   },
   {
-    "id": "fr-b2-340",
+    "id": "fr-b2-352",
     "language": "fr",
     "level": "B2",
     "tag": "EXPR",
@@ -3062,7 +3170,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 23: Literatura e Situações Hipotéticas"
   },
   {
-    "id": "fr-b2-341",
+    "id": "fr-b2-353",
     "language": "fr",
     "level": "B2",
     "tag": "EXPR",
@@ -3071,7 +3179,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 23: Literatura e Situações Hipotéticas"
   },
   {
-    "id": "fr-b2-342",
+    "id": "fr-b2-354",
     "language": "fr",
     "level": "B2",
     "tag": "MISS",
@@ -3080,7 +3188,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
-    "id": "fr-b2-343",
+    "id": "fr-b2-355",
     "language": "fr",
     "level": "B2",
     "tag": "DIAL",
@@ -3089,7 +3197,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
-    "id": "fr-b2-344",
+    "id": "fr-b2-356",
     "language": "fr",
     "level": "B2",
     "tag": "EXPR",
@@ -3098,7 +3206,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
-    "id": "fr-b2-345",
+    "id": "fr-b2-357",
     "language": "fr",
     "level": "B2",
     "tag": "PRON",
@@ -3107,7 +3215,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
-    "id": "fr-b2-346",
+    "id": "fr-b2-358",
     "language": "fr",
     "level": "B2",
     "tag": "GRAM",
@@ -3116,7 +3224,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
-    "id": "fr-b2-347",
+    "id": "fr-b2-359",
     "language": "fr",
     "level": "B2",
     "tag": "MISS",
@@ -3125,7 +3233,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
-    "id": "fr-b2-348",
+    "id": "fr-b2-360",
     "language": "fr",
     "level": "B2",
     "tag": "DIAL",
@@ -3134,7 +3242,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
-    "id": "fr-b2-349",
+    "id": "fr-b2-361",
     "language": "fr",
     "level": "B2",
     "tag": "PRON",
@@ -3143,7 +3251,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
-    "id": "fr-b2-350",
+    "id": "fr-b2-362",
     "language": "fr",
     "level": "B2",
     "tag": "GRAM",
@@ -3152,7 +3260,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
-    "id": "fr-b2-351",
+    "id": "fr-b2-363",
     "language": "fr",
     "level": "B2",
     "tag": "MISS",
@@ -3161,7 +3269,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
-    "id": "fr-b2-352",
+    "id": "fr-b2-364",
     "language": "fr",
     "level": "B2",
     "tag": "DIAL",
@@ -3170,7 +3278,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
-    "id": "fr-b2-353",
+    "id": "fr-b2-365",
     "language": "fr",
     "level": "B2",
     "tag": "GRAM",
@@ -3179,7 +3287,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
-    "id": "fr-b2-354",
+    "id": "fr-b2-366",
     "language": "fr",
     "level": "B2",
     "tag": "GRAM",
@@ -3188,7 +3296,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
-    "id": "fr-b2-355",
+    "id": "fr-b2-367",
     "language": "fr",
     "level": "B2",
     "tag": "GRAM",
@@ -3197,7 +3305,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
-    "id": "fr-b2-356",
+    "id": "fr-b2-368",
     "language": "fr",
     "level": "B2",
     "tag": "GRAM",
@@ -3206,7 +3314,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
-    "id": "fr-c1-357",
+    "id": "fr-c1-369",
     "language": "fr",
     "level": "C1",
     "tag": "DIAL",
@@ -3215,7 +3323,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 25: Oratória e Expressões Elevadas"
   },
   {
-    "id": "fr-c1-358",
+    "id": "fr-c1-370",
     "language": "fr",
     "level": "C1",
     "tag": "GRAM",
@@ -3224,7 +3332,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 25: Oratória e Expressões Elevadas"
   },
   {
-    "id": "fr-c1-359",
+    "id": "fr-c1-371",
     "language": "fr",
     "level": "C1",
     "tag": "VERB",
@@ -3233,7 +3341,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 25: Oratória e Expressões Elevadas"
   },
   {
-    "id": "fr-c1-360",
+    "id": "fr-c1-372",
     "language": "fr",
     "level": "C1",
     "tag": "VOC",
@@ -3242,7 +3350,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 25: Oratória e Expressões Elevadas"
   },
   {
-    "id": "fr-c1-361",
+    "id": "fr-c1-373",
     "language": "fr",
     "level": "C1",
     "tag": "EXPR",
@@ -3251,7 +3359,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 25: Oratória e Expressões Elevadas"
   },
   {
-    "id": "fr-c1-362",
+    "id": "fr-c1-374",
     "language": "fr",
     "level": "C1",
     "tag": "DIAL",
@@ -3260,7 +3368,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 25: Oratória e Expressões Elevadas"
   },
   {
-    "id": "fr-c1-363",
+    "id": "fr-c1-375",
     "language": "fr",
     "level": "C1",
     "tag": "GRAM",
@@ -3269,7 +3377,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 25: Oratória e Expressões Elevadas"
   },
   {
-    "id": "fr-c1-364",
+    "id": "fr-c1-376",
     "language": "fr",
     "level": "C1",
     "tag": "VERB",
@@ -3278,7 +3386,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 25: Oratória e Expressões Elevadas"
   },
   {
-    "id": "fr-c1-365",
+    "id": "fr-c1-377",
     "language": "fr",
     "level": "C1",
     "tag": "VOC",
@@ -3287,7 +3395,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 25: Oratória e Expressões Elevadas"
   },
   {
-    "id": "fr-c1-366",
+    "id": "fr-c1-378",
     "language": "fr",
     "level": "C1",
     "tag": "EXPR",
@@ -3296,7 +3404,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 25: Oratória e Expressões Elevadas"
   },
   {
-    "id": "fr-c1-367",
+    "id": "fr-c1-379",
     "language": "fr",
     "level": "C1",
     "tag": "GRAM",
@@ -3305,7 +3413,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 25: Oratória e Expressões Elevadas"
   },
   {
-    "id": "fr-c1-368",
+    "id": "fr-c1-380",
     "language": "fr",
     "level": "C1",
     "tag": "VERB",
@@ -3314,7 +3422,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 25: Oratória e Expressões Elevadas"
   },
   {
-    "id": "fr-c1-369",
+    "id": "fr-c1-381",
     "language": "fr",
     "level": "C1",
     "tag": "GRAM",
@@ -3323,7 +3431,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 25: Oratória e Expressões Elevadas"
   },
   {
-    "id": "fr-c1-370",
+    "id": "fr-c1-382",
     "language": "fr",
     "level": "C1",
     "tag": "VERB",
@@ -3332,7 +3440,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 25: Oratória e Expressões Elevadas"
   },
   {
-    "id": "fr-c1-371",
+    "id": "fr-c1-383",
     "language": "fr",
     "level": "C1",
     "tag": "GRAM",
@@ -3341,7 +3449,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 26: O Francês das Ruas e o Formal"
   },
   {
-    "id": "fr-c1-372",
+    "id": "fr-c1-384",
     "language": "fr",
     "level": "C1",
     "tag": "VOC",
@@ -3350,7 +3458,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 26: O Francês das Ruas e o Formal"
   },
   {
-    "id": "fr-c1-373",
+    "id": "fr-c1-385",
     "language": "fr",
     "level": "C1",
     "tag": "CULT",
@@ -3359,7 +3467,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 26: O Francês das Ruas e o Formal"
   },
   {
-    "id": "fr-c1-374",
+    "id": "fr-c1-386",
     "language": "fr",
     "level": "C1",
     "tag": "MISS",
@@ -3368,7 +3476,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 26: O Francês das Ruas e o Formal"
   },
   {
-    "id": "fr-c1-375",
+    "id": "fr-c1-387",
     "language": "fr",
     "level": "C1",
     "tag": "VERB",
@@ -3377,7 +3485,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 26: O Francês das Ruas e o Formal"
   },
   {
-    "id": "fr-c1-376",
+    "id": "fr-c1-388",
     "language": "fr",
     "level": "C1",
     "tag": "DIAL",
@@ -3386,7 +3494,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 26: O Francês das Ruas e o Formal"
   },
   {
-    "id": "fr-c1-377",
+    "id": "fr-c1-389",
     "language": "fr",
     "level": "C1",
     "tag": "GRAM",
@@ -3395,7 +3503,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 26: O Francês das Ruas e o Formal"
   },
   {
-    "id": "fr-c1-378",
+    "id": "fr-c1-390",
     "language": "fr",
     "level": "C1",
     "tag": "CULT",
@@ -3404,7 +3512,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 26: O Francês das Ruas e o Formal"
   },
   {
-    "id": "fr-c1-379",
+    "id": "fr-c1-391",
     "language": "fr",
     "level": "C1",
     "tag": "MISS",
@@ -3413,7 +3521,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 26: O Francês das Ruas e o Formal"
   },
   {
-    "id": "fr-c1-380",
+    "id": "fr-c1-392",
     "language": "fr",
     "level": "C1",
     "tag": "VERB",
@@ -3422,7 +3530,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 26: O Francês das Ruas e o Formal"
   },
   {
-    "id": "fr-c1-381",
+    "id": "fr-c1-393",
     "language": "fr",
     "level": "C1",
     "tag": "GRAM",
@@ -3431,7 +3539,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 26: O Francês das Ruas e o Formal"
   },
   {
-    "id": "fr-c1-382",
+    "id": "fr-c1-394",
     "language": "fr",
     "level": "C1",
     "tag": "CULT",
@@ -3440,7 +3548,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 26: O Francês das Ruas e o Formal"
   },
   {
-    "id": "fr-c1-383",
+    "id": "fr-c1-395",
     "language": "fr",
     "level": "C1",
     "tag": "VERB",
@@ -3449,7 +3557,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 26: O Francês das Ruas e o Formal"
   },
   {
-    "id": "fr-c1-384",
+    "id": "fr-c1-396",
     "language": "fr",
     "level": "C1",
     "tag": "CULT",
@@ -3458,7 +3566,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 26: O Francês das Ruas e o Formal"
   },
   {
-    "id": "fr-c1-385",
+    "id": "fr-c1-397",
     "language": "fr",
     "level": "C1",
     "tag": "CULT",
@@ -3467,7 +3575,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 26: O Francês das Ruas e o Formal"
   },
   {
-    "id": "fr-c2-386",
+    "id": "fr-c2-398",
     "language": "fr",
     "level": "C2",
     "tag": "GRAM",
@@ -3476,7 +3584,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 27: Geopolítica e Filosofia"
   },
   {
-    "id": "fr-c2-387",
+    "id": "fr-c2-399",
     "language": "fr",
     "level": "C2",
     "tag": "DIAL",
@@ -3485,7 +3593,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 27: Geopolítica e Filosofia"
   },
   {
-    "id": "fr-c2-388",
+    "id": "fr-c2-400",
     "language": "fr",
     "level": "C2",
     "tag": "EXPR",
@@ -3494,7 +3602,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 27: Geopolítica e Filosofia"
   },
   {
-    "id": "fr-c2-389",
+    "id": "fr-c2-401",
     "language": "fr",
     "level": "C2",
     "tag": "VOC",
@@ -3503,7 +3611,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 27: Geopolítica e Filosofia"
   },
   {
-    "id": "fr-c2-390",
+    "id": "fr-c2-402",
     "language": "fr",
     "level": "C2",
     "tag": "CULT",
@@ -3512,7 +3620,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 27: Geopolítica e Filosofia"
   },
   {
-    "id": "fr-c2-391",
+    "id": "fr-c2-403",
     "language": "fr",
     "level": "C2",
     "tag": "GRAM",
@@ -3521,7 +3629,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 27: Geopolítica e Filosofia"
   },
   {
-    "id": "fr-c2-392",
+    "id": "fr-c2-404",
     "language": "fr",
     "level": "C2",
     "tag": "VOC",
@@ -3530,7 +3638,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 27: Geopolítica e Filosofia"
   },
   {
-    "id": "fr-c2-393",
+    "id": "fr-c2-405",
     "language": "fr",
     "level": "C2",
     "tag": "MISS",
@@ -3539,7 +3647,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 27: Geopolítica e Filosofia"
   },
   {
-    "id": "fr-c2-394",
+    "id": "fr-c2-406",
     "language": "fr",
     "level": "C2",
     "tag": "CULT",
@@ -3548,7 +3656,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 27: Geopolítica e Filosofia"
   },
   {
-    "id": "fr-c2-395",
+    "id": "fr-c2-407",
     "language": "fr",
     "level": "C2",
     "tag": "GRAM",
@@ -3557,7 +3665,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 27: Geopolítica e Filosofia"
   },
   {
-    "id": "fr-c2-396",
+    "id": "fr-c2-408",
     "language": "fr",
     "level": "C2",
     "tag": "MISS",
@@ -3566,7 +3674,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 27: Geopolítica e Filosofia"
   },
   {
-    "id": "fr-c2-397",
+    "id": "fr-c2-409",
     "language": "fr",
     "level": "C2",
     "tag": "MISS",
@@ -3575,7 +3683,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 27: Geopolítica e Filosofia"
   },
   {
-    "id": "fr-c2-398",
+    "id": "fr-c2-410",
     "language": "fr",
     "level": "C2",
     "tag": "CULT",
@@ -3584,7 +3692,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 28: Literatura Clássica e Análise Textual"
   },
   {
-    "id": "fr-c2-399",
+    "id": "fr-c2-411",
     "language": "fr",
     "level": "C2",
     "tag": "GRAM",
@@ -3593,7 +3701,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 28: Literatura Clássica e Análise Textual"
   },
   {
-    "id": "fr-c2-400",
+    "id": "fr-c2-412",
     "language": "fr",
     "level": "C2",
     "tag": "VOC",
@@ -3602,7 +3710,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 28: Literatura Clássica e Análise Textual"
   },
   {
-    "id": "fr-c2-401",
+    "id": "fr-c2-413",
     "language": "fr",
     "level": "C2",
     "tag": "CULT",
@@ -3611,7 +3719,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 28: Literatura Clássica e Análise Textual"
   },
   {
-    "id": "fr-c2-402",
+    "id": "fr-c2-414",
     "language": "fr",
     "level": "C2",
     "tag": "EXPR",
@@ -3620,7 +3728,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 28: Literatura Clássica e Análise Textual"
   },
   {
-    "id": "fr-c2-403",
+    "id": "fr-c2-415",
     "language": "fr",
     "level": "C2",
     "tag": "GRAM",
@@ -3629,7 +3737,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 28: Literatura Clássica e Análise Textual"
   },
   {
-    "id": "fr-c2-404",
+    "id": "fr-c2-416",
     "language": "fr",
     "level": "C2",
     "tag": "CULT",
@@ -3638,7 +3746,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 28: Literatura Clássica e Análise Textual"
   },
   {
-    "id": "fr-c2-405",
+    "id": "fr-c2-417",
     "language": "fr",
     "level": "C2",
     "tag": "MISS",
@@ -3647,7 +3755,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 28: Literatura Clássica e Análise Textual"
   },
   {
-    "id": "fr-c2-406",
+    "id": "fr-c2-418",
     "language": "fr",
     "level": "C2",
     "tag": "CULT",
@@ -3656,7 +3764,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 28: Literatura Clássica e Análise Textual"
   },
   {
-    "id": "fr-c2-407",
+    "id": "fr-c2-419",
     "language": "fr",
     "level": "C2",
     "tag": "VERB",
@@ -3665,7 +3773,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 28: Literatura Clássica e Análise Textual"
   },
   {
-    "id": "fr-c2-408",
+    "id": "fr-c2-420",
     "language": "fr",
     "level": "C2",
     "tag": "CULT",
@@ -3674,7 +3782,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 28: Literatura Clássica e Análise Textual"
   },
   {
-    "id": "fr-c2-409",
+    "id": "fr-c2-421",
     "language": "fr",
     "level": "C2",
     "tag": "MISS",
@@ -3683,7 +3791,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 28: Literatura Clássica e Análise Textual"
   },
   {
-    "id": "fr-c2-410",
+    "id": "fr-c2-422",
     "language": "fr",
     "level": "C2",
     "tag": "DIAL",
@@ -3692,7 +3800,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 29: Debate Formal e Retórica"
   },
   {
-    "id": "fr-c2-411",
+    "id": "fr-c2-423",
     "language": "fr",
     "level": "C2",
     "tag": "EXPR",
@@ -3701,7 +3809,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 29: Debate Formal e Retórica"
   },
   {
-    "id": "fr-c2-412",
+    "id": "fr-c2-424",
     "language": "fr",
     "level": "C2",
     "tag": "GRAM",
@@ -3710,7 +3818,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 29: Debate Formal e Retórica"
   },
   {
-    "id": "fr-c2-413",
+    "id": "fr-c2-425",
     "language": "fr",
     "level": "C2",
     "tag": "MISS",
@@ -3719,7 +3827,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 29: Debate Formal e Retórica"
   },
   {
-    "id": "fr-c2-414",
+    "id": "fr-c2-426",
     "language": "fr",
     "level": "C2",
     "tag": "CULT",
@@ -3728,7 +3836,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 29: Debate Formal e Retórica"
   },
   {
-    "id": "fr-c2-415",
+    "id": "fr-c2-427",
     "language": "fr",
     "level": "C2",
     "tag": "DIAL",
@@ -3737,7 +3845,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 29: Debate Formal e Retórica"
   },
   {
-    "id": "fr-c2-416",
+    "id": "fr-c2-428",
     "language": "fr",
     "level": "C2",
     "tag": "EXPR",
@@ -3746,7 +3854,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 29: Debate Formal e Retórica"
   },
   {
-    "id": "fr-c2-417",
+    "id": "fr-c2-429",
     "language": "fr",
     "level": "C2",
     "tag": "MISS",
@@ -3755,7 +3863,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 29: Debate Formal e Retórica"
   },
   {
-    "id": "fr-c2-418",
+    "id": "fr-c2-430",
     "language": "fr",
     "level": "C2",
     "tag": "MISS",

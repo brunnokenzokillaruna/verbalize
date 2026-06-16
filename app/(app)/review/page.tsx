@@ -108,6 +108,7 @@ function ReviewContent() {
     if (!isLast) {
       setExerciseAnswer(null);
       setIsExerciseReady(false);
+      setSubmitTrigger(0);
       setCurrentIndex((i) => i + 1);
       return;
     }
@@ -134,6 +135,7 @@ function ReviewContent() {
     setCorrectCount(0);
     setExerciseAnswer(null);
     setIsExerciseReady(false);
+    setSubmitTrigger(0);
 
     if (!mistake) return;
     const exs = await generateMistakeReview({

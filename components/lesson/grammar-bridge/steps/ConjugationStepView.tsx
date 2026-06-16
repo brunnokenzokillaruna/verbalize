@@ -15,31 +15,25 @@ export function ConjugationStepView({
   const { infinitive, forms, partLabel } = step.data;
 
   return (
-    <div className="flex flex-col items-center justify-center gap-4 px-2 w-full max-w-md mx-auto">
+    <div className="flex flex-col items-center justify-center gap-4 px-1 w-full max-w-lg mx-auto">
       <div className="text-center">
-        <span className="text-[10px] font-black uppercase tracking-[0.15em] text-[var(--color-text-muted)]">
-          Conjugação — Presente
-        </span>
+        <span className="grammar-step-label">Conjugação — Presente</span>
         {partLabel && (
-          <p className="text-[10px] font-bold text-[var(--color-primary)] uppercase mt-1">
-            {partLabel}
-          </p>
+          <p className="text-xs font-bold text-primary uppercase mt-1.5">{partLabel}</p>
         )}
-        <p className="text-xs text-[var(--color-text-muted)] mt-0.5">{infinitive}</p>
+        <p className="grammar-body font-semibold text-text-muted mt-1">{infinitive}</p>
       </div>
 
-      <div className="w-full grid grid-cols-2 gap-2">
+      <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-2.5">
         {forms.map((c, i) => (
           <div
             key={i}
-            className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[var(--color-border)]/60 bg-[var(--color-surface)]"
+            className="flex items-center gap-2.5 px-3.5 py-3 rounded-xl border border-border/60 bg-surface"
           >
-            <span className="text-[9px] font-bold text-[var(--color-text-muted)] uppercase w-10 shrink-0 truncate">
+            <span className="text-xs font-bold text-text-muted uppercase w-11 shrink-0">
               {c.pronoun}
             </span>
-            <span className="flex-1 font-display text-xs font-bold text-[var(--color-primary-dark)] truncate">
-              {c.form}
-            </span>
+            <span className="flex-1 grammar-body font-bold text-primary truncate">{c.form}</span>
             <AudioPlayerButton
               text={getConjugationAudioText(c.pronoun, c.form, language)}
               language={language}

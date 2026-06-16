@@ -14,9 +14,7 @@ export function QuizStepView({
 }) {
   return (
     <div className="flex flex-col items-center justify-center gap-4 px-2 w-full max-w-md mx-auto">
-      <span className="text-[10px] font-black uppercase tracking-[0.15em] text-[var(--color-text-muted)]">
-        Teste rápido
-      </span>
+      <span className="grammar-step-label">Teste rápido</span>
       <RetentionCheckCard
         check={step.data}
         onAnswered={onAnswered}

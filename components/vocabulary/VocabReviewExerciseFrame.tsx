@@ -66,7 +66,7 @@ export function VocabReviewExerciseFrame({
             </div>
           )}
           <div className="flex-1 min-w-0">
-            <p className="font-display text-xl font-bold truncate" style={{ color: theme.accent }}>
+            <p className="font-display text-lg sm:text-xl font-bold truncate" style={{ color: theme.accent }}>
               {word}
             </p>
             {translation && (

@@ -12,7 +12,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!initialized) return;
     if (!user) {
-      router.replace('/login');
+      router.replace('/?auth=login');
       return;
     }
     if (!profile) {
@@ -41,7 +41,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
           />
         </div>
         <noscript>
-          <a href="/login" className="sr-only">Acessar a página de login</a>
+          <a href="/?auth=login" className="sr-only">Abrir modal de login</a>
         </noscript>
       </main>
     );

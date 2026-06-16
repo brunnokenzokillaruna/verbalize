@@ -16,6 +16,14 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 
     const resolvedType = isPasswordField && showPassword ? 'text' : type;
 
+    const horizontalPadding = Icon
+      ? isPasswordField
+        ? 'pl-11 pr-11 sm:pl-11 sm:pr-11'
+        : 'pl-11 pr-3.5 sm:pr-4'
+      : isPasswordField
+        ? 'pl-3.5 pr-11 sm:pl-4 sm:pr-11'
+        : 'px-3.5 sm:px-4';
+
     return (
       <div className="flex flex-col gap-1.5">
         {label && (
@@ -31,7 +39,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         <div className="relative group">
           {Icon && (
             <span
-              className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-150"
+              className="pointer-events-none absolute left-3.5 top-1/2 flex -translate-y-1/2 items-center justify-center transition-colors duration-150"
               style={{ color: 'var(--color-text-muted)' }}
             >
               <Icon size={17} />
@@ -43,9 +51,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             id={inputId}
             type={resolvedType}
             className={[
-              'w-full rounded-2xl border px-4 py-3 text-base outline-none transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:border-transparent',
-              Icon ? 'pl-10' : '',
-              isPasswordField ? 'pr-11' : '',
+              'w-full rounded-xl sm:rounded-2xl border py-2.5 sm:py-3 text-base outline-none transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:border-transparent',
+              horizontalPadding,
               className,
             ]
               .filter(Boolean)

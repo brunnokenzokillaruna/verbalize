@@ -33,13 +33,48 @@ function uniqueSemanticFields(fields: (string | undefined)[]): boolean {
   return new Set(normalized).size === normalized.length;
 }
 
+function shuffleInPlace<T>(array: T[]): T[] {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+function pickUniqueImageDistractors(
+  targetUrl: string,
+  candidates: ImageMatchCandidate[],
+  count = 3,
+): ImageMatchCandidate[] {
+  const picked: ImageMatchCandidate[] = [];
+  const usedUrls = new Set<string>([targetUrl]);
+
+  for (const candidate of shuffleInPlace([...candidates])) {
+    if (usedUrls.has(candidate.imageUrl)) continue;
+    usedUrls.add(candidate.imageUrl);
+    picked.push(candidate);
+    if (picked.length >= count) break;
+  }
+
+  return picked;
+}
+
+type CanBuildImageMatchOptions = {
+  requireApproved?: boolean;
+  requireConcrete?: boolean;
+};
+
 export function canBuildImageMatch(
   target: ImageMatchCandidate,
   distractors: ImageMatchCandidate[],
-  requireApproved = false,
+  options: boolean | CanBuildImageMatchOptions = {},
 ): boolean {
+  const opts: CanBuildImageMatchOptions =
+    typeof options === 'boolean' ? { requireApproved: options } : options;
+  const { requireApproved = false, requireConcrete = true } = opts;
+
   if (!target.imageUrl || distractors.length < 3) return false;
-  if (!isConcreteNoun(target)) return false;
+  if (requireConcrete && !isConcreteNoun(target)) return false;
   if (requireApproved && !target.approved) return false;
 
   const all = [target, ...distractors.slice(0, 3)];
@@ -160,26 +195,64 @@ export function buildImageMatchFromLessonVocab(params: {
   );
 }
 
+export const MIN_VISUAL_REVIEW_ITEMS = 4;
+
+export function getVisualReviewPlayableItems<
+  T extends { word: string; translation: string; imageUrl?: string },
+>(
+  sessionItems: T[],
+  imagePool: Array<{ word: string; translation: string; imageUrl?: string }>,
+): T[] {
+  return sessionItems.filter(
+    (item) => buildImageMatchFromReviewWords(item.word, imagePool) !== null,
+  );
+}
+
 export function buildImageMatchFromReviewWords(
   targetWord: string,
-  items: Array<{ word: string; translation: string; imageUrl?: string }>,
+  imagePool: Array<{ word: string; translation: string; imageUrl?: string }>,
 ): Exercise | null {
-  const target = items.find((i) => normalizeWord(i.word) === normalizeWord(targetWord));
+  const withImages = imagePool.filter((item) => item.imageUrl);
+  const target = withImages.find((item) => normalizeWord(item.word) === normalizeWord(targetWord));
   if (!target?.imageUrl) return null;
 
-  const distractors: ImageMatchCandidate[] = items
-    .filter((i) => normalizeWord(i.word) !== normalizeWord(targetWord) && i.imageUrl)
-    .map((i) => ({
-      word: i.word,
-      imageUrl: i.imageUrl!,
-      translation: i.translation,
+  const distractorCandidates: ImageMatchCandidate[] = withImages
+    .filter((item) => normalizeWord(item.word) !== normalizeWord(targetWord))
+    .map((item) => ({
+      word: item.word,
+      imageUrl: item.imageUrl!,
+      imageAlt: item.word,
+      translation: item.translation,
       wordType: 'noun' as const,
     }));
 
-  return buildImageMatchExercise(
-    target.word,
-    { imageUrl: target.imageUrl, imageAlt: target.word },
-    target.translation,
-    distractors,
-  );
+  const picked = pickUniqueImageDistractors(target.imageUrl, distractorCandidates, 3);
+  if (picked.length < 3) return null;
+
+  const targetCandidate: ImageMatchCandidate = {
+    word: target.word,
+    imageUrl: target.imageUrl,
+    imageAlt: target.word,
+    translation: target.translation,
+    wordType: 'noun',
+  };
+
+  if (!canBuildImageMatch(targetCandidate, picked, { requireConcrete: false })) return null;
+
+  const options = [targetCandidate, ...picked].map((candidate) => ({
+    word: candidate.word,
+    imageUrl: candidate.imageUrl,
+    imageAlt: candidate.imageAlt ?? candidate.word,
+  }));
+
+  shuffleInPlace(options);
+
+  const data: ImageMatchData = {
+    targetWord: target.word,
+    translation: target.translation,
+    correctWord: target.word,
+    options,
+  };
+
+  return { type: 'image-match', data };
 }

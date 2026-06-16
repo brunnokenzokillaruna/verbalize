@@ -3,8 +3,35 @@
 import { useState } from 'react';
 import { AudioPlayerButton } from '../AudioPlayerButton';
 import { ClickableSentence } from '../ClickableSentence';
+import { BrazilFlag, LanguageFlag } from '@/components/LanguageFlag';
 import type { WordClickPayload } from '../ClickableWord';
 import type { GrammarBridgeResult, SupportedLanguage } from '@/types';
+
+export function GrammarFlagAvatar({
+  variant,
+  language,
+  className = '',
+}: {
+  variant: 'target' | 'pt-br';
+  language?: SupportedLanguage;
+  className?: string;
+}) {
+  return (
+    <div
+      className={`flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-full overflow-hidden border border-border bg-surface shadow-sm ${className}`}
+    >
+      {variant === 'pt-br' ? (
+        <BrazilFlag size="lg" className="h-full w-full rounded-none object-cover" />
+      ) : (
+        <LanguageFlag
+          language={language!}
+          size="lg"
+          className="h-full w-full rounded-none object-cover"
+        />
+      )}
+    </div>
+  );
+}
 
 export function stripHighlights(text: string): string {
   return text.replace(/\^\^/g, '');
@@ -236,7 +263,7 @@ export function RetentionCheckCard({
 
   return (
     <div className="flex flex-col gap-3 w-full">
-      <p className="text-sm font-semibold text-center text-[var(--color-text-primary)]">
+      <p className="grammar-body font-semibold text-center text-text-primary">
         {check.question}
       </p>
       <div className="flex flex-col gap-2">

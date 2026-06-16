@@ -1,6 +1,7 @@
 import type { LessonDefinition, SupportedLanguage } from '@/types';
 import { FRENCH_LESSONS } from './curriculum/french';
 import { ENGLISH_LESSONS } from './curriculum/english';
+import { resolveFrontierLessonId } from './curriculum/lessonProgress';
 
 export { FRENCH_LESSONS, ENGLISH_LESSONS };
 
@@ -23,9 +24,8 @@ export function getLessonsForLanguage(language: SupportedLanguage): LessonDefini
  */
 export function getNextLesson(language: SupportedLanguage, currentLessonId?: string): LessonDefinition {
   const lessons = LESSON_MAP[language];
-  if (!currentLessonId) return lessons[0];
-  const lesson = lessons.find((l) => l.id === currentLessonId);
-  return lesson ?? lessons[0];
+  const resolvedId = resolveFrontierLessonId(language, currentLessonId);
+  return lessons.find((l) => l.id === resolvedId) ?? lessons[0]!;
 }
 
 /**

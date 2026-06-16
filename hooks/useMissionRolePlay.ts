@@ -36,7 +36,7 @@ export function useMissionRolePlay({
 
   const [currentIdx, setCurrentIdx] = useState(0);
   const [spokenCount, setSpokenCount] = useState(0);
-  const [showHint, setShowHint] = useState(false);
+  const [showHint, setShowHint] = useState(true);
   const [recState, setRecState] = useState<RecState>('idle');
   const [transcript, setTranscript] = useState('');
   const [recordError, setRecordError] = useState('');

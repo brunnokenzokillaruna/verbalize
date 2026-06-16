@@ -32,7 +32,7 @@ export function buildTypeDescriptions(langLabel: string): Record<ExerciseTypeId,
    - "question" (PT-BR).
    - "options" (3-4 complete sentences or phrases in ${langLabel}).
    - "correctIndex" (0-based).
-   - "explanation" (PT-BR).
+   - "explanation" (PT-BR). NEVER use "primeira opção", "segunda opção", etc. — quote key phrases or describe errors by content, because options are shuffled on screen.
    - "trapRule" (optional PT-BR, 1 sentence about the interference pattern).`,
     'listen-and-select': `type "listen-and-select":
    - "audioText" (${langLabel} sentence to be played via TTS).
@@ -52,7 +52,7 @@ export function buildTypeDescriptions(langLabel: string): Record<ExerciseTypeId,
    - "context" (PT-BR) describing the situation.
    - "promptLine" (${langLabel}) what the NPC says.
    - "options" (3 responses in target language). The correct option must use the target expression naturally. The other 2 options MUST be highly plausible, grammatically correct responses in target language that are contextually inappropriate or slightly incorrect (e.g. wrong pronoun, incorrect politeness level, or a subtle mismatch in context). DO NOT generate silly, obviously wrong, or unrelated distractors. The options should make the student think.
-   - "correctIndex" (0-2), "explanation" (PT-BR).`,
+   - "correctIndex" (0-2), "explanation" (PT-BR). In "explanation", NEVER refer to "primeira opção", "segunda opção", etc. — quote key phrases from each response or describe the grammatical difference directly, because options are shuffled on screen.`,
     'scrambled-conversation': `type "scrambled-conversation":
    - A short sequence of 3-4 dialogue lines.
    - "lines" (correct order), "shuffledLines" (random order).
@@ -80,7 +80,7 @@ export function buildTypeDescriptions(langLabel: string): Record<ExerciseTypeId,
      - "isCorrect" (boolean): EXACTLY ONE must be true
    - The 3 incorrect options MUST contain classic errors Brazilians make due to Portuguese interference on the grammar focus of this lesson.
    - The 1 correct option must be perfectly grammatical.
-   - "explanation" (PT-BR): clear explanation of WHY the correct answer is right and why the traps are wrong.
+   - "explanation" (PT-BR): clear explanation of WHY the correct answer is right and why the traps are wrong. NEVER use "primeira opção", "segunda opção", etc. — quote key phrases from each sentence, because options are shuffled on screen.
    - "trapRule" (PT-BR, 1 sentence): the core Brazilian error pattern.`,
     'minimal-pair': `type "minimal-pair":
    - This exercise trains auditory discrimination between similar-sounding words.

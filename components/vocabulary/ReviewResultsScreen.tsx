@@ -2,6 +2,8 @@
 
 import { useRef, useEffect } from 'react';
 import { Loader2, X, CheckCircle2, XCircle, ChevronRight } from 'lucide-react';
+import { useLockDocumentScroll } from '@/hooks/useLockDocumentScroll';
+import { useReviewSoundFeedback } from '@/hooks/useReviewSoundFeedback';
 import type { ReviewTheme } from './reviewThemes';
 import type { UserVocabularyDocument } from '@/types';
 import type { ReviewResult } from './reviewTypes';
@@ -32,7 +34,9 @@ export function ReviewResultsScreen({
   const correctCount = results.filter((r) => r.correct).length;
   const pct = Math.round((correctCount / Math.max(results.length, 1)) * 100);
   const containerRef = useRef<HTMLDivElement>(null);
+  const completionSoundPlayedRef = useRef(false);
   const ThemeIcon = theme.icon;
+  const { playSessionComplete } = useReviewSoundFeedback();
 
   const translationMap = Object.fromEntries(
     sessionItems.map((item) => [item.word, item.translation]),
@@ -48,10 +52,18 @@ export function ReviewResultsScreen({
   const scoreColor = pct >= 70 ? 'var(--color-success)' : 'var(--color-error)';
   const scoreBg = pct >= 70 ? 'var(--color-success-bg)' : 'var(--color-error-bg)';
 
+  useLockDocumentScroll();
+
+  useEffect(() => {
+    if (completionSoundPlayedRef.current) return;
+    completionSoundPlayedRef.current = true;
+    playSessionComplete(pct);
+  }, [pct, playSessionComplete]);
+
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 z-50 flex flex-col overflow-y-auto animate-fade-in"
+      className="fixed inset-0 z-50 flex h-dvh max-h-dvh flex-col overflow-hidden animate-fade-in"
       style={{ backgroundColor: 'var(--color-bg)' }}
     >
       <div
@@ -60,7 +72,7 @@ export function ReviewResultsScreen({
         aria-hidden
       />
 
-      <div className="flex items-center justify-between px-5 pt-6 pb-4 relative">
+      <div className="flex items-center justify-between px-5 pt-[max(1.5rem,env(safe-area-inset-top))] pb-4 relative shrink-0">
         <button
           type="button"
           onClick={onClose}
@@ -82,7 +94,7 @@ export function ReviewResultsScreen({
         <span className="w-9" />
       </div>
 
-      <div className="flex flex-1 flex-col items-center gap-6 px-6 py-6 text-center mx-auto max-w-sm w-full relative">
+      <div className="flex min-h-0 flex-1 flex-col items-center gap-6 overflow-y-auto scrollbar-hide px-6 py-6 text-center mx-auto max-w-sm w-full relative">
         <div
           className="flex h-28 w-28 flex-col items-center justify-center rounded-full border-[3px]"
           style={{

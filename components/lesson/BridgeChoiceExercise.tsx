@@ -3,6 +3,10 @@
 import { useState, useEffect, useMemo } from 'react';
 import { CheckCircle2, XCircle, Lightbulb } from 'lucide-react';
 import type { BridgeChoiceData } from '@/types';
+import {
+  buildOriginalToDisplayLetter,
+  remapPositionalExplanation,
+} from '@/utils/remapPositionalExplanation';
 
 interface BridgeChoiceExerciseProps {
   data: BridgeChoiceData;
@@ -29,6 +33,11 @@ export function BridgeChoiceExercise({
     }
     return indexed;
   }, [data.options]);
+
+  const displayExplanation = useMemo(() => {
+    const letterMap = buildOriginalToDisplayLetter(shuffledOptions);
+    return remapPositionalExplanation(data.explanation, letterMap);
+  }, [data.explanation, shuffledOptions]);
 
   useEffect(() => {
     if (!answered) {
@@ -94,7 +103,7 @@ export function BridgeChoiceExercise({
               Ponte PT-BR
             </span>
           </div>
-          <p className="text-sm text-[var(--color-text-secondary)]">{data.explanation}</p>
+          <p className="text-sm text-[var(--color-text-secondary)]">{displayExplanation}</p>
           {data.trapRule && (
             <p className="text-xs text-[var(--color-text-muted)] mt-2 italic">{data.trapRule}</p>
           )}

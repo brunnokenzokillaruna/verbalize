@@ -1,13 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Frame, Eye } from 'lucide-react';
 import { ImageMatchExercise } from '@/components/lesson/ImageMatchExercise';
 import { AudioPlayerButton } from '@/components/lesson/AudioPlayerButton';
 import { ReviewSessionShell } from './ReviewSessionShell';
 import { ReviewResultsScreen } from './ReviewResultsScreen';
 import { ReviewActionFooter } from './ReviewActionFooter';
-import { buildImageMatchFromReviewWords } from '@/utils/imageMatchBuilder';
+import { buildImageMatchFromReviewWords, MIN_VISUAL_REVIEW_ITEMS } from '@/utils/imageMatchBuilder';
 import { REVIEW_THEMES } from './reviewThemes';
 import type { UserVocabularyDocument, SupportedLanguage } from '@/types';
 import type { ReviewResult } from './reviewTypes';
@@ -17,6 +17,7 @@ const THEME = REVIEW_THEMES.visual;
 interface VisualReviewSessionProps {
   state: 'ready' | 'running' | 'done';
   sessionItems: UserVocabularyDocument[];
+  imagePool: Array<{ word: string; translation: string; imageUrl?: string }>;
   currentIdx: number;
   answered: boolean;
   lastCorrect: boolean | null;
@@ -26,6 +27,7 @@ interface VisualReviewSessionProps {
   hasMoreDue?: boolean;
   onAnswer: (correct: boolean) => void;
   onContinue: () => void;
+  onSkipUnavailable: () => void;
   onFinish: () => void;
   onClose: () => void;
   onStart: () => void;
@@ -34,6 +36,7 @@ interface VisualReviewSessionProps {
 export function VisualReviewSession({
   state,
   sessionItems,
+  imagePool,
   currentIdx,
   answered,
   lastCorrect,
@@ -43,6 +46,7 @@ export function VisualReviewSession({
   hasMoreDue,
   onAnswer,
   onContinue,
+  onSkipUnavailable,
   onFinish,
   onClose,
   onStart,
@@ -51,11 +55,25 @@ export function VisualReviewSession({
   const currentItem = state === 'running' ? sessionItems[currentIdx] : null;
   const [isExerciseReady, setIsExerciseReady] = useState(false);
   const [submitTrigger, setSubmitTrigger] = useState(0);
+  const skipHandledRef = useRef<number | null>(null);
 
   useEffect(() => {
+    skipHandledRef.current = null;
     setIsExerciseReady(false);
     setSubmitTrigger(0);
   }, [currentIdx]);
+
+  const exercise =
+    state === 'running' && currentItem
+      ? buildImageMatchFromReviewWords(currentItem.word, imagePool)
+      : null;
+
+  useEffect(() => {
+    if (state !== 'running' || exercise || !currentItem) return;
+    if (skipHandledRef.current === currentIdx) return;
+    skipHandledRef.current = currentIdx;
+    onSkipUnavailable();
+  }, [state, exercise, currentItem, currentIdx, onSkipUnavailable]);
 
   if (state === 'done') {
     return (
@@ -72,9 +90,10 @@ export function VisualReviewSession({
   }
 
   if (state === 'ready') {
-    const withImages = sessionItems.filter((i) => i.imageUrl).length;
+    const playableCount = sessionItems.length;
+    const canStart = playableCount >= MIN_VISUAL_REVIEW_ITEMS;
     return (
-      <ReviewSessionShell theme={THEME} current={0} total={total} onCloseRequest={onClose}>
+      <ReviewSessionShell theme={THEME} current={0} total={playableCount || 1} onCloseRequest={onClose}>
         <div className="flex-1 flex flex-col items-center justify-center px-6 py-8 mx-auto max-w-lg w-full text-center gap-8">
           <div
             className="flex h-16 w-16 items-center justify-center rounded-2xl"
@@ -87,20 +106,22 @@ export function VisualReviewSession({
               Galeria visual
             </h2>
             <p className="text-sm mt-2 text-text-secondary leading-relaxed">
-              Associe cada palavra à imagem certa. {withImages} palavras com foto nesta sessão.
+              Associe cada palavra à imagem certa. {playableCount} palavras prontas nesta sessão.
             </p>
           </div>
           <button
             type="button"
             onClick={onStart}
-            disabled={withImages < 3}
+            disabled={!canStart}
             className="w-full rounded-2xl px-6 py-4 text-base font-bold text-white transition-all active:scale-[0.98] disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
             style={{
               backgroundColor: THEME.accent,
-              boxShadow: withImages >= 3 ? `0 3px 0 ${THEME.accentDark}` : 'none',
+              boxShadow: canStart ? `0 3px 0 ${THEME.accentDark}` : 'none',
             }}
           >
-            {withImages >= 3 ? 'Abrir galeria' : 'Precisa de pelo menos 3 palavras com imagem'}
+            {canStart
+              ? 'Abrir galeria'
+              : `Precisa de pelo menos ${MIN_VISUAL_REVIEW_ITEMS} palavras com imagens distintas`}
           </button>
         </div>
       </ReviewSessionShell>
@@ -108,15 +129,6 @@ export function VisualReviewSession({
   }
 
   if (!currentItem) return null;
-
-  const exercise = buildImageMatchFromReviewWords(
-    currentItem.word,
-    sessionItems.map((i) => ({
-      word: i.word,
-      translation: i.translation,
-      imageUrl: i.imageUrl,
-    })),
-  );
 
   const footer = (
     <ReviewActionFooter
@@ -139,10 +151,9 @@ export function VisualReviewSession({
         current={currentIdx + 1}
         total={total}
         onCloseRequest={onClose}
-        footer={footer}
       >
         <p className="text-center text-sm p-6 text-text-muted">
-          Sem imagens suficientes. Avançando…
+          Preparando próxima palavra…
         </p>
       </ReviewSessionShell>
     );
@@ -156,7 +167,7 @@ export function VisualReviewSession({
       onCloseRequest={onClose}
       footer={footer}
     >
-      <div className="flex-1 px-5 py-4 mx-auto max-w-lg w-full flex flex-col gap-5 animate-slide-up">
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto scrollbar-hide px-5 py-3 mx-auto max-w-lg w-full gap-4 sm:gap-5 animate-slide-up pb-[max(0.75rem,env(safe-area-inset-bottom))]">
         {/* Curator challenge header */}
         <div
           className="rounded-2xl border-2 overflow-hidden"
@@ -175,7 +186,7 @@ export function VisualReviewSession({
             <p className="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-2">
               Qual imagem representa
             </p>
-            <p className="font-display text-3xl font-bold text-text-primary">
+            <p className="font-display text-[clamp(1.5rem,6vw,1.875rem)] font-bold text-text-primary break-words">
               {exercise.data.targetWord}
             </p>
             <p className="text-sm text-text-secondary italic mt-1">
@@ -188,6 +199,7 @@ export function VisualReviewSession({
         </div>
 
         <ImageMatchExercise
+          key={currentIdx}
           data={exercise.data}
           onAnswer={onAnswer}
           answered={answered}

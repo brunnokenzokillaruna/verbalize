@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { X } from 'lucide-react';
+import { useLockDocumentScroll } from '@/hooks/useLockDocumentScroll';
 import type { ReviewTheme } from './reviewThemes';
 
 interface ReviewSessionShellProps {
@@ -25,6 +26,8 @@ export function ReviewSessionShell({
   const containerRef = useRef<HTMLDivElement>(null);
   const progress = total > 0 ? (current / total) * 100 : 0;
   const ThemeIcon = theme.icon;
+
+  useLockDocumentScroll();
 
   function handleCloseRequest() {
     setShowExitConfirm(true);
@@ -91,7 +94,7 @@ export function ReviewSessionShell({
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 z-50 flex flex-col overflow-y-auto animate-fade-in"
+      className="fixed inset-0 z-50 flex h-dvh max-h-dvh flex-col overflow-hidden animate-fade-in"
       style={{ backgroundColor: 'var(--color-bg)' }}
     >
       <div
@@ -101,7 +104,7 @@ export function ReviewSessionShell({
       />
 
       <div
-        className="sticky top-0 z-10 px-5 pt-5 pb-3"
+        className="sticky top-0 z-10 shrink-0 px-5 pt-[max(1.25rem,env(safe-area-inset-top))] pb-3"
         style={{ backgroundColor: 'var(--color-bg)' }}
       >
         <div className="mx-auto max-w-lg">
@@ -169,11 +172,13 @@ export function ReviewSessionShell({
         </div>
       </div>
 
-      <div className="relative flex-1 flex flex-col">{children}</div>
+      <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
+        {children}
+      </div>
 
       {footer && (
         <div
-          className="sticky bottom-0 z-10 border-t border-border"
+          className="sticky bottom-0 z-10 shrink-0 border-t border-border"
           style={{ backgroundColor: 'var(--color-bg)' }}
         >
           {footer}

@@ -17,20 +17,189 @@ import { getDb } from './firebase';
 import type { UserDocument, UserVocabularyDocument, ImageCacheDocument, VerbDocument, LessonMistakeDocument, PregeneratedLessonDocument, SupportedLanguage, ProficiencyLevel } from '@/types';
 import { calculateNextReview } from '@/lib/srs';
 import { getNextLessonId, getLessonsForLanguage } from '@/lib/curriculum';
+import {
+  buildCurriculumSyncNotice,
+  buildUserCurriculumMigrationUpdates,
+  CURRICULUM_VERSION,
+  getStoredCurriculumVersion,
+  isFutureCurriculumVersion,
+  migrateContentLessonId,
+  shouldClearPregenCacheOnMigration,
+} from '@/lib/curriculum/lessonIdMigration';
+import { INITIAL_LESSON_PROGRESS, resolveFrontierLessonId, sanitizeLessonProgress } from '@/lib/curriculum/lessonProgress';
+import { logCurriculum } from '@/lib/curriculumLogger';
+import type { CurriculumSyncNotice, CurriculumSyncReport } from '@/types/curriculumSync';
 import { getEffectiveStreak } from '@/lib/stats';
 import { stripUndefinedDeep } from '@/utils/stripUndefined';
 
 // ─── Users ────────────────────────────────────────────────────────────────────
 
-export async function getUser(uid: string): Promise<UserDocument | null> {
+export interface SyncUserProfileResult {
+  profile: UserDocument;
+  notice: CurriculumSyncNotice | null;
+  report: CurriculumSyncReport;
+}
+
+export async function syncUserProfile(uid: string): Promise<SyncUserProfileResult | null> {
   const snap = await getDoc(doc(await getDb(), 'users', uid));
-  return snap.exists() ? (snap.data() as UserDocument) : null;
+  if (!snap.exists()) return null;
+
+  const profile = snap.data() as UserDocument;
+  const fromVersion = getStoredCurriculumVersion(profile);
+
+  logCurriculum('sync_start', { uid, fromVersion, targetVersion: CURRICULUM_VERSION });
+
+  const report: CurriculumSyncReport = {
+    uid,
+    fromVersion,
+    toVersion: CURRICULUM_VERSION,
+    migrated: false,
+    progressChanges: [],
+    sanitizedChanges: [],
+    mistakesUpdated: 0,
+    pregenCleared: 0,
+  };
+
+  if (isFutureCurriculumVersion(profile)) {
+    logCurriculum('invalid_version', {
+      uid,
+      storedVersion: fromVersion,
+      appVersion: CURRICULUM_VERSION,
+    });
+    return {
+      profile,
+      notice: null,
+      report,
+    };
+  }
+
+  let workingProgress = profile.lessonProgress;
+  let curriculumVersion = profile.curriculumVersion;
+
+  const migrationUpdates = buildUserCurriculumMigrationUpdates(profile);
+  if (migrationUpdates) {
+    report.migrated = true;
+    report.progressChanges = migrationUpdates.curriculumMigrationMeta?.progressChanges ?? [];
+    workingProgress = migrationUpdates.lessonProgress;
+    curriculumVersion = migrationUpdates.curriculumVersion;
+
+    logCurriculum('migration_applied', {
+      uid,
+      fromVersion,
+      toVersion: CURRICULUM_VERSION,
+      progressChanges: report.progressChanges,
+    });
+  }
+
+  const { lessonProgress: sanitizedProgress, changes: sanitizedChanges } =
+    sanitizeLessonProgress(workingProgress);
+
+  if (sanitizedChanges.length > 0) {
+    report.sanitizedChanges = sanitizedChanges.map((change) => ({
+      language: change.language,
+      from: change.from,
+      to: change.to,
+      reason: change.reason,
+    }));
+    logCurriculum('progress_sanitized', { uid, changes: sanitizedChanges });
+  }
+
+  const progressChanged =
+    sanitizedProgress.fr !== profile.lessonProgress?.fr ||
+    sanitizedProgress.en !== profile.lessonProgress?.en ||
+    !profile.lessonProgress?.fr ||
+    !profile.lessonProgress?.en;
+
+  const versionChanged = (curriculumVersion ?? 1) !== fromVersion;
+  const shouldPersist = report.migrated || progressChanged || versionChanged;
+
+  let nextProfile = profile;
+
+  if (shouldPersist) {
+    const userUpdates: Partial<UserDocument> = {
+      lessonProgress: sanitizedProgress,
+      curriculumVersion: curriculumVersion ?? CURRICULUM_VERSION,
+    };
+
+    if (report.migrated) {
+      userUpdates.curriculumMigrationMeta = {
+        version: CURRICULUM_VERSION,
+        fromVersion,
+        progressChanges: report.progressChanges,
+        migratedAt: Timestamp.now(),
+      };
+    }
+
+    await updateUser(uid, userUpdates);
+    nextProfile = { ...profile, ...userUpdates };
+
+    if (report.migrated) {
+      report.mistakesUpdated = await migrateUserLessonMistakes(uid, fromVersion);
+
+      if (shouldClearPregenCacheOnMigration(profile, report.progressChanges)) {
+        report.pregenCleared = await clearUserPregeneratedLessons(uid);
+      }
+
+      if (report.mistakesUpdated > 0) {
+        logCurriculum('mistakes_migrated', { uid, count: report.mistakesUpdated });
+      }
+      if (report.pregenCleared > 0) {
+        logCurriculum('pregen_cleared', { uid, count: report.pregenCleared });
+      }
+    }
+  }
+
+  const notice = buildCurriculumSyncNotice(report);
+
+  logCurriculum(shouldPersist ? 'sync_complete' : 'sync_noop', {
+    uid,
+    migrated: report.migrated,
+    sanitizedCount: report.sanitizedChanges.length,
+    mistakesUpdated: report.mistakesUpdated,
+    pregenCleared: report.pregenCleared,
+    hasNotice: Boolean(notice),
+  });
+
+  return { profile: nextProfile, notice, report };
+}
+
+export async function getUser(uid: string): Promise<UserDocument | null> {
+  const result = await syncUserProfile(uid);
+  return result?.profile ?? null;
+}
+
+/** Migrates lesson mistake documents to current lesson ids (client-writable). */
+async function migrateUserLessonMistakes(uid: string, fromVersion: number): Promise<number> {
+  const mistakes = await getUserMistakes(uid);
+  let updated = 0;
+
+  await Promise.all(
+    mistakes.map(async (mistake) => {
+      const migratedId = migrateContentLessonId(mistake.language, mistake.lessonId, fromVersion);
+      if (!migratedId || migratedId === mistake.lessonId || !mistake.id) return;
+      await updateDoc(doc(await getDb(), 'lesson_mistakes', mistake.id), { lessonId: migratedId });
+      updated += 1;
+    }),
+  );
+
+  return updated;
+}
+
+/** Clears stale pre-generated lesson caches after a curriculum version bump. */
+async function clearUserPregeneratedLessons(uid: string): Promise<number> {
+  const snap = await getDocs(query(collection(await getDb(), 'lesson_pregen'), where('uid', '==', uid)));
+  if (snap.empty) return 0;
+
+  await Promise.all(snap.docs.map((entry) => deleteDoc(entry.ref)));
+  return snap.size;
 }
 
 export async function createUser(uid: string, data: Omit<UserDocument, 'uid' | 'createdAt' | 'lastLogin'>) {
   await setDoc(doc(await getDb(), 'users', uid), {
     ...data,
     uid,
+    lessonProgress: data.lessonProgress ?? INITIAL_LESSON_PROGRESS,
+    curriculumVersion: data.curriculumVersion ?? CURRICULUM_VERSION,
     createdAt: serverTimestamp(),
     lastLogin: serverTimestamp(),
   });
@@ -187,17 +356,36 @@ export async function updateLessonStats(
 
   // Advance lesson progress only when the user completes their current frontier lesson (or something ahead of it)
   const currentProgress = profile.lessonProgress ?? {};
-  const frontierLessonId = currentProgress[language];
-  
+  const rawFrontierId = currentProgress[language];
+  const frontierLessonId = rawFrontierId
+    ? resolveFrontierLessonId(language, rawFrontierId)
+    : undefined;
+
   const allLessons = getLessonsForLanguage(language);
-  const frontierIdx = frontierLessonId ? allLessons.findIndex(l => l.id === frontierLessonId) : 0;
-  const completedIdx = allLessons.findIndex(l => l.id === completedLessonId);
+  const frontierIdx = frontierLessonId
+    ? allLessons.findIndex((l) => l.id === frontierLessonId)
+    : 0;
+  const completedIdx = allLessons.findIndex((l) => l.id === completedLessonId);
+
+  if (completedIdx === -1) {
+    logCurriculum('sync_error', {
+      uid,
+      context: 'updateLessonStats',
+      reason: 'unknown_completed_lesson',
+      completedLessonId,
+      language,
+    });
+  }
 
   // If we can't find the completed lesson, we can't safely advance
   const nextId = getNextLessonId(language, completedLessonId);
   const isAtFrontier = completedIdx !== -1 && (completedIdx >= frontierIdx || !frontierLessonId);
   
   const newLessonProgress: Record<string, string> = { ...currentProgress };
+
+  if (frontierLessonId && rawFrontierId && frontierLessonId !== rawFrontierId) {
+    newLessonProgress[language] = frontierLessonId;
+  }
   
   if (isAtFrontier && nextId) {
     newLessonProgress[language] = nextId;

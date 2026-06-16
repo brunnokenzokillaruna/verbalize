@@ -50,9 +50,9 @@ export function DashboardProfileDrawer({
       />
       <div
         ref={drawerRef}
-        className="fixed inset-y-0 right-0 z-50 w-80 bg-[var(--color-surface)] border-l border-[var(--color-border)] p-6 shadow-2xl flex flex-col justify-between animate-drawer-slide"
+        className="fixed top-0 right-0 bottom-0 z-50 w-80 max-w-[min(20rem,100vw)] bg-[var(--color-surface)] border-l border-[var(--color-border)] shadow-2xl flex flex-col min-h-0 animate-drawer-slide max-md:bottom-[calc(4rem+env(safe-area-inset-bottom,0px))]"
       >
-        <div>
+        <div className="flex-1 overflow-y-auto overscroll-contain min-h-0 p-6 pb-4">
           <div className="flex items-center justify-between mb-6">
             <h2 className="font-display text-xl font-extrabold text-text-primary">Perfil</h2>
             <button
@@ -164,7 +164,10 @@ export function DashboardProfileDrawer({
           </div>
         </div>
 
-        <div>
+        <div
+          className="shrink-0 p-6 pt-4 border-t border-[var(--color-border)]"
+          style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom, 0px))' }}
+        >
           <button
             onClick={onLogout}
             className="w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary cursor-pointer active:translate-y-[2px]"

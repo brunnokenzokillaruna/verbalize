@@ -1028,7 +1028,34 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "en-a2-115",
+    "level": "A2",
+    "tag": "VERB",
+    "uiTitle": "Check-in e Bagagem",
+    "grammarFocus": "Phrasal Verbs: Check in, Pick up, Drop off",
+    "theme": "Tema 9: Minha Casa, Minha Rotina",
+    "language": "en",
+    "id": "en-a2-115"
+  },
+  {
+    "level": "A2",
+    "tag": "VERB",
+    "uiTitle": "Descobertas Urbanas",
+    "grammarFocus": "Phrasal Verbs: Run out of, Find out, Figure out",
+    "theme": "Tema 9: Minha Casa, Minha Rotina",
+    "language": "en",
+    "id": "en-a2-116"
+  },
+  {
+    "level": "A2",
+    "tag": "DIAL",
+    "uiTitle": "Frases de Viagem",
+    "grammarFocus": "5 Frases com Phrasal Verbs em Aeroportos e Hotéis",
+    "theme": "Tema 9: Minha Casa, Minha Rotina",
+    "language": "en",
+    "id": "en-a2-117"
+  },
+  {
+    "id": "en-a2-118",
     "language": "en",
     "level": "A2",
     "tag": "GRAM",
@@ -1037,7 +1064,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "en-a2-116",
+    "id": "en-a2-119",
     "language": "en",
     "level": "A2",
     "tag": "MISS",
@@ -1046,7 +1073,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "en-a2-117",
+    "id": "en-a2-120",
     "language": "en",
     "level": "A2",
     "tag": "VERB",
@@ -1055,7 +1082,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "en-a2-118",
+    "id": "en-a2-121",
     "language": "en",
     "level": "A2",
     "tag": "VERB",
@@ -1064,7 +1091,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "en-a2-119",
+    "id": "en-a2-122",
     "language": "en",
     "level": "A2",
     "tag": "GRAM",
@@ -1073,7 +1100,25 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "en-a2-120",
+    "level": "A2",
+    "tag": "PRON",
+    "uiTitle": "The Schwa Sound",
+    "grammarFocus": "The Schwa /ə/ in Unstressed Syllables",
+    "theme": "Tema 9: Minha Casa, Minha Rotina",
+    "language": "en",
+    "id": "en-a2-123"
+  },
+  {
+    "level": "A2",
+    "tag": "PRON",
+    "uiTitle": "Silent Letters",
+    "grammarFocus": "Silent Letters: K, B, W and GH in Common Words",
+    "theme": "Tema 9: Minha Casa, Minha Rotina",
+    "language": "en",
+    "id": "en-a2-124"
+  },
+  {
+    "id": "en-a2-125",
     "language": "en",
     "level": "A2",
     "tag": "VERB",
@@ -1082,7 +1127,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "en-a2-121",
+    "id": "en-a2-126",
     "language": "en",
     "level": "A2",
     "tag": "GRAM",
@@ -1091,7 +1136,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "en-a2-122",
+    "id": "en-a2-127",
     "language": "en",
     "level": "A2",
     "tag": "VERB",
@@ -1100,7 +1145,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "en-a2-123",
+    "id": "en-a2-128",
     "language": "en",
     "level": "A2",
     "tag": "GRAM",
@@ -1109,7 +1154,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "en-a2-124",
+    "id": "en-a2-129",
     "language": "en",
     "level": "A2",
     "tag": "VERB",
@@ -1118,7 +1163,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "en-a2-125",
+    "id": "en-a2-130",
     "language": "en",
     "level": "A2",
     "tag": "GRAM",
@@ -1127,7 +1172,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "en-a2-126",
+    "id": "en-a2-131",
     "language": "en",
     "level": "A2",
     "tag": "VERB",
@@ -1136,7 +1181,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "en-a2-127",
+    "id": "en-a2-132",
     "language": "en",
     "level": "A2",
     "tag": "VERB",
@@ -1145,7 +1190,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "en-a2-128",
+    "id": "en-a2-133",
     "language": "en",
     "level": "A2",
     "tag": "VERB",
@@ -1154,7 +1199,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
-    "id": "en-a2-129",
+    "id": "en-a2-134",
     "language": "en",
     "level": "A2",
     "tag": "VERB",
@@ -1163,7 +1208,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
-    "id": "en-a2-130",
+    "id": "en-a2-135",
     "language": "en",
     "level": "A2",
     "tag": "MISS",
@@ -1172,7 +1217,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
-    "id": "en-a2-131",
+    "id": "en-a2-136",
     "language": "en",
     "level": "A2",
     "tag": "VERB",
@@ -1181,7 +1226,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
-    "id": "en-a2-132",
+    "id": "en-a2-137",
     "language": "en",
     "level": "A2",
     "tag": "GRAM",
@@ -1190,7 +1235,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
-    "id": "en-a2-133",
+    "id": "en-a2-138",
     "language": "en",
     "level": "A2",
     "tag": "GRAM",
@@ -1199,7 +1244,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
-    "id": "en-a2-134",
+    "id": "en-a2-139",
     "language": "en",
     "level": "A2",
     "tag": "GRAM",
@@ -1208,7 +1253,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
-    "id": "en-a2-135",
+    "id": "en-a2-140",
     "language": "en",
     "level": "A2",
     "tag": "GRAM",
@@ -1217,7 +1262,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
-    "id": "en-a2-136",
+    "id": "en-a2-141",
     "language": "en",
     "level": "A2",
     "tag": "GRAM",
@@ -1226,7 +1271,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
-    "id": "en-a2-137",
+    "id": "en-a2-142",
     "language": "en",
     "level": "A2",
     "tag": "GRAM",
@@ -1235,7 +1280,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
-    "id": "en-a2-138",
+    "id": "en-a2-143",
     "language": "en",
     "level": "A2",
     "tag": "GRAM",
@@ -1244,7 +1289,43 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
-    "id": "en-a2-139",
+    "level": "A2",
+    "tag": "VOC",
+    "uiTitle": "Make ou Do?",
+    "grammarFocus": "Collocations: Make vs Do (Make a mistake, Do homework)",
+    "theme": "Tema 10: O Mercado e a Cozinha",
+    "language": "en",
+    "id": "en-a2-144"
+  },
+  {
+    "level": "A2",
+    "tag": "VOC",
+    "uiTitle": "Take ou Have?",
+    "grammarFocus": "Collocations: Take vs Have (Take a shower, Have a break)",
+    "theme": "Tema 10: O Mercado e a Cozinha",
+    "language": "en",
+    "id": "en-a2-145"
+  },
+  {
+    "level": "A2",
+    "tag": "VOC",
+    "uiTitle": "Adjetivos Fortes",
+    "grammarFocus": "Collocations: Adjective + Noun (Heavy rain, Deep sleep)",
+    "theme": "Tema 10: O Mercado e a Cozinha",
+    "language": "en",
+    "id": "en-a2-146"
+  },
+  {
+    "level": "A2",
+    "tag": "MISS",
+    "uiTitle": "Dia no Supermercado",
+    "grammarFocus": "Prática: Collocations do Cotidiano em Lojas e Mercados",
+    "theme": "Tema 10: O Mercado e a Cozinha",
+    "language": "en",
+    "id": "en-a2-147"
+  },
+  {
+    "id": "en-a2-148",
     "language": "en",
     "level": "A2",
     "tag": "GRAM",
@@ -1253,7 +1334,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
-    "id": "en-a2-140",
+    "id": "en-a2-149",
     "language": "en",
     "level": "A2",
     "tag": "GRAM",
@@ -1262,7 +1343,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
-    "id": "en-a2-141",
+    "id": "en-a2-150",
     "language": "en",
     "level": "A2",
     "tag": "GRAM",
@@ -1271,7 +1352,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
-    "id": "en-a2-142",
+    "id": "en-a2-151",
     "language": "en",
     "level": "A2",
     "tag": "MISS",
@@ -1280,7 +1361,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "en-a2-143",
+    "id": "en-a2-152",
     "language": "en",
     "level": "A2",
     "tag": "VERB",
@@ -1289,7 +1370,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "en-a2-144",
+    "id": "en-a2-153",
     "language": "en",
     "level": "A2",
     "tag": "GRAM",
@@ -1298,7 +1379,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "en-a2-145",
+    "id": "en-a2-154",
     "language": "en",
     "level": "A2",
     "tag": "VOC",
@@ -1307,7 +1388,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "en-a2-146",
+    "id": "en-a2-155",
     "language": "en",
     "level": "A2",
     "tag": "DIAL",
@@ -1316,7 +1397,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "en-a2-147",
+    "id": "en-a2-156",
     "language": "en",
     "level": "A2",
     "tag": "MISS",
@@ -1325,7 +1406,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "en-a2-148",
+    "id": "en-a2-157",
     "language": "en",
     "level": "A2",
     "tag": "VERB",
@@ -1334,7 +1415,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "en-a2-149",
+    "id": "en-a2-158",
     "language": "en",
     "level": "A2",
     "tag": "GRAM",
@@ -1343,7 +1424,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "en-a2-150",
+    "id": "en-a2-159",
     "language": "en",
     "level": "A2",
     "tag": "VOC",
@@ -1352,7 +1433,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "en-a2-151",
+    "id": "en-a2-160",
     "language": "en",
     "level": "A2",
     "tag": "VERB",
@@ -1361,7 +1442,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "en-a2-152",
+    "id": "en-a2-161",
     "language": "en",
     "level": "A2",
     "tag": "GRAM",
@@ -1370,7 +1451,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "en-a2-153",
+    "id": "en-a2-162",
     "language": "en",
     "level": "A2",
     "tag": "VERB",
@@ -1379,7 +1460,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "en-a2-154",
+    "id": "en-a2-163",
     "language": "en",
     "level": "A2",
     "tag": "GRAM",
@@ -1388,7 +1469,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "en-a2-155",
+    "id": "en-a2-164",
     "language": "en",
     "level": "A2",
     "tag": "VERB",
@@ -1397,7 +1478,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "en-a2-156",
+    "id": "en-a2-165",
     "language": "en",
     "level": "A2",
     "tag": "GRAM",
@@ -1406,7 +1487,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
-    "id": "en-a2-157",
+    "id": "en-a2-166",
     "language": "en",
     "level": "A2",
     "tag": "MISS",
@@ -1415,7 +1496,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "en-a2-158",
+    "id": "en-a2-167",
     "language": "en",
     "level": "A2",
     "tag": "VOC",
@@ -1424,7 +1505,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "en-a2-159",
+    "id": "en-a2-168",
     "language": "en",
     "level": "A2",
     "tag": "VOC",
@@ -1433,7 +1514,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "en-a2-160",
+    "id": "en-a2-169",
     "language": "en",
     "level": "A2",
     "tag": "GRAM",
@@ -1442,7 +1523,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "en-a2-161",
+    "id": "en-a2-170",
     "language": "en",
     "level": "A2",
     "tag": "EXPR",
@@ -1451,7 +1532,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "en-a2-162",
+    "id": "en-a2-171",
     "language": "en",
     "level": "A2",
     "tag": "GRAM",
@@ -1460,7 +1541,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "en-a2-163",
+    "id": "en-a2-172",
     "language": "en",
     "level": "A2",
     "tag": "EXPR",
@@ -1469,7 +1550,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "en-a2-164",
+    "id": "en-a2-173",
     "language": "en",
     "level": "A2",
     "tag": "VOC",
@@ -1478,7 +1559,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "en-a2-165",
+    "id": "en-a2-174",
     "language": "en",
     "level": "A2",
     "tag": "GRAM",
@@ -1487,7 +1568,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "en-a2-166",
+    "id": "en-a2-175",
     "language": "en",
     "level": "A2",
     "tag": "VOC",
@@ -1496,7 +1577,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "en-a2-167",
+    "id": "en-a2-176",
     "language": "en",
     "level": "A2",
     "tag": "GRAM",
@@ -1505,7 +1586,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "en-a2-168",
+    "id": "en-a2-177",
     "language": "en",
     "level": "A2",
     "tag": "VOC",
@@ -1514,7 +1595,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "en-a2-169",
+    "id": "en-a2-178",
     "language": "en",
     "level": "A2",
     "tag": "GRAM",
@@ -1523,7 +1604,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "en-a2-170",
+    "id": "en-a2-179",
     "language": "en",
     "level": "A2",
     "tag": "VOC",
@@ -1532,7 +1613,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "en-a2-171",
+    "id": "en-a2-180",
     "language": "en",
     "level": "A2",
     "tag": "GRAM",
@@ -1541,7 +1622,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
-    "id": "en-a2-172",
+    "id": "en-a2-181",
     "language": "en",
     "level": "A2",
     "tag": "EXPR",
@@ -1550,7 +1631,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
-    "id": "en-a2-173",
+    "id": "en-a2-182",
     "language": "en",
     "level": "A2",
     "tag": "DIAL",
@@ -1559,7 +1640,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
-    "id": "en-a2-174",
+    "id": "en-a2-183",
     "language": "en",
     "level": "A2",
     "tag": "GRAM",
@@ -1568,7 +1649,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
-    "id": "en-a2-175",
+    "id": "en-a2-184",
     "language": "en",
     "level": "A2",
     "tag": "MISS",
@@ -1577,7 +1658,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
-    "id": "en-a2-176",
+    "id": "en-a2-185",
     "language": "en",
     "level": "A2",
     "tag": "DIAL",
@@ -1586,7 +1667,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
-    "id": "en-a2-177",
+    "id": "en-a2-186",
     "language": "en",
     "level": "A2",
     "tag": "VOC",
@@ -1595,7 +1676,16 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
-    "id": "en-a2-178",
+    "level": "A2",
+    "tag": "VOC",
+    "uiTitle": "Big Price Tags",
+    "grammarFocus": "Large Numbers: Hundred, Thousand and Million",
+    "theme": "Tema 13: Clima, Natureza e Passeios",
+    "language": "en",
+    "id": "en-a2-187"
+  },
+  {
+    "id": "en-a2-188",
     "language": "en",
     "level": "A2",
     "tag": "MISS",
@@ -1604,7 +1694,16 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
-    "id": "en-a2-179",
+    "level": "A2",
+    "tag": "MISS",
+    "uiTitle": "Buying the Ticket",
+    "grammarFocus": "Public Transport: Oyster Card, Tube and Transfers",
+    "theme": "Tema 13: Clima, Natureza e Passeios",
+    "language": "en",
+    "id": "en-a2-189"
+  },
+  {
+    "id": "en-a2-190",
     "language": "en",
     "level": "A2",
     "tag": "DIAL",
@@ -1613,7 +1712,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
-    "id": "en-a2-180",
+    "id": "en-a2-191",
     "language": "en",
     "level": "A2",
     "tag": "VOC",
@@ -1622,7 +1721,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
-    "id": "en-a2-181",
+    "id": "en-a2-192",
     "language": "en",
     "level": "A2",
     "tag": "VOC",
@@ -1631,7 +1730,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
-    "id": "en-a2-182",
+    "id": "en-a2-193",
     "language": "en",
     "level": "A2",
     "tag": "VOC",
@@ -1640,7 +1739,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
-    "id": "en-a2-183",
+    "id": "en-a2-194",
     "language": "en",
     "level": "A2",
     "tag": "VOC",
@@ -1649,7 +1748,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
-    "id": "en-a2-184",
+    "id": "en-a2-195",
     "language": "en",
     "level": "A2",
     "tag": "VOC",
@@ -1658,7 +1757,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
-    "id": "en-a2-185",
+    "id": "en-a2-196",
     "language": "en",
     "level": "A2",
     "tag": "VOC",
@@ -1667,7 +1766,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
-    "id": "en-a2-186",
+    "id": "en-a2-197",
     "language": "en",
     "level": "A2",
     "tag": "MISS",
@@ -1676,7 +1775,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 14: Rotina do Escritório e da Cidade"
   },
   {
-    "id": "en-a2-187",
+    "id": "en-a2-198",
     "language": "en",
     "level": "A2",
     "tag": "GRAM",
@@ -1685,7 +1784,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 14: Rotina do Escritório e da Cidade"
   },
   {
-    "id": "en-a2-188",
+    "id": "en-a2-199",
     "language": "en",
     "level": "A2",
     "tag": "PRON",
@@ -1694,7 +1793,16 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 14: Rotina do Escritório e da Cidade"
   },
   {
-    "id": "en-a2-189",
+    "level": "A2",
+    "tag": "PRON",
+    "uiTitle": "Word Stress Patterns",
+    "grammarFocus": "Word Stress: Two-Syllable Nouns vs Verbs",
+    "theme": "Tema 14: Rotina do Escritório e da Cidade",
+    "language": "en",
+    "id": "en-a2-200"
+  },
+  {
+    "id": "en-a2-201",
     "language": "en",
     "level": "A2",
     "tag": "MISS",
@@ -1703,7 +1811,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 14: Rotina do Escritório e da Cidade"
   },
   {
-    "id": "en-a2-190",
+    "id": "en-a2-202",
     "language": "en",
     "level": "A2",
     "tag": "GRAM",
@@ -1712,7 +1820,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 14: Rotina do Escritório e da Cidade"
   },
   {
-    "id": "en-a2-191",
+    "id": "en-a2-203",
     "language": "en",
     "level": "A2",
     "tag": "PRON",
@@ -1721,7 +1829,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 14: Rotina do Escritório e da Cidade"
   },
   {
-    "id": "en-a2-192",
+    "id": "en-a2-204",
     "language": "en",
     "level": "A2",
     "tag": "GRAM",
@@ -1730,7 +1838,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 14: Rotina do Escritório e da Cidade"
   },
   {
-    "id": "en-a2-193",
+    "id": "en-a2-205",
     "language": "en",
     "level": "A2",
     "tag": "GRAM",
@@ -1739,7 +1847,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 14: Rotina do Escritório e da Cidade"
   },
   {
-    "id": "en-a2-194",
+    "id": "en-a2-206",
     "language": "en",
     "level": "A2",
     "tag": "GRAM",
@@ -1748,7 +1856,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 14: Rotina do Escritório e da Cidade"
   },
   {
-    "id": "en-a2-195",
+    "id": "en-a2-207",
     "language": "en",
     "level": "A2",
     "tag": "GRAM",
@@ -1757,7 +1865,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 14: Rotina do Escritório e da Cidade"
   },
   {
-    "id": "en-a2-196",
+    "id": "en-a2-208",
     "language": "en",
     "level": "A2",
     "tag": "VERB",
@@ -1766,7 +1874,34 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 15: Saúde e Farmácia"
   },
   {
-    "id": "en-a2-197",
+    "level": "A2",
+    "tag": "DIAL",
+    "uiTitle": "At the Doctor",
+    "grammarFocus": "5 Phrases for Appointments: Symptoms and Prescriptions",
+    "theme": "Tema 15: Saúde e Farmácia",
+    "language": "en",
+    "id": "en-a2-209"
+  },
+  {
+    "level": "A2",
+    "tag": "VOC",
+    "uiTitle": "Opening an Account",
+    "grammarFocus": "Vocabulary: Bank, Account, Sort Code and GP Registration",
+    "theme": "Tema 15: Saúde e Farmácia",
+    "language": "en",
+    "id": "en-a2-210"
+  },
+  {
+    "level": "A2",
+    "tag": "VOC",
+    "uiTitle": "Britânico vs Americano",
+    "grammarFocus": "British vs American Vocabulary (Lift/Elevator, Queue/Line)",
+    "theme": "Tema 15: Saúde e Farmácia",
+    "language": "en",
+    "id": "en-a2-211"
+  },
+  {
+    "id": "en-a2-212",
     "language": "en",
     "level": "A2",
     "tag": "MISS",
@@ -1775,7 +1910,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 15: Saúde e Farmácia"
   },
   {
-    "id": "en-a2-198",
+    "id": "en-a2-213",
     "language": "en",
     "level": "A2",
     "tag": "VERB",
@@ -1784,7 +1919,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 15: Saúde e Farmácia"
   },
   {
-    "id": "en-a2-199",
+    "id": "en-a2-214",
     "language": "en",
     "level": "A2",
     "tag": "MISS",
@@ -1793,7 +1928,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 15: Saúde e Farmácia"
   },
   {
-    "id": "en-a2-200",
+    "id": "en-a2-215",
     "language": "en",
     "level": "A2",
     "tag": "VERB",
@@ -1802,7 +1937,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 15: Saúde e Farmácia"
   },
   {
-    "id": "en-a2-201",
+    "id": "en-a2-216",
     "language": "en",
     "level": "A2",
     "tag": "MISS",
@@ -1811,7 +1946,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 15: Saúde e Farmácia"
   },
   {
-    "id": "en-a2-202",
+    "id": "en-a2-217",
     "language": "en",
     "level": "A2",
     "tag": "VERB",
@@ -1820,7 +1955,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 15: Saúde e Farmácia"
   },
   {
-    "id": "en-a2-203",
+    "id": "en-a2-218",
     "language": "en",
     "level": "A2",
     "tag": "VERB",
@@ -1829,7 +1964,25 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 15: Saúde e Farmácia"
   },
   {
-    "id": "en-a2-204",
+    "level": "A2",
+    "tag": "GRAM",
+    "uiTitle": "Action in Progress",
+    "grammarFocus": "Present Continuous: Be + -ing vs Simple Present",
+    "theme": "Tema 15: Saúde e Farmácia",
+    "language": "en",
+    "id": "en-a2-219"
+  },
+  {
+    "level": "A2",
+    "tag": "GRAM",
+    "uiTitle": "Artigo Zero",
+    "grammarFocus": "Zero Article: I like music vs I like the music",
+    "theme": "Tema 15: Saúde e Farmácia",
+    "language": "en",
+    "id": "en-a2-220"
+  },
+  {
+    "id": "en-a2-221",
     "language": "en",
     "level": "A2",
     "tag": "VERB",
@@ -1838,7 +1991,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 15: Saúde e Farmácia"
   },
   {
-    "id": "en-a2-205",
+    "id": "en-a2-222",
     "language": "en",
     "level": "A2",
     "tag": "VERB",
@@ -1847,7 +2000,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 15: Saúde e Farmácia"
   },
   {
-    "id": "en-b1-206",
+    "id": "en-b1-223",
     "language": "en",
     "level": "B1",
     "tag": "VERB",
@@ -1856,7 +2009,43 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "en-b1-207",
+    "level": "B1",
+    "tag": "PRON",
+    "uiTitle": "Intonation and Rhythm",
+    "grammarFocus": "Intonation in Questions, Negation and Emphasis",
+    "theme": "Tema 16: Relembrando a Infância",
+    "language": "en",
+    "id": "en-b1-224"
+  },
+  {
+    "level": "B1",
+    "tag": "PRON",
+    "uiTitle": "Linking Sounds",
+    "grammarFocus": "Linking Sounds and Weak Forms (An apple, Cup of tea)",
+    "theme": "Tema 16: Relembrando a Infância",
+    "language": "en",
+    "id": "en-b1-225"
+  },
+  {
+    "level": "B1",
+    "tag": "GRAM",
+    "uiTitle": "Gonna, Wanna, Gotta",
+    "grammarFocus": "Informal Reductions: Gonna, Wanna, Gotta, Kinda",
+    "theme": "Tema 16: Relembrando a Infância",
+    "language": "en",
+    "id": "en-b1-226"
+  },
+  {
+    "level": "B1",
+    "tag": "DIAL",
+    "uiTitle": "Small Talk Natural",
+    "grammarFocus": "5 Small Talk Fillers (I mean, You know, Sort of)",
+    "theme": "Tema 16: Relembrando a Infância",
+    "language": "en",
+    "id": "en-b1-227"
+  },
+  {
+    "id": "en-b1-228",
     "language": "en",
     "level": "B1",
     "tag": "GRAM",
@@ -1865,7 +2054,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "en-b1-208",
+    "id": "en-b1-229",
     "language": "en",
     "level": "B1",
     "tag": "VERB",
@@ -1874,7 +2063,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "en-b1-209",
+    "id": "en-b1-230",
     "language": "en",
     "level": "B1",
     "tag": "GRAM",
@@ -1883,7 +2072,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "en-b1-210",
+    "id": "en-b1-231",
     "language": "en",
     "level": "B1",
     "tag": "VERB",
@@ -1892,7 +2081,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "en-b1-211",
+    "id": "en-b1-232",
     "language": "en",
     "level": "B1",
     "tag": "GRAM",
@@ -1901,7 +2090,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "en-b1-212",
+    "id": "en-b1-233",
     "language": "en",
     "level": "B1",
     "tag": "VERB",
@@ -1910,7 +2099,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "en-b1-213",
+    "id": "en-b1-234",
     "language": "en",
     "level": "B1",
     "tag": "GRAM",
@@ -1919,7 +2108,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "en-b1-214",
+    "id": "en-b1-235",
     "language": "en",
     "level": "B1",
     "tag": "VERB",
@@ -1928,7 +2117,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "en-b1-215",
+    "id": "en-b1-236",
     "language": "en",
     "level": "B1",
     "tag": "GRAM",
@@ -1937,7 +2126,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "en-b1-216",
+    "id": "en-b1-237",
     "language": "en",
     "level": "B1",
     "tag": "GRAM",
@@ -1946,7 +2135,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "en-b1-217",
+    "id": "en-b1-238",
     "language": "en",
     "level": "B1",
     "tag": "GRAM",
@@ -1955,7 +2144,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "en-b1-218",
+    "id": "en-b1-239",
     "language": "en",
     "level": "B1",
     "tag": "GRAM",
@@ -1964,7 +2153,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "en-b1-219",
+    "id": "en-b1-240",
     "language": "en",
     "level": "B1",
     "tag": "GRAM",
@@ -1973,7 +2162,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "en-b1-220",
+    "id": "en-b1-241",
     "language": "en",
     "level": "B1",
     "tag": "GRAM",
@@ -1982,7 +2171,16 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "en-b1-221",
+    "level": "B1",
+    "tag": "DIAL",
+    "uiTitle": "Phone Call",
+    "grammarFocus": "5 Phrases for Phone Calls: Voicemail and Scheduling",
+    "theme": "Tema 17: Fofocas e Histórias Indiretas",
+    "language": "en",
+    "id": "en-b1-242"
+  },
+  {
+    "id": "en-b1-243",
     "language": "en",
     "level": "B1",
     "tag": "GRAM",
@@ -1991,7 +2189,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "en-b1-222",
+    "id": "en-b1-244",
     "language": "en",
     "level": "B1",
     "tag": "GRAM",
@@ -2000,7 +2198,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "en-b1-223",
+    "id": "en-b1-245",
     "language": "en",
     "level": "B1",
     "tag": "GRAM",
@@ -2009,7 +2207,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
-    "id": "en-b1-224",
+    "id": "en-b1-246",
     "language": "en",
     "level": "B1",
     "tag": "VERB",
@@ -2018,7 +2216,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
-    "id": "en-b1-225",
+    "id": "en-b1-247",
     "language": "en",
     "level": "B1",
     "tag": "GRAM",
@@ -2027,7 +2225,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
-    "id": "en-b1-226",
+    "id": "en-b1-248",
     "language": "en",
     "level": "B1",
     "tag": "MISS",
@@ -2036,7 +2234,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
-    "id": "en-b1-227",
+    "id": "en-b1-249",
     "language": "en",
     "level": "B1",
     "tag": "VOC",
@@ -2045,7 +2243,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
-    "id": "en-b1-228",
+    "id": "en-b1-250",
     "language": "en",
     "level": "B1",
     "tag": "EXPR",
@@ -2054,7 +2252,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
-    "id": "en-b1-229",
+    "id": "en-b1-251",
     "language": "en",
     "level": "B1",
     "tag": "VERB",
@@ -2063,7 +2261,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
-    "id": "en-b1-230",
+    "id": "en-b1-252",
     "language": "en",
     "level": "B1",
     "tag": "GRAM",
@@ -2072,7 +2270,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
-    "id": "en-b1-231",
+    "id": "en-b1-253",
     "language": "en",
     "level": "B1",
     "tag": "VOC",
@@ -2081,7 +2279,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
-    "id": "en-b1-232",
+    "id": "en-b1-254",
     "language": "en",
     "level": "B1",
     "tag": "GRAM",
@@ -2090,7 +2288,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
-    "id": "en-b1-233",
+    "id": "en-b1-255",
     "language": "en",
     "level": "B1",
     "tag": "VOC",
@@ -2099,7 +2297,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
-    "id": "en-b1-234",
+    "id": "en-b1-256",
     "language": "en",
     "level": "B1",
     "tag": "GRAM",
@@ -2108,7 +2306,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
-    "id": "en-b1-235",
+    "id": "en-b1-257",
     "language": "en",
     "level": "B1",
     "tag": "VOC",
@@ -2117,7 +2315,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
-    "id": "en-b1-236",
+    "id": "en-b1-258",
     "language": "en",
     "level": "B1",
     "tag": "GRAM",
@@ -2126,7 +2324,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
-    "id": "en-b1-237",
+    "id": "en-b1-259",
     "language": "en",
     "level": "B1",
     "tag": "GRAM",
@@ -2135,7 +2333,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
-    "id": "en-b1-238",
+    "id": "en-b1-260",
     "language": "en",
     "level": "B1",
     "tag": "GRAM",
@@ -2144,7 +2342,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
-    "id": "en-b1-239",
+    "id": "en-b1-261",
     "language": "en",
     "level": "B1",
     "tag": "GRAM",
@@ -2153,7 +2351,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
-    "id": "en-b1-240",
+    "id": "en-b1-262",
     "language": "en",
     "level": "B1",
     "tag": "GRAM",
@@ -2162,7 +2360,25 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
-    "id": "en-b1-241",
+    "level": "B1",
+    "tag": "MISS",
+    "uiTitle": "Reserved Dinner",
+    "grammarFocus": "At the Restaurant: Booking, Menu, Bill and Tip",
+    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro",
+    "language": "en",
+    "id": "en-b1-263"
+  },
+  {
+    "level": "B1",
+    "tag": "CULT",
+    "uiTitle": "NHS and Health Insurance",
+    "grammarFocus": "UK Health System: NHS, GP and Private Insurance",
+    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro",
+    "language": "en",
+    "id": "en-b1-264"
+  },
+  {
+    "id": "en-b1-265",
     "language": "en",
     "level": "B1",
     "tag": "GRAM",
@@ -2171,7 +2387,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
-    "id": "en-b1-242",
+    "id": "en-b1-266",
     "language": "en",
     "level": "B1",
     "tag": "GRAM",
@@ -2180,7 +2396,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
-    "id": "en-b1-243",
+    "id": "en-b1-267",
     "language": "en",
     "level": "B1",
     "tag": "GRAM",
@@ -2189,7 +2405,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
-    "id": "en-b1-244",
+    "id": "en-b1-268",
     "language": "en",
     "level": "B1",
     "tag": "EXPR",
@@ -2198,7 +2414,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "en-b1-245",
+    "id": "en-b1-269",
     "language": "en",
     "level": "B1",
     "tag": "MISS",
@@ -2207,7 +2423,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "en-b1-246",
+    "id": "en-b1-270",
     "language": "en",
     "level": "B1",
     "tag": "CULT",
@@ -2216,7 +2432,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "en-b1-247",
+    "id": "en-b1-271",
     "language": "en",
     "level": "B1",
     "tag": "VOC",
@@ -2225,7 +2441,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "en-b1-248",
+    "id": "en-b1-272",
     "language": "en",
     "level": "B1",
     "tag": "GRAM",
@@ -2234,7 +2450,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "en-b1-249",
+    "id": "en-b1-273",
     "language": "en",
     "level": "B1",
     "tag": "EXPR",
@@ -2243,7 +2459,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "en-b1-250",
+    "id": "en-b1-274",
     "language": "en",
     "level": "B1",
     "tag": "MISS",
@@ -2252,7 +2468,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "en-b1-251",
+    "id": "en-b1-275",
     "language": "en",
     "level": "B1",
     "tag": "VOC",
@@ -2261,7 +2477,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "en-b1-252",
+    "id": "en-b1-276",
     "language": "en",
     "level": "B1",
     "tag": "GRAM",
@@ -2270,7 +2486,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "en-b1-253",
+    "id": "en-b1-277",
     "language": "en",
     "level": "B1",
     "tag": "EXPR",
@@ -2279,7 +2495,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "en-b1-254",
+    "id": "en-b1-278",
     "language": "en",
     "level": "B1",
     "tag": "MISS",
@@ -2288,7 +2504,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "en-b1-255",
+    "id": "en-b1-279",
     "language": "en",
     "level": "B1",
     "tag": "VOC",
@@ -2297,7 +2513,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "en-b1-256",
+    "id": "en-b1-280",
     "language": "en",
     "level": "B1",
     "tag": "EXPR",
@@ -2306,7 +2522,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "en-b1-257",
+    "id": "en-b1-281",
     "language": "en",
     "level": "B1",
     "tag": "MISS",
@@ -2315,7 +2531,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "en-b1-258",
+    "id": "en-b1-282",
     "language": "en",
     "level": "B1",
     "tag": "EXPR",
@@ -2324,7 +2540,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "en-b1-259",
+    "id": "en-b1-283",
     "language": "en",
     "level": "B1",
     "tag": "MISS",
@@ -2333,7 +2549,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "en-b1-260",
+    "id": "en-b1-284",
     "language": "en",
     "level": "B1",
     "tag": "EXPR",
@@ -2342,7 +2558,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "en-b1-261",
+    "id": "en-b1-285",
     "language": "en",
     "level": "B1",
     "tag": "MISS",
@@ -2351,7 +2567,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
-    "id": "en-b1-262",
+    "id": "en-b1-286",
     "language": "en",
     "level": "B1",
     "tag": "GRAM",
@@ -2360,7 +2576,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
-    "id": "en-b1-263",
+    "id": "en-b1-287",
     "language": "en",
     "level": "B1",
     "tag": "DIAL",
@@ -2369,7 +2585,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
-    "id": "en-b1-264",
+    "id": "en-b1-288",
     "language": "en",
     "level": "B1",
     "tag": "VERB",
@@ -2378,7 +2594,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
-    "id": "en-b1-265",
+    "id": "en-b1-289",
     "language": "en",
     "level": "B1",
     "tag": "GRAM",
@@ -2387,7 +2603,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
-    "id": "en-b1-266",
+    "id": "en-b1-290",
     "language": "en",
     "level": "B1",
     "tag": "DIAL",
@@ -2396,7 +2612,25 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
-    "id": "en-b1-267",
+    "level": "B1",
+    "tag": "MISS",
+    "uiTitle": "A Entrevista Decisiva",
+    "grammarFocus": "Job Interview: Tell me about yourself, Strengths and Weaknesses",
+    "theme": "Tema 19: Vida Profissional e Entrevistas",
+    "language": "en",
+    "id": "en-b1-291"
+  },
+  {
+    "level": "B1",
+    "tag": "DIAL",
+    "uiTitle": "E-mail Profissional",
+    "grammarFocus": "5 Phrases for Professional Email (I am writing to, Please find attached)",
+    "theme": "Tema 19: Vida Profissional e Entrevistas",
+    "language": "en",
+    "id": "en-b1-292"
+  },
+  {
+    "id": "en-b1-293",
     "language": "en",
     "level": "B1",
     "tag": "VERB",
@@ -2405,7 +2639,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
-    "id": "en-b1-268",
+    "id": "en-b1-294",
     "language": "en",
     "level": "B1",
     "tag": "GRAM",
@@ -2414,7 +2648,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
-    "id": "en-b1-269",
+    "id": "en-b1-295",
     "language": "en",
     "level": "B1",
     "tag": "VERB",
@@ -2423,7 +2657,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
-    "id": "en-b1-270",
+    "id": "en-b1-296",
     "language": "en",
     "level": "B1",
     "tag": "GRAM",
@@ -2432,7 +2666,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
-    "id": "en-b1-271",
+    "id": "en-b1-297",
     "language": "en",
     "level": "B1",
     "tag": "VERB",
@@ -2441,7 +2675,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
-    "id": "en-b1-272",
+    "id": "en-b1-298",
     "language": "en",
     "level": "B1",
     "tag": "VERB",
@@ -2450,7 +2684,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
-    "id": "en-b1-273",
+    "id": "en-b1-299",
     "language": "en",
     "level": "B1",
     "tag": "VERB",
@@ -2459,7 +2693,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
-    "id": "en-b1-274",
+    "id": "en-b1-300",
     "language": "en",
     "level": "B1",
     "tag": "VERB",
@@ -2468,7 +2702,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
-    "id": "en-b1-275",
+    "id": "en-b1-301",
     "language": "en",
     "level": "B1",
     "tag": "VERB",
@@ -2477,7 +2711,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
-    "id": "en-b1-276",
+    "id": "en-b1-302",
     "language": "en",
     "level": "B1",
     "tag": "VERB",
@@ -2486,7 +2720,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
-    "id": "en-b1-277",
+    "id": "en-b1-303",
     "language": "en",
     "level": "B1",
     "tag": "VERB",
@@ -2495,7 +2729,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
-    "id": "en-b1-278",
+    "id": "en-b1-304",
     "language": "en",
     "level": "B1",
     "tag": "VERB",
@@ -2504,7 +2738,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
-    "id": "en-b1-279",
+    "id": "en-b1-305",
     "language": "en",
     "level": "B1",
     "tag": "VERB",
@@ -2513,7 +2747,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
-    "id": "en-b1-280",
+    "id": "en-b1-306",
     "language": "en",
     "level": "B1",
     "tag": "VERB",
@@ -2522,7 +2756,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
-    "id": "en-b1-281",
+    "id": "en-b1-307",
     "language": "en",
     "level": "B1",
     "tag": "GRAM",
@@ -2531,7 +2765,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
-    "id": "en-b1-282",
+    "id": "en-b1-308",
     "language": "en",
     "level": "B1",
     "tag": "MISS",
@@ -2540,7 +2774,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
-    "id": "en-b1-283",
+    "id": "en-b1-309",
     "language": "en",
     "level": "B1",
     "tag": "VERB",
@@ -2549,7 +2783,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
-    "id": "en-b1-284",
+    "id": "en-b1-310",
     "language": "en",
     "level": "B1",
     "tag": "GRAM",
@@ -2558,7 +2792,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
-    "id": "en-b1-285",
+    "id": "en-b1-311",
     "language": "en",
     "level": "B1",
     "tag": "MISS",
@@ -2567,7 +2801,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
-    "id": "en-b1-286",
+    "id": "en-b1-312",
     "language": "en",
     "level": "B1",
     "tag": "VERB",
@@ -2576,7 +2810,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
-    "id": "en-b1-287",
+    "id": "en-b1-313",
     "language": "en",
     "level": "B1",
     "tag": "GRAM",
@@ -2585,7 +2819,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
-    "id": "en-b1-288",
+    "id": "en-b1-314",
     "language": "en",
     "level": "B1",
     "tag": "VERB",
@@ -2594,7 +2828,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
-    "id": "en-b1-289",
+    "id": "en-b1-315",
     "language": "en",
     "level": "B1",
     "tag": "GRAM",
@@ -2603,7 +2837,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
-    "id": "en-b1-290",
+    "id": "en-b1-316",
     "language": "en",
     "level": "B1",
     "tag": "VERB",
@@ -2612,7 +2846,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
-    "id": "en-b1-291",
+    "id": "en-b1-317",
     "language": "en",
     "level": "B1",
     "tag": "VERB",
@@ -2621,7 +2855,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
-    "id": "en-b1-292",
+    "id": "en-b1-318",
     "language": "en",
     "level": "B1",
     "tag": "VERB",
@@ -2630,7 +2864,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
-    "id": "en-b1-293",
+    "id": "en-b1-319",
     "language": "en",
     "level": "B1",
     "tag": "VERB",
@@ -2639,7 +2873,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
-    "id": "en-b1-294",
+    "id": "en-b1-320",
     "language": "en",
     "level": "B1",
     "tag": "VERB",
@@ -2648,7 +2882,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
-    "id": "en-b1-295",
+    "id": "en-b1-321",
     "language": "en",
     "level": "B1",
     "tag": "VERB",
@@ -2657,7 +2891,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
-    "id": "en-b1-296",
+    "id": "en-b1-322",
     "language": "en",
     "level": "B1",
     "tag": "VERB",
@@ -2666,7 +2900,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
-    "id": "en-b1-297",
+    "id": "en-b1-323",
     "language": "en",
     "level": "B1",
     "tag": "VERB",
@@ -2675,7 +2909,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
-    "id": "en-b2-298",
+    "id": "en-b2-324",
     "language": "en",
     "level": "B2",
     "tag": "VERB",
@@ -2684,7 +2918,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 21: O Mundo das Emoções"
   },
   {
-    "id": "en-b2-299",
+    "id": "en-b2-325",
     "language": "en",
     "level": "B2",
     "tag": "GRAM",
@@ -2693,7 +2927,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 21: O Mundo das Emoções"
   },
   {
-    "id": "en-b2-300",
+    "id": "en-b2-326",
     "language": "en",
     "level": "B2",
     "tag": "VERB",
@@ -2702,7 +2936,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 21: O Mundo das Emoções"
   },
   {
-    "id": "en-b2-301",
+    "id": "en-b2-327",
     "language": "en",
     "level": "B2",
     "tag": "GRAM",
@@ -2711,7 +2945,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 21: O Mundo das Emoções"
   },
   {
-    "id": "en-b2-302",
+    "id": "en-b2-328",
     "language": "en",
     "level": "B2",
     "tag": "VERB",
@@ -2720,7 +2954,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 21: O Mundo das Emoções"
   },
   {
-    "id": "en-b2-303",
+    "id": "en-b2-329",
     "language": "en",
     "level": "B2",
     "tag": "GRAM",
@@ -2729,7 +2963,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 21: O Mundo das Emoções"
   },
   {
-    "id": "en-b2-304",
+    "id": "en-b2-330",
     "language": "en",
     "level": "B2",
     "tag": "VERB",
@@ -2738,7 +2972,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 21: O Mundo das Emoções"
   },
   {
-    "id": "en-b2-305",
+    "id": "en-b2-331",
     "language": "en",
     "level": "B2",
     "tag": "VERB",
@@ -2747,7 +2981,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 21: O Mundo das Emoções"
   },
   {
-    "id": "en-b2-306",
+    "id": "en-b2-332",
     "language": "en",
     "level": "B2",
     "tag": "VERB",
@@ -2756,7 +2990,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 21: O Mundo das Emoções"
   },
   {
-    "id": "en-b2-307",
+    "id": "en-b2-333",
     "language": "en",
     "level": "B2",
     "tag": "VERB",
@@ -2765,7 +2999,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 21: O Mundo das Emoções"
   },
   {
-    "id": "en-b2-308",
+    "id": "en-b2-334",
     "language": "en",
     "level": "B2",
     "tag": "VERB",
@@ -2774,7 +3008,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 21: O Mundo das Emoções"
   },
   {
-    "id": "en-b2-309",
+    "id": "en-b2-335",
     "language": "en",
     "level": "B2",
     "tag": "VERB",
@@ -2783,7 +3017,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 21: O Mundo das Emoções"
   },
   {
-    "id": "en-b2-310",
+    "id": "en-b2-336",
     "language": "en",
     "level": "B2",
     "tag": "VERB",
@@ -2792,7 +3026,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 21: O Mundo das Emoções"
   },
   {
-    "id": "en-b2-311",
+    "id": "en-b2-337",
     "language": "en",
     "level": "B2",
     "tag": "VERB",
@@ -2801,7 +3035,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 21: O Mundo das Emoções"
   },
   {
-    "id": "en-b2-312",
+    "id": "en-b2-338",
     "language": "en",
     "level": "B2",
     "tag": "VERB",
@@ -2810,7 +3044,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 21: O Mundo das Emoções"
   },
   {
-    "id": "en-b2-313",
+    "id": "en-b2-339",
     "language": "en",
     "level": "B2",
     "tag": "GRAM",
@@ -2819,7 +3053,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
-    "id": "en-b2-314",
+    "id": "en-b2-340",
     "language": "en",
     "level": "B2",
     "tag": "VERB",
@@ -2828,7 +3062,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
-    "id": "en-b2-315",
+    "id": "en-b2-341",
     "language": "en",
     "level": "B2",
     "tag": "GRAM",
@@ -2837,7 +3071,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
-    "id": "en-b2-316",
+    "id": "en-b2-342",
     "language": "en",
     "level": "B2",
     "tag": "VOC",
@@ -2846,7 +3080,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
-    "id": "en-b2-317",
+    "id": "en-b2-343",
     "language": "en",
     "level": "B2",
     "tag": "GRAM",
@@ -2855,7 +3089,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
-    "id": "en-b2-318",
+    "id": "en-b2-344",
     "language": "en",
     "level": "B2",
     "tag": "GRAM",
@@ -2864,7 +3098,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
-    "id": "en-b2-319",
+    "id": "en-b2-345",
     "language": "en",
     "level": "B2",
     "tag": "GRAM",
@@ -2873,7 +3107,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
-    "id": "en-b2-320",
+    "id": "en-b2-346",
     "language": "en",
     "level": "B2",
     "tag": "GRAM",
@@ -2882,7 +3116,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
-    "id": "en-b2-321",
+    "id": "en-b2-347",
     "language": "en",
     "level": "B2",
     "tag": "GRAM",
@@ -2891,7 +3125,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
-    "id": "en-b2-322",
+    "id": "en-b2-348",
     "language": "en",
     "level": "B2",
     "tag": "GRAM",
@@ -2900,7 +3134,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
-    "id": "en-b2-323",
+    "id": "en-b2-349",
     "language": "en",
     "level": "B2",
     "tag": "GRAM",
@@ -2909,7 +3143,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
-    "id": "en-b2-324",
+    "id": "en-b2-350",
     "language": "en",
     "level": "B2",
     "tag": "VERB",
@@ -2918,7 +3152,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
-    "id": "en-b2-325",
+    "id": "en-b2-351",
     "language": "en",
     "level": "B2",
     "tag": "GRAM",
@@ -2927,7 +3161,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
-    "id": "en-b2-326",
+    "id": "en-b2-352",
     "language": "en",
     "level": "B2",
     "tag": "MISS",
@@ -2936,7 +3170,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
-    "id": "en-b2-327",
+    "id": "en-b2-353",
     "language": "en",
     "level": "B2",
     "tag": "GRAM",
@@ -2945,7 +3179,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
-    "id": "en-b2-328",
+    "id": "en-b2-354",
     "language": "en",
     "level": "B2",
     "tag": "GRAM",
@@ -2954,7 +3188,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
-    "id": "en-b2-329",
+    "id": "en-b2-355",
     "language": "en",
     "level": "B2",
     "tag": "GRAM",
@@ -2963,7 +3197,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 23: Literatura e Situações Hipotéticas"
   },
   {
-    "id": "en-b2-330",
+    "id": "en-b2-356",
     "language": "en",
     "level": "B2",
     "tag": "VOC",
@@ -2972,7 +3206,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 23: Literatura e Situações Hipotéticas"
   },
   {
-    "id": "en-b2-331",
+    "id": "en-b2-357",
     "language": "en",
     "level": "B2",
     "tag": "EXPR",
@@ -2981,7 +3215,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 23: Literatura e Situações Hipotéticas"
   },
   {
-    "id": "en-b2-332",
+    "id": "en-b2-358",
     "language": "en",
     "level": "B2",
     "tag": "MISS",
@@ -2990,7 +3224,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 23: Literatura e Situações Hipotéticas"
   },
   {
-    "id": "en-b2-333",
+    "id": "en-b2-359",
     "language": "en",
     "level": "B2",
     "tag": "CULT",
@@ -2999,7 +3233,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 23: Literatura e Situações Hipotéticas"
   },
   {
-    "id": "en-b2-334",
+    "id": "en-b2-360",
     "language": "en",
     "level": "B2",
     "tag": "EXPR",
@@ -3008,7 +3242,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 23: Literatura e Situações Hipotéticas"
   },
   {
-    "id": "en-b2-335",
+    "id": "en-b2-361",
     "language": "en",
     "level": "B2",
     "tag": "MISS",
@@ -3017,7 +3251,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 23: Literatura e Situações Hipotéticas"
   },
   {
-    "id": "en-b2-336",
+    "id": "en-b2-362",
     "language": "en",
     "level": "B2",
     "tag": "CULT",
@@ -3026,7 +3260,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 23: Literatura e Situações Hipotéticas"
   },
   {
-    "id": "en-b2-337",
+    "id": "en-b2-363",
     "language": "en",
     "level": "B2",
     "tag": "EXPR",
@@ -3035,7 +3269,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 23: Literatura e Situações Hipotéticas"
   },
   {
-    "id": "en-b2-338",
+    "id": "en-b2-364",
     "language": "en",
     "level": "B2",
     "tag": "MISS",
@@ -3044,7 +3278,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 23: Literatura e Situações Hipotéticas"
   },
   {
-    "id": "en-b2-339",
+    "id": "en-b2-365",
     "language": "en",
     "level": "B2",
     "tag": "EXPR",
@@ -3053,7 +3287,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 23: Literatura e Situações Hipotéticas"
   },
   {
-    "id": "en-b2-340",
+    "id": "en-b2-366",
     "language": "en",
     "level": "B2",
     "tag": "EXPR",
@@ -3062,7 +3296,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 23: Literatura e Situações Hipotéticas"
   },
   {
-    "id": "en-b2-341",
+    "id": "en-b2-367",
     "language": "en",
     "level": "B2",
     "tag": "EXPR",
@@ -3071,7 +3305,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 23: Literatura e Situações Hipotéticas"
   },
   {
-    "id": "en-b2-342",
+    "id": "en-b2-368",
     "language": "en",
     "level": "B2",
     "tag": "MISS",
@@ -3080,7 +3314,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
-    "id": "en-b2-343",
+    "id": "en-b2-369",
     "language": "en",
     "level": "B2",
     "tag": "DIAL",
@@ -3089,7 +3323,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
-    "id": "en-b2-344",
+    "id": "en-b2-370",
     "language": "en",
     "level": "B2",
     "tag": "EXPR",
@@ -3098,7 +3332,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
-    "id": "en-b2-345",
+    "id": "en-b2-371",
     "language": "en",
     "level": "B2",
     "tag": "PRON",
@@ -3107,7 +3341,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
-    "id": "en-b2-346",
+    "id": "en-b2-372",
     "language": "en",
     "level": "B2",
     "tag": "GRAM",
@@ -3116,7 +3350,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
-    "id": "en-b2-347",
+    "id": "en-b2-373",
     "language": "en",
     "level": "B2",
     "tag": "MISS",
@@ -3125,7 +3359,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
-    "id": "en-b2-348",
+    "id": "en-b2-374",
     "language": "en",
     "level": "B2",
     "tag": "DIAL",
@@ -3134,7 +3368,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
-    "id": "en-b2-349",
+    "id": "en-b2-375",
     "language": "en",
     "level": "B2",
     "tag": "PRON",
@@ -3143,7 +3377,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
-    "id": "en-b2-350",
+    "id": "en-b2-376",
     "language": "en",
     "level": "B2",
     "tag": "GRAM",
@@ -3152,7 +3386,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
-    "id": "en-b2-351",
+    "id": "en-b2-377",
     "language": "en",
     "level": "B2",
     "tag": "MISS",
@@ -3161,7 +3395,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
-    "id": "en-b2-352",
+    "id": "en-b2-378",
     "language": "en",
     "level": "B2",
     "tag": "DIAL",
@@ -3170,7 +3404,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
-    "id": "en-b2-353",
+    "id": "en-b2-379",
     "language": "en",
     "level": "B2",
     "tag": "GRAM",
@@ -3179,7 +3413,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
-    "id": "en-b2-354",
+    "id": "en-b2-380",
     "language": "en",
     "level": "B2",
     "tag": "GRAM",
@@ -3188,7 +3422,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
-    "id": "en-b2-355",
+    "id": "en-b2-381",
     "language": "en",
     "level": "B2",
     "tag": "GRAM",
@@ -3197,7 +3431,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
-    "id": "en-b2-356",
+    "id": "en-b2-382",
     "language": "en",
     "level": "B2",
     "tag": "GRAM",
@@ -3206,7 +3440,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
-    "id": "en-c1-357",
+    "id": "en-c1-383",
     "language": "en",
     "level": "C1",
     "tag": "DIAL",
@@ -3215,7 +3449,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 25: Oratória e Expressões Elevadas"
   },
   {
-    "id": "en-c1-358",
+    "id": "en-c1-384",
     "language": "en",
     "level": "C1",
     "tag": "GRAM",
@@ -3224,7 +3458,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 25: Oratória e Expressões Elevadas"
   },
   {
-    "id": "en-c1-359",
+    "id": "en-c1-385",
     "language": "en",
     "level": "C1",
     "tag": "VERB",
@@ -3233,7 +3467,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 25: Oratória e Expressões Elevadas"
   },
   {
-    "id": "en-c1-360",
+    "id": "en-c1-386",
     "language": "en",
     "level": "C1",
     "tag": "VOC",
@@ -3242,7 +3476,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 25: Oratória e Expressões Elevadas"
   },
   {
-    "id": "en-c1-361",
+    "id": "en-c1-387",
     "language": "en",
     "level": "C1",
     "tag": "EXPR",
@@ -3251,7 +3485,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 25: Oratória e Expressões Elevadas"
   },
   {
-    "id": "en-c1-362",
+    "id": "en-c1-388",
     "language": "en",
     "level": "C1",
     "tag": "DIAL",
@@ -3260,7 +3494,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 25: Oratória e Expressões Elevadas"
   },
   {
-    "id": "en-c1-363",
+    "id": "en-c1-389",
     "language": "en",
     "level": "C1",
     "tag": "GRAM",
@@ -3269,7 +3503,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 25: Oratória e Expressões Elevadas"
   },
   {
-    "id": "en-c1-364",
+    "id": "en-c1-390",
     "language": "en",
     "level": "C1",
     "tag": "VERB",
@@ -3278,7 +3512,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 25: Oratória e Expressões Elevadas"
   },
   {
-    "id": "en-c1-365",
+    "id": "en-c1-391",
     "language": "en",
     "level": "C1",
     "tag": "VOC",
@@ -3287,7 +3521,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 25: Oratória e Expressões Elevadas"
   },
   {
-    "id": "en-c1-366",
+    "id": "en-c1-392",
     "language": "en",
     "level": "C1",
     "tag": "EXPR",
@@ -3296,7 +3530,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 25: Oratória e Expressões Elevadas"
   },
   {
-    "id": "en-c1-367",
+    "id": "en-c1-393",
     "language": "en",
     "level": "C1",
     "tag": "GRAM",
@@ -3305,7 +3539,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 25: Oratória e Expressões Elevadas"
   },
   {
-    "id": "en-c1-368",
+    "id": "en-c1-394",
     "language": "en",
     "level": "C1",
     "tag": "VERB",
@@ -3314,7 +3548,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 25: Oratória e Expressões Elevadas"
   },
   {
-    "id": "en-c1-369",
+    "id": "en-c1-395",
     "language": "en",
     "level": "C1",
     "tag": "GRAM",
@@ -3323,7 +3557,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 25: Oratória e Expressões Elevadas"
   },
   {
-    "id": "en-c1-370",
+    "id": "en-c1-396",
     "language": "en",
     "level": "C1",
     "tag": "VERB",
@@ -3332,7 +3566,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 25: Oratória e Expressões Elevadas"
   },
   {
-    "id": "en-c1-371",
+    "id": "en-c1-397",
     "language": "en",
     "level": "C1",
     "tag": "GRAM",
@@ -3341,7 +3575,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 26: O Inglês das Ruas e o Formal"
   },
   {
-    "id": "en-c1-372",
+    "id": "en-c1-398",
     "language": "en",
     "level": "C1",
     "tag": "VOC",
@@ -3350,7 +3584,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 26: O Inglês das Ruas e o Formal"
   },
   {
-    "id": "en-c1-373",
+    "id": "en-c1-399",
     "language": "en",
     "level": "C1",
     "tag": "CULT",
@@ -3359,7 +3593,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 26: O Inglês das Ruas e o Formal"
   },
   {
-    "id": "en-c1-374",
+    "id": "en-c1-400",
     "language": "en",
     "level": "C1",
     "tag": "MISS",
@@ -3368,7 +3602,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 26: O Inglês das Ruas e o Formal"
   },
   {
-    "id": "en-c1-375",
+    "id": "en-c1-401",
     "language": "en",
     "level": "C1",
     "tag": "VERB",
@@ -3377,7 +3611,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 26: O Inglês das Ruas e o Formal"
   },
   {
-    "id": "en-c1-376",
+    "id": "en-c1-402",
     "language": "en",
     "level": "C1",
     "tag": "DIAL",
@@ -3386,7 +3620,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 26: O Inglês das Ruas e o Formal"
   },
   {
-    "id": "en-c1-377",
+    "id": "en-c1-403",
     "language": "en",
     "level": "C1",
     "tag": "GRAM",
@@ -3395,7 +3629,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 26: O Inglês das Ruas e o Formal"
   },
   {
-    "id": "en-c1-378",
+    "id": "en-c1-404",
     "language": "en",
     "level": "C1",
     "tag": "CULT",
@@ -3404,7 +3638,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 26: O Inglês das Ruas e o Formal"
   },
   {
-    "id": "en-c1-379",
+    "id": "en-c1-405",
     "language": "en",
     "level": "C1",
     "tag": "MISS",
@@ -3413,7 +3647,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 26: O Inglês das Ruas e o Formal"
   },
   {
-    "id": "en-c1-380",
+    "id": "en-c1-406",
     "language": "en",
     "level": "C1",
     "tag": "VERB",
@@ -3422,7 +3656,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 26: O Inglês das Ruas e o Formal"
   },
   {
-    "id": "en-c1-381",
+    "id": "en-c1-407",
     "language": "en",
     "level": "C1",
     "tag": "GRAM",
@@ -3431,7 +3665,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 26: O Inglês das Ruas e o Formal"
   },
   {
-    "id": "en-c1-382",
+    "id": "en-c1-408",
     "language": "en",
     "level": "C1",
     "tag": "CULT",
@@ -3440,7 +3674,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 26: O Inglês das Ruas e o Formal"
   },
   {
-    "id": "en-c1-383",
+    "id": "en-c1-409",
     "language": "en",
     "level": "C1",
     "tag": "VERB",
@@ -3449,7 +3683,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 26: O Inglês das Ruas e o Formal"
   },
   {
-    "id": "en-c1-384",
+    "id": "en-c1-410",
     "language": "en",
     "level": "C1",
     "tag": "CULT",
@@ -3458,7 +3692,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 26: O Inglês das Ruas e o Formal"
   },
   {
-    "id": "en-c1-385",
+    "id": "en-c1-411",
     "language": "en",
     "level": "C1",
     "tag": "CULT",
@@ -3467,7 +3701,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 26: O Inglês das Ruas e o Formal"
   },
   {
-    "id": "en-c2-386",
+    "id": "en-c2-412",
     "language": "en",
     "level": "C2",
     "tag": "GRAM",
@@ -3476,7 +3710,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 27: Geopolítica e Filosofia"
   },
   {
-    "id": "en-c2-387",
+    "id": "en-c2-413",
     "language": "en",
     "level": "C2",
     "tag": "DIAL",
@@ -3485,7 +3719,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 27: Geopolítica e Filosofia"
   },
   {
-    "id": "en-c2-388",
+    "id": "en-c2-414",
     "language": "en",
     "level": "C2",
     "tag": "EXPR",
@@ -3494,7 +3728,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 27: Geopolítica e Filosofia"
   },
   {
-    "id": "en-c2-389",
+    "id": "en-c2-415",
     "language": "en",
     "level": "C2",
     "tag": "VOC",
@@ -3503,7 +3737,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 27: Geopolítica e Filosofia"
   },
   {
-    "id": "en-c2-390",
+    "id": "en-c2-416",
     "language": "en",
     "level": "C2",
     "tag": "CULT",
@@ -3512,7 +3746,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 27: Geopolítica e Filosofia"
   },
   {
-    "id": "en-c2-391",
+    "id": "en-c2-417",
     "language": "en",
     "level": "C2",
     "tag": "GRAM",
@@ -3521,7 +3755,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 27: Geopolítica e Filosofia"
   },
   {
-    "id": "en-c2-392",
+    "id": "en-c2-418",
     "language": "en",
     "level": "C2",
     "tag": "VOC",
@@ -3530,7 +3764,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 27: Geopolítica e Filosofia"
   },
   {
-    "id": "en-c2-393",
+    "id": "en-c2-419",
     "language": "en",
     "level": "C2",
     "tag": "MISS",
@@ -3539,7 +3773,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 27: Geopolítica e Filosofia"
   },
   {
-    "id": "en-c2-394",
+    "id": "en-c2-420",
     "language": "en",
     "level": "C2",
     "tag": "CULT",
@@ -3548,7 +3782,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 27: Geopolítica e Filosofia"
   },
   {
-    "id": "en-c2-395",
+    "id": "en-c2-421",
     "language": "en",
     "level": "C2",
     "tag": "GRAM",
@@ -3557,7 +3791,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 27: Geopolítica e Filosofia"
   },
   {
-    "id": "en-c2-396",
+    "id": "en-c2-422",
     "language": "en",
     "level": "C2",
     "tag": "MISS",
@@ -3566,7 +3800,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 27: Geopolítica e Filosofia"
   },
   {
-    "id": "en-c2-397",
+    "id": "en-c2-423",
     "language": "en",
     "level": "C2",
     "tag": "MISS",
@@ -3575,7 +3809,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 27: Geopolítica e Filosofia"
   },
   {
-    "id": "en-c2-398",
+    "id": "en-c2-424",
     "language": "en",
     "level": "C2",
     "tag": "CULT",
@@ -3584,7 +3818,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 28: Literatura Clássica e Análise Textual"
   },
   {
-    "id": "en-c2-399",
+    "id": "en-c2-425",
     "language": "en",
     "level": "C2",
     "tag": "GRAM",
@@ -3593,7 +3827,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 28: Literatura Clássica e Análise Textual"
   },
   {
-    "id": "en-c2-400",
+    "id": "en-c2-426",
     "language": "en",
     "level": "C2",
     "tag": "VOC",
@@ -3602,7 +3836,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 28: Literatura Clássica e Análise Textual"
   },
   {
-    "id": "en-c2-401",
+    "id": "en-c2-427",
     "language": "en",
     "level": "C2",
     "tag": "CULT",
@@ -3611,7 +3845,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 28: Literatura Clássica e Análise Textual"
   },
   {
-    "id": "en-c2-402",
+    "id": "en-c2-428",
     "language": "en",
     "level": "C2",
     "tag": "EXPR",
@@ -3620,7 +3854,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 28: Literatura Clássica e Análise Textual"
   },
   {
-    "id": "en-c2-403",
+    "id": "en-c2-429",
     "language": "en",
     "level": "C2",
     "tag": "GRAM",
@@ -3629,7 +3863,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 28: Literatura Clássica e Análise Textual"
   },
   {
-    "id": "en-c2-404",
+    "id": "en-c2-430",
     "language": "en",
     "level": "C2",
     "tag": "CULT",
@@ -3638,7 +3872,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 28: Literatura Clássica e Análise Textual"
   },
   {
-    "id": "en-c2-405",
+    "id": "en-c2-431",
     "language": "en",
     "level": "C2",
     "tag": "MISS",
@@ -3647,7 +3881,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 28: Literatura Clássica e Análise Textual"
   },
   {
-    "id": "en-c2-406",
+    "id": "en-c2-432",
     "language": "en",
     "level": "C2",
     "tag": "CULT",
@@ -3656,7 +3890,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 28: Literatura Clássica e Análise Textual"
   },
   {
-    "id": "en-c2-407",
+    "id": "en-c2-433",
     "language": "en",
     "level": "C2",
     "tag": "VERB",
@@ -3665,7 +3899,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 28: Literatura Clássica e Análise Textual"
   },
   {
-    "id": "en-c2-408",
+    "id": "en-c2-434",
     "language": "en",
     "level": "C2",
     "tag": "CULT",
@@ -3674,7 +3908,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 28: Literatura Clássica e Análise Textual"
   },
   {
-    "id": "en-c2-409",
+    "id": "en-c2-435",
     "language": "en",
     "level": "C2",
     "tag": "MISS",
@@ -3683,7 +3917,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 28: Literatura Clássica e Análise Textual"
   },
   {
-    "id": "en-c2-410",
+    "id": "en-c2-436",
     "language": "en",
     "level": "C2",
     "tag": "DIAL",
@@ -3692,7 +3926,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 29: Debate Formal e Retórica"
   },
   {
-    "id": "en-c2-411",
+    "id": "en-c2-437",
     "language": "en",
     "level": "C2",
     "tag": "EXPR",
@@ -3701,7 +3935,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 29: Debate Formal e Retórica"
   },
   {
-    "id": "en-c2-412",
+    "id": "en-c2-438",
     "language": "en",
     "level": "C2",
     "tag": "GRAM",
@@ -3710,7 +3944,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 29: Debate Formal e Retórica"
   },
   {
-    "id": "en-c2-413",
+    "id": "en-c2-439",
     "language": "en",
     "level": "C2",
     "tag": "MISS",
@@ -3719,7 +3953,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 29: Debate Formal e Retórica"
   },
   {
-    "id": "en-c2-414",
+    "id": "en-c2-440",
     "language": "en",
     "level": "C2",
     "tag": "CULT",
@@ -3728,7 +3962,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 29: Debate Formal e Retórica"
   },
   {
-    "id": "en-c2-415",
+    "id": "en-c2-441",
     "language": "en",
     "level": "C2",
     "tag": "DIAL",
@@ -3737,7 +3971,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 29: Debate Formal e Retórica"
   },
   {
-    "id": "en-c2-416",
+    "id": "en-c2-442",
     "language": "en",
     "level": "C2",
     "tag": "EXPR",
@@ -3746,7 +3980,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 29: Debate Formal e Retórica"
   },
   {
-    "id": "en-c2-417",
+    "id": "en-c2-443",
     "language": "en",
     "level": "C2",
     "tag": "MISS",
@@ -3755,7 +3989,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 29: Debate Formal e Retórica"
   },
   {
-    "id": "en-c2-418",
+    "id": "en-c2-444",
     "language": "en",
     "level": "C2",
     "tag": "MISS",

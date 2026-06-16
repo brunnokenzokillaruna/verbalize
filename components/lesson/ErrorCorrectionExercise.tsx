@@ -45,7 +45,7 @@ export function ErrorCorrectionExercise({
   }, [input, answered, setIsExerciseReady]);
 
   useEffect(() => {
-    if (submitTrigger > 0 && !answered) {
+    if (submitTrigger > 0 && !answered && input.trim().length > 0) {
       handleSubmit();
     }
   }, [submitTrigger]);
@@ -79,7 +79,7 @@ export function ErrorCorrectionExercise({
       (exercise.acceptable_answers ?? []).some((alt) => isAccentOnlyDiff(input, alt)));
 
   function handleSubmit() {
-    if (answered) return;
+    if (answered || input.trim() === '') return;
     const status: AnswerStatus = isCorrect ? 'correct' : isAccentWarning ? 'accent-warning' : 'wrong';
     setAnswerStatus(status);
     onAnswer(status === 'correct');

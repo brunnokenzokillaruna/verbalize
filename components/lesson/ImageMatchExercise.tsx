@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { Check } from 'lucide-react';
 import type { ImageMatchData } from '@/types';
 
 interface ImageMatchExerciseProps {
@@ -28,6 +29,10 @@ export function ImageMatchExercise({
   const [selectedWord, setSelectedWord] = useState<string | null>(null);
 
   useEffect(() => {
+    setSelectedWord(null);
+  }, [data.targetWord, data.correctWord]);
+
+  useEffect(() => {
     if (!answered) {
       setIsExerciseReady(selectedWord !== null);
     } else {
@@ -48,6 +53,7 @@ export function ImageMatchExercise({
   }
 
   const isGallery = variant === 'gallery';
+  const hasPendingSelection = selectedWord !== null && !answered;
 
   return (
     <div className="flex flex-col gap-6">
@@ -70,7 +76,7 @@ export function ImageMatchExercise({
         </div>
       )}
 
-      <div className={`grid grid-cols-2 gap-3 ${isGallery ? 'gap-4' : ''}`}>
+      <div className={`grid grid-cols-2 gap-3 ${isGallery ? 'gap-4 sm:gap-5' : ''}`}>
         {data.options.map((option, idx) => {
           const isSelected = selectedWord === option.word;
           const isCorrect = option.word === data.correctWord;
@@ -85,10 +91,11 @@ export function ImageMatchExercise({
             ring = 'rgba(239, 68, 68, 0.2)';
           } else if (isSelected) {
             border = accentColor;
-            ring = isGallery ? 'rgba(217, 119, 6, 0.25)' : 'rgba(29, 94, 212, 0.2)';
+            ring = isGallery ? 'color-mix(in srgb, var(--color-warning) 35%, transparent)' : 'rgba(29, 94, 212, 0.2)';
           }
 
           const galleryRotate = isGallery ? (idx % 2 === 0 ? -2 : 2) : 0;
+          const isDimmed = hasPendingSelection && !isSelected;
 
           return (
             <button
@@ -96,23 +103,39 @@ export function ImageMatchExercise({
               type="button"
               disabled={answered}
               onClick={() => handlePick(option.word)}
-              className={`relative overflow-hidden transition-all active:scale-[0.98] disabled:cursor-default ${
+              aria-pressed={isSelected}
+              aria-label={
+                isSelected ? `${option.imageAlt}, selecionada` : option.imageAlt
+              }
+              className={`relative overflow-hidden transition-all duration-200 active:scale-[0.98] disabled:cursor-default ${
                 isGallery
                   ? 'rounded-sm border-[10px] border-b-[28px] border-white shadow-md'
                   : 'rounded-xl border-2'
-              }`}
+              } ${isSelected && !answered ? 'z-10' : 'z-0'}`}
               style={{
-                borderColor: isGallery ? '#fff' : border,
-                outline: !isGallery && (isSelected || (answered && isCorrect)) ? `3px solid ${ring}` : undefined,
+                borderColor: isGallery ? (isSelected && !answered ? accentColor : '#fff') : border,
+                outline:
+                  !isGallery && (isSelected || (answered && isCorrect))
+                    ? `3px solid ${ring}`
+                    : undefined,
                 boxShadow: isGallery
-                  ? isSelected || (answered && isCorrect)
-                    ? `0 0 0 3px ${ring}, 0 8px 20px rgba(0,0,0,0.12)`
-                    : '0 4px 12px rgba(0,0,0,0.08)'
+                  ? isSelected && !answered
+                    ? `0 0 0 3px ${accentColor}, 0 10px 28px rgba(0,0,0,0.18)`
+                    : answered && isCorrect
+                      ? `0 0 0 3px var(--color-success), 0 8px 20px rgba(0,0,0,0.12)`
+                      : answered && isSelected && !isCorrect
+                        ? `0 0 0 3px var(--color-error), 0 8px 20px rgba(0,0,0,0.12)`
+                        : '0 4px 12px rgba(0,0,0,0.08)'
                   : isSelected || (answered && isCorrect)
                     ? `0 0 0 4px ${ring}`
                     : undefined,
                 aspectRatio: '4/3',
-                transform: `rotate(${galleryRotate}deg)`,
+                transform: isGallery
+                  ? `rotate(${galleryRotate}deg) scale(${isSelected && !answered ? 1.05 : 1})`
+                  : isSelected && !answered
+                    ? 'scale(1.02)'
+                    : undefined,
+                opacity: isDimmed ? 0.45 : 1,
               }}
             >
               <Image
@@ -122,13 +145,30 @@ export function ImageMatchExercise({
                 className="object-cover"
                 sizes="(max-width: 640px) 45vw, 200px"
               />
-              {isGallery && isSelected && !answered && (
-                <div
-                  className="absolute bottom-[-22px] left-0 right-0 text-center text-[9px] font-bold truncate px-1"
-                  style={{ color: accentColor }}
-                >
-                  selecionada
-                </div>
+
+              {isSelected && !answered && (
+                <>
+                  <div
+                    className="absolute inset-0 pointer-events-none"
+                    style={{
+                      background: `linear-gradient(to top, color-mix(in srgb, ${accentColor} 55%, transparent) 0%, transparent 55%)`,
+                    }}
+                  />
+                  <div
+                    className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-full shadow-lg"
+                    style={{ backgroundColor: accentColor }}
+                  >
+                    <Check size={14} className="text-white" strokeWidth={3} />
+                  </div>
+                  <div
+                    className="absolute bottom-0 inset-x-0 py-2 text-center"
+                    style={{ backgroundColor: accentColor }}
+                  >
+                    <span className="text-[10px] font-extrabold uppercase tracking-widest text-white">
+                      {isGallery ? 'Sua escolha' : 'Selecionada'}
+                    </span>
+                  </div>
+                </>
               )}
             </button>
           );

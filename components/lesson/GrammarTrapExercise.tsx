@@ -1,6 +1,10 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import type { GrammarTrapData } from '@/types';
 import { CheckCircle2, XCircle, Lightbulb } from 'lucide-react';
+import {
+  buildOriginalToDisplayLetter,
+  remapPositionalExplanation,
+} from '@/utils/remapPositionalExplanation';
 
 interface GrammarTrapExerciseProps {
   data: GrammarTrapData;
@@ -39,6 +43,11 @@ export function GrammarTrapExercise({
     }
     return indexed;
   }, [data.options]);
+
+  const displayExplanation = useMemo(() => {
+    const letterMap = buildOriginalToDisplayLetter(shuffledOptions);
+    return remapPositionalExplanation(data.explanation, letterMap);
+  }, [data.explanation, shuffledOptions]);
 
   // Notify parent of readiness
   useEffect(() => {
@@ -213,7 +222,7 @@ export function GrammarTrapExercise({
               </span>
             </div>
             <p className="text-sm font-medium leading-relaxed text-[var(--color-text-secondary)]">
-              {data.explanation}
+              {displayExplanation}
             </p>
           </div>
 

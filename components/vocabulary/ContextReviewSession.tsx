@@ -113,7 +113,7 @@ export function ContextReviewSession({
       onCloseRequest={onClose}
       footer={footer}
     >
-      <div className="flex-1 px-5 pb-4 mx-auto max-w-lg w-full animate-slide-up">
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto scrollbar-hide px-5 pt-3 mx-auto max-w-lg w-full animate-slide-up pb-[max(1rem,env(safe-area-inset-bottom))]">
         <VocabReviewExerciseFrame
           theme={THEME}
           exerciseType={exerciseType}

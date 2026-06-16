@@ -27,17 +27,21 @@ const nextConfig: NextConfig = {
             value: 'strict-origin-when-cross-origin',
           },
           {
+            key: 'Cross-Origin-Opener-Policy',
+            value: 'same-origin-allow-popups',
+          },
+          {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://www.gstatic.com",
-              "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebase.googleapis.com wss://*.firebaseio.com https://*.spline.design https://unpkg.com",
+              "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebase.googleapis.com wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://*.spline.design https://unpkg.com",
               "img-src 'self' data: blob: https:",
               "media-src 'self' data: blob:",
               "style-src 'self' 'unsafe-inline'",
               "font-src 'self' data:",
               "worker-src 'self' blob:",
-              "frame-src 'self' https://accounts.google.com",
+              "frame-src 'self' https://accounts.google.com https://*.firebaseapp.com https://*.google.com",
               "frame-ancestors 'none'",
               'upgrade-insecure-requests',
             ].join('; '),
@@ -58,7 +62,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  transpilePackages: ['@splinetool/react-spline'],
+  transpilePackages: ['@splinetool/react-spline', '@splinetool/runtime'],
 };
 
 export default nextConfig;

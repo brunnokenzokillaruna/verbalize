@@ -1,7 +1,6 @@
 'use client';
 
-import React, { Suspense, useRef, useState, useEffect, Component, type ReactNode } from 'react';
-import dynamic from 'next/dynamic';
+import React, { useRef, useState, useEffect, Component, type ReactNode } from 'react';
 import type { Application } from '@splinetool/runtime';
 import { Sparkles } from 'lucide-react';
 import {
@@ -12,9 +11,7 @@ import {
 const SPLINE_SCENE_URL =
   'https://prod.spline.design/Lid0QTY4Wf0IjJ4l/scene.splinecode';
 
-const Spline = dynamic(() => import('@splinetool/react-spline'), {
-  ssr: false,
-});
+type SplineComponent = typeof import('@splinetool/react-spline').default;
 
 class SplineErrorBoundary extends Component<
   { children: ReactNode; fallback: ReactNode },
@@ -81,11 +78,31 @@ export default function SplineRobot() {
   const [mounted, setMounted] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [loadFailed, setLoadFailed] = useState(false);
+  const [Spline, setSpline] = useState<SplineComponent | null>(null);
   const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (!mounted || prefersReducedMotion) return;
+
+    let cancelled = false;
+
+    import('@splinetool/react-spline')
+      .then((mod) => {
+        if (!cancelled) setSpline(() => mod.default);
+      })
+      .catch((error) => {
+        console.warn('[SplineRobot] Failed to load Spline module:', error);
+        if (!cancelled) setLoadFailed(true);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [mounted, prefersReducedMotion]);
 
   useEffect(() => {
     if (!mounted || prefersReducedMotion || loadFailed) return;
@@ -165,6 +182,14 @@ export default function SplineRobot() {
     );
   }
 
+  if (!Spline) {
+    return (
+      <div className="flex items-center justify-center w-full h-full">
+        <div className="w-12 h-12 border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <div className="relative w-full h-full flex items-center justify-center overflow-hidden pointer-events-auto spline-robot-scene">
       <div
@@ -172,23 +197,15 @@ export default function SplineRobot() {
         className="relative w-full h-[105%] -bottom-[5%] pointer-events-auto"
       >
         <SplineErrorBoundary fallback={<StaticFallback />}>
-          <Suspense
-            fallback={
-              <div className="flex items-center justify-center w-full h-full">
-                <div className="w-12 h-12 border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
-              </div>
-            }
+          <div
+            className={`w-full h-full transition-all duration-1000 ${isLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}
           >
-            <div
-              className={`w-full h-full transition-all duration-1000 ${isLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}
-            >
-              <Spline
-                scene={SPLINE_SCENE_URL}
-                onLoad={onLoad}
-                className="w-full h-full"
-              />
-            </div>
-          </Suspense>
+            <Spline
+              scene={SPLINE_SCENE_URL}
+              onLoad={onLoad}
+              className="w-full h-full"
+            />
+          </div>
         </SplineErrorBoundary>
       </div>
 
