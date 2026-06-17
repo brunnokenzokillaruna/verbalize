@@ -213,6 +213,7 @@ export function pushFixarSteps(
   const hasSynthesis =
     synthesisData.insight ||
     synthesisData.survivalTip ||
+    synthesisData.formulas?.length ||
     synthesisData.formula ||
     synthesisData.trap;
 

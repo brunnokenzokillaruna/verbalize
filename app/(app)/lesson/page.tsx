@@ -20,6 +20,7 @@ import { useLessonAudio } from './hooks/useLessonAudio';
 import { useLessonFlow } from './hooks/useLessonFlow';
 import { useLessonBootstrap } from './hooks/useLessonBootstrap';
 import { useLessonTooltip } from './hooks/useLessonTooltip';
+import { useWordTooltipPrefetch } from './hooks/useWordTooltipPrefetch';
 import { useLessonExerciseHandlers } from './hooks/useLessonExerciseHandlers';
 import { phaseToStage } from './utils';
 
@@ -83,6 +84,7 @@ export default function LessonPage() {
   });
 
   const { tooltip, handleWordClick, closeTooltip } = useLessonTooltip();
+  useWordTooltipPrefetch({ grammarBridgePrefetchRef });
 
   const {
     exerciseAnswer,

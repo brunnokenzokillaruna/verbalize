@@ -37,8 +37,16 @@ export function stripHighlights(text: string): string {
   return text.replace(/\^\^/g, '');
 }
 
+/** Collapses stray spaces around ^^ markers (e.g. "^^Eu^^ , acho" → "^^Eu^^, acho"). */
+export function normalizeHighlightMarkers(text: string): string {
+  return text
+    .replace(/\^\^([^*^]+?)\^\^[\s\u00a0]+([,.!?;:])/g, '^^$1^^$2')
+    .replace(/\^\^[\s\u00a0]+/g, '^^')
+    .replace(/[\s\u00a0]+\^\^/g, ' ^^');
+}
+
 export function HighlightedText({ text, className }: { text: string; className: string }) {
-  const parts = text.split(/\^\^/g);
+  const parts = normalizeHighlightMarkers(text).split(/\^\^/g);
   return (
     <>
       {parts.map((part, i) =>
@@ -138,6 +146,7 @@ function parseFormulaBranches(formula: string): Array<{ label?: string; formula:
 type FormulaBranch = {
   label?: string;
   formula: string;
+  hint?: string;
   example?: { target: string; portuguese: string };
 };
 
@@ -194,6 +203,7 @@ export function FormulaRenderer({
   structureFormulas?: Array<{
     label: string;
     formula: string;
+    hint?: string;
     example?: { target: string; portuguese: string };
   }> | null;
   formulaExample?: { target: string; portuguese: string } | null;
@@ -221,9 +231,16 @@ export function FormulaRenderer({
       {branches.map((branch, i) => (
         <div key={i} className="flex flex-col gap-3 items-center w-full">
           {branch.label && branches.length > 1 && (
-            <span className="text-[10px] font-bold text-[var(--color-primary)] uppercase tracking-wide">
-              {branch.label}
-            </span>
+            <div className="flex flex-col gap-1 items-center">
+              <span className="text-[10px] font-bold text-[var(--color-primary)] uppercase tracking-wide text-center">
+                {branch.label}
+              </span>
+              {branch.hint && (
+                <p className="text-xs text-[var(--color-text-muted)] text-center max-w-sm leading-relaxed">
+                  {branch.hint}
+                </p>
+              )}
+            </div>
           )}
           <FormulaLine formula={branch.formula} />
           {showExamples && branch.example && (

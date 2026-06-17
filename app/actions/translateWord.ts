@@ -33,26 +33,15 @@ export async function translateWord(
 - Ensure the explanation in Portuguese mentions the infinitive verb and explains why it is conjugated this way.`;
     }
 
-    const prompt = `A user clicked on the word "${word}" inside the sentence "${sentence}".
-
-Provide a quick, helpful explanation in Brazilian Portuguese.
+    const prompt = `A user clicked on the word "${word}" in: "${sentence}".
 ${verbInstruction}
 
-Output JSON in exactly this format:
-{
-  "translation": "Portuguese translation of the word",
-  "explanation": "One sentence explaining usage or grammar tip (in Portuguese, max 20 words)",
-  "example": "A new example sentence using the same word in ${LANG_LABEL[language]} only",
-  "partOfSpeech": "Only if this is a new verb, set this to 'Verbo', otherwise omit or set to null",
-  "infinitive": "Only if this is a new verb, set this to its infinitive form, otherwise omit or set to null"
-}
+Respond with ONLY this JSON (no markdown):
+{"translation":"PT-BR translation","explanation":"one PT-BR sentence, max 20 words","example":"new sentence in ${LANG_LABEL[language]} using the same word","partOfSpeech":${isNewVerb ? '"Verbo"' : 'null'},"infinitive":${isNewVerb ? '"infinitive lowercase"' : 'null'}}
 
-Rules:
-- Keep explanation under 20 words in Portuguese.
-- The example must be in ${LANG_LABEL[language]} only (no Portuguese).
-- Use simple vocabulary appropriate for beginners.`;
+Rules: example must be ${LANG_LABEL[language]} only; beginner vocabulary.`;
 
-    return await callGeminiJSON<TranslateWordResult>(prompt, systemPrompt, 500, 0);
+    return await callGeminiJSON<TranslateWordResult>(prompt, systemPrompt, 256, 0);
   } catch (err) {
     console.error('[translateWord] Error:', err);
     return null;

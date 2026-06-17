@@ -42,7 +42,11 @@ function getAdjustedMaxTokens(model: string, maxOutputTokens: number): number {
   const isLargeOutput = maxOutputTokens >= LARGE_OUTPUT_THRESHOLD;
 
   if (model.includes('3.5') || model.includes('thinking')) {
-    return Math.max(maxOutputTokens * 3, LARGE_OUTPUT_MIN_TOKENS);
+    if (isLargeOutput) {
+      return Math.max(maxOutputTokens * 3, LARGE_OUTPUT_MIN_TOKENS);
+    }
+    // Small JSON (word tooltips, etc.): avoid 8192-token budget that slows TTFT.
+    return Math.ceil(maxOutputTokens * 1.25);
   }
 
   // Fallback models (2.5-flash, etc.) need the same headroom for large JSON payloads

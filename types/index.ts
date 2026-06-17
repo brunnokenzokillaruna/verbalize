@@ -208,6 +208,7 @@ export interface GrammarBridgeResult {
   structureFormulas?: Array<{
     label: string;
     formula: string;
+    hint?: string;            // 1 frase: quando usar esta construção
     example?: { target: string; portuguese: string }; // Exemplo real que instancia esta fórmula
   }>; // Alternativas quando a regra tem 2+ construções
   formulaExample?: { target: string; portuguese: string }; // Exemplo real quando há só UMA fórmula

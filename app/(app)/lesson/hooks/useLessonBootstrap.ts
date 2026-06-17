@@ -14,6 +14,7 @@ import { pregenerateNextLesson } from '@/app/actions/pregenerateNextLesson';
 import { getVocabImage } from '@/app/actions/getVocabImage';
 import { translateWord } from '@/app/actions/translateWord';
 import { getPregeneratedLesson, deletePregeneratedLesson, getUserVocabulary, upsertVocabularyItem } from '@/services/firestore';
+import { tooltipCacheKey } from '@/lib/wordTooltipUtils';
 import type { GrammarBridgeResult, Exercise, LessonTag, MissionBriefingResult } from '@/types';
 
 const TAGS_WITH_GRAMMAR_PHASE: ReadonlySet<LessonTag> = new Set(['GRAM', 'VERB', 'CULT', 'VOC', 'DIAL', 'EXPR']);
@@ -352,7 +353,10 @@ export function useLessonBootstrap({
     if (hook.vocabTranslations) {
       words.forEach((word) => {
         const result = hook.vocabTranslations![word];
-        if (result?.translation) store.setVocabTranslation(word, result.translation);
+        if (result?.translation) {
+          store.setVocabTranslation(word, result.translation);
+          store.cacheWordTooltip(tooltipCacheKey(word, language, false), result);
+        }
       });
       devLog(`[Timing] Traduções do vocabulário: vindas do hook (0ms)`);
     } else {
@@ -361,7 +365,10 @@ export function useLessonBootstrap({
         for (const word of words) {
           const t = performance.now();
           const result = await translateWord(word, dialogue, language);
-          if (result?.translation) store.setVocabTranslation(word, result.translation);
+          if (result?.translation) {
+            store.setVocabTranslation(word, result.translation);
+            store.cacheWordTooltip(tooltipCacheKey(word, language, false), result);
+          }
           devLog(`[Timing] Tradução '${word}': ${(performance.now() - t).toFixed(0)}ms`);
           await new Promise((resolve) => setTimeout(resolve, 300)); // small cooldown
         }

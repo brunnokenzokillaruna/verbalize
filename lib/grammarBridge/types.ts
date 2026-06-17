@@ -67,7 +67,7 @@ export interface FormulaStep extends GrammarStepBase {
   type: 'formula';
   data: {
     structureFormula?: string;
-    structureFormulas?: Array<{ label: string; formula: string; example?: FormulaExample }>;
+    structureFormulas?: Array<{ label: string; formula: string; hint?: string; example?: FormulaExample }>;
     formulaExample?: FormulaExample;
   };
 }
@@ -133,7 +133,9 @@ export interface SynthesisStep extends GrammarStepBase {
   data: {
     insight?: string;
     survivalTip?: string;
+    /** @deprecated use formulas — kept for backward compat with cached bridges */
     formula?: string;
+    formulas?: Array<{ label?: string; formula: string; hint?: string }>;
     trap?: {
       wrong: string;
       right: string;

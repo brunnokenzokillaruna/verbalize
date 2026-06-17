@@ -51,7 +51,17 @@ export function CuidadoStepView({ step }: { step: CuidadoStep }) {
       )}
 
       {trap.explanation && (
-        <p className="grammar-secondary text-center">{trap.explanation}</p>
+        <div className="w-full p-4 rounded-xl border border-amber-500/15 bg-amber-500/5 flex items-start gap-3">
+          <span className="text-base shrink-0">💡</span>
+          <div className="flex flex-col gap-1 min-w-0">
+            <span className="grammar-step-label" style={{ color: '#f59e0b' }}>
+              Por quê?
+            </span>
+            <p className="grammar-secondary font-medium text-text-primary leading-relaxed text-left">
+              {trap.explanation}
+            </p>
+          </div>
+        </div>
       )}
 
       {survivalTip && (

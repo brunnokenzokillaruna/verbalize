@@ -35,6 +35,7 @@ const formulaExampleSchema = z.object({
 const structureFormulaItemSchema = z.object({
   label: z.string(),
   formula: z.string(),
+  hint: wordLimit(20).optional(),
   example: formulaExampleSchema.optional(),
 });
 

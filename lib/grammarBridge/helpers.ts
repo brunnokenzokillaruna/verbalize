@@ -74,13 +74,22 @@ export function getTrap(bridge: GrammarBridgeResult) {
 
 export function buildSynthesisData(bridge: GrammarBridgeResult): SynthesisStep['data'] {
   const trap = getTrap(bridge);
-  const formula =
-    bridge.structureFormulas?.[0]?.formula ?? bridge.structureFormula ?? undefined;
+
+  const formulas = bridge.structureFormulas?.length
+    ? bridge.structureFormulas.map((f) => ({
+        label: f.label,
+        formula: f.formula,
+        hint: f.hint,
+      }))
+    : bridge.structureFormula
+      ? [{ formula: bridge.structureFormula }]
+      : undefined;
 
   return {
     insight: bridge.insight,
     survivalTip: bridge.survivalTip,
-    formula,
+    formula: formulas?.[0]?.formula,
+    formulas,
     trap:
       trap?.wrong && trap?.right
         ? {

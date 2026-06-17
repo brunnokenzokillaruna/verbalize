@@ -194,11 +194,25 @@ export function getErrorCorrectionAnswerMode(
     return data.answer_mode;
   }
 
-  if (data.corrected_sentence?.trim()) {
+  if (isDeletionCorrection(data.correct_word)) {
     return 'rewrite';
   }
 
-  if (isDeletionCorrection(data.correct_word)) {
+  const index = resolveErrorHighlightIndex(data);
+  const derived = applyCorrectionAtIndex(
+    data.sentence_with_error,
+    data.error_word,
+    data.correct_word,
+    index,
+  );
+  const target = data.corrected_sentence?.trim() || derived;
+
+  // Localized word/phrase fix → ask only for the replacement, not the full sentence.
+  if (normalizeErrorText(derived) === normalizeErrorText(target)) {
+    return 'replace';
+  }
+
+  if (data.corrected_sentence?.trim()) {
     return 'rewrite';
   }
 
@@ -287,6 +301,20 @@ export function isRewriteAnswerCorrect(
   const normalizedCorrect = normalizeErrorText(normalized.corrected_sentence ?? '');
 
   if (normalizedInput === normalizedCorrect) return true;
+
+  // Users often type only the fix (e.g. "tu fais") instead of the full sentence.
+  if (normalizedInput === normalizeErrorText(data.correct_word)) return true;
+
+  const index = resolveErrorHighlightIndex(normalized);
+  if (index >= 0) {
+    const applied = applyCorrectionAtIndex(
+      normalized.sentence_with_error,
+      normalized.error_word,
+      input.trim(),
+      index,
+    );
+    if (normalizeErrorText(applied) === normalizedCorrect) return true;
+  }
 
   return (data.acceptable_answers ?? []).some(
     (alt) => normalizeErrorText(alt) === normalizedInput,

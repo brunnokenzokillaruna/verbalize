@@ -4,7 +4,8 @@ import { FormulaLine } from '../shared';
 import type { SynthesisStep } from '@/lib/grammarBridgeSteps';
 
 export function SynthesisStepView({ step }: { step: SynthesisStep }) {
-  const { insight, survivalTip, formula, trap } = step.data;
+  const { insight, survivalTip, formula, formulas, trap } = step.data;
+  const formulaItems = formulas?.length ? formulas : formula ? [{ formula }] : [];
 
   return (
     <div className="flex flex-col gap-4 sm:gap-5 px-1 w-full max-w-lg mx-auto">
@@ -14,16 +15,32 @@ export function SynthesisStepView({ step }: { step: SynthesisStep }) {
 
       {insight && (
         <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-primary/10 to-transparent border border-primary/10">
-          <p className="grammar-body font-bold text-text-primary text-center leading-snug">
+          <p className="grammar-secondary font-semibold text-text-primary text-center leading-snug">
             {insight}
           </p>
         </div>
       )}
 
-      {formula && (
-        <div className="flex flex-col gap-2.5 items-center">
-          <span className="grammar-step-label">Fórmula</span>
-          <FormulaLine formula={formula} />
+      {formulaItems.length > 0 && (
+        <div className="flex flex-col gap-3 items-center w-full">
+          <span className="grammar-step-label">
+            {formulaItems.length > 1 ? 'Fórmulas' : 'Fórmula'}
+          </span>
+          {formulaItems.map((item, i) => (
+            <div key={i} className="flex flex-col gap-1.5 items-center w-full">
+              {item.label && formulaItems.length > 1 && (
+                <span className="text-[10px] font-bold text-primary uppercase tracking-wide text-center">
+                  {item.label}
+                </span>
+              )}
+              {item.hint && (
+                <p className="text-xs text-text-muted text-center max-w-sm leading-relaxed">
+                  {item.hint}
+                </p>
+              )}
+              <FormulaLine formula={item.formula} />
+            </div>
+          ))}
         </div>
       )}
 

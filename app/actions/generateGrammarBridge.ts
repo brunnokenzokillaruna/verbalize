@@ -7,7 +7,7 @@ import type { SupportedLanguage, GrammarBridgeResult, LessonTag } from '@/types'
 function buildTagBridgeGuidance(tag: LessonTag | undefined): string {
   switch (tag) {
     case 'GRAM':
-      return 'PRIORIDADE: bridge + patterns (2-3) + brazilianTrap. structureFormulas se houver 2 construções alternativas.';
+      return 'PRIORIDADE: bridge + structureFormulas (quando houver 2+ usos) + patterns (2-3) + brazilianTrap. Garanta COMPLETUDE: todo uso ensinado em structureFormulas deve aparecer também em insight, explanation e síntese.';
     case 'VERB':
       return 'PRIORIDADE: verbSpotlight completo + patterns (1-2 exemplos de uso do verbo) + brazilianTrap. NÃO omita patterns.';
     case 'EXPR':
@@ -19,6 +19,37 @@ function buildTagBridgeGuidance(tag: LessonTag | undefined): string {
     default:
       return 'Use bridge + patterns para regras sistêmicas, ou items para listas de expressões.';
   }
+}
+
+function buildGrammarFocusGuidance(grammarFocus: string, language: SupportedLanguage): string {
+  const focus = grammarFocus.toLowerCase();
+
+  if (
+    language === 'fr' &&
+    (focus.includes('pronomes tônicos') ||
+      focus.includes('pronomes tonicos') ||
+      focus.includes('tonic') ||
+      /\bmoi\b.*\btoi\b/i.test(grammarFocus))
+  ) {
+    return `
+⚠️ PRONOMES TÔNICOS (moi, toi, lui, elle, nous, vous, eux, elles) — COMPLETUDE OBRIGATÓRIA ⚠️
+Esta regra tem DOIS usos distintos que o aluno PRECISA sair sabendo:
+1. ÊNFASE/CONTRASTE no sujeito → pronome no INÍCIO + vírgula + sujeito + verbo (ex: "Moi, je préfère le café.")
+2. DEPOIS DE PREPOSIÇÃO → pronome APÓS pour/avec/chez/sans/de (ex: "Je fais ça pour toi.", "Viens avec moi.")
+
+OBRIGATÓRIO no JSON:
+- structureFormulas: EXATAMENTE 2 itens, um por uso, cada um com label, hint, formula e example.
+  - Item 1 — label: "Ênfase no início" | hint: "Pra destacar quem fala ou contrastar, tipo 'quanto a mim...'" | formula: "[Pronome tônico] + , + [Sujeito] + [Verbo]"
+  - Item 2 — label: "Depois de preposição" | hint: "Quando fala de alguém depois de pour, avec, chez etc. — o pronome vai DEPOIS da preposição." | formula: "[Verbo] + [pour/avec/chez] + [Pronome tônico]"
+- insight: mencionar os DOIS usos em no máximo 2 frases (não só o início).
+- explanation: item 1 = uso 1; item 2 = uso 2.
+- survivalTip: cobrir os dois casos (ex: "Início com vírgula = ênfase; depois de pour/avec = outra pessoa.").
+- brazilianTrap: erro clássico do uso 1 (pronome no início sem sujeito clítico: "Moi aime" → "Moi, j'aime").
+- bridge: ilustrar preferencialmente o uso 1 (ênfase no início), pois é o erro mais comum do brasileiro.
+`;
+  }
+
+  return '';
 }
 
 const LANG_LABEL: Record<SupportedLanguage, string> = {
@@ -105,6 +136,7 @@ REGRAS EXTRA PARA LIÇÃO DE VERBO:
       : '';
 
     const tagGuidance = buildTagBridgeGuidance(tag);
+    const focusGuidance = buildGrammarFocusGuidance(grammarFocus, language);
 
     const prompt = `Explique o padrão gramatical "${grammarFocus}" para um brasileiro aprendendo ${LANG_LABEL[language]}.
 
@@ -113,6 +145,7 @@ Contexto do diálogo:
 
 ORIENTAÇÃO POR TIPO DE LIÇÃO (tag: ${tag ?? 'GRAM'}):
 ${tagGuidance}
+${focusGuidance}
 
 Você está falando com um falante nativo de português brasileiro. Use isso a seu favor: compare diretamente com o português, aponte os erros clássicos que brasileiros cometem e explique POR QUÊ a estrutura funciona diferente.
 
@@ -197,11 +230,13 @@ Output ONLY este JSON (sem markdown):
   "structureFormulas": [
     {
       "label": "Opção A (ex: necessidade geral)",
+      "hint": "1 frase simples: QUANDO usar esta construção. MAX 20 palavras.",
       "formula": "[il faut] + [verbo no infinitivo]",
       "example": { "target": "Il faut ranger.", "portuguese": "É preciso organizar." }
     },
     {
       "label": "Opção B (ex: obrigação pessoal)",
+      "hint": "1 frase simples: QUANDO usar esta construção. MAX 20 palavras.",
       "formula": "[Sujeito] + [devoir conjugado] + [verbo no infinitivo]",
       "example": { "target": "Je dois ranger.", "portuguese": "Eu preciso organizar." }
     }
@@ -248,7 +283,7 @@ Regras Cruciais:
 3. brazilianTrap: FOQUE no erro clássico. Mostre o que o brasileiro tentaria dizer e a versão correta no objeto estruturado. SEMPRE preencha wrongPortuguese e rightPortuguese com traduções naturais em PT-BR das frases wrong e right.
 4. Destaque Visual: Use ^^ envolta das palavras-chave em bridge.target and bridge.portuguese para criar o mapeamento visual.
 5. explanation: array de 0-2 strings. OMITA se insight + bridge.difference já explicam a regra. Nunca repita insight nem bridge.difference.
-5b. structureFormulas: use quando a regra tiver 2+ construções alternativas (ex: il faut vs devoir). Cada item com label descritivo e example (frase real + tradução PT-BR que instancia aquela fórmula). Deixe structureFormula e formulaExample null nesse caso.
+5b. structureFormulas: use quando a regra tiver 2+ construções ou usos distintos (ex: il faut vs devoir; pronome tônico no início vs depois de preposição). Cada item com label (nome curto do uso), hint (1 frase: QUANDO usar), formula e example (frase real + tradução PT-BR). Deixe structureFormula e formulaExample null nesse caso.
 5b2. formulaExample: quando usar structureFormula única, inclua 1 frase real + tradução PT-BR que mostra a fórmula aplicada na prática (ex: fórmula [Sujeito] + [réponds] + [à/au/aux] + [resposta] → target: "Je réponds à la question.", portuguese: "Eu respondo à pergunta.").
 5c. retentionCheck: pergunta de 2 opções; prefira "Como você diria X?" quando possível. correctIndex deve apontar para a opção certa.
 6. dialogueExample.target: DEVE ser uma linha real do diálogo acima.
@@ -261,7 +296,13 @@ Regras Cruciais:
     - 'bridge.difference': Foco na diferença estrutural direta do exemplo principal (PT-BR vs Língua-alvo) em 1 frase curta.
     - 'explanation': Explicação profunda e conceitual do padrão.
     - 'brazilianTrap.explanation': Foco estritamente no motivo por trás do erro clássico do brasileiro.
-12. ESTRUTURA E COMPLETUDE EM FRANCÊS: Se o foco for francês e envolver preposições + artigos (ex: contrações para dor, direção, lugares, etc.), você DEVE incluir nos padrões ('patterns') ou exemplos adicionais a contração antes de vogal/H mudo ('à l\''), além de cobrir o masculino ('au'), feminino ('à la') e plural ('aux').`;
+12. ESTRUTURA E COMPLETUDE EM FRANCÊS: Se o foco for francês e envolver preposições + artigos (ex: contrações para dor, direção, lugares, etc.), você DEVE incluir nos padrões ('patterns') ou exemplos adicionais a contração antes de vogal/H mudo ('à l\''), além de cobrir o masculino ('au'), feminino ('à la') e plural ('aux').
+13. COMPLETUDE EM REGRAS COM MÚLTIPLOS USOS: Se o tópico tiver 2+ funções/posições/construções distintas, você DEVE:
+    - Preencher structureFormulas com TODAS (máx. 3), cada uma com label + hint + formula + example.
+    - insight: resumir TODOS os usos ensinados em no máximo 2 frases — nunca omita um uso que aparece em structureFormulas.
+    - explanation: 1 item por uso principal (máx. 2 itens).
+    - survivalTip: cobrir todos os usos ou dar mnemônico que não omita nenhum.
+    - NUNCA ensine um uso na fase Estruturar e omita na Síntese — o aluno precisa sair com a visão completa da lição.`;
 
     const raw = await callGeminiJSON<GrammarBridgeResult>(prompt, systemPrompt, 3500);
     return normalizeGrammarBridgeResult(raw, language);

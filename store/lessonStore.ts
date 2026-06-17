@@ -7,6 +7,7 @@ import type {
   Exercise,
   LessonMistakeDocument,
   MissionBriefingResult,
+  TranslateWordResult,
 } from '@/types';
 
 export type LessonPhase =
@@ -35,6 +36,8 @@ interface LessonState {
   grammarBridge: GrammarBridgeResult | null;
   vocabImages: Record<string, VocabImageResult | null>; // keyed by word
   vocabTranslations: Record<string, string>; // keyed by word → PT-BR translation
+  /** Full AI tooltip payloads keyed by tooltipCacheKey — instant word clicks. */
+  wordTooltips: Record<string, TranslateWordResult>;
   knownVocabulary: string[]; // words the user already learned (from Firestore)
 
   // Practice exercises
@@ -77,6 +80,7 @@ interface LessonState {
   setGrammarBridge: (bridge: GrammarBridgeResult) => void;
   setVocabImage: (word: string, image: VocabImageResult | null) => void;
   setVocabTranslation: (word: string, translation: string) => void;
+  cacheWordTooltip: (key: string, result: TranslateWordResult) => void;
   setExercises: (exercises: Exercise[]) => void;
   setIsLoading: (loading: boolean) => void;
   setBridgeQuizPassed: (passed: boolean) => void;
@@ -117,6 +121,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
   grammarBridge: null,
   vocabImages: {},
   vocabTranslations: {},
+  wordTooltips: {},
   knownVocabulary: [],
   discoveredVerbs: [],
   exercises: [],
@@ -145,6 +150,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       grammarBridge: null,
       vocabImages: {},
       vocabTranslations: {},
+      wordTooltips: {},
       knownVocabulary: [],
       discoveredVerbs: [],
       exercises: [],
@@ -200,6 +206,13 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       vocabTranslations: { ...state.vocabTranslations, [word]: translation },
     })),
 
+  cacheWordTooltip: (key, result) =>
+    set((state) => ({
+      wordTooltips: state.wordTooltips[key]
+        ? state.wordTooltips
+        : { ...state.wordTooltips, [key]: result },
+    })),
+
   setExercises: (exercises) => set({ exercises, isLoading: false }),
 
   recordCorrect: () =>
@@ -239,6 +252,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       grammarBridge: null,
       vocabImages: {},
       vocabTranslations: {},
+      wordTooltips: {},
       knownVocabulary: [],
       discoveredVerbs: [],
       exercises: [],
