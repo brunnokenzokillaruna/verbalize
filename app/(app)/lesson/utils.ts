@@ -36,6 +36,8 @@ export function buildMistakeContext(exercise: Exercise): string {
       return `Bridge choice: "${exercise.data.question}" — correct: "${exercise.data.options[exercise.data.correctIndex]}"`;
     case 'listen-and-select':
       return `Listen and select: "${exercise.data.audioText}"`;
+    case 'listening-comprehension':
+      return `Listening comprehension: "${exercise.data.questionPt}" — correct: "${exercise.data.options[exercise.data.correctIndex]}"`;
   }
 }
 
