@@ -1,6 +1,6 @@
 'use client';
 
-import { Book, Zap, Mic, MessageSquare, Target, Loader2, ChevronRight, Repeat, Sparkles, BookOpen } from 'lucide-react';
+import { Book, Zap, Mic, MessageSquare, Target, Loader2, ChevronRight, Repeat, Sparkles, BookOpen, Flag } from 'lucide-react';
 import type { LessonTag, SupportedLanguage } from '@/types';
 
 const TAG_CONFIG: Record<LessonTag, {
@@ -74,6 +74,14 @@ const TAG_CONFIG: Record<LessonTag, {
     gradient: 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)',
     accent: '#8b5cf6',
     shadow: 'rgba(109, 40, 217, 0.25)',
+  },
+  REVIEW: {
+    icon: Flag,
+    title: 'Checkpoint',
+    desc: 'Hora de provar o que você aprendeu — compreensão e produção sem dicas',
+    gradient: 'linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)',
+    accent: '#14b8a6',
+    shadow: 'rgba(13, 148, 136, 0.25)',
   },
 };
 

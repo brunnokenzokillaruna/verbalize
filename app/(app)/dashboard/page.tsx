@@ -17,7 +17,7 @@ import { useSoundEffects } from '@/hooks/useSoundEffects';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { useDashboardPregen } from '@/hooks/useDashboardPregen';
 import { logOut } from '@/services/auth';
-import { updateUser, syncUserProfile, logLesson, updateLessonStats } from '@/services/firestore';
+import { updateUser, syncUserProfile, logLesson, updateLessonStats, getUserVocabulary, getRecentLessonStats } from '@/services/firestore';
 import { SkipLessonModal } from '@/components/ui/SkipLessonModal';
 import type { LessonDefinition } from '@/types';
 import { getLessonsForLanguage } from '@/lib/curriculum';
@@ -28,6 +28,7 @@ import {
   shouldShowCurriculumNotice,
 } from '@/components/dashboard/CurriculumSyncNotice';
 import { getEffectiveStreak } from '@/lib/stats';
+import { computeVocabCounts } from '@/utils/vocabPageHelpers';
 import type { ProficiencyLevel, SupportedLanguage } from '@/types';
 
 export default function DashboardPage() {
@@ -62,6 +63,10 @@ export default function DashboardPage() {
   const [showSkipModal, setShowSkipModal] = useState(false);
   const [isSkipping, setIsSkipping] = useState(false);
   const [modalState, setModalState] = useState<LessonModalState>(EMPTY_LESSON_MODAL);
+  const [dueTodayCount, setDueTodayCount] = useState<number | undefined>();
+  const [masteredCount, setMasteredCount] = useState<number | undefined>();
+  const [lessonsLast7Days, setLessonsLast7Days] = useState<number | undefined>();
+  const [averageScoreLast7Days, setAverageScoreLast7Days] = useState<number | undefined>();
 
   const currentLessonRef = useRef<HTMLDivElement | null>(null);
   const hasScrolledToCurrentRef = useRef(false);
@@ -142,6 +147,29 @@ export default function DashboardPage() {
   }, [user?.uid]);
 
   useDashboardPregen(user, profile, activeLessonObj);
+
+  useEffect(() => {
+    if (!user || !profile?.currentTargetLanguage) return;
+    let cancelled = false;
+
+    Promise.all([
+      getUserVocabulary(user.uid, profile.currentTargetLanguage),
+      getRecentLessonStats(user.uid),
+    ])
+      .then(([vocab, lessonStats]) => {
+        if (cancelled) return;
+        const counts = computeVocabCounts(vocab);
+        setDueTodayCount(counts.dueTodayCount);
+        setMasteredCount(counts.masteredCount);
+        setLessonsLast7Days(lessonStats.lessonsLast7Days);
+        setAverageScoreLast7Days(lessonStats.averageScoreLast7Days);
+      })
+      .catch(console.error);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.uid, profile?.currentTargetLanguage]);
 
   useEffect(() => {
     setVisibleThemeIdx(null);
@@ -319,6 +347,10 @@ export default function DashboardPage() {
           frontierIndex={frontierIndex}
           totalLessons={allLessons.length}
           completionPct={completionPct}
+          dueTodayCount={dueTodayCount}
+          masteredCount={masteredCount}
+          lessonsLast7Days={lessonsLast7Days}
+          averageScoreLast7Days={averageScoreLast7Days}
         />
       </div>
 

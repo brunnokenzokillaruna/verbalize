@@ -7,7 +7,12 @@ import {
   LessonPhoneticsScreen,
   LessonPracticeScreen,
 } from '@/app/(app)/lesson/dynamicScreens';
+import { CheckpointBriefingScreen } from '@/components/lesson/CheckpointBriefingScreen';
+import { CheckpointListeningScreen } from '@/components/lesson/CheckpointListeningScreen';
+import { CheckpointDebriefScreen } from '@/components/lesson/CheckpointDebriefScreen';
+import { HOOK_LISTEN_FIRST } from '@/lib/practiceExercises/constants';
 import { useLessonStore } from '@/store/lessonStore';
+import { useAuthStore } from '@/store/authStore';
 import type { Exercise, LessonTag } from '@/types';
 import type { WordClickPayload } from '@/components/lesson/ClickableWord';
 
@@ -26,6 +31,10 @@ type LessonPhaseContentProps = {
   onAnswer: (correct: boolean) => void;
   onReviewAnswer: (correct: boolean) => void;
   onAdvanceFromGrammar: () => void;
+  comprehensionAnswered?: boolean;
+  comprehensionLastCorrect?: boolean | null;
+  onComprehensionAnswer?: (correct: boolean) => void;
+  onDebriefExit?: () => void;
 };
 
 export function LessonPhaseContent({
@@ -43,8 +52,14 @@ export function LessonPhaseContent({
   onAnswer,
   onReviewAnswer,
   onAdvanceFromGrammar,
+  comprehensionAnswered,
+  comprehensionLastCorrect,
+  onComprehensionAnswer,
+  onDebriefExit,
 }: LessonPhaseContentProps) {
   const store = useLessonStore();
+  const { profile } = useAuthStore();
+  const immersionMode = profile?.immersionMode ?? 'auto';
 
   return (
     <>
@@ -71,6 +86,56 @@ export function LessonPhaseContent({
           playingLineIdx={playingLineIdx}
           onAudioButton={onAudioButton}
           onWordClick={onWordClick}
+          listenFirstEnabled={HOOK_LISTEN_FIRST}
+        />
+      )}
+
+      {phase === 'briefing' && store.checkpointSession && (
+        <CheckpointBriefingScreen
+          briefing={store.checkpointSession.briefing}
+          coveredTopics={store.checkpointSession.coveredTopics}
+        />
+      )}
+
+      {phase === 'comprehension' && store.checkpointSession && store.lesson && onComprehensionAnswer && (
+        <CheckpointListeningScreen
+          dialogueAudio={store.checkpointSession.dialogueAudio}
+          questions={store.checkpointSession.comprehensionQuestions}
+          questionIndex={store.comprehensionIndex}
+          language={store.lesson.language}
+          isPlaying={isPlaying}
+          isLoadingAudio={isLoadingAudio}
+          onPlayAudio={onAudioButton}
+          onAnswer={onComprehensionAnswer}
+          answered={comprehensionAnswered ?? false}
+          lastCorrect={comprehensionLastCorrect ?? null}
+        />
+      )}
+
+      {phase === 'production' && currentExercise && store.lesson && (
+        <LessonPracticeScreen
+          exercises={store.exercises}
+          exerciseIndex={store.checkpointProductionIndex}
+          currentExercise={currentExercise}
+          exerciseAnswer={exerciseAnswer}
+          language={store.lesson.language}
+          level={store.lesson.level}
+          immersionMode={immersionMode}
+          lessonTag={store.lesson.tag as LessonTag}
+          onAnswer={onAnswer}
+          setIsExerciseReady={setIsExerciseReady}
+          submitTrigger={submitTrigger}
+        />
+      )}
+
+      {phase === 'debrief' && store.checkpointSession && (
+        <CheckpointDebriefScreen
+          comprehensionCorrect={store.comprehensionCorrect}
+          comprehensionTotal={store.checkpointSession.comprehensionQuestions.length}
+          productionCorrect={store.checkpointProductionCorrect}
+          productionTotal={store.checkpointSession.productionExercises.length}
+          passed={store.checkpointPassed}
+          onReviewMistakes={onDebriefExit}
         />
       )}
 
@@ -123,6 +188,8 @@ export function LessonPhaseContent({
           currentExercise={currentExercise}
           exerciseAnswer={exerciseAnswer}
           language={store.lesson.language}
+          level={store.lesson.level}
+          immersionMode={immersionMode}
           lessonTag={store.lesson.tag as LessonTag}
           onAnswer={onAnswer}
           setIsExerciseReady={setIsExerciseReady}
@@ -137,6 +204,8 @@ export function LessonPhaseContent({
           currentExercise={currentReviewExercise}
           exerciseAnswer={exerciseAnswer}
           language={store.lesson.language}
+          level={store.lesson.level}
+          immersionMode={immersionMode}
           onAnswer={onReviewAnswer}
           setIsExerciseReady={setIsExerciseReady}
           submitTrigger={submitTrigger}

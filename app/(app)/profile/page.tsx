@@ -8,6 +8,7 @@ import { updateUser } from '@/services/firestore';
 import { logOut } from '@/services/auth';
 import { ImageCacheManager } from '@/components/admin/ImageCacheManager';
 import type { SupportedLanguage } from '@/types';
+import type { ImmersionMode } from '@/lib/immersion';
 
 import { ADMIN_EMAIL, PROFESSIONS } from '@/components/profile/constants';
 import { ProfileHeader } from '@/components/profile/ProfileHeader';
@@ -43,6 +44,9 @@ export default function ProfilePage() {
   const [language, setLanguage] = useState<SupportedLanguage>(
     profile?.currentTargetLanguage ?? 'fr',
   );
+  const [immersionMode, setImmersionMode] = useState<ImmersionMode>(
+    profile?.immersionMode ?? 'auto',
+  );
 
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -56,6 +60,7 @@ export default function ProfilePage() {
     profession !== profile.profession ||
     goal !== profile.languageGoals ||
     language !== profile.currentTargetLanguage ||
+    immersionMode !== (profile.immersionMode ?? 'auto') ||
     JSON.stringify([...interests].sort()) !==
       JSON.stringify([...(profile.interests ?? [])].sort());
 
@@ -76,6 +81,7 @@ export default function ProfilePage() {
         languageGoals: goal,
         interests,
         currentTargetLanguage: language,
+        immersionMode,
       };
       await updateUser(user.uid, updates);
       setProfile({ ...profile, ...updates });
@@ -132,6 +138,8 @@ export default function ProfilePage() {
             onGoalChange={setGoal}
             onToggleInterest={toggleInterest}
             onLanguageChange={setLanguage}
+            immersionMode={immersionMode}
+            onImmersionModeChange={setImmersionMode}
           />
         )}
 

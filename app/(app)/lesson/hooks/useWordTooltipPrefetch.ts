@@ -7,6 +7,8 @@ import {
 } from '@/lib/prefetchWordTooltips';
 import type { GrammarBridgeResult } from '@/types';
 
+const DEFERRED_PHASES = new Set(['practice', 'complete']);
+
 interface UseWordTooltipPrefetchProps {
   grammarBridgePrefetchRef?: React.MutableRefObject<Promise<GrammarBridgeResult | null> | null>;
 }
@@ -14,6 +16,7 @@ interface UseWordTooltipPrefetchProps {
 /**
  * Warms the word-tooltip cache in the background so highlighted words
  * open instantly when clicked during hook and grammar phases.
+ * Skips prefetch during practice/complete to avoid Gemini calls mid-exercise.
  */
 export function useWordTooltipPrefetch({
   grammarBridgePrefetchRef,
@@ -21,6 +24,7 @@ export function useWordTooltipPrefetch({
   const hook = useLessonStore((s) => s.hook);
   const grammarBridge = useLessonStore((s) => s.grammarBridge);
   const lesson = useLessonStore((s) => s.lesson);
+  const phase = useLessonStore((s) => s.phase);
   const discoveredVerbs = useLessonStore((s) => s.discoveredVerbs);
   const cacheWordTooltip = useLessonStore((s) => s.cacheWordTooltip);
   const wordTooltips = useLessonStore((s) => s.wordTooltips);
@@ -28,6 +32,8 @@ export function useWordTooltipPrefetch({
   const inflightRef = useRef(new Set<string>());
   const bridgePrefetchedRef = useRef(false);
   const earlyBridgePrefetchedRef = useRef(false);
+
+  const prefetchAllowed = !DEFERRED_PHASES.has(phase);
 
   // Seed cache from hook.vocabTranslations (already generated with the dialogue).
   useEffect(() => {
@@ -42,6 +48,7 @@ export function useWordTooltipPrefetch({
 
   // Prefetch conjugated verb forms from the hook dialogue.
   useEffect(() => {
+    if (!prefetchAllowed) return;
     if (!hook?.dialogue || !lesson || discoveredVerbs.length === 0) return;
 
     const existingKeys = new Set(Object.keys(useLessonStore.getState().wordTooltips));
@@ -53,10 +60,11 @@ export function useWordTooltipPrefetch({
       existingKeys,
       inflightRef.current,
     );
-  }, [hook?.dialogue, lesson, discoveredVerbs, cacheWordTooltip]);
+  }, [hook?.dialogue, lesson, discoveredVerbs, cacheWordTooltip, prefetchAllowed]);
 
   // Prefetch as soon as the grammar bridge prefetch promise resolves (during hook phase).
   useEffect(() => {
+    if (!prefetchAllowed) return;
     if (!grammarBridgePrefetchRef?.current || !hook || !lesson) return;
     if (earlyBridgePrefetchedRef.current) return;
 
@@ -64,7 +72,7 @@ export function useWordTooltipPrefetch({
     earlyBridgePrefetchedRef.current = true;
 
     void promise.then(async (bridge) => {
-      if (!bridge) return;
+      if (!bridge || DEFERRED_PHASES.has(useLessonStore.getState().phase)) return;
       const existingKeys = new Set(Object.keys(useLessonStore.getState().wordTooltips));
       await prefetchWordTooltipsForBridge(
         bridge,
@@ -76,10 +84,11 @@ export function useWordTooltipPrefetch({
         inflightRef.current,
       );
     });
-  }, [grammarBridgePrefetchRef, hook, lesson, discoveredVerbs, cacheWordTooltip]);
+  }, [grammarBridgePrefetchRef, hook, lesson, discoveredVerbs, cacheWordTooltip, prefetchAllowed]);
 
   // Fallback when bridge is set on store (e.g. generated on demand without prefetch).
   useEffect(() => {
+    if (!prefetchAllowed) return;
     if (!grammarBridge || !hook || !lesson) return;
     if (bridgePrefetchedRef.current) return;
     bridgePrefetchedRef.current = true;
@@ -94,7 +103,7 @@ export function useWordTooltipPrefetch({
       existingKeys,
       inflightRef.current,
     );
-  }, [grammarBridge, hook, lesson, discoveredVerbs, cacheWordTooltip]);
+  }, [grammarBridge, hook, lesson, discoveredVerbs, cacheWordTooltip, prefetchAllowed]);
 
   useEffect(() => {
     if (!grammarBridge) bridgePrefetchedRef.current = false;

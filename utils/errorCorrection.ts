@@ -248,6 +248,80 @@ export function countErrorWordOccurrences(sentence: string, errorWord: string): 
   return findAllWholeWordIndices(sentence, errorWord).length;
 }
 
+function tokenizeForComparison(text: string): string[] {
+  return normalizeErrorText(text).split(' ').filter(Boolean);
+}
+
+function multisetEqual(a: string[], b: string[]): boolean {
+  if (a.length !== b.length) return false;
+  const sortedA = [...a].sort();
+  const sortedB = [...b].sort();
+  return sortedA.every((value, index) => value === sortedB[index]);
+}
+
+/**
+ * True when fixing the error requires moving words (e.g. COI "à lui" → "lui" before the verb),
+ * not a simple in-place substitution. These exercises confuse learners in error-correction UI.
+ */
+export function isDisplacementCorrection(data: ErrorCorrectionData): boolean {
+  const normalized = normalizeErrorCorrectionData(data);
+
+  if (isDeletionCorrection(normalized.correct_word)) {
+    return false;
+  }
+
+  const index = resolveErrorHighlightIndex(normalized);
+  if (index < 0) return false;
+
+  const target = normalized.corrected_sentence ?? '';
+  if (!target.trim()) return false;
+
+  const inPlace = applyCorrectionAtIndex(
+    normalized.sentence_with_error,
+    normalized.error_word,
+    normalized.correct_word,
+    index,
+  );
+
+  if (normalizeErrorText(inPlace) === normalizeErrorText(target)) {
+    return false;
+  }
+
+  const inPlaceTokens = tokenizeForComparison(inPlace);
+  const targetTokens = tokenizeForComparison(target);
+
+  if (multisetEqual(inPlaceTokens, targetTokens)) {
+    return true;
+  }
+
+  const correctWordTokens = tokenizeForComparison(normalized.correct_word);
+  for (const token of correctWordTokens) {
+    const idxInPlace = inPlaceTokens.indexOf(token);
+    const idxTarget = targetTokens.indexOf(token);
+    if (idxInPlace >= 0 && idxTarget >= 0 && idxInPlace !== idxTarget) {
+      return true;
+    }
+  }
+
+  const errorWord = normalized.error_word.toLowerCase();
+  if (
+    /\b(à|a|de|pour|avec|chez)\s+(moi|toi|lui|elle|nous|vous|eux|elles)\b/i.test(errorWord) ||
+    /\bparle\s+(à|a)\s+(lui|elle|eux|elles)\b/i.test(errorWord)
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
+/** Whether the UI should highlight error_word (misleading for displacement / reorder fixes). */
+export function shouldHighlightErrorSpan(data: ErrorCorrectionData): boolean {
+  const normalized = normalizeErrorCorrectionData(data);
+  if (normalized.answer_mode === 'replace') return true;
+  if (isDeletionCorrection(normalized.correct_word)) return true;
+  return !isDisplacementCorrection(normalized);
+}
+
 export function isValidErrorCorrectionExercise(data: ErrorCorrectionData): boolean {
   if (!data.sentence_with_error?.trim() || !data.error_word?.trim()) return false;
   if (data.correct_word == null || !data.translation?.trim()) return false;
@@ -256,6 +330,11 @@ export function isValidErrorCorrectionExercise(data: ErrorCorrectionData): boole
   if (occurrences === 0) return false;
 
   const normalized = normalizeErrorCorrectionData(data);
+
+  if (isDisplacementCorrection(normalized)) {
+    return false;
+  }
+
   const isReplace = normalized.answer_mode === 'replace';
 
   if (isReplace) {
@@ -279,6 +358,9 @@ export function formatErrorCorrectionAnswer(data: ErrorCorrectionData): string {
 export function errorCorrectionInstruction(data: ErrorCorrectionData): string {
   const normalized = normalizeErrorCorrectionData(data);
   if (normalized.answer_mode === 'rewrite') {
+    if (isDisplacementCorrection(normalized)) {
+      return 'Reorganize a frase abaixo — escreva a versão correta:';
+    }
     return 'Corrija a frase abaixo — reescreva a versão certa:';
   }
   return 'Encontre e corrija o erro na frase abaixo:';

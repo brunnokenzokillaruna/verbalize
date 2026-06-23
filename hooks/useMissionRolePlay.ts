@@ -2,6 +2,8 @@ import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { useAudio } from '@/hooks/useAudio';
 import { useVoiceRecorder } from '@/hooks/useVoiceRecorder';
 import { useSoundEffects } from '@/hooks/useSoundEffects';
+import { useAuthStore } from '@/store/authStore';
+import { incrementProductionStats } from '@/services/firestore';
 import { transcribeSpeech } from '@/app/actions/transcribeSpeech';
 import { evaluateFreeResponse } from '@/app/actions/evaluateFreeResponse';
 import { getFixedVoiceName } from '@/lib/voiceConfig';
@@ -28,6 +30,8 @@ export function useMissionRolePlay({
   intentMode,
   onComplete,
 }: UseMissionRolePlayOptions) {
+  const { user } = useAuthStore();
+  const statsLoggedRef = useRef(false);
   const lines = useMemo(
     () => parseDialogueLines(dialogue, dialogueTranslations),
     [dialogue, dialogueTranslations],
@@ -81,6 +85,7 @@ export function useMissionRolePlay({
     setShowHint(false);
     setEvalFeedback('');
     setEvalCorrected('');
+    statsLoggedRef.current = false;
   }, [currentIdx]);
 
   const advance = useCallback(
@@ -151,6 +156,7 @@ export function useMissionRolePlay({
           intent: current.translation || '',
           language,
           previousContext: contextLines,
+          expectedLine: current.text,
         });
 
         if (evalResult.error) {
@@ -161,17 +167,27 @@ export function useMissionRolePlay({
 
         setEvalFeedback(evalResult.feedback);
         setEvalCorrected(evalResult.correctedSentence || '');
-        setRecState(evalResult.isCorrect ? 'review-correct' : 'review-retry');
+        const accepted = evalResult.isCorrect;
+        if (user && !statsLoggedRef.current) {
+          statsLoggedRef.current = true;
+          incrementProductionStats(user.uid, 'oral', accepted).catch(console.error);
+        }
+        setRecState(accepted ? 'review-correct' : 'review-retry');
       } else {
         const matchScore = similarity(current.text, said);
-        setRecState(matchScore >= CORRECT_THRESHOLD ? 'review-correct' : 'review-retry');
+        const accepted = matchScore >= CORRECT_THRESHOLD;
+        if (user && !statsLoggedRef.current) {
+          statsLoggedRef.current = true;
+          incrementProductionStats(user.uid, 'oral', accepted).catch(console.error);
+        }
+        setRecState(accepted ? 'review-correct' : 'review-retry');
       }
     } catch (err) {
       console.error('[LessonMissionRolePlay] transcription failed:', err);
       setRecState('idle');
       setRecordError('Erro ao transcrever. Tente de novo.');
     }
-  }, [current, recState, recorder, language, intentMode, lines, currentIdx]);
+  }, [current, recState, recorder, language, intentMode, lines, currentIdx, user]);
 
   const playCurrentLine = useCallback(() => {
     if (!current) return;

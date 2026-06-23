@@ -61,7 +61,7 @@ Example output: {"aimer_fr": "amar", "manger_fr": "comer"}
 Output ONLY the JSON object, nothing else.`;
 
   try {
-    const translations = await callGeminiJSON<Record<string, string>>(prompt);
+    const translations = await callGeminiJSON<Record<string, string>>(prompt, undefined, 1024, undefined, 'lightweight');
 
     // Persist to Firestore in the background (fire-and-forget per entry)
     for (const [key, t] of Object.entries(translations)) {
@@ -98,6 +98,10 @@ export async function fetchPexelsAlternatives(
       resolvedTranslation = (
         await callGemini(
           `Translate the ${langLabel} word "${word}" to Portuguese (pt-BR). Reply with ONLY the translation, no explanation.`,
+          undefined,
+          64,
+          0,
+          'lightweight',
         )
       ).trim();
     } catch (err) {
@@ -122,6 +126,10 @@ Rules:
 - Prefer isolated subjects on neutral backgrounds.
 - Output ONLY the search query string (e.g., "red apple isolated white background").
 - No explanation, no punctuation other than spaces.`,
+        undefined,
+        150,
+        0,
+        'lightweight',
       )
     ).trim();
   } catch (err) {

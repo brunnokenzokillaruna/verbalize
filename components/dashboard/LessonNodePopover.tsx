@@ -1,5 +1,6 @@
 import type { RefObject } from 'react';
 import type { LessonDefinition } from '@/types';
+import { getCheckpointPopoverCopy } from '@/lib/curriculum/checkpointPresentation';
 
 type LessonNodePopoverProps = {
   lesson: LessonDefinition;
@@ -18,7 +19,21 @@ export function LessonNodePopover({
   popoverRef,
   onStart,
 }: LessonNodePopoverProps) {
+  const isCheckpoint = lesson.tag === 'REVIEW';
+  const checkpointCopy = isCheckpoint ? getCheckpointPopoverCopy(lesson) : null;
   const [mainTitle, subTitle] = lesson.grammarFocus.split(' — ');
+
+  const title = checkpointCopy?.title ?? lesson.uiTitle ?? mainTitle;
+  const subtitle = isLocked
+    ? 'Complete todos os níveis acima pra desbloquear esse aqui!'
+    : checkpointCopy?.subtitle
+      ?? (lesson.uiTitle ? lesson.grammarFocus : subTitle || lesson.theme);
+
+  const startLabel = isLocked
+    ? 'Bloqueado'
+    : isCheckpoint
+      ? (isCompleted ? 'Refazer checkpoint' : checkpointCopy!.startLabel)
+      : (isCompleted ? 'Revisar' : 'Começar');
 
   return (
     <div
@@ -42,14 +57,10 @@ export function LessonNodePopover({
       />
 
       <h3 className="text-[17px] font-display font-extrabold mb-1.5 text-left text-text-primary leading-tight">
-        {lesson.uiTitle || mainTitle}
+        {title}
       </h3>
       <p className="text-xs font-semibold mb-4 leading-relaxed text-left text-text-muted">
-        {isLocked
-          ? 'Complete todos os níveis acima pra desbloquear esse aqui!'
-          : lesson.uiTitle
-            ? lesson.grammarFocus
-            : subTitle || lesson.theme}
+        {subtitle}
       </p>
 
       <button
@@ -59,12 +70,12 @@ export function LessonNodePopover({
           isLocked ? 'opacity-85 cursor-not-allowed' : 'active:scale-95'
         }`}
         style={{
-          backgroundColor: isLocked ? 'var(--color-surface-raised)' : isMission ? 'var(--color-vocab)' : 'var(--color-primary)',
+          backgroundColor: isLocked ? 'var(--color-surface-raised)' : isMission ? 'var(--color-vocab)' : isCheckpoint ? '#0d9488' : 'var(--color-primary)',
           color: isLocked ? 'var(--color-text-muted)' : 'var(--color-on-accent)',
-          boxShadow: isLocked ? 'none' : isMission ? '0 3px 0 var(--color-warning)' : '0 3px 0 var(--color-primary-dark)',
+          boxShadow: isLocked ? 'none' : isMission ? '0 3px 0 var(--color-warning)' : isCheckpoint ? '0 3px 0 #0f766e' : '0 3px 0 var(--color-primary-dark)',
         }}
       >
-        {isLocked ? 'Bloqueado' : isCompleted ? 'Revisar' : 'Começar'}
+        {startLabel}
       </button>
     </div>
   );

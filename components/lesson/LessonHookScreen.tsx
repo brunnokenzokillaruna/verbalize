@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
-import { Loader2, Volume2, VolumeX, MessageSquare } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Loader2, Volume2, VolumeX, MessageSquare, Eye } from 'lucide-react';
 import { ClickableSentence } from './ClickableSentence';
 import type { WordClickPayload } from './ClickableWord';
 
@@ -15,6 +15,7 @@ interface LessonHookScreenProps {
   playingLineIdx: number;
   onAudioButton: () => void;
   onWordClick: (payload: WordClickPayload) => void;
+  listenFirstEnabled?: boolean;
 }
 
 const SPEAKER_COLORS = {
@@ -37,8 +38,25 @@ export function LessonHookScreen({
   playingLineIdx,
   onAudioButton,
   onWordClick,
+  listenFirstEnabled = false,
 }: LessonHookScreenProps) {
   const lineRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [textRevealed, setTextRevealed] = useState(!listenFirstEnabled);
+  const [hasListenedOnce, setHasListenedOnce] = useState(false);
+
+  useEffect(() => {
+    if (isPlaying) setHasListenedOnce(true);
+    if (listenFirstEnabled && hasListenedOnce && !isPlaying) {
+      setTextRevealed(true);
+    }
+  }, [isPlaying, hasListenedOnce, listenFirstEnabled]);
+
+  function handleAudioClick() {
+    setHasListenedOnce(true);
+    onAudioButton();
+  }
+
+  const hideText = listenFirstEnabled && !textRevealed;
 
   useEffect(() => {
     if (playingLineIdx < 0) return;
@@ -75,7 +93,7 @@ export function LessonHookScreen({
 
         <button
           type="button"
-          onClick={onAudioButton}
+          onClick={handleAudioClick}
           disabled={isLoadingAudio}
           className={[
             'flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold',
@@ -97,10 +115,28 @@ export function LessonHookScreen({
           ) : (
             <Volume2 size={16} />
           )}
-          <span>{isPlaying ? 'Parar áudio' : isLoadingAudio ? 'Carregando…' : 'Ouvir diálogo'}</span>
+          <span>{isPlaying ? 'Parar áudio' : isLoadingAudio ? 'Carregando…' : listenFirstEnabled && !hasListenedOnce ? 'Ouvir diálogo completo' : 'Ouvir diálogo'}</span>
         </button>
+
+        {listenFirstEnabled && !textRevealed && (
+          <button
+            type="button"
+            onClick={() => setTextRevealed(true)}
+            className="flex items-center justify-center gap-2 rounded-xl border border-border bg-surface px-4 py-2 text-xs font-semibold text-text-muted"
+          >
+            <Eye size={14} />
+            Mostrar texto
+          </button>
+        )}
       </div>
 
+      {hideText ? (
+        <div className="rounded-2xl border border-dashed border-border bg-surface/50 px-6 py-10 text-center">
+          <p className="text-sm text-text-muted">
+            Ouça o diálogo completo para treinar a compreensão. O texto aparece depois.
+          </p>
+        </div>
+      ) : (
       <div className="relative flex flex-col gap-3 sm:gap-4">
         {lines.map((line, i) => {
           const match = line.match(/^([^:]+):\s*(.+)/);
@@ -211,6 +247,7 @@ export function LessonHookScreen({
           );
         })}
       </div>
+      )}
     </div>
   );
 }

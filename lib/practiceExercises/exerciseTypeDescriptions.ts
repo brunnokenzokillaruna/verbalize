@@ -13,6 +13,7 @@ export function buildTypeDescriptions(langLabel: string): Record<ExerciseTypeId,
    - "answer_mode": "replace" when the student only types the replacement word/phrase; "rewrite" when they must type the full corrected sentence (use for deletions, multi-word fixes, or redundant repetition like pronoun + noun).
    - When the fix is to REMOVE a word (e.g. redundant "du pain" after "en"), set answer_mode to "rewrite", correct_word to the removed span, and corrected_sentence to the full fixed sentence. NEVER leave correct_word empty and NEVER ask the student to leave the answer blank.
    - When the fix is to REPLACE one word, set answer_mode to "replace", correct_word to the replacement, and corrected_sentence to the full fixed sentence.
+   - FORBIDDEN for error-correction (use sentence-builder, grammar-trap, bridge-choice, or context-choice instead): errors that require MOVING words to a new position — e.g. COI/COD clitic placement ("je parle à lui" → "je lui parle"), negation word order ("je parle pas" → "je ne parle pas"), adverb repositioning. Highlighting error_word misleads the student when the fix is reordering, not substitution.
    - CRITICAL: "error_word" must appear EXACTLY ONCE in "sentence_with_error". If the natural context repeats the phrase (e.g. question + answer both with "du pain"), isolate ONLY the clause with the error — e.g. use "Oui, j'en ai du pain." instead of "Tu as du pain ? Oui, j'en ai du pain."
    - If error_word truly cannot be unique, set "error_span_start" to the 0-based character index where the erroneous occurrence begins.
    - "acceptable_answers" is an array of other valid corrected sentences or replacement words, or empty.`,
@@ -39,6 +40,13 @@ export function buildTypeDescriptions(langLabel: string): Record<ExerciseTypeId,
    - "options" (4 written transcriptions — 1 correct, 3 plausible but wrong).
    - "correctIndex" (0-based).
    - "translation" (PT-BR hint).`,
+    'listening-comprehension': `type "listening-comprehension":
+   - "dialogueAudio" (3-5 line ORIGINAL ${langLabel} dialogue using Speaker: line format — related to lesson theme, NOT copied from the lesson dialogue).
+   - "questionPt" (comprehension question in PT-BR about dialogue meaning, intent, or key detail).
+   - "options" (3 answer choices in PT-BR — 1 correct, 2 plausible distractors).
+   - "correctIndex" (0-based).
+   - "explanationPt" (short PT-BR explanation after answering).
+   - The student listens WITHOUT seeing the dialogue text — test comprehension, not transcription.`,
     'audio-dictation': `type "audio-dictation":
    - Short ORIGINAL sentence. "text" (${langLabel}), "translation" (PT-BR).`,
     'speak-repeat': `type "speak-repeat":

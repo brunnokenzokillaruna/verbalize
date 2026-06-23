@@ -1,5 +1,10 @@
-import type { ExerciseType } from '@/types';
+import type { ExerciseType, SupportedLanguage, ProficiencyLevel } from '@/types';
 import type { LucideIcon } from 'lucide-react';
+import type { ImmersionMode } from '@/lib/immersion';
+import {
+  shouldUseTargetLanguageInstructions,
+  EXERCISE_INSTRUCTIONS_TARGET,
+} from '@/lib/immersion';
 import {
   Braces,
   Ear,
@@ -105,6 +110,15 @@ export const EXERCISE_TYPE_META: Record<ExerciseType, ExerciseTypeMeta> = {
     accentBorder: 'rgba(219, 39, 119, 0.3)',
     variant: 'oral',
   },
+  'listening-comprehension': {
+    title: 'Compreensão auditiva',
+    instruction: 'Ouça o diálogo e responda sobre o significado.',
+    icon: Ear,
+    accent: 'var(--color-primary)',
+    accentBg: 'var(--color-primary-light)',
+    accentBorder: 'rgba(29, 94, 212, 0.3)',
+    variant: 'oral',
+  },
   'audio-dictation': {
     title: 'Ditado',
     instruction: 'Ouça e escreva o que você ouviu.',
@@ -199,6 +213,27 @@ export const EXERCISE_TYPE_META: Record<ExerciseType, ExerciseTypeMeta> = {
 
 export function getExerciseTypeMeta(type: ExerciseType): ExerciseTypeMeta {
   return EXERCISE_TYPE_META[type];
+}
+
+export interface ExerciseMetaContext {
+  language?: SupportedLanguage;
+  level?: ProficiencyLevel;
+  immersionMode?: ImmersionMode;
+}
+
+export function getExerciseTypeMetaWithContext(
+  type: ExerciseType,
+  ctx: ExerciseMetaContext = {},
+): ExerciseTypeMeta {
+  const base = EXERCISE_TYPE_META[type];
+  const { language, level, immersionMode = 'auto' } = ctx;
+  if (!language || !level) return base;
+  if (!shouldUseTargetLanguageInstructions(language, level, immersionMode)) return base;
+
+  const targetInstruction = EXERCISE_INSTRUCTIONS_TARGET[type]?.[language];
+  if (!targetInstruction) return base;
+
+  return { ...base, instruction: targetInstruction };
 }
 
 /** Decorative pattern per shell variant (CSS background) */

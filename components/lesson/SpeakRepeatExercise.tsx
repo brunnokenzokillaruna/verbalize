@@ -5,6 +5,8 @@ import { Mic, Square, Loader2, CheckCircle, XCircle, SkipForward, RefreshCw, Sen
 import { AudioPlayerButton } from './AudioPlayerButton';
 import { useVoiceRecorder } from '@/hooks/useVoiceRecorder';
 import { transcribeSpeech } from '@/app/actions/transcribeSpeech';
+import { incrementProductionStats } from '@/services/firestore';
+import { useAuthStore } from '@/store/authStore';
 import type { SpeakRepeatData, SupportedLanguage } from '@/types';
 
 interface SpeakRepeatExerciseProps {
@@ -50,6 +52,7 @@ export function SpeakRepeatExercise({
   setIsExerciseReady,
   submitTrigger
 }: SpeakRepeatExerciseProps) {
+  const { user } = useAuthStore();
   const threshold = strictMode ? 0.9 : 0.85;
   const recorder = useVoiceRecorder();
   const hasSpeechAPI = recorder.isSupported;
@@ -130,6 +133,7 @@ export function SpeakRepeatExercise({
 
   function submit(correct: boolean) {
     setPhase('answered');
+    if (user) incrementProductionStats(user.uid, 'oral', correct).catch(console.error);
     onAnswer(correct);
   }
 

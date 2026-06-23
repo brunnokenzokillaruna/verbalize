@@ -8,7 +8,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "Chegando no Aeroporto",
     "grammarFocus": "10 Maneiras de Dizer Hello",
-    "theme": "Tema 1: A Bordo do Avião e Aeroporto"
+    "theme": "Tema 1: A Bordo do Avião e Aeroporto",
+    "arcCharacters": { "learner": "Jake", "local": "Emma" },
+    "arcSummary": "Você chega a Londres de avião; Emma, uma britânica, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
   },
   {
     "id": "en-a1-002",
@@ -17,7 +19,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Lendo as Placas de Voo",
     "grammarFocus": "Pronomes Sujeitos Singulares (I, You, He, She, It)",
-    "theme": "Tema 1: A Bordo do Avião e Aeroporto"
+    "theme": "Tema 1: A Bordo do Avião e Aeroporto",
+    "arcCharacters": { "learner": "Jake", "local": "Emma" },
+    "arcSummary": "Você chega a Londres de avião; Emma, uma britânica, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
   },
   {
     "id": "en-a1-003",
@@ -26,7 +30,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "Despachando a Bagagem",
     "grammarFocus": "12 Maneiras de Dizer Thank you",
-    "theme": "Tema 1: A Bordo do Avião e Aeroporto"
+    "theme": "Tema 1: A Bordo do Avião e Aeroporto",
+    "arcCharacters": { "learner": "Jake", "local": "Emma" },
+    "arcSummary": "Você chega a Londres de avião; Emma, uma britânica, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
   },
   {
     "id": "en-a1-004",
@@ -35,7 +41,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "A Sala de Embarque",
     "grammarFocus": "8 Maneiras de Dizer You're Welcome",
-    "theme": "Tema 1: A Bordo do Avião e Aeroporto"
+    "theme": "Tema 1: A Bordo do Avião e Aeroporto",
+    "arcCharacters": { "learner": "Jake", "local": "Emma" },
+    "arcSummary": "Você chega a Londres de avião; Emma, uma britânica, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
   },
   {
     "id": "en-a1-005",
@@ -44,7 +52,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "PRON",
     "uiTitle": "O Portão Correto",
     "grammarFocus": "O Som do TH (Voiced /ð/ vs Voiceless /θ/)",
-    "theme": "Tema 1: A Bordo do Avião e Aeroporto"
+    "theme": "Tema 1: A Bordo do Avião e Aeroporto",
+    "arcCharacters": { "learner": "Jake", "local": "Emma" },
+    "arcSummary": "Você chega a Londres de avião; Emma, uma britânica, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
   },
   {
     "id": "en-a1-006",
@@ -53,7 +63,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "A Caminho da Aeronave",
     "grammarFocus": "10 Maneiras de Dizer How are you?",
-    "theme": "Tema 1: A Bordo do Avião e Aeroporto"
+    "theme": "Tema 1: A Bordo do Avião e Aeroporto",
+    "arcCharacters": { "learner": "Jake", "local": "Emma" },
+    "arcSummary": "Você chega a Londres de avião; Emma, uma britânica, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
   },
   {
     "id": "en-a1-007",
@@ -62,7 +74,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "PRON",
     "uiTitle": "Entrada e Recepção",
     "grammarFocus": "Vogais Curtas vs Longas (Sit/Seat, Ship/Sheep)",
-    "theme": "Tema 1: A Bordo do Avião e Aeroporto"
+    "theme": "Tema 1: A Bordo do Avião e Aeroporto",
+    "arcCharacters": { "learner": "Jake", "local": "Emma" },
+    "arcSummary": "Você chega a Londres de avião; Emma, uma britânica, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
   },
   {
     "id": "en-a1-008",
@@ -71,7 +85,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "Cumprimentando os Comissários",
     "grammarFocus": "12 Maneiras de Dizer I'm fine",
-    "theme": "Tema 1: A Bordo do Avião e Aeroporto"
+    "theme": "Tema 1: A Bordo do Avião e Aeroporto",
+    "arcCharacters": { "learner": "Jake", "local": "Emma" },
+    "arcSummary": "Você chega a Londres de avião; Emma, uma britânica, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
   },
   {
     "id": "en-a1-009",
@@ -80,16 +96,20 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "PRON",
     "uiTitle": "Guardando a Bagagem de Mão",
     "grammarFocus": "Sons das Consoantes V vs B",
-    "theme": "Tema 1: A Bordo do Avião e Aeroporto"
+    "theme": "Tema 1: A Bordo do Avião e Aeroporto",
+    "arcCharacters": { "learner": "Jake", "local": "Emma" },
+    "arcSummary": "Você chega a Londres de avião; Emma, uma britânica, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
   },
   {
     "id": "en-a1-010",
     "language": "en",
     "level": "A1",
-    "tag": "DIAL",
-    "uiTitle": "Avisos do Capitão no Rádio",
-    "grammarFocus": "10 Maneiras de Dizer Goodbye",
-    "theme": "Tema 1: A Bordo do Avião e Aeroporto"
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 1–10",
+    "grammarFocus": "Revisão: lições 1–10",
+    "theme": "Tema 1: A Bordo do Avião e Aeroporto",
+    "arcCharacters": { "learner": "Jake", "local": "Emma" },
+    "arcSummary": "Você chega a Londres de avião; Emma, uma britânica, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
   },
   {
     "id": "en-a1-011",
@@ -98,7 +118,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "PRON",
     "uiTitle": "Pousando em Londres",
     "grammarFocus": "Sílabas Tônicas e Ritmo do Inglês",
-    "theme": "Tema 1: A Bordo do Avião e Aeroporto"
+    "theme": "Tema 1: A Bordo do Avião e Aeroporto",
+    "arcCharacters": { "learner": "Jake", "local": "Emma" },
+    "arcSummary": "Você chega a Londres de avião; Emma, uma britânica, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
   },
   {
     "id": "en-a1-012",
@@ -107,7 +129,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "PRON",
     "uiTitle": "Saindo da Aeronave",
     "grammarFocus": "Letras Mudas (Knight, Wrist, Lamb)",
-    "theme": "Tema 1: A Bordo do Avião e Aeroporto"
+    "theme": "Tema 1: A Bordo do Avião e Aeroporto",
+    "arcCharacters": { "learner": "Jake", "local": "Emma" },
+    "arcSummary": "Você chega a Londres de avião; Emma, uma britânica, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
   },
   {
     "id": "en-a1-013",
@@ -116,7 +140,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "O Saguão de Desembarque",
     "grammarFocus": "To Be (ser/estar) — Presente Afirmativo",
-    "theme": "Tema 2: Rumo ao Hostel"
+    "theme": "Tema 2: Rumo ao Hostel",
+    "arcCharacters": { "learner": "Jake", "local": "Emma" },
+    "arcSummary": "Você chega a Londres de avião; Emma, uma britânica, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
   },
   {
     "id": "en-a1-014",
@@ -125,7 +151,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Puxando as Malas",
     "grammarFocus": "Pronomes Sujeitos Plurais (We, You, They)",
-    "theme": "Tema 2: Rumo ao Hostel"
+    "theme": "Tema 2: Rumo ao Hostel",
+    "arcCharacters": { "learner": "Jake", "local": "Emma" },
+    "arcSummary": "Você chega a Londres de avião; Emma, uma britânica, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
   },
   {
     "id": "en-a1-015",
@@ -134,7 +162,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Achando a Saída",
     "grammarFocus": "Números de 0 a 10",
-    "theme": "Tema 2: Rumo ao Hostel"
+    "theme": "Tema 2: Rumo ao Hostel",
+    "arcCharacters": { "learner": "Jake", "local": "Emma" },
+    "arcSummary": "Você chega a Londres de avião; Emma, uma britânica, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
   },
   {
     "id": "en-a1-016",
@@ -176,9 +206,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-a1-020",
     "language": "en",
     "level": "A1",
-    "tag": "DIAL",
-    "uiTitle": "Lendo Placas de Trânsito",
-    "grammarFocus": "Palavra Interrogativa: Where (Lugar)",
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 11–20",
+    "grammarFocus": "Revisão: lições 11–20",
     "theme": "Tema 2: Rumo ao Hostel"
   },
   {
@@ -266,9 +296,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-a1-030",
     "language": "en",
     "level": "A1",
-    "tag": "VOC",
-    "uiTitle": "Encontrando a Recepção",
-    "grammarFocus": "Cores Primárias (Colors)",
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 21–30",
+    "grammarFocus": "Revisão: lições 21–30",
     "theme": "Tema 3: Check-in e Apresentações"
   },
   {
@@ -356,9 +386,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-a1-040",
     "language": "en",
     "level": "A1",
-    "tag": "VOC",
-    "uiTitle": "Abrindo a Porta do Dormitório",
-    "grammarFocus": "Vocabulário: Well (Bem — usos básicos)",
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 31–40",
+    "grammarFocus": "Revisão: lições 31–40",
     "theme": "Tema 3: Check-in e Apresentações"
   },
   {
@@ -446,9 +476,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-a1-050",
     "language": "en",
     "level": "A1",
-    "tag": "GRAM",
-    "uiTitle": "Chamando a Atendente",
-    "grammarFocus": "Pergunta no Simple Present (Do/Does)",
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 41–50",
+    "grammarFocus": "Revisão: lições 41–50",
     "theme": "Tema 4: O Primeiro Café da Manhã"
   },
   {
@@ -536,9 +566,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-a1-060",
     "language": "en",
     "level": "A1",
-    "tag": "DIAL",
-    "uiTitle": "Encontrando Sua Cor",
-    "grammarFocus": "10 Maneiras de Dizer Sorry",
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 51–60",
+    "grammarFocus": "Revisão: lições 51–60",
     "theme": "Tema 5: Compras na Oxford Street"
   },
   {
@@ -626,9 +656,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-a1-070",
     "language": "en",
     "level": "A1",
-    "tag": "VOC",
-    "uiTitle": "As Sacolas Pesadas",
-    "grammarFocus": "Preposições: In Front of, Behind, Between",
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 61–70",
+    "grammarFocus": "Revisão: lições 61–70",
     "theme": "Tema 5: Compras na Oxford Street"
   },
   {
@@ -716,9 +746,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-a1-080",
     "language": "en",
     "level": "A1",
-    "tag": "GRAM",
-    "uiTitle": "O Monumento de Longe",
-    "grammarFocus": "Adjetivos Possessivos: My, Your, His, Her",
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 71–80",
+    "grammarFocus": "Revisão: lições 71–80",
     "theme": "Tema 6: Passeando e Explorando"
   },
   {
@@ -806,9 +836,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-a1-090",
     "language": "en",
     "level": "A1",
-    "tag": "VERB",
-    "uiTitle": "De Onde Você Vem?",
-    "grammarFocus": "Verbo Play (Jogar/Brincar) — Presente",
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 81–90",
+    "grammarFocus": "Revisão: lições 81–90",
     "theme": "Tema 7: Novas Amizades e A Família"
   },
   {
@@ -896,9 +926,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-a1-100",
     "language": "en",
     "level": "A1",
-    "tag": "GRAM",
-    "uiTitle": "A Despedida Rápida",
-    "grammarFocus": "Par de Confusão: Say VS Tell",
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 91–100",
+    "grammarFocus": "Revisão: lições 91–100",
     "theme": "Tema 7: Novas Amizades e A Família"
   },
   {
@@ -986,9 +1016,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-a1-110",
     "language": "en",
     "level": "A1",
-    "tag": "VERB",
-    "uiTitle": "Esclarecendo Posições",
-    "grammarFocus": "Verbo Buy (Comprar) — Presente",
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 101–110",
+    "grammarFocus": "Revisão: lições 101–110",
     "theme": "Tema 8: Emergências e Resolução de Problemas"
   },
   {
@@ -1076,9 +1106,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-a2-120",
     "language": "en",
     "level": "A2",
-    "tag": "VERB",
-    "uiTitle": "Indo à Luta",
-    "grammarFocus": "Modal Verb: Must (Obrigação Forte)",
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 111–120",
+    "grammarFocus": "Revisão: lições 111–120",
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
@@ -1166,9 +1196,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-a2-130",
     "language": "en",
     "level": "A2",
-    "tag": "GRAM",
-    "uiTitle": "Começando a Rotina",
-    "grammarFocus": "Pronomes Indefinidos: Something, Anything, Nothing",
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 121–130",
+    "grammarFocus": "Revisão: lições 121–130",
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
@@ -1256,9 +1286,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-a2-140",
     "language": "en",
     "level": "A2",
-    "tag": "GRAM",
-    "uiTitle": "Estoque Semanal",
-    "grammarFocus": "Adjetivos Superlativos (The -est)",
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 131–140",
+    "grammarFocus": "Revisão: lições 131–140",
     "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
@@ -1346,9 +1376,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-a2-150",
     "language": "en",
     "level": "A2",
-    "tag": "GRAM",
-    "uiTitle": "Organização",
-    "grammarFocus": "Par de Confusão: Make VS Do",
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 141–150",
+    "grammarFocus": "Revisão: lições 141–150",
     "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
@@ -1436,9 +1466,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-a2-160",
     "language": "en",
     "level": "A2",
-    "tag": "VERB",
-    "uiTitle": "Detalhes Escondidos",
-    "grammarFocus": "Verbos Irregulares (Bring, Buy, Catch, Choose)",
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 151–160",
+    "grammarFocus": "Revisão: lições 151–160",
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
@@ -1526,9 +1556,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-a2-170",
     "language": "en",
     "level": "A2",
-    "tag": "EXPR",
-    "uiTitle": "O Critério Principal",
-    "grammarFocus": "5 Expressões com o verbo Be (Be tired, Be hungry)",
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 161–170",
+    "grammarFocus": "Revisão: lições 161–170",
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
@@ -1616,9 +1646,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-a2-180",
     "language": "en",
     "level": "A2",
-    "tag": "GRAM",
-    "uiTitle": "Tudo Certo",
-    "grammarFocus": "Par de Confusão: Speak VS Talk",
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 171–180",
+    "grammarFocus": "Revisão: lições 171–180",
     "theme": "Tema 12: Expressando Opiniões e Comparações"
   },
   {
@@ -1706,9 +1736,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-a2-190",
     "language": "en",
     "level": "A2",
-    "tag": "DIAL",
-    "uiTitle": "O Som da Natureza",
-    "grammarFocus": "8 Maneiras de Expressar Sentimento e Afeto",
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 181–190",
+    "grammarFocus": "Revisão: lições 181–190",
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
@@ -1794,9 +1824,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
   },
   {
     "level": "A2",
-    "tag": "PRON",
-    "uiTitle": "Word Stress Patterns",
-    "grammarFocus": "Word Stress: Two-Syllable Nouns vs Verbs",
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 191–200",
+    "grammarFocus": "Revisão: lições 191–200",
     "theme": "Tema 14: Rotina do Escritório e da Cidade",
     "language": "en",
     "id": "en-a2-200"
@@ -1884,9 +1914,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
   },
   {
     "level": "A2",
-    "tag": "VOC",
-    "uiTitle": "Opening an Account",
-    "grammarFocus": "Vocabulary: Bank, Account, Sort Code and GP Registration",
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 201–210",
+    "grammarFocus": "Revisão: lições 201–210",
     "theme": "Tema 15: Saúde e Farmácia",
     "language": "en",
     "id": "en-a2-210"
@@ -1974,9 +2004,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
   },
   {
     "level": "A2",
-    "tag": "GRAM",
-    "uiTitle": "Artigo Zero",
-    "grammarFocus": "Zero Article: I like music vs I like the music",
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 211–220",
+    "grammarFocus": "Revisão: lições 211–220",
     "theme": "Tema 15: Saúde e Farmácia",
     "language": "en",
     "id": "en-a2-220"
@@ -2066,9 +2096,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-b1-230",
     "language": "en",
     "level": "B1",
-    "tag": "GRAM",
-    "uiTitle": "As Regras de Ouro",
-    "grammarFocus": "Will VS Going to (Decisões espontâneas vs Planos)",
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 221–230",
+    "grammarFocus": "Revisão: lições 221–230",
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
@@ -2156,9 +2186,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-b1-240",
     "language": "en",
     "level": "B1",
-    "tag": "GRAM",
-    "uiTitle": "Relato Final",
-    "grammarFocus": "Orações Temporais: When VS While",
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 231–240",
+    "grammarFocus": "Revisão: lições 231–240",
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
@@ -2246,9 +2276,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-b1-250",
     "language": "en",
     "level": "B1",
-    "tag": "EXPR",
-    "uiTitle": "A Panela Fervendo",
-    "grammarFocus": "5 Expressões com Take (Take care, Take a break)",
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 241–250",
+    "grammarFocus": "Revisão: lições 241–250",
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
@@ -2336,9 +2366,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-b1-260",
     "language": "en",
     "level": "B1",
-    "tag": "GRAM",
-    "uiTitle": "Encerrando a Manhã",
-    "grammarFocus": "Par de Confusão: Since VS For (Tempo)",
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 251–260",
+    "grammarFocus": "Revisão: lições 251–260",
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
@@ -2426,9 +2456,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-b1-270",
     "language": "en",
     "level": "B1",
-    "tag": "CULT",
-    "uiTitle": "O E Se...",
-    "grammarFocus": "Redação: Redes Sociais e Sociedade",
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 261–270",
+    "grammarFocus": "Revisão: lições 261–270",
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
@@ -2516,9 +2546,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-b1-280",
     "language": "en",
     "level": "B1",
-    "tag": "EXPR",
-    "uiTitle": "Tudo em Paz",
-    "grammarFocus": "5 Expressões sobre Clima (It's pouring, Under the weather)",
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 271–280",
+    "grammarFocus": "Revisão: lições 271–280",
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
@@ -2606,9 +2636,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-b1-290",
     "language": "en",
     "level": "B1",
-    "tag": "DIAL",
-    "uiTitle": "As Perguntas do Recrutador",
-    "grammarFocus": "10 Maneiras de Dizer Goodbye (B1)",
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 281–290",
+    "grammarFocus": "Revisão: lições 281–290",
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
@@ -2696,9 +2726,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-b1-300",
     "language": "en",
     "level": "B1",
-    "tag": "VERB",
-    "uiTitle": "A Oferta Chega",
-    "grammarFocus": "Phrasal Verb: Put on, Put off, Put away",
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 291–300",
+    "grammarFocus": "Revisão: lições 291–300",
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
@@ -2786,9 +2816,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-b1-310",
     "language": "en",
     "level": "B1",
-    "tag": "GRAM",
-    "uiTitle": "Diferença Aparente",
-    "grammarFocus": "Par de Confusão: Present Perfect VS Simple Past",
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 301–310",
+    "grammarFocus": "Revisão: lições 301–310",
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
@@ -2876,9 +2906,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-b1-320",
     "language": "en",
     "level": "B1",
-    "tag": "VERB",
-    "uiTitle": "Partindo para a Próxima",
-    "grammarFocus": "Question Tags Avançados (You'd come, wouldn't you?)",
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 311–320",
+    "grammarFocus": "Revisão: lições 311–320",
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
@@ -2966,9 +2996,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-b2-330",
     "language": "en",
     "level": "B2",
-    "tag": "VERB",
-    "uiTitle": "Dúvidas Corrosivas",
-    "grammarFocus": "3ª Condicional (If I had known, I would have...)",
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 321–330",
+    "grammarFocus": "Revisão: lições 321–330",
     "theme": "Tema 21: O Mundo das Emoções"
   },
   {
@@ -3056,9 +3086,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-b2-340",
     "language": "en",
     "level": "B2",
-    "tag": "VERB",
-    "uiTitle": "Delegando com Clareza",
-    "grammarFocus": "Discurso Indireto: Reported Wh-Questions",
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 331–340",
+    "grammarFocus": "Revisão: lições 331–340",
     "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
@@ -3146,9 +3176,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-b2-350",
     "language": "en",
     "level": "B2",
-    "tag": "VERB",
-    "uiTitle": "O Relatório de Performance",
-    "grammarFocus": "Voz Passiva Avançada (Will be done, Has been done)",
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 341–350",
+    "grammarFocus": "Revisão: lições 341–350",
     "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
@@ -3236,9 +3266,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-b2-360",
     "language": "en",
     "level": "B2",
-    "tag": "EXPR",
-    "uiTitle": "No Salão de Leitura",
-    "grammarFocus": "5 Expressões com Run (Run out of, Run into)",
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 351–360",
+    "grammarFocus": "Revisão: lições 351–360",
     "theme": "Tema 23: Literatura e Situações Hipotéticas"
   },
   {
@@ -3326,9 +3356,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-b2-370",
     "language": "en",
     "level": "B2",
-    "tag": "EXPR",
-    "uiTitle": "Pisando em Ovos",
-    "grammarFocus": "Walking on eggshells (Expressões Idiomáticas)",
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 361–370",
+    "grammarFocus": "Revisão: lições 361–370",
     "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
@@ -3416,9 +3446,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-b2-380",
     "language": "en",
     "level": "B2",
-    "tag": "GRAM",
-    "uiTitle": "Omitindo Palavras",
-    "grammarFocus": "Inglês Falado: Omissões em ambientes informais (Seen John?)",
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 371–380",
+    "grammarFocus": "Revisão: lições 371–380",
     "theme": "Tema 24: Debates Culturais e Cívicos"
   },
   {
@@ -3506,9 +3536,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-c1-390",
     "language": "en",
     "level": "C1",
-    "tag": "VERB",
-    "uiTitle": "Orações Clivadas",
-    "grammarFocus": "Orações Clivadas para Ênfase (It was John who...)",
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 381–390",
+    "grammarFocus": "Revisão: lições 381–390",
     "theme": "Tema 25: Oratória e Expressões Elevadas"
   },
   {
@@ -3596,9 +3626,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-c1-400",
     "language": "en",
     "level": "C1",
-    "tag": "MISS",
-    "uiTitle": "Revisão Geral C1",
-    "grammarFocus": "Revisão Geral C1",
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 391–400",
+    "grammarFocus": "Revisão: lições 391–400",
     "theme": "Tema 26: O Inglês das Ruas e o Formal"
   },
   {
@@ -3686,9 +3716,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-c1-410",
     "language": "en",
     "level": "C1",
-    "tag": "CULT",
-    "uiTitle": "Gírias e Coloquialismos",
-    "grammarFocus": "Inglês Informal Contemporâneo (Lit, Vibe, Ghosting)",
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 401–410",
+    "grammarFocus": "Revisão: lições 401–410",
     "theme": "Tema 26: O Inglês das Ruas e o Formal"
   },
   {
@@ -3776,9 +3806,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-c2-420",
     "language": "en",
     "level": "C2",
-    "tag": "CULT",
-    "uiTitle": "O Ensaio Literário",
-    "grammarFocus": "Ensaio Literário e Persuasão C2",
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 411–420",
+    "grammarFocus": "Revisão: lições 411–420",
     "theme": "Tema 27: Geopolítica e Filosofia"
   },
   {
@@ -3866,9 +3896,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-c2-430",
     "language": "en",
     "level": "C2",
-    "tag": "CULT",
-    "uiTitle": "Cinema e Crítica",
-    "grammarFocus": "Análise de Crítica Cinematográfica",
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 421–430",
+    "grammarFocus": "Revisão: lições 421–430",
     "theme": "Tema 28: Literatura Clássica e Análise Textual"
   },
   {
@@ -3956,9 +3986,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-c2-440",
     "language": "en",
     "level": "C2",
-    "tag": "CULT",
-    "uiTitle": "A Retórica Anglo-Saxã",
-    "grammarFocus": "Argumentação no Estilo Acadêmico Inglês",
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 431–440",
+    "grammarFocus": "Revisão: lições 431–440",
     "theme": "Tema 29: Debate Formal e Retórica"
   },
   {

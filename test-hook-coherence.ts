@@ -1,11 +1,14 @@
 /**
  * Manual regression script for dialogue coherence (key-on-door scenario).
- * Run: npx tsx test-hook-coherence.ts
+ * Run: ALLOW_GEMINI_INTEGRATION=1 npx tsx test-hook-coherence.ts
  *
  * Requires GEMINI_API_KEY in .env.local
  */
+import { assertGeminiIntegrationAllowed } from './lib/geminiDevGuard';
 import { generateHook } from './app/actions/generateHook';
 import { validateDialogueCoherence } from './lib/validateDialogueCoherence';
+
+assertGeminiIntegrationAllowed();
 
 const BAD_DIALOGUE = `Julia: Oh non, j'ai oublié ma clé sur la porte !
 Victor: Bah, j'attends ici pendant que tu la cherches.

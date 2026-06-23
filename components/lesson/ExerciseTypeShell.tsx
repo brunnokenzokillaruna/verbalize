@@ -1,11 +1,15 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import type { ExerciseType } from '@/types';
+import type { ExerciseType, SupportedLanguage, ProficiencyLevel } from '@/types';
+import type { ImmersionMode } from '@/lib/immersion';
 import {
-  getExerciseTypeMeta,
+  getExerciseTypeMetaWithContext,
   SHELL_VARIANT_STYLES,
 } from '@/lib/exerciseTypeMeta';
+import { HelpCircle } from 'lucide-react';
+import { shouldUseTargetLanguageInstructions } from '@/lib/immersion';
+import { EXERCISE_TYPE_META } from '@/lib/exerciseTypeMeta';
 
 interface ExerciseTypeShellProps {
   type: ExerciseType;
@@ -14,6 +18,9 @@ interface ExerciseTypeShellProps {
   hideInstruction?: boolean;
   /** Hide type header when parent already shows session header */
   hideHeader?: boolean;
+  language?: SupportedLanguage;
+  level?: ProficiencyLevel;
+  immersionMode?: ImmersionMode;
 }
 
 export function ExerciseTypeShell({
@@ -21,8 +28,17 @@ export function ExerciseTypeShell({
   children,
   hideInstruction = false,
   hideHeader = false,
+  language,
+  level,
+  immersionMode = 'auto',
 }: ExerciseTypeShellProps) {
-  const meta = getExerciseTypeMeta(type);
+  const meta = getExerciseTypeMetaWithContext(type, { language, level, immersionMode });
+  const ptInstruction = EXERCISE_TYPE_META[type].instruction;
+  const showImmersionTooltip =
+    language &&
+    level &&
+    shouldUseTargetLanguageInstructions(language, level, immersionMode) &&
+    meta.instruction !== ptInstruction;
   const shell = SHELL_VARIANT_STYLES[meta.variant];
   const Icon = meta.icon;
 
@@ -52,10 +68,21 @@ export function ExerciseTypeShell({
             </span>
             {!hideInstruction && (
               <p
-                className="text-sm font-medium leading-snug"
+                className="text-sm font-medium leading-snug flex items-start gap-1.5"
                 style={{ color: 'var(--color-text-secondary)' }}
               >
-                {meta.instruction}
+                <span>{meta.instruction}</span>
+                {showImmersionTooltip && (
+                  <span className="relative group shrink-0 mt-0.5">
+                    <HelpCircle size={14} className="text-text-muted" aria-hidden />
+                    <span
+                      role="tooltip"
+                      className="pointer-events-none absolute left-1/2 -translate-x-1/2 top-full mt-1.5 z-10 w-48 rounded-lg border border-border bg-surface px-2.5 py-1.5 text-[11px] font-medium text-text-secondary opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity shadow-sm"
+                    >
+                      {ptInstruction}
+                    </span>
+                  </span>
+                )}
               </p>
             )}
           </div>
@@ -117,14 +144,20 @@ interface ExerciseSessionHeaderProps {
   type: ExerciseType;
   exerciseIndex: number;
   total: number;
+  language?: SupportedLanguage;
+  level?: ProficiencyLevel;
+  immersionMode?: ImmersionMode;
 }
 
 export function ExerciseSessionHeader({
   type,
   exerciseIndex,
   total,
+  language,
+  level,
+  immersionMode = 'auto',
 }: ExerciseSessionHeaderProps) {
-  const meta = getExerciseTypeMeta(type);
+  const meta = getExerciseTypeMetaWithContext(type, { language, level, immersionMode });
   const Icon = meta.icon;
   const progress = Math.round(((exerciseIndex + 1) / total) * 100);
 

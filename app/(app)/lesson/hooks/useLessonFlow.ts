@@ -7,7 +7,8 @@ import { getPreviousTopics } from '@/lib/curriculum';
 import { generateGrammarBridge } from '@/app/actions/generateGrammarBridge';
 import { generatePracticeExercises } from '@/app/actions/generatePracticeExercises';
 import { getVerbConjugation } from '@/app/actions/getVerbConjugation';
-import { logLesson, updateLessonStats, upsertVocabularyItem } from '@/services/firestore';
+import { logLesson, updateLessonStats, upsertVocabularyItem, saveLessonMistake, updateUser } from '@/services/firestore';
+import { sessionHasProduction } from '@/lib/practiceExercises/productionTypes';
 import { assemblePracticeSession, injectImageMatchIntoPool } from '@/utils/assemblePracticeExercises';
 import { buildImageMatchFromLessonVocab } from '@/utils/imageMatchBuilder';
 import type { GrammarBridgeResult, Exercise, LessonTag } from '@/types';
@@ -22,6 +23,7 @@ const LESSON_FLOW: Record<LessonTag, LessonPhase[]> = {
   VERB: ['vocabulary', 'hook', 'grammar',   'practice', 'complete'],
   EXPR: ['vocabulary', 'hook', 'grammar',   'practice', 'complete'],
   CULT: ['vocabulary', 'hook', 'grammar',   'practice', 'complete'],
+  REVIEW: ['briefing', 'comprehension', 'production', 'debrief', 'complete'],
 };
 
 export function getInitialPhase(tag: LessonTag): LessonPhase {
@@ -105,9 +107,68 @@ export function useLessonFlow({
       merged = injectImageMatchIntoPool(merged, imageMatchForPool);
     }
 
+    if (merged.length === 0) {
+      console.error('[useLessonFlow] Empty practice session — staying on grammar phase');
+      store.setIsLoading(false);
+      return;
+    }
+
+    if (!sessionHasProduction(merged)) {
+      devLog('[useLessonFlow] Warning: practice session has no production exercise after assembly');
+    }
+
     store.setExercises(merged);
     store.setPhase('practice');
   }, [store, exercisesPrefetchRef, fetchAiExercises, buildClientExercises]);
+
+  const advanceFromBriefing = useCallback(() => {
+    if (!store.lesson) return;
+    store.setPhase('comprehension');
+  }, [store]);
+
+  const advanceFromComprehension = useCallback(() => {
+    if (!store.lesson || !store.checkpointSession) return;
+    const total = store.checkpointSession.comprehensionQuestions.length;
+    if (store.comprehensionIndex < total - 1) {
+      store.nextComprehensionQuestion();
+      return;
+    }
+    store.setExercises(store.checkpointSession.productionExercises);
+    store.setPhase('production');
+  }, [store]);
+
+  const advanceFromCheckpointProduction = useCallback(() => {
+    if (!store.lesson || !store.checkpointSession) return;
+    const total = store.checkpointSession.productionExercises.length;
+    if (store.checkpointProductionIndex < total - 1) {
+      store.nextCheckpointProduction();
+      return;
+    }
+
+    const compTotal = store.checkpointSession.comprehensionQuestions.length;
+    const prodTotal = store.checkpointSession.productionExercises.length;
+    const compPass = store.comprehensionCorrect >= Math.ceil(compTotal / 2);
+    const prodPass = store.checkpointProductionCorrect >= Math.ceil(prodTotal / 2);
+    const passed = compPass && prodPass;
+    store.setCheckpointPassed(passed);
+
+    if (!passed && user && store.lesson) {
+      saveLessonMistake(
+        user.uid,
+        store.lesson.language,
+        store.lesson.grammarFocus,
+        `Checkpoint reprovado: compreensão ${store.comprehensionCorrect}/${compTotal}, produção ${store.checkpointProductionCorrect}/${prodTotal}`,
+        store.lesson.id,
+        store.lesson.level,
+      ).catch(console.error);
+    }
+
+    store.setPhase('debrief');
+  }, [store, user]);
+
+  const advanceFromDebrief = useCallback(() => {
+    store.setPhase('complete');
+  }, [store]);
 
   const advanceFromIntro = useCallback(() => {
     if (!store.lesson) return;
@@ -173,7 +234,46 @@ export function useLessonFlow({
   }, [store, grammarBridgePrefetchRef, advanceFromGrammar]);
 
   const finishLesson = useCallback(async () => {
-    if (!user || !store.lesson || !store.hook) return;
+    if (!user || !store.lesson) return;
+
+    const persistScenarioSummary = (summary: string) => {
+      const trimmed = summary.trim().slice(0, 240);
+      if (!trimmed) return;
+      updateUser(user.uid, { lastScenarioSummary: trimmed }).catch(console.error);
+      if (profile) {
+        setProfile({ ...profile, lastScenarioSummary: trimmed });
+      }
+    };
+
+    if (store.lesson.tag === 'REVIEW') {
+      const compTotal = store.checkpointSession?.comprehensionQuestions.length ?? 0;
+      const prodTotal = store.checkpointSession?.productionExercises.length ?? 0;
+      const totalItems = compTotal + prodTotal;
+      const correctItems = store.comprehensionCorrect + store.checkpointProductionCorrect;
+      const score = totalItems > 0 ? Math.min(Math.round((correctItems / totalItems) * 100), 100) : 0;
+
+      logLesson({
+        uid: user.uid,
+        lessonId: store.lesson.id,
+        language: store.lesson.language,
+        score,
+      }).catch(console.error);
+
+      if (profile) {
+        updateLessonStats(user.uid, profile, store.lesson.id, store.lesson.language)
+          .then((updates) => setProfile({ ...profile, ...updates }))
+          .catch(console.error);
+      }
+
+      const reviewSummary =
+        store.checkpointSession?.briefing ??
+        store.lesson.uiTitle ??
+        '';
+      persistScenarioSummary(reviewSummary);
+      return;
+    }
+
+    if (!store.hook) return;
     const total = store.exercises.length;
     const score = total > 0 ? Math.min(Math.round((store.correctCount / total) * 100), 100) : 0;
 
@@ -198,8 +298,29 @@ export function useLessonFlow({
       upsertVocabularyItem(user.uid, word, translation, language, imageUrl, wordType).catch(console.error);
     });
 
+    store.hook.newChunks?.forEach((chunk) => {
+      upsertVocabularyItem(
+        user.uid,
+        chunk.phrase,
+        chunk.translation,
+        language,
+        undefined,
+        'noun',
+        chunk.entryType,
+      ).catch(console.error);
+    });
+
     if (store.hook.verbWord) {
       getVerbConjugation(store.hook.verbWord, language).catch(console.error);
+    }
+
+    if (store.lesson.tag === 'MISS') {
+      const missSummary =
+        store.missionBriefing?.scenario ??
+        store.hook.dialogue.split('\n').slice(0, 2).join(' ') ??
+        store.lesson.uiTitle ??
+        '';
+      persistScenarioSummary(missSummary);
     }
   }, [user, profile, store, setProfile]);
 
@@ -241,6 +362,10 @@ export function useLessonFlow({
     advanceFromGrammar,
     advanceFromPhonetics,
     advanceFromRolePlay,
+    advanceFromBriefing,
+    advanceFromComprehension,
+    advanceFromCheckpointProduction,
+    advanceFromDebrief,
     finishLesson,
     skipLesson,
     exitLesson,

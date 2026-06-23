@@ -46,6 +46,7 @@ Rules for breaks:
       JUDGE_SYSTEM,
       512,
       0,
+      'standard',
     );
 
     const score = typeof raw?.score === 'number'

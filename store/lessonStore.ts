@@ -8,21 +8,26 @@ import type {
   LessonMistakeDocument,
   MissionBriefingResult,
   TranslateWordResult,
+  CheckpointSessionResult,
 } from '@/types';
 
 export type LessonPhase =
   | 'idle'
   | 'loading'
-  | 'intro'      // shown while AI generates in background
+  | 'intro'
   | 'vocabulary'
   | 'hook'
-  | 'role-play'  // MISS only — replaces hook, user speaks their lines
-  | 'phonetics'  // PRON only — after hook
-  | 'mission'    // MISS only — before vocabulary
+  | 'role-play'
+  | 'phonetics'
+  | 'mission'
   | 'grammar'
   | 'practice'
-  | 'review'     // mistake review — after practice, before complete
-  | 'complete';
+  | 'review'
+  | 'complete'
+  | 'briefing'
+  | 'comprehension'
+  | 'production'
+  | 'debrief';
 
 interface LessonState {
   // Context
@@ -65,6 +70,21 @@ interface LessonState {
 
   /** True when the grammar bridge retention quiz was answered correctly. */
   bridgeQuizPassed: boolean;
+
+  /** REVIEW checkpoint session content */
+  checkpointSession: CheckpointSessionResult | null;
+  comprehensionIndex: number;
+  comprehensionCorrect: number;
+  checkpointProductionIndex: number;
+  checkpointProductionCorrect: number;
+  checkpointPassed: boolean;
+
+  setCheckpointSession: (session: CheckpointSessionResult) => void;
+  recordComprehensionAnswer: (correct: boolean) => void;
+  nextComprehensionQuestion: () => void;
+  recordCheckpointProduction: (correct: boolean) => void;
+  nextCheckpointProduction: () => void;
+  setCheckpointPassed: (passed: boolean) => void;
 
   // ── Actions ────────────────────────────────────────────────────────────────
 
@@ -137,6 +157,12 @@ export const useLessonStore = create<LessonState>((set, get) => ({
   rolePlayComplete: false,
   isLoading: false,
   bridgeQuizPassed: false,
+  checkpointSession: null,
+  comprehensionIndex: 0,
+  comprehensionCorrect: 0,
+  checkpointProductionIndex: 0,
+  checkpointProductionCorrect: 0,
+  checkpointPassed: false,
 
   // ── Actions ────────────────────────────────────────────────────────────────
 
@@ -166,6 +192,12 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       rolePlayComplete: false,
       isLoading: true,
       bridgeQuizPassed: false,
+      checkpointSession: null,
+      comprehensionIndex: 0,
+      comprehensionCorrect: 0,
+      checkpointProductionIndex: 0,
+      checkpointProductionCorrect: 0,
+      checkpointPassed: false,
     }),
 
   setPhase: (phase) => set({ phase }),
@@ -213,7 +245,27 @@ export const useLessonStore = create<LessonState>((set, get) => ({
         : { ...state.wordTooltips, [key]: result },
     })),
 
-  setExercises: (exercises) => set({ exercises, isLoading: false }),
+  setExercises: (exercises) => set({ exercises, exerciseIndex: 0, correctCount: 0, isLoading: false }),
+
+  setCheckpointSession: (checkpointSession) => set({ checkpointSession, isLoading: false }),
+
+  recordComprehensionAnswer: (correct) =>
+    set((state) => ({
+      comprehensionCorrect: state.comprehensionCorrect + (correct ? 1 : 0),
+    })),
+
+  nextComprehensionQuestion: () =>
+    set((state) => ({ comprehensionIndex: state.comprehensionIndex + 1 })),
+
+  recordCheckpointProduction: (correct) =>
+    set((state) => ({
+      checkpointProductionCorrect: state.checkpointProductionCorrect + (correct ? 1 : 0),
+    })),
+
+  nextCheckpointProduction: () =>
+    set((state) => ({ checkpointProductionIndex: state.checkpointProductionIndex + 1 })),
+
+  setCheckpointPassed: (checkpointPassed) => set({ checkpointPassed }),
 
   recordCorrect: () =>
     set((state) => ({ correctCount: state.correctCount + 1 })),
@@ -268,5 +320,11 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       rolePlayComplete: false,
       isLoading: false,
       bridgeQuizPassed: false,
+      checkpointSession: null,
+      comprehensionIndex: 0,
+      comprehensionCorrect: 0,
+      checkpointProductionIndex: 0,
+      checkpointProductionCorrect: 0,
+      checkpointPassed: false,
     }),
 }));

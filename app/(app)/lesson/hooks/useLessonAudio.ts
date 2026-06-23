@@ -1,7 +1,9 @@
 import { devLog } from '@/lib/devLog';
 import { useState, useRef, useEffect } from 'react';
+import { synthesizeDialogueGemini } from '@/app/actions/synthesizeGeminiTts';
 import { synthesizeDialogue } from '@/app/actions/synthesizeSpeech';
 import { synthesizeDialogueElevenLabs } from '@/app/actions/synthesizeElevenLabs';
+import { getPlaybackRateForLevel } from '@/lib/immersion';
 import type { SupportedLanguage, HookResult, LessonDefinition } from '@/types';
 
 /**
@@ -9,12 +11,13 @@ import type { SupportedLanguage, HookResult, LessonDefinition } from '@/types';
  *
  * Provider priority:
  *   1. ElevenLabs (if ELEVENLABS_API_KEY is set server-side)
- *   2. Google Cloud TTS (original fallback)
+ *   2. Gemini Flash TTS — multi-speaker, 1 API call (separate TTS quota)
+ *   3. Google Cloud TTS (last resort)
  *
  * Caching strategy (two layers — zero wasted credits on replay):
- *   • Server-side: in-memory Map in synthesizeElevenLabs.ts keyed by
- *     (text + voiceId + language). Survives across requests within the
- *     same server process / warm Vercel function.
+ *   • Server-side: in-memory Maps in synthesizeElevenLabs.ts /
+ *     synthesizeGeminiTts.ts. Survives across requests within the same
+ *     server process / warm Vercel function.
  *   • Client-side: `cachedChunksRef` below — once audio is fetched for
  *     the current dialogue, pressing "play" again never hits the server.
  */
@@ -22,6 +25,7 @@ export function useLessonAudio(
   phase: string,
   lesson: LessonDefinition | null,
   hook: HookResult | null | undefined,
+  dialogueOverride?: string | null,
 ) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [playingLineIdx, setPlayingLineIdx] = useState(-1);
@@ -29,6 +33,8 @@ export function useLessonAudio(
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const cachedChunksRef = useRef<string[] | null>(null);
+  const audioMimeRef = useRef<'audio/mpeg' | 'audio/wav'>('audio/mpeg');
+  const monolithicAudioRef = useRef(false);
   const lastHookRef = useRef<HookResult | null | undefined>(null);
   const playSessionRef = useRef(0);
   const fetchPromiseRef = useRef<Promise<string[]> | null>(null);
@@ -58,12 +64,13 @@ export function useLessonAudio(
       if (session !== playSessionRef.current) return;
       if (i >= chunks.length) { setIsPlaying(false); setPlayingLineIdx(-1); return; }
 
-      setPlayingLineIdx(i);
+      if (!monolithicAudioRef.current) setPlayingLineIdx(i);
       audio.onended = () => setTimeout(() => playIndex(i + 1), 300);
       audio.onerror = () => {
         if (session === playSessionRef.current) { setIsPlaying(false); setPlayingLineIdx(-1); }
       };
-      audio.src = `data:audio/mp3;base64,${chunks[i]}`;
+      audio.src = `data:${audioMimeRef.current};base64,${chunks[i]}`;
+      if (lesson) audio.playbackRate = getPlaybackRateForLevel(lesson.level);
       audio.play().catch(() => {
         if (session === playSessionRef.current) { setIsPlaying(false); setPlayingLineIdx(-1); }
       });
@@ -73,8 +80,7 @@ export function useLessonAudio(
   }
 
   /**
-   * Fetches dialogue audio — tries ElevenLabs first, falls back to Google TTS
-   * when ElevenLabs is unavailable or returns fewer lines than expected.
+   * Fetches dialogue audio — ElevenLabs → Gemini TTS → Google Cloud TTS.
    * Results are cached client-side in `cachedChunksRef` so replays are instant.
    */
   async function fetchDialogueAudio(lines: string[], language: SupportedLanguage): Promise<string[]> {
@@ -84,6 +90,8 @@ export function useLessonAudio(
     try {
       const elChunks = await synthesizeDialogueElevenLabs(lines, language);
       if (elChunks.length === expectedLines) {
+        audioMimeRef.current = 'audio/mpeg';
+        monolithicAudioRef.current = false;
         devLog(
           '%c🎙️ [Audio Provider] SUCCESS: ElevenLabs premium dialogue voices generated successfully! ✓',
           'color: #10b981; font-weight: bold; background-color: #ecfdf5; padding: 4px 8px; border-radius: 4px; border: 1px solid #a7f3d0;'
@@ -92,34 +100,64 @@ export function useLessonAudio(
       }
       if (elChunks.length > 0) {
         console.warn(
-          `[useLessonAudio] ElevenLabs partial failure (${elChunks.length}/${expectedLines} lines), falling back to Google TTS`,
+          `[useLessonAudio] ElevenLabs partial failure (${elChunks.length}/${expectedLines} lines), trying Gemini TTS`,
         );
       }
     } catch (err) {
-      console.warn('[useLessonAudio] ElevenLabs failed, falling back to Google TTS:', err);
+      console.warn('[useLessonAudio] ElevenLabs failed, trying Gemini TTS:', err);
     }
 
-    // 2️⃣ Fallback to Google Cloud TTS
+    // 2️⃣ Try Gemini Flash TTS (1 multi-speaker call — separate model quota)
+    try {
+      const geminiResult = await synthesizeDialogueGemini(lines, language);
+      if (geminiResult && geminiResult.chunks.length > 0) {
+        audioMimeRef.current = geminiResult.mimeType;
+        monolithicAudioRef.current = geminiResult.monolithic;
+        devLog(
+          '%c🎙️ [Audio Provider] SUCCESS: Gemini Flash TTS dialogue generated (1 API call) ✓',
+          'color: #059669; font-weight: bold; background-color: #ecfdf5; padding: 4px 8px; border-radius: 4px; border: 1px solid #a7f3d0;'
+        );
+        return geminiResult.chunks;
+      }
+    } catch (err) {
+      console.warn('[useLessonAudio] Gemini TTS failed, falling back to Google Cloud TTS:', err);
+    }
+
+    // 3️⃣ Last resort — Google Cloud TTS
+    audioMimeRef.current = 'audio/mpeg';
+    monolithicAudioRef.current = false;
     devLog(
-      '%c🎙️ [Audio Provider] FALLBACK: ElevenLabs unavailable or disabled. Using Google TTS (Studio/Chirp voices) instead.',
+      '%c🎙️ [Audio Provider] FALLBACK: Using Google Cloud TTS (Studio/Chirp voices).',
       'color: #d97706; font-weight: bold; background-color: #fffbeb; padding: 4px 8px; border-radius: 4px; border: 1px solid #fef3c7;'
     );
     return synthesizeDialogue(lines, language);
   }
 
-  // Clear client cache and reset when a new lesson / hook is loaded
-  if (hook !== lastHookRef.current) {
-    cachedChunksRef.current = null;
-    fetchPromiseRef.current = null;
-    lastHookRef.current = hook;
-    stopAudio();
+  function getDialogueLines(): string[] {
+    if (phase === 'comprehension' && dialogueOverride?.trim()) {
+      return dialogueOverride.split('\n').filter((l) => l.trim().length > 0);
+    }
+    if (!hook) return [];
+    return hook.dialogue.split('\n').filter((l) => l.trim().length > 0);
   }
 
-  // Background Prefetching Effect - runs as soon as hook & lesson are available (e.g. in vocabulary phase)
-  useEffect(() => {
-    if (!hook || !lesson) return;
+  // Clear client cache and reset when dialogue source changes
+  const dialogueKey = dialogueOverride ?? hook?.dialogue ?? '';
+  if (dialogueKey !== lastHookRef.current?.dialogue) {
+    if (dialogueOverride || hook) {
+      cachedChunksRef.current = null;
+      fetchPromiseRef.current = null;
+      audioMimeRef.current = 'audio/mpeg';
+      monolithicAudioRef.current = false;
+      lastHookRef.current = hook ?? ({ dialogue: dialogueOverride ?? '' } as HookResult);
+      stopAudio();
+    }
+  }
 
-    const lines = hook.dialogue.split('\n').filter((l: string) => l.trim().length > 0);
+  // Background Prefetching Effect
+  useEffect(() => {
+    const lines = getDialogueLines();
+    if (lines.length === 0 || !lesson) return;
     const language = lesson.language;
 
     if (!fetchPromiseRef.current && !cachedChunksRef.current) {
@@ -138,11 +176,13 @@ export function useLessonAudio(
           return [];
         });
     }
-  }, [hook, lesson]);
+  }, [hook, lesson, phase, dialogueOverride]);
 
   function handleAudioButton() {
     if (isPlaying) { stopAudio(); return; }
-    if (!hook || !lesson) return;
+    if (!lesson) return;
+    const lines = getDialogueLines();
+    if (lines.length === 0) return;
 
     if (cachedChunksRef.current) {
       devLog(

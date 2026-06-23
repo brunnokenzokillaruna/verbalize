@@ -1,3 +1,5 @@
+import { PRACTICE_EXERCISE_COUNT } from '@/lib/practiceExercises/constants';
+import { isProductionExerciseType } from '@/lib/practiceExercises/productionTypes';
 import type { Exercise, ExerciseType } from '@/types';
 
 const TAG_EXCLUSIVE_TYPES: ExerciseType[] = [
@@ -27,6 +29,38 @@ function hasValidVariety(exercises: Exercise[]): boolean {
   return true;
 }
 
+/** Ensures the sole production exercise is not dropped during variety enforcement. */
+export function protectProductionSlot(
+  exercises: Exercise[],
+  requiredType: ExerciseType | null,
+): Exercise[] {
+  if (!requiredType || exercises.length === 0) return exercises;
+
+  const productionIndices = exercises
+    .map((ex, i) => (ex.type === requiredType || isProductionExerciseType(ex.type) ? i : -1))
+    .filter((i) => i >= 0);
+
+  if (productionIndices.length !== 1) return exercises;
+
+  return exercises;
+}
+
+/** Move production exercise to last slot (after receptive drills). */
+export function pinProductionLast(
+  exercises: Exercise[],
+  productionType: ExerciseType | null,
+): Exercise[] {
+  if (!productionType || exercises.length <= 1) return exercises;
+
+  const idx = exercises.findIndex((ex) => ex.type === productionType);
+  if (idx <= 0 || idx === exercises.length - 1) return exercises;
+
+  const result = [...exercises];
+  const [production] = result.splice(idx, 1);
+  result.push(production);
+  return result;
+}
+
 /** Ensures tag-exclusive exercise stays at index 0. */
 export function pinTagExclusiveFirst(
   exercises: Exercise[],
@@ -49,16 +83,31 @@ export function enforceVariety(
   exercises: Exercise[],
   allowedTypes: ExerciseType[],
   tagExclusive: ExerciseType | null = null,
+  minCount = PRACTICE_EXERCISE_COUNT,
+  protectedProductionType: ExerciseType | null = null,
 ): Exercise[] {
   if (exercises.length === 0) return exercises;
 
   let result = pinTagExclusiveFirst(exercises, tagExclusive);
 
-  // Drop duplicates beyond MAX_SAME_TYPE (never drop index 0 if tag-exclusive)
+  if (result.length < minCount) {
+    return result;
+  }
+
   const typeCounts = new Map<ExerciseType, number>();
   result = result.filter((ex, i) => {
     const count = typeCounts.get(ex.type) ?? 0;
-    if (count >= MAX_SAME_TYPE) return false;
+    if (count >= MAX_SAME_TYPE) {
+      if (
+        protectedProductionType &&
+        ex.type === protectedProductionType &&
+        result.filter((e) => e.type === protectedProductionType).length === 1
+      ) {
+        typeCounts.set(ex.type, count + 1);
+        return true;
+      }
+      return false;
+    }
     if (i === 0 && tagExclusive && ex.type === tagExclusive) {
       typeCounts.set(ex.type, count + 1);
       return true;
@@ -79,7 +128,7 @@ export function enforceVariety(
   for (let i = result.length - 1; i >= 0 && unusedTypes.length > 0; i--) {
     const ex = result[i];
     if (i === 0 && tagExclusive && ex.type === tagExclusive) continue;
-    if ((counts.get(ex.type) ?? 0) > MAX_SAME_TYPE) {
+    if ((counts.get(ex.type) ?? 0) > MAX_SAME_TYPE && result.length > minCount) {
       result.splice(i, 1);
       counts.set(ex.type, (counts.get(ex.type) ?? 1) - 1);
     }

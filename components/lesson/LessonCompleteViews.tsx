@@ -26,6 +26,23 @@ export function LessonCompleteViews({ onExit }: LessonCompleteViewsProps) {
     );
   }
 
+  if (store.lesson?.tag === 'REVIEW' && store.checkpointSession) {
+    const compTotal = store.checkpointSession.comprehensionQuestions.length;
+    const prodTotal = store.checkpointSession.productionExercises.length;
+    const totalExercises = compTotal + prodTotal;
+    const correctExercises =
+      store.comprehensionCorrect + store.checkpointProductionCorrect;
+
+    return (
+      <LessonCompleteScreen
+        totalExercises={totalExercises}
+        correctExercises={correctExercises}
+        newVocabulary={store.hook?.newVocabulary ?? []}
+        onExit={onExit}
+      />
+    );
+  }
+
   return (
     <LessonCompleteScreen
       totalExercises={store.exercises.length}

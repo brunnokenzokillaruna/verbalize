@@ -16,11 +16,13 @@ import { ImageMatchExercise } from './ImageMatchExercise';
 import { WordBankTranslation } from './WordBankTranslation';
 import { BridgeChoiceExercise } from './BridgeChoiceExercise';
 import { ListenAndSelectExercise } from './ListenAndSelectExercise';
+import { ListeningComprehensionExercise } from './ListeningComprehensionExercise';
 import {
   ExerciseSessionHeader,
   ExerciseTypeShell,
 } from './ExerciseTypeShell';
-import type { Exercise, LessonTag, SupportedLanguage } from '@/types';
+import type { Exercise, LessonTag, ProficiencyLevel, SupportedLanguage } from '@/types';
+import type { ImmersionMode } from '@/lib/immersion';
 
 interface LessonPracticeScreenProps {
   exercises: Exercise[];
@@ -28,6 +30,8 @@ interface LessonPracticeScreenProps {
   currentExercise: Exercise;
   exerciseAnswer: boolean | null;
   language: SupportedLanguage;
+  level?: ProficiencyLevel;
+  immersionMode?: ImmersionMode;
   lessonTag?: LessonTag;
   onAnswer: (correct: boolean) => void;
   setIsExerciseReady: (ready: boolean) => void;
@@ -52,6 +56,8 @@ export function LessonPracticeScreen({
   currentExercise,
   exerciseAnswer,
   language,
+  level,
+  immersionMode = 'auto',
   lessonTag,
   onAnswer,
   setIsExerciseReady,
@@ -102,6 +108,15 @@ export function LessonPracticeScreen({
             {...common}
           />
         );
+      case 'listening-comprehension':
+        return (
+          <ListeningComprehensionExercise
+            data={currentExercise.data}
+            language={language}
+            level={level}
+            {...common}
+          />
+        );
       case 'speak-repeat':
         return (
           <SpeakRepeatExercise
@@ -148,9 +163,18 @@ export function LessonPracticeScreen({
         type={currentExercise.type}
         exerciseIndex={exerciseIndex}
         total={exercises.length}
+        language={language}
+        level={level}
+        immersionMode={immersionMode}
       />
 
-      <ExerciseTypeShell type={currentExercise.type} hideHeader>
+      <ExerciseTypeShell
+        type={currentExercise.type}
+        hideHeader
+        language={language}
+        level={level}
+        immersionMode={immersionMode}
+      >
         {renderExerciseBody()}
       </ExerciseTypeShell>
     </div>

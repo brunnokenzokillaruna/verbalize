@@ -3,6 +3,8 @@ import { ChevronDown, Loader2, Languages, Lightbulb, XCircle } from 'lucide-reac
 import type { ReverseTranslationData } from '@/types';
 import { isAccentOnlyDiff } from '@/utils/accent';
 import { validateReverseTranslation } from '@/app/actions/validateAnswer';
+import { incrementProductionStats } from '@/services/firestore';
+import { useAuthStore } from '@/store/authStore';
 
 interface ReverseTranslationInputProps {
   data: ReverseTranslationData;
@@ -31,6 +33,12 @@ export function ReverseTranslationInput({
   setIsExerciseReady,
   submitTrigger
 }: ReverseTranslationInputProps) {
+  const { user } = useAuthStore();
+
+  function reportProduction(correct: boolean) {
+    if (user) incrementProductionStats(user.uid, 'freeWrite', correct).catch(console.error);
+    onAnswer(correct);
+  }
   const [input, setInput] = useState('');
   const [hintOpen, setHintOpen] = useState(false);
   const [answerStatus, setAnswerStatus] = useState<AnswerStatus>('idle');
@@ -70,13 +78,13 @@ export function ReverseTranslationInput({
 
     if (isCorrect) {
       setAnswerStatus('correct');
-      onAnswer(true);
+      reportProduction(true);
       return;
     }
 
     if (isAccentWarning) {
       setAnswerStatus('accent-warning');
-      onAnswer(true);
+      reportProduction(true);
       return;
     }
 
@@ -86,15 +94,16 @@ export function ReverseTranslationInput({
       data.target_translation,
       data.portuguese_sentence,
       language,
+      data.acceptable_variants,
     );
 
     if (result.accepted) {
       setAnswerStatus('correct');
-      onAnswer(true);
+      reportProduction(true);
     } else {
       setAiNote(result.note);
       setAnswerStatus('wrong');
-      onAnswer(false);
+      reportProduction(false);
     }
   }
 

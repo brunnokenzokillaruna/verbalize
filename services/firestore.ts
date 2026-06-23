@@ -10,11 +10,13 @@ import {
   getDocs,
   addDoc,
   serverTimestamp,
+  runTransaction,
   type DocumentData,
   Timestamp,
 } from 'firebase/firestore';
 import { getDb } from './firebase';
-import type { UserDocument, UserVocabularyDocument, ImageCacheDocument, VerbDocument, LessonMistakeDocument, PregeneratedLessonDocument, SupportedLanguage, ProficiencyLevel } from '@/types';
+import { SEPARATE_PASSIVE_SRS, PREGEN_SCHEMA_VERSION } from '@/lib/practiceExercises/constants';
+import type { UserDocument, UserVocabularyDocument, ImageCacheDocument, VerbDocument, LessonMistakeDocument, PregeneratedLessonDocument, SupportedLanguage, ProficiencyLevel, LessonLogDocument } from '@/types';
 import { calculateNextReview } from '@/lib/srs';
 import { getNextLessonId, getLessonsForLanguage } from '@/lib/curriculum';
 import {
@@ -257,7 +259,13 @@ export async function upsertVocabularyItem(
   language: SupportedLanguage,
   imageUrl?: string,
   wordType?: 'verb' | 'noun',
+  entryType?: UserVocabularyDocument['entryType'],
 ): Promise<void> {
+  if (SEPARATE_PASSIVE_SRS) {
+    await recordPassiveEncounter(uid, word, translation, language, imageUrl, wordType, entryType);
+    return;
+  }
+
   const q = query(
     collection(await getDb(), 'user_vocabulary'),
     where('uid', '==', uid),
@@ -276,6 +284,7 @@ export async function upsertVocabularyItem(
       translation,
       ...(imageUrl && { imageUrl }),
       ...(wordType && { wordType }),
+      ...(entryType && { entryType }),
       srsLevel: newLevel,
       mistakeCount: 0,
       firstSeen: serverTimestamp(),
@@ -297,6 +306,140 @@ export async function upsertVocabularyItem(
       ...(translation && translation !== word && { translation }),
     });
   }
+}
+
+/** Passive exposure — does not advance SRS when SEPARATE_PASSIVE_SRS is enabled. */
+export async function recordPassiveEncounter(
+  uid: string,
+  word: string,
+  translation: string,
+  language: SupportedLanguage,
+  imageUrl?: string,
+  wordType?: 'verb' | 'noun',
+  entryType?: UserVocabularyDocument['entryType'],
+): Promise<void> {
+  const q = query(
+    collection(await getDb(), 'user_vocabulary'),
+    where('uid', '==', uid),
+    where('language', '==', language),
+    where('word', '==', word),
+  );
+  const snap = await getDocs(q);
+
+  if (snap.empty) {
+    await addDoc(collection(await getDb(), 'user_vocabulary'), {
+      uid,
+      language,
+      word,
+      translation,
+      ...(imageUrl && { imageUrl }),
+      ...(wordType && { wordType }),
+      ...(entryType && { entryType }),
+      knowledgeMode: 'passive',
+      encounterCount: 1,
+      productionCount: 0,
+      srsLevel: 0,
+      mistakeCount: 0,
+      firstSeen: serverTimestamp(),
+      lastReview: serverTimestamp(),
+      nextReview: Timestamp.fromDate(new Date()),
+    });
+    return;
+  }
+
+  const docRef = snap.docs[0].ref;
+  const existing = snap.docs[0].data() as UserVocabularyDocument;
+  await updateDoc(docRef, {
+    encounterCount: (existing.encounterCount ?? 0) + 1,
+    ...(imageUrl && { imageUrl }),
+    ...(translation && translation !== word && { translation }),
+    ...(entryType && !existing.entryType && { entryType }),
+  });
+}
+
+/** Active production success — advances SRS. */
+export async function recordActiveSuccess(
+  uid: string,
+  word: string,
+  language: SupportedLanguage,
+): Promise<void> {
+  const q = query(
+    collection(await getDb(), 'user_vocabulary'),
+    where('uid', '==', uid),
+    where('language', '==', language),
+    where('word', '==', word),
+  );
+  const snap = await getDocs(q);
+  if (snap.empty) return;
+
+  const docRef = snap.docs[0].ref;
+  const existing = snap.docs[0].data() as UserVocabularyDocument;
+  const { newLevel, nextReview } = calculateNextReview(existing.srsLevel, true);
+  await updateDoc(docRef, {
+    srsLevel: newLevel,
+    knowledgeMode: 'active',
+    productionCount: (existing.productionCount ?? 0) + 1,
+    lastReview: serverTimestamp(),
+    nextReview: Timestamp.fromDate(nextReview),
+  });
+}
+
+export async function incrementProductionStats(
+  uid: string,
+  kind: 'oral' | 'freeWrite',
+  accepted: boolean,
+): Promise<void> {
+  const userRef = doc(await getDb(), 'users', uid);
+  const snap = await getDoc(userRef);
+  if (!snap.exists()) return;
+
+  const profile = snap.data() as UserDocument;
+  const stats = profile.productionStats ?? {
+    oralAttempts: 0,
+    oralAccepted: 0,
+    freeWriteAttempts: 0,
+    freeWriteAccepted: 0,
+  };
+
+  const next = { ...stats };
+  if (kind === 'oral') {
+    next.oralAttempts += 1;
+    if (accepted) next.oralAccepted += 1;
+  } else {
+    next.freeWriteAttempts += 1;
+    if (accepted) next.freeWriteAccepted += 1;
+  }
+
+  await updateDoc(userRef, {
+    productionStats: { ...next, lastUpdated: serverTimestamp() },
+  });
+}
+
+export interface RecentLessonStats {
+  lessonsLast7Days: number;
+  averageScoreLast7Days: number;
+}
+
+export async function getRecentLessonStats(uid: string): Promise<RecentLessonStats> {
+  const weekAgo = new Date();
+  weekAgo.setDate(weekAgo.getDate() - 7);
+
+  const q = query(
+    collection(await getDb(), 'lesson_logs'),
+    where('uid', '==', uid),
+  );
+  const snap = await getDocs(q);
+  const recent = snap.docs
+    .map((d) => d.data() as LessonLogDocument)
+    .filter((log) => log.completedAt?.toDate?.() >= weekAgo);
+
+  const lessonsLast7Days = recent.length;
+  const averageScoreLast7Days =
+    lessonsLast7Days > 0
+      ? Math.round(recent.reduce((sum, l) => sum + l.score, 0) / lessonsLast7Days)
+      : 0;
+
+  return { lessonsLast7Days, averageScoreLast7Days };
 }
 
 // ─── Lesson Log ───────────────────────────────────────────────────────────────
@@ -644,16 +787,41 @@ function pregeneratedDocId(uid: string, lessonId: string) {
   return `${uid}_${lessonId}`;
 }
 
+const PREGEN_GENERATING_TIMEOUT_MS = 5 * 60 * 1000;
+
+function pregenCreatedAtMs(createdAt: PregeneratedLessonDocument['createdAt']): number {
+  if (!createdAt) return 0;
+  if (typeof createdAt.toMillis === 'function') return createdAt.toMillis();
+  return (createdAt.seconds ?? 0) * 1000;
+}
+
 /**
- * Stores a pre-generated lesson placeholder to mark that pregeneration is active.
+ * Atomically claims pregeneration for a lesson. Returns false when another
+ * process is already generating (and not timed out) or the cache is ready.
  */
-export async function startPregeneratingLesson(uid: string, lessonId: string): Promise<void> {
+export async function tryStartPregeneratingLesson(uid: string, lessonId: string): Promise<boolean> {
+  const db = await getDb();
   const id = pregeneratedDocId(uid, lessonId);
-  await setDoc(doc(await getDb(), 'lesson_pregen', id), {
-    uid,
-    lessonId,
-    status: 'generating',
-    createdAt: serverTimestamp(),
+  const ref = doc(db, 'lesson_pregen', id);
+
+  return runTransaction(db, async (tx) => {
+    const snap = await tx.get(ref);
+    if (snap.exists()) {
+      const data = snap.data() as PregeneratedLessonDocument;
+      if (data.status === 'ready') return false;
+      if (data.status === 'generating') {
+        const age = Date.now() - pregenCreatedAtMs(data.createdAt);
+        if (age < PREGEN_GENERATING_TIMEOUT_MS) return false;
+      }
+    }
+
+    tx.set(ref, {
+      uid,
+      lessonId,
+      status: 'generating',
+      createdAt: serverTimestamp(),
+    });
+    return true;
   });
 }
 
@@ -666,18 +834,20 @@ export async function startPregeneratingLesson(uid: string, lessonId: string): P
 export async function savePregeneratedLesson(
   uid: string,
   lessonId: string,
-  payload: Pick<PregeneratedLessonDocument, 'hook' | 'grammarBridge' | 'exercises' | 'missionBriefing'>,
+  payload: Pick<PregeneratedLessonDocument, 'hook' | 'grammarBridge' | 'exercises' | 'missionBriefing' | 'checkpointSession'>,
 ): Promise<void> {
   const id = pregeneratedDocId(uid, lessonId);
   const data = stripUndefinedDeep({
     uid,
     lessonId,
     status: 'ready' as const,
+    schemaVersion: PREGEN_SCHEMA_VERSION,
     hook: payload.hook,
     createdAt: serverTimestamp(),
     ...(payload.grammarBridge ? { grammarBridge: payload.grammarBridge } : {}),
     ...(payload.exercises && payload.exercises.length > 0 ? { exercises: payload.exercises } : {}),
     ...(payload.missionBriefing ? { missionBriefing: payload.missionBriefing } : {}),
+    ...(payload.checkpointSession ? { checkpointSession: payload.checkpointSession } : {}),
   });
   await setDoc(doc(await getDb(), 'lesson_pregen', id), data);
 }

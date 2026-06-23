@@ -1,18 +1,14 @@
 'use server';
 
-import { callGeminiJSON } from '@/services/gemini';
+import { similarity, normalizeText } from '@/components/lesson/mission-roleplay/utils';
 import type { SupportedLanguage } from '@/types';
-
-const LANG_LABEL: Record<SupportedLanguage, string> = {
-  fr: 'French',
-  en: 'English',
-};
 
 interface EvaluateFreeResponseParams {
   transcript: string;
   intent: string;
   language: SupportedLanguage;
-  previousContext: string[]; // Last few lines of dialogue to provide context
+  previousContext: string[];
+  expectedLine?: string;
 }
 
 export interface EvaluateFreeResponseResult {
@@ -22,39 +18,75 @@ export interface EvaluateFreeResponseResult {
   error?: string;
 }
 
+const PT_STOP_WORDS = new Set([
+  'a', 'o', 'e', 'de', 'da', 'do', 'em', 'um', 'uma', 'que', 'se', 'na', 'no',
+  'para', 'por', 'com', 'como', 'voce', 'você', 'eu', 'ele', 'ela', 'isso', 'diga',
+  'dizer', 'fale', 'peça', 'peca', 'pergunte', 'sugira', 'the', 'to', 'and',
+]);
+
+function extractKeywords(text: string): string[] {
+  return normalizeText(text)
+    .split(' ')
+    .filter((w) => w.length > 3 && !PT_STOP_WORDS.has(w));
+}
+
+function evaluateLocally(params: EvaluateFreeResponseParams): EvaluateFreeResponseResult {
+  const transcript = params.transcript.trim();
+  if (!transcript || transcript.length < 2) {
+    return {
+      isCorrect: false,
+      feedback: 'Não ouvimos sua fala. Tente falar mais perto do microfone.',
+    };
+  }
+
+  if (params.expectedLine) {
+    const score = similarity(params.expectedLine, transcript);
+    if (score >= 0.55) {
+      return {
+        isCorrect: true,
+        feedback: score >= 0.75 ? 'Perfeito! Comunicou a ideia muito bem.' : 'Boa! A ideia ficou clara.',
+      };
+    }
+    if (score >= 0.4) {
+      return {
+        isCorrect: true,
+        feedback: 'Quase lá — a ideia passou, mas dá para polir a frase.',
+        correctedSentence: params.expectedLine,
+      };
+    }
+  }
+
+  const intentKeywords = extractKeywords(params.intent);
+  const transcriptNorm = normalizeText(transcript);
+  const keywordHits = intentKeywords.filter((kw) => transcriptNorm.includes(kw)).length;
+  const keywordRatio = intentKeywords.length > 0 ? keywordHits / intentKeywords.length : 0;
+
+  if (keywordRatio >= 0.35 || transcript.split(/\s+/).length >= 3) {
+    return {
+      isCorrect: true,
+      feedback: 'Boa! Você se comunicou de forma clara.',
+      correctedSentence: params.expectedLine,
+    };
+  }
+
+  return {
+    isCorrect: false,
+    feedback: 'A resposta não parece comunicar a intenção. Ouça de novo e tente outra formulação.',
+    correctedSentence: params.expectedLine,
+  };
+}
+
 export async function evaluateFreeResponse(
-  params: EvaluateFreeResponseParams
+  params: EvaluateFreeResponseParams,
 ): Promise<EvaluateFreeResponseResult> {
-  const prompt = `You are a strict but fair language teacher evaluating a student's spoken response in ${LANG_LABEL[params.language]}.
-
-CONTEXT (previous dialogue lines):
-${params.previousContext.join('\n') || '(Start of conversation)'}
-
-STUDENT'S INTENT (what they were supposed to say in PT-BR):
-"${params.intent}"
-
-STUDENT'S ACTUAL TRANSCRIPT (what the speech-to-text heard in ${LANG_LABEL[params.language]}):
-"${params.transcript}"
-
-EVALUATION TASK:
-1. Determine if the student's transcript successfully and naturally communicates the required intent in ${LANG_LABEL[params.language]}.
-2. Minor grammar mistakes (like wrong gender or slight misconjugation) are acceptable IF the intent is perfectly clear and it's a typical intermediate learner mistake.
-3. If the transcript makes no sense, is the wrong language, or completely misses the intent, it is INCORRECT.
-4. Provide a very short, encouraging feedback in PT-BR (max 2 sentences).
-5. If there are mistakes or a much more natural way to say it, provide the "correctedSentence" in ${LANG_LABEL[params.language]}.
-
-Return ONLY a JSON object with this exact structure:
-{
-  "isCorrect": boolean,
-  "feedback": "string",
-  "correctedSentence": "string" // optional
-}`;
-
   try {
-    const result = await callGeminiJSON<EvaluateFreeResponseResult>(prompt, 'You are an expert language evaluator. Return ONLY valid JSON.');
-    return result;
+    return evaluateLocally(params);
   } catch (err) {
     console.error('[evaluateFreeResponse] Error:', err);
-    return { isCorrect: false, feedback: 'Houve um erro ao analisar sua resposta. Tente novamente.', error: 'EVALUATION_FAILED' };
+    return {
+      isCorrect: false,
+      feedback: 'Houve um erro ao analisar sua resposta. Tente novamente.',
+      error: 'EVALUATION_FAILED',
+    };
   }
 }

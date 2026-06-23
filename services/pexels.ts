@@ -4,6 +4,7 @@ interface PexelsPhoto {
   src: {
     large2x: string;
     large: string;
+    medium: string;
   };
   photographer: string;
   alt: string | null;
@@ -31,16 +32,27 @@ export async function searchPexels(
     orientation: 'landscape',
   });
 
-  const res = await fetch(`https://api.pexels.com/v1/search?${params}`, {
-    headers: { Authorization: apiKey },
-    // Cache for 1 hour at the edge — Pexels results for the same keyword rarely change
-    next: { revalidate: 3600 },
-  });
+  let res: Response | null = null;
 
-  if (!res.ok) {
-    console.error(`[Pexels] API error ${res.status} for keyword: "${keyword}"`);
-    return null;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    res = await fetch(`https://api.pexels.com/v1/search?${params}`, {
+      headers: { Authorization: apiKey },
+      // Cache for 1 hour at the edge — Pexels results for the same keyword rarely change
+      next: { revalidate: 3600 },
+    });
+
+    if (res.ok) break;
+
+    const retryable = res.status === 429 || res.status >= 500;
+    if (!retryable || attempt === 2) {
+      console.error(`[Pexels] API error ${res.status} for keyword: "${keyword}"`);
+      return null;
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 400 * (attempt + 1)));
   }
+
+  if (!res?.ok) return null;
 
   const data: PexelsResponse = await res.json();
   const photo = data.photos?.[0];
@@ -51,7 +63,7 @@ export async function searchPexels(
   }
 
   return {
-    imageUrl: photo.src.large2x || photo.src.large,
+    imageUrl: photo.src.large || photo.src.medium || photo.src.large2x,
     photographer: photo.photographer,
   };
 }

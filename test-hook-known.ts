@@ -1,4 +1,7 @@
+import { assertGeminiIntegrationAllowed } from './lib/geminiDevGuard';
 import { generateHook } from './app/actions/generateHook';
+
+assertGeminiIntegrationAllowed();
 
 async function test() {
   const result = await generateHook({
@@ -9,7 +12,7 @@ async function test() {
     theme: 'Tema 3: Check-in e Apresentações',
     uiTitle: 'Pegando a Chave',
     grammarFocus: 'Vocabulário: Bon',
-    knownVocabulary: ['bon', 'jour', 'merci', 'oui'] // Add bon here!
+    knownVocabulary: ['bon', 'jour', 'merci', 'oui'],
   });
 
   console.log('Result:', JSON.stringify(result, null, 2));

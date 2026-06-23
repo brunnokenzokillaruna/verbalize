@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useCallback, useRef } from 'react';
+import { useEffect, useCallback, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { useAuthStore } from '@/store/authStore';
@@ -36,16 +36,36 @@ export default function LessonPage() {
   const { play: playSound, isMuted, toggleMute } = useSoundEffects();
 
   const playCompletionSound = useCallback(() => {
+    if (store.lesson?.tag === 'REVIEW' && store.checkpointSession) {
+      const compTotal = store.checkpointSession.comprehensionQuestions.length;
+      const prodTotal = store.checkpointSession.productionExercises.length;
+      const total = compTotal + prodTotal;
+      const correct = store.comprehensionCorrect + store.checkpointProductionCorrect;
+      playSound(total > 0 && correct >= total ? 'perfect' : 'complete');
+      return;
+    }
     const total = store.exercises.length;
     const isPerfect = total > 0 && store.correctCount >= total;
     playSound(isPerfect ? 'perfect' : 'complete');
-  }, [store.exercises.length, store.correctCount, playSound]);
+  }, [
+    store.lesson?.tag,
+    store.checkpointSession,
+    store.comprehensionCorrect,
+    store.checkpointProductionCorrect,
+    store.exercises.length,
+    store.correctCount,
+    playSound,
+  ]);
 
   const { isPlaying, playingLineIdx, isLoadingAudio, handleAudioButton } = useLessonAudio(
     store.phase,
     store.lesson,
     store.hook,
+    store.checkpointSession?.dialogueAudio,
   );
+
+  const [comprehensionAnswered, setComprehensionAnswered] = useState(false);
+  const [comprehensionLastCorrect, setComprehensionLastCorrect] = useState<boolean | null>(null);
 
   const exitingRef = useRef(false);
   const lessonInitiatedRef = useRef(false);
@@ -66,6 +86,10 @@ export default function LessonPage() {
     advanceFromGrammar,
     advanceFromPhonetics,
     advanceFromRolePlay,
+    advanceFromBriefing,
+    advanceFromComprehension,
+    advanceFromCheckpointProduction,
+    advanceFromDebrief,
     finishLesson,
     exitLesson,
   } = useLessonFlow({
@@ -100,7 +124,13 @@ export default function LessonPage() {
     handleReviewAnswer,
     handleContinue,
     handleReviewContinue,
-  } = useLessonExerciseHandlers(user, playSound, playCompletionSound, finishLesson);
+  } = useLessonExerciseHandlers(
+    user,
+    playSound,
+    playCompletionSound,
+    finishLesson,
+    advanceFromCheckpointProduction,
+  );
 
   function handleRetry() {
     setHookError(false);
@@ -128,18 +158,52 @@ export default function LessonPage() {
       case 'role-play':
         advanceFromRolePlay();
         break;
+      case 'briefing':
+        advanceFromBriefing();
+        break;
+      case 'comprehension':
+        if (comprehensionAnswered) {
+          setComprehensionAnswered(false);
+          setComprehensionLastCorrect(null);
+          resetExerciseState();
+          advanceFromComprehension();
+        }
+        break;
+      case 'debrief':
+        finishLesson();
+        advanceFromDebrief();
+        playCompletionSound();
+        break;
       default:
         advanceFromGrammar();
     }
   }, [
     phase,
+    comprehensionAnswered,
     advanceFromVocabulary,
     advanceFromHook,
     advanceFromMission,
     advanceFromPhonetics,
     advanceFromRolePlay,
+    advanceFromBriefing,
+    advanceFromComprehension,
+    advanceFromDebrief,
     advanceFromGrammar,
+    finishLesson,
+    playCompletionSound,
+    resetExerciseState,
   ]);
+
+  const handleComprehensionAnswer = useCallback(
+    (correct: boolean) => {
+      if (comprehensionAnswered) return;
+      setComprehensionAnswered(true);
+      setComprehensionLastCorrect(correct);
+      store.recordComprehensionAnswer(correct);
+      playSound(correct ? 'correct' : 'incorrect');
+    },
+    [comprehensionAnswered, store, playSound],
+  );
 
   if (hookError) {
     return <LessonErrorScreen onRetry={handleRetry} onExit={exitLesson} />;
@@ -169,7 +233,7 @@ export default function LessonPage() {
 
       <main
         className={`mx-auto max-w-lg md:max-w-2xl lg:max-w-4xl px-6 pt-10 ${
-          phase === 'practice' || phase === 'review' ? 'pb-48' : 'pb-20'
+          phase === 'practice' || phase === 'review' || phase === 'production' ? 'pb-48' : 'pb-20'
         }`}
       >
         <LessonPhaseContent
@@ -187,25 +251,36 @@ export default function LessonPage() {
           onAnswer={handleAnswer}
           onReviewAnswer={handleReviewAnswer}
           onAdvanceFromGrammar={advanceFromGrammar}
+          comprehensionAnswered={comprehensionAnswered}
+          comprehensionLastCorrect={comprehensionLastCorrect}
+          onComprehensionAnswer={handleComprehensionAnswer}
+          onDebriefExit={() => router.push('/profile')}
         />
 
-        {phase !== 'practice' && phase !== 'review' && phase !== 'grammar' && (
+        {phase !== 'practice' && phase !== 'review' && phase !== 'production' && phase !== 'grammar' && (
           <LessonContinueButton
             phase={phase}
             isLoading={store.isLoading}
             rolePlayComplete={store.rolePlayComplete}
             lessonTag={store.lesson?.tag}
+            comprehensionAnswered={comprehensionAnswered}
             onAdvance={handleAdvance}
           />
         )}
       </main>
 
-      {(phase === 'practice' || phase === 'review') && (
+      {(phase === 'practice' || phase === 'review' || phase === 'production') && (
         <CheckButton
           state={checkState}
           correctAnswer={correctAnswerForBanner}
           onCheck={handleCheck}
-          onContinue={phase === 'review' ? handleReviewContinue : handleContinue}
+          onContinue={
+            phase === 'review'
+              ? handleReviewContinue
+              : phase === 'production'
+                ? handleContinue
+                : handleContinue
+          }
         />
       )}
 

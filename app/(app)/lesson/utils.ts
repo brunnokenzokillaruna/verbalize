@@ -50,6 +50,10 @@ export function phaseToStage(phase: string): LessonStage {
     case 'grammar':    return 'grammar';
     case 'practice':   return 'practice';
     case 'review':     return 'review';
+    case 'briefing':   return 'mission';
+    case 'comprehension': return 'hook';
+    case 'production': return 'practice';
+    case 'debrief':    return 'review';
     case 'complete':   return 'review';
     default:           return 'hook';
   }

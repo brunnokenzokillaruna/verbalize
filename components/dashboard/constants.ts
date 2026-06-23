@@ -26,4 +26,5 @@ export const TAG_LABELS: Record<string, string> = {
   VERB: 'Verbos',
   EXPR: 'Expressões',
   CULT: 'Cultura',
+  REVIEW: 'Checkpoint',
 };

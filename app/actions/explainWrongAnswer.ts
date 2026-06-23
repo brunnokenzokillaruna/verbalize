@@ -89,7 +89,7 @@ ${accessibilityRule}`;
   }
 
   try {
-    const result = await callGemini(prompt, undefined, 120);
+    const result = await callGemini(prompt, undefined, 120, undefined, 'lightweight');
     return result?.trim() ?? null;
   } catch {
     return null;

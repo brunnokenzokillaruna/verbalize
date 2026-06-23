@@ -41,7 +41,7 @@ Respond with ONLY this JSON (no markdown):
 
 Rules: example must be ${LANG_LABEL[language]} only; beginner vocabulary.`;
 
-    return await callGeminiJSON<TranslateWordResult>(prompt, systemPrompt, 256, 0);
+    return await callGeminiJSON<TranslateWordResult>(prompt, systemPrompt, 256, 0, 'lightweight');
   } catch (err) {
     console.error('[translateWord] Error:', err);
     return null;
@@ -77,7 +77,7 @@ Rules:
 - Keep translations brief, accurate, and natural.
 - Respond ONLY with the JSON array, no markdown fences, no extra text.`;
 
-    return await callGeminiJSON<{ word: string; translation: string }[]>(prompt, systemPrompt, 1500, 0);
+    return await callGeminiJSON<{ word: string; translation: string }[]>(prompt, systemPrompt, 1500, 0, 'lightweight');
   } catch (err) {
     console.error('[translateWordsBatch] Error:', err);
     return null;

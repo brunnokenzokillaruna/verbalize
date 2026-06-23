@@ -1,6 +1,6 @@
 'use client';
 
-import { X, Book, MessageSquare, Mic, Target, Zap, Repeat, Sparkles, BookOpen, Volume2, VolumeX, type LucideIcon } from 'lucide-react';
+import { X, Book, MessageSquare, Mic, Target, Zap, Repeat, Sparkles, BookOpen, Volume2, VolumeX, Flag, type LucideIcon } from 'lucide-react';
 import type { LessonStage, LessonTag } from '@/types';
 
 const STAGES_BY_TAG: Record<LessonTag, { key: LessonStage; label: string }[]> = {
@@ -52,6 +52,12 @@ const STAGES_BY_TAG: Record<LessonTag, { key: LessonStage; label: string }[]> = 
     { key: 'grammar',    label: 'Cultura' },
     { key: 'practice',   label: 'Prática' },
   ],
+  REVIEW: [
+    { key: 'briefing',      label: 'Briefing' },
+    { key: 'comprehension', label: 'Compreensão' },
+    { key: 'production',    label: 'Produção' },
+    { key: 'debrief',       label: 'Resultado' },
+  ],
 };
 
 const TAG_CONFIG: Record<LessonTag, { label: string; icon: LucideIcon; color: string; bg: string }> = {
@@ -63,6 +69,7 @@ const TAG_CONFIG: Record<LessonTag, { label: string; icon: LucideIcon; color: st
   VERB: { label: 'Verbos',      icon: Repeat,        color: '#0369a1',              bg: '#e0f2fe' },
   EXPR: { label: 'Expressões',  icon: Sparkles,      color: '#be185d',              bg: '#fce7f3' },
   CULT: { label: 'Cultura',     icon: BookOpen,      color: '#6d28d9',              bg: '#ede9fe' },
+  REVIEW: { label: 'Checkpoint', icon: Flag,          color: '#0d9488',              bg: '#ccfbf1' },
 };
 
 interface LessonProgressHeaderProps {

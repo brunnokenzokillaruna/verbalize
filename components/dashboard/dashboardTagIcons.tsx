@@ -102,6 +102,18 @@ function IconCULT({ size = 32 }: { size?: number }) {
   );
 }
 
+function IconREVIEW({ size = 32 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" aria-hidden="true">
+      <path d="M6 4h16l4 4v20H6V4z" fill="currentColor" fillOpacity="0.85" />
+      <path d="M22 4v4h4" stroke="rgba(255,255,255,0.5)" strokeWidth="1.5" fill="none" />
+      <path d="M10 14h12M10 18h12M10 22h8" stroke="rgba(255,255,255,0.75)" strokeWidth="2" strokeLinecap="round" />
+      <circle cx="24" cy="8" r="5" fill="#14b8a6" stroke="white" strokeWidth="1.5" />
+      <path d="M22.5 8l1.2 1.2 2.3-2.3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 export function getTagIcon(tag: string, size = 30) {
   switch (tag) {
     case 'PRON': return <IconPRON size={size} />;
@@ -112,6 +124,7 @@ export function getTagIcon(tag: string, size = 30) {
     case 'VERB': return <IconVERB size={size} />;
     case 'EXPR': return <IconEXPR size={size} />;
     case 'CULT': return <IconCULT size={size} />;
+    case 'REVIEW': return <IconREVIEW size={size} />;
     default:     return <IconGRAM size={size} />;
   }
 }

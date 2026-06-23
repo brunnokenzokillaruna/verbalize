@@ -1,4 +1,7 @@
+import { assertGeminiIntegrationAllowed } from './lib/geminiDevGuard';
 import { generateHook } from './app/actions/generateHook';
+
+assertGeminiIntegrationAllowed();
 
 async function test() {
   const result = await generateHook({
@@ -9,7 +12,7 @@ async function test() {
     theme: 'Sécurité dans la rue',
     uiTitle: 'Parler avec le policier',
     grammarFocus: 'Demander des informations sur la sécurité de la rue',
-    knownVocabulary: []
+    knownVocabulary: [],
   });
 
   console.log('Result:', JSON.stringify(result, null, 2));

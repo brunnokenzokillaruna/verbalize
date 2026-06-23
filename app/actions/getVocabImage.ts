@@ -4,7 +4,6 @@ import { callGemini } from '@/services/gemini';
 import { searchPexels } from '@/services/pexels';
 import { getCachedImage, saveImageCache } from '@/services/firestore';
 import type { SupportedLanguage, VocabImageResult } from '@/types';
-import { unstable_cacheLife as cacheLife } from 'next/cache';
 
 const LANG_LABEL: Record<SupportedLanguage, string> = {
   fr: 'French',
@@ -25,8 +24,6 @@ export async function getVocabImage(
   excludeUrls: string[] = [],
   precomputedKeyword?: string,
 ): Promise<VocabImageResult | null> {
-  'use cache';
-  cacheLife('days');
   try {
     // ── 1. Check Firestore cache ──────────────────────────────────────────────
     const cacheKey = `${word}_${language}`;
@@ -49,7 +46,7 @@ Rules:
 - Output ONLY the search query string in English (e.g., "coffee cup isolated white background").
 - No explanation, no punctuation, just the keyword string.`;
 
-      keyword = (await callGemini(keywordPrompt, undefined, 150, 4, 0)).trim();
+      keyword = (await callGemini(keywordPrompt, undefined, 150, 0, 'lightweight')).trim();
     }
 
     // ── 3. Fetch from Pexels, trying pages 1-3 to avoid duplicate images ─────

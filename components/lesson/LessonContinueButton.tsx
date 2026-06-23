@@ -8,10 +8,14 @@ type LessonContinueButtonProps = {
   isLoading: boolean;
   rolePlayComplete: boolean;
   lessonTag?: LessonTag;
+  comprehensionAnswered?: boolean;
   onAdvance: () => void;
 };
 
 function getNextLabel(phase: LessonPhase, lessonTag?: LessonTag): string {
+  if (phase === 'briefing') return 'Começar checkpoint';
+  if (phase === 'comprehension') return 'Próxima pergunta';
+  if (phase === 'debrief') return 'Concluir';
   if (phase === 'vocabulary') {
     return lessonTag === 'MISS' ? 'Role-play' : 'Diálogo';
   }
@@ -29,9 +33,13 @@ export function LessonContinueButton({
   isLoading,
   rolePlayComplete,
   lessonTag,
+  comprehensionAnswered,
   onAdvance,
 }: LessonContinueButtonProps) {
-  const disabled = isLoading || (phase === 'role-play' && !rolePlayComplete);
+  const disabled =
+    isLoading ||
+    (phase === 'role-play' && !rolePlayComplete) ||
+    (phase === 'comprehension' && !comprehensionAnswered);
 
   return (
     <div className="mt-10 animate-slide-up delay-300">

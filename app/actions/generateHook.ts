@@ -18,9 +18,19 @@ interface GenerateHookParams {
   uiTitle?: string;
   grammarFocus: string;
   knownVocabulary: string[];
+  arcCharacters?: { learner?: string; local?: string };
+  arcSummary?: string;
+  lastScenarioSummary?: string;
 }
 
-function pickNames(language: SupportedLanguage, tag?: LessonTag) {
+function pickNames(
+  language: SupportedLanguage,
+  tag?: LessonTag,
+  arcCharacters?: { learner?: string; local?: string },
+) {
+  if (arcCharacters?.learner && arcCharacters?.local) {
+    return { nameA: arcCharacters.learner, nameB: arcCharacters.local };
+  }
   // MISS lessons use first-person immersion: the Brazilian learner ("Você")
   // is one of the speakers. The second speaker is a local role chosen by
   // the AI based on the scenario (Recepcionista, Garçom, Atendente, etc.).
@@ -224,6 +234,16 @@ function normalizeHookResult(
     result.vocabTranslations = vt;
   }
 
+  if (result.newChunks?.length) {
+    result.newChunks = result.newChunks
+      .filter((c) => c.phrase?.trim() && c.translation?.trim())
+      .map((c) => ({
+        phrase: c.phrase.trim(),
+        translation: c.translation.trim(),
+        entryType: c.entryType ?? 'expression',
+      }));
+  }
+
   return result;
 }
 
@@ -241,11 +261,29 @@ ${breaks.map((b) => `- ${b}`).join('\n')}`;
  * in parallel by useLessonBootstrap via smaller focused actions.
  */
 export async function generateHook(params: GenerateHookParams): Promise<HookResult | null> {
-  const { language, level, tag, interests, theme, uiTitle, grammarFocus, knownVocabulary } = params;
-  const { nameA, nameB } = pickNames(language, tag);
-  
-  // NARRATIVE ANCHOR: Use the curated theme and uiTitle instead of random topics
-  const themeContext = theme ? `Theme: ${theme}${uiTitle ? ` - Scenario: ${uiTitle}` : ''}` : `Topic: ${pickTopic(level, interests)}`;
+  const {
+    language,
+    level,
+    tag,
+    interests,
+    theme,
+    uiTitle,
+    grammarFocus,
+    knownVocabulary,
+    arcCharacters,
+    arcSummary,
+    lastScenarioSummary,
+  } = params;
+  const { nameA, nameB } = pickNames(language, tag, arcCharacters);
+
+  const arcBlock = [
+    arcSummary ? `Story arc for this theme: ${arcSummary}` : '',
+    lastScenarioSummary ? `Previous scene recap: ${lastScenarioSummary}` : '',
+  ].filter(Boolean).join('\n');
+
+  const themeContext = theme
+    ? `Theme: ${theme}${uiTitle ? ` - Scenario: ${uiTitle}` : ''}${arcBlock ? `\n${arcBlock}` : ''}`
+    : `Topic: ${pickTopic(level, interests)}`;
   
   const { min: minLines, max: maxLines } = DIALOGUE_LINE_RANGES[level];
   const lang = LANG_LABEL[language];
@@ -284,10 +322,12 @@ export async function generateHook(params: GenerateHookParams): Promise<HookResu
   } else if (tag === 'EXPR') {
     tagInstruction = `- EXPRESSION SHOWCASE: The focus '${grammarFocus}' is a list of fixed expressions or idioms. The dialogue MUST naturally use AT LEAST 2 of these expressions verbatim.
 - CONTEXT IS KING: Each expression should be used in a situation that makes its meaning obvious from context, so the learner absorbs it without needing a translation.
-- NO GRAMMAR NOISE: Keep the surrounding grammar extremely simple so the fixed expressions stand out as the memorable part of each line.`;
+- NO GRAMMAR NOISE: Keep the surrounding grammar extremely simple so the fixed expressions stand out as the memorable part of each line.
+- CHUNKS: Include 1–2 multi-word expressions from the dialogue in newChunks (full phrase + PT-BR translation, entryType "expression" or "chunk").`;
   } else if (tag === 'CULT') {
     tagInstruction = `- CULTURAL ANCHOR: '${grammarFocus}' is a cultural topic. The dialogue MUST take place in a recognizably French/English-speaking cultural setting and naturally reveal a cultural detail (a habit, an unspoken rule, a food, a place, a social norm).
-- SHOW, DON'T TELL: Don't have characters explain culture like tourists. Let the cultural element emerge from what they do or react to naturally.`;
+- SHOW, DON'T TELL: Don't have characters explain culture like tourists. Let the cultural element emerge from what they do or react to naturally.
+- CHUNKS: Include 1 cultural collocation or fixed phrase in newChunks when it appears naturally in the dialogue.`;
   }
 
   const systemPrompt = `Você é um amigo brasileiro muito gente boa e fluente em ${lang}. Seu objetivo é criar conteúdo que pareça 100% humano e zero robótico.
@@ -430,7 +470,10 @@ Output ONLY this JSON object (no extra text):
   "vocabTranslations": {
     "<vocab word 1>": { "translation": "pt-BR word/phrase", "explanation": "dica de uso em PT-BR SIMPLES, ≤15 palavras — linguagem de amigo, sem jargão gramatical (nada de 'substantivo feminino', 'locução adverbial', 'distinção semântica'). Prefira exemplos concretos a termos técnicos.", "example": "one sentence in ${lang} using the word" },
     "<vocab word 2>": { "translation": "...", "explanation": "...", "example": "..." }
-  }
+  }${tag === 'EXPR' || tag === 'CULT' ? `,
+  "newChunks": [
+    { "phrase": "<multi-word expression in ${lang}>", "translation": "<pt-BR>", "entryType": "expression" }
+  ]` : ''}
 }
 
 Rules:
@@ -444,7 +487,7 @@ Rules:
 
   try {
     const fetchHook = async (generationPrompt: string): Promise<HookResult | null> => {
-      const raw = await callGeminiJSON<HookResult>(generationPrompt, systemPrompt, 2048);
+      const raw = await callGeminiJSON<HookResult>(generationPrompt, systemPrompt, 2048, 0, 'critical');
       if (!raw?.dialogue || raw?.newVocabulary?.length !== 2) {
         console.error('[generateHook] Invalid minimal hook response');
         return null;
@@ -461,8 +504,15 @@ Rules:
       return first;
     }
 
-    if (coherenceFirst.pass) {
+    if (coherenceFirst.pass || coherenceFirst.score >= 6) {
       console.log(`[generateHook] Coherence pass (score ${coherenceFirst.score})`);
+      return first;
+    }
+
+    if (coherenceFirst.score > 4) {
+      console.warn(
+        `[generateHook] Coherence marginal (score ${coherenceFirst.score}) — keeping first dialogue without retry`,
+      );
       return first;
     }
 
@@ -488,8 +538,6 @@ Rules:
       );
       return second;
     }
-
-    if (coherenceSecond.pass && !coherenceFirst.pass) return second;
 
     console.log(
       `[generateHook] Keeping first dialogue (scores: first=${coherenceFirst.score}, retry=${coherenceSecond.score})`,

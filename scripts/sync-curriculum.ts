@@ -40,7 +40,7 @@ function sync() {
 
       // Extract Lesson from numbered lines (e.g., 1. [TAG] Title)
       // Updated regex to handle IDs correctly
-      const lessonMatch = line.match(/^(\d+)\.\s*\[(GRAM|VOC|DIAL|MISS|PRON|VERB|EXPR|CULT)\]\s*(.+)/i);
+      const lessonMatch = line.match(/^(\d+)\.\s*\[(GRAM|VOC|DIAL|MISS|PRON|VERB|EXPR|CULT|REVIEW)\]\s*(.+)/i);
       if (lessonMatch) {
         const num = lessonMatch[1];
         const tag = lessonMatch[2].toUpperCase();

@@ -18,4 +18,6 @@ export interface GeneratePracticeParams {
   knownVocabulary: string[];
   previousTopics: string[];
   grammarBridge?: GrammarBridgeResult | null;
+  /** Override retry count (pregen uses 1, live path uses 2). */
+  maxAttempts?: number;
 }

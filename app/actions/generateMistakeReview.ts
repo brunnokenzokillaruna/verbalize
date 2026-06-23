@@ -1,6 +1,7 @@
 'use server';
 
 import { callGeminiJSON } from '@/services/gemini';
+import { buildGrammarFocusExerciseGuidance } from '@/lib/practiceExercises/grammarFocusExerciseGuidance';
 import { isValidErrorCorrectionExercise, normalizeErrorCorrectionData } from '@/utils/errorCorrection';
 import type { ErrorCorrectionData, Exercise, SupportedLanguage, ProficiencyLevel } from '@/types';
 
@@ -96,9 +97,12 @@ Exercise 5 — type "reverse-translation":
     }
   }` : '';
 
+    const grammarFocusGuidance = buildGrammarFocusExerciseGuidance(grammarFocus, language);
+
     const prompt = `A student learning ${LANG_LABEL[language]} at level ${level} made a mistake.
 Grammar topic: "${grammarFocus}"
 Mistake context: "${mistakeContext}"${vocabHint}
+${grammarFocusGuidance}
 
 Generate exactly ${isFive ? 5 : 3} exercises to help them correct this mistake and reinforce the grammar point.
 
@@ -124,7 +128,8 @@ Exercise 2 — type "error-correction":
 - NEVER ask the student to leave the answer blank. For deletions, use answer_mode "rewrite" and corrected_sentence as the full fixed sentence.
 - CRITICAL: The sentence_with_error must be OBJECTIVELY AND UNAMBIGUOUSLY WRONG. A native speaker would immediately recognize the error. NEVER create trick sentences where the "error" is actually grammatically valid.
 - SELF-CHECK before outputting: ask yourself "Is this sentence clearly wrong? Would every native speaker agree it contains an error?" If there is any doubt, choose a different, clearer error.
-- GOOD error types (clear and unambiguous): wrong verb conjugation, wrong gender agreement, wrong subject pronoun, missing negation particle, wrong required preposition.
+- GOOD error types (clear and unambiguous): wrong verb conjugation, wrong gender agreement, wrong subject pronoun, wrong required preposition (when it is a simple in-place swap).
+- FORBIDDEN for error-correction: fixes that require MOVING words (COI/COD clitic before verb, negation ne/pas order, adverb repositioning). For those, Exercise 1 context-choice should use a blank BEFORE the verb instead.
 - BAD error types (AVOID — too ambiguous): swapping determiners that could both be valid, word-order variations acceptable in informal speech, register differences.
 - CRITICAL — ELISION/CONTRACTION RULE: When the error involves elision or contraction (e.g., "Je" before a vowel that should become "J'"), the "error_word" MUST span ALL words involved in the contraction, and "correct_word" MUST be the complete contracted result. NEVER set correct_word to a bare clitic like "J'" that cannot stand alone. Example: error_word="Je écoute" → correct_word="J'écoute" (NOT error_word="Je" → correct_word="J'"). The same rule applies to "de + vowel" → "d'", "le/la + vowel" → "l'", etc.
 
@@ -178,6 +183,8 @@ Output format (exactly this structure, ${isFive ? 5 : 3} items):
         prompt,
         systemPrompt,
         isFive ? 1800 : 1200,
+        undefined,
+        'standard',
       );
 
       if (!Array.isArray(exercises) || exercises.length < MIN_EXERCISES) {
@@ -193,7 +200,7 @@ Output format (exactly this structure, ${isFive ? 5 : 3} items):
         if (ok) {
           Object.assign(ex.data, prepared);
         } else {
-          console.warn('[generateMistakeReview] Dropped malformed error-correction exercise');
+          console.warn('[generateMistakeReview] Dropped error-correction (malformed or displacement fix)');
         }
         return ok;
       });

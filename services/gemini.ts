@@ -1,34 +1,37 @@
 import { GoogleGenAI } from '@google/genai';
 import { getGeminiKey } from '@/lib/env';
+import {
+  enqueueGeminiCall,
+  GeminiQuotaExceededError,
+} from '@/lib/geminiRequestQueue';
+import {
+  type GeminiTier,
+  isFlash35BudgetExhausted,
+  isQuotaAvailable,
+} from '@/lib/geminiQuota';
 
-/**
- * Models in priority order. Each model has its own rate-limit quota on the
- * free tier, so when the primary is exhausted we fall back to the next.
- *
- * Fallback strategy (free tier):
- *  1. 3.5 Flash  — best quality (primary)
- *  2. 3.1 Flash Lite — fastest fallback + 500 RPD (vs 20 on 2.5 Flash)
- *  3. 2.5 Flash — stronger reasoning when Lite struggles with complex JSON
- *  4. 2.5 Flash Lite — last resort
- */
-const GEMINI_MODEL_CHAIN = [
-  'gemini-3.5-flash',
-  'gemini-3.1-flash-lite',
-  'gemini-2.5-flash',
-  'gemini-2.5-flash-lite',
-] as const;
+export type { GeminiTier } from '@/lib/geminiQuota';
 
-export const PRIMARY_GEMINI_MODEL = GEMINI_MODEL_CHAIN[0];
+const MODEL_CHAINS: Record<GeminiTier, readonly string[]> = {
+  // Lite is the runtime fallback when 3.5 is overloaded (503) or rate-limited.
+  critical: ['gemini-3.5-flash', 'gemini-3.1-flash-lite'],
+  standard: ['gemini-3.1-flash-lite', 'gemini-2.5-flash-lite'],
+  lightweight: ['gemini-3.1-flash-lite'],
+};
+
+/** Degraded hook path when 3.5 daily budget is exhausted. */
+const CRITICAL_FALLBACK_MODEL = 'gemini-3.1-flash-lite';
+
+export const PRIMARY_GEMINI_MODEL = 'gemini-3.5-flash';
 
 const DEFAULT_COOLDOWN_MS = 5 * 60 * 1000;
+const OVERLOAD_COOLDOWN_MS = 60 * 1000;
 const DAILY_QUOTA_COOLDOWN_MS = 60 * 60 * 1000;
 
-/** Models temporarily skipped after quota/rate-limit failures (in-process cache). */
 const modelCooldownUntil = new Map<string, number>();
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// Instantiate the official Google Gen AI Client
 const ai = new GoogleGenAI({ apiKey: getGeminiKey() });
 
 function modelSupportsThinkingConfig(model: string): boolean {
@@ -45,12 +48,9 @@ function getAdjustedMaxTokens(model: string, maxOutputTokens: number): number {
     if (isLargeOutput) {
       return Math.max(maxOutputTokens * 3, LARGE_OUTPUT_MIN_TOKENS);
     }
-    // Small JSON (word tooltips, etc.): avoid 8192-token budget that slows TTFT.
     return Math.ceil(maxOutputTokens * 1.25);
   }
 
-  // Fallback models (2.5-flash, etc.) need the same headroom for large JSON payloads
-  // like hooks, grammar bridges, and exercise arrays — otherwise output truncates mid-JSON.
   if (isLargeOutput) {
     return Math.max(maxOutputTokens, LARGE_OUTPUT_MIN_TOKENS);
   }
@@ -73,8 +73,6 @@ function buildGenerationConfig(
     config.systemInstruction = systemPrompt;
   }
 
-  // Gemini 3.1 Flash-Lite has thinking enabled by default; pass thinkingBudget=0
-  // to disable it for speed-critical calls like the minimal hook.
   if (thinkingBudget !== undefined && modelSupportsThinkingConfig(model)) {
     config.thinkingConfig = { thinkingBudget };
   }
@@ -122,6 +120,8 @@ function markModelCooldown(model: string, err: unknown): void {
 
   if (isDailyQuotaExhausted(err)) {
     duration = DAILY_QUOTA_COOLDOWN_MS;
+  } else if (isServiceUnavailable(err)) {
+    duration = OVERLOAD_COOLDOWN_MS;
   } else {
     const match = message.match(/retry in ([\d.]+)s/i);
     if (match) {
@@ -135,12 +135,20 @@ function markModelCooldown(model: string, err: unknown): void {
   );
 }
 
-function getActiveModelChain(): readonly (typeof GEMINI_MODEL_CHAIN)[number][] {
-  const available = GEMINI_MODEL_CHAIN.filter((model) => !isModelInCooldown(model));
-  return available.length > 0 ? available : GEMINI_MODEL_CHAIN;
+function getActiveModelChain(tier: GeminiTier): string[] {
+  let chain = [...MODEL_CHAINS[tier]];
+
+  if (tier === 'critical' && (isFlash35BudgetExhausted() || !isQuotaAvailable(PRIMARY_GEMINI_MODEL))) {
+    console.warn(
+      '[Gemini SDK] gemini-3.5-flash daily budget exhausted — degrading critical call to gemini-3.1-flash-lite',
+    );
+    chain = [CRITICAL_FALLBACK_MODEL];
+  }
+
+  const available = chain.filter((model) => !isModelInCooldown(model));
+  return available.length > 0 ? available : chain;
 }
 
-/** How many retries to attempt on the same model before falling back. */
 function getMaxRetries(err: unknown): number {
   if (isRateLimit(err) || isServiceUnavailable(err)) return 0;
   return 2;
@@ -152,57 +160,78 @@ function getRetryDelay(err: unknown, attempt: number): number {
   return Math.pow(2, attempt) * 1000 + Math.random() * 500;
 }
 
-/** 503 often masks quota exhaustion on the free tier — skip retries and switch model. */
 function shouldFallbackImmediately(err: unknown): boolean {
   return isRateLimit(err) || isServiceUnavailable(err);
 }
 
+async function generateWithModel(
+  tier: GeminiTier,
+  model: string,
+  prompt: string,
+  config: Record<string, unknown>,
+): Promise<string> {
+  const response = await enqueueGeminiCall(tier, model, () =>
+    ai.models.generateContent({
+      model,
+      contents: prompt,
+      config,
+    }),
+  );
+
+  const text = response.text;
+  if (!text) {
+    throw new Error('Gemini returned empty content');
+  }
+
+  return text.trim();
+}
+
 /**
- * Calls the Gemini API using the official SDK and returns the text response.
- * Runs server-side only (uses GEMINI_API_KEY).
- *
- * Tries models in GEMINI_MODEL_CHAIN order. When the primary model hits its
- * rate limit, automatically falls back to the next available model.
+ * Calls the Gemini API using tier-specific model chains.
+ * critical → 3.5-flash only (degrades to lite when daily budget exhausted)
+ * standard → 3.1-flash-lite → 2.5-flash-lite
+ * lightweight → 3.1-flash-lite only
  */
 export async function callGemini(
   prompt: string,
   systemPrompt?: string,
   maxOutputTokens = 1024,
-  _retries = 4,
   thinkingBudget?: number,
+  tier: GeminiTier = 'standard',
 ): Promise<string> {
   let lastError: Error | null = null;
-  const modelChain = getActiveModelChain();
+  const modelChain = getActiveModelChain(tier);
 
-  if (modelChain[0] !== GEMINI_MODEL_CHAIN[0]) {
-    console.info(`[Gemini SDK] Pulando modelos em cooldown. Iniciando com: ${modelChain[0]}`);
+  if (modelChain[0] !== MODEL_CHAINS[tier][0]) {
+    console.info(`[Gemini SDK] tier=${tier} iniciando com: ${modelChain[0]}`);
   }
 
   for (let modelIndex = 0; modelIndex < modelChain.length; modelIndex++) {
     const model = modelChain[modelIndex];
-    const config = buildGenerationConfig(model, systemPrompt, maxOutputTokens, thinkingBudget);
+    const effectiveThinking =
+      thinkingBudget ?? (model.includes('flash-lite') ? 0 : undefined);
+    const config = buildGenerationConfig(model, systemPrompt, maxOutputTokens, effectiveThinking);
     let attempt = 0;
     let maxRetries = 2;
 
     while (attempt <= maxRetries) {
       try {
-        const response = await ai.models.generateContent({
-          model,
-          contents: prompt,
-          config,
-        });
+        const text = await generateWithModel(tier, model, prompt, config);
 
-        const text = response.text;
-        if (!text) {
-          throw new Error('Gemini returned empty content');
-        }
-
-        if (model !== PRIMARY_GEMINI_MODEL) {
+        if (model !== MODEL_CHAINS[tier][0]) {
           console.info(`[Gemini SDK] Request succeeded using fallback model: ${model}`);
         }
 
-        return text.trim();
+        return text;
       } catch (err: unknown) {
+        if (err instanceof GeminiQuotaExceededError) {
+          if (tier === 'critical' && model === PRIMARY_GEMINI_MODEL) {
+            console.warn('[Gemini SDK] Critical quota exceeded — retrying with lite model');
+            return callGemini(prompt, systemPrompt, maxOutputTokens, thinkingBudget ?? 0, 'standard');
+          }
+          throw err;
+        }
+
         lastError = err instanceof Error ? err : new Error(String(err));
         maxRetries = getMaxRetries(err);
 
@@ -218,6 +247,9 @@ export async function callGemini(
           if (nextModel) {
             const reason = isRateLimit(err) ? 'rate limit' : 'indisponível';
             console.warn(`[Gemini SDK] ${model} ${reason}. Fallback imediato para ${nextModel}...`);
+          } else if (tier === 'critical') {
+            console.warn('[Gemini SDK] Critical tier exhausted — degrading to standard/lite chain');
+            return callGemini(prompt, systemPrompt, maxOutputTokens, effectiveThinking ?? 0, 'standard');
           }
           break;
         }
@@ -241,14 +273,17 @@ export async function callGemini(
     }
   }
 
+  if (tier === 'critical') {
+    console.warn('[Gemini SDK] Critical models failed — last resort: standard/lite chain');
+    return callGemini(prompt, systemPrompt, maxOutputTokens, thinkingBudget ?? 0, 'standard');
+  }
+
   throw lastError || new Error('All Gemini models failed in callGemini');
 }
 
 function parseGeminiJsonResponse<T>(raw: string): T {
-  // 1. Strip markdown code fences
   let cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim();
 
-  // 2. Extract the outermost JSON object or array (handles extra text before/after)
   const objStart = cleaned.indexOf('{');
   const arrStart = cleaned.indexOf('[');
   const start = objStart === -1 ? arrStart : arrStart === -1 ? objStart : Math.min(objStart, arrStart);
@@ -269,17 +304,12 @@ function isJsonParseFailure(err: unknown): boolean {
   return err instanceof SyntaxError;
 }
 
-/**
- * Calls Gemini and parses the response as JSON.
- * The prompt should instruct Gemini to respond with ONLY valid JSON.
- * Robustly extracts the first complete JSON object/array even when Gemini
- * adds surrounding text or markdown fences.
- */
 export async function callGeminiJSON<T>(
   prompt: string,
   systemPrompt?: string,
   maxOutputTokens = 1024,
   thinkingBudget?: number,
+  tier: GeminiTier = 'standard',
 ): Promise<T> {
   const tokenAttempts =
     maxOutputTokens >= LARGE_OUTPUT_THRESHOLD
@@ -291,7 +321,7 @@ export async function callGeminiJSON<T>(
   for (let i = 0; i < tokenAttempts.length; i++) {
     const tokens = tokenAttempts[i];
     try {
-      const raw = await callGemini(prompt, systemPrompt, tokens, 4, thinkingBudget);
+      const raw = await callGemini(prompt, systemPrompt, tokens, thinkingBudget, tier);
       return parseGeminiJsonResponse<T>(raw);
     } catch (err: unknown) {
       if (isJsonParseFailure(err) && i < tokenAttempts.length - 1) {

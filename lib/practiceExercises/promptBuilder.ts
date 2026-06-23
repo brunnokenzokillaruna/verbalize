@@ -1,13 +1,17 @@
 import type { GrammarBridgeResult } from '@/types';
 import {
+  ENFORCE_PRODUCTION_PER_LESSON,
   getAllowedExerciseTypes,
   getTagExclusiveType,
   LANG_LABEL,
   LEVEL_EXERCISE_DESCRIPTORS,
+  PRACTICE_EXERCISE_COUNT,
   type ExerciseTypeId,
 } from './constants';
 import { buildTypeDescriptions } from './exerciseTypeDescriptions';
 import { buildTagGuidance } from './tagGuidance';
+import { buildGrammarFocusExerciseGuidance } from './grammarFocusExerciseGuidance';
+import { resolveRequiredProductionType } from './productionTypes';
 import type { GeneratePracticeParams } from './types';
 
 export function buildGrammarBridgeExerciseBlock(bridge: GrammarBridgeResult | null | undefined): string {
@@ -63,12 +67,30 @@ export function buildPracticeExercisePrompt(params: GeneratePracticeParams): {
 
   const tagExclusive = getTagExclusiveType(tag);
 
+  const requiredProduction = resolveRequiredProductionType(
+    level,
+    knownVocabulary.length,
+    allowedTypes,
+  );
+
   const poolTypes: ExerciseTypeId[] = tagExclusive
-    ? [tagExclusive, ...allowedTypes]
-    : allowedTypes;
+    ? [
+        tagExclusive,
+        ...(requiredProduction && requiredProduction !== tagExclusive ? [requiredProduction] : []),
+        ...allowedTypes.filter((t) => t !== tagExclusive && t !== requiredProduction),
+      ]
+    : requiredProduction
+      ? [requiredProduction, ...allowedTypes.filter((t) => t !== requiredProduction)]
+      : allowedTypes;
+
+  const productionRuleBlock =
+    ENFORCE_PRODUCTION_PER_LESSON && requiredProduction
+      ? `\nPRODUCTION RULE (mandatory): You MUST include EXACTLY ONE exercise of type "${requiredProduction}". This exercise must appear in the final array. Place it as the LAST exercise (index ${PRACTICE_EXERCISE_COUNT - 1}) so the learner produces language after receptive drills.\n`
+      : '';
 
   const poolSection = poolTypes.map((t, i) => `${i + 1}. ${typeDescriptions[t]}`).join('\n\n');
-  const tagGuidance = buildTagGuidance(tag, allowedSet);
+  const tagGuidance = buildTagGuidance(tag, allowedSet, level, knownVocabulary.length);
+  const grammarFocusGuidance = buildGrammarFocusExerciseGuidance(grammarFocus, language);
 
   const vocabConstraint = isEarlyLearner
     ? `\nVOCABULARY CONSTRAINT: The learner is a beginner with very limited vocabulary. All exercise sentences must use ONLY: the key vocabulary words listed above, the words that appeared in the dialogue above, the words involved in the grammar focus ("${grammarFocus}"), basic function words (articles, prepositions, pronouns, conjunctions, auxiliary verbs), and simple A1-level everyday words. Do NOT use any advanced or uncommon content words.`
@@ -110,7 +132,7 @@ ${previousTopicsBlock}
 ${grammarBridgeBlock}
 
 TAG-SPECIFIC EXERCISE BALANCE (follow this strictly):
-${tagGuidance}
+${tagGuidance}${grammarFocusGuidance}${productionRuleBlock}
 
 CRITICAL RULE: Do NOT copy or reuse any sentence from the dialogue above. Every exercise sentence must be ORIGINAL — newly created by you. The sentences should be related to the lesson's theme and grammar focus, but must be completely different from the dialogue lines.
 
@@ -118,7 +140,7 @@ LEVEL CONSTRAINTS — all sentences you write must follow these rules: ${levelDe
 ${vocabConstraint}
 ${grammarAccuracyBlock}
 
-Generate exactly 5 exercises as a JSON array. Choose varied types from the following pool for a balanced practice session. You MUST use ONLY the types listed below — any other type is forbidden.
+Generate exactly ${PRACTICE_EXERCISE_COUNT} exercises as a JSON array. Choose varied types from the following pool for a balanced practice session. You MUST use ONLY the types listed below — any other type is forbidden.
 
 VARIETY RULE (mandatory): use at least 3 DIFFERENT exercise types; no type may appear more than twice.
 
@@ -127,7 +149,7 @@ VARIETY RULE (mandatory): use at least 3 DIFFERENT exercise types; no type may a
 ${poolSection}
 
 --- OUTPUT FORMAT ---
-Return a JSON array of 5 objects, each with "type" and "data".
+Return a JSON array of ${PRACTICE_EXERCISE_COUNT} objects, each with "type" and "data".
 Example for social-roleplay:
 {
   "type": "social-roleplay",

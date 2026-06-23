@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { Loader2 } from 'lucide-react';
 import { AudioPlayerButton } from './AudioPlayerButton';
 import type { SupportedLanguage } from '@/types';
 
@@ -16,6 +17,8 @@ interface VisualVocabCardProps {
   targetDefinition?: string;
   /** When true, hides translation initially and shows targetDefinition instead. User taps to reveal. */
   immersive?: boolean;
+  /** True while the image is still being fetched from the server. */
+  isImageLoading?: boolean;
 }
 
 export function VisualVocabCard({
@@ -27,9 +30,19 @@ export function VisualVocabCard({
   exampleSentence,
   targetDefinition,
   immersive = false,
+  isImageLoading = false,
 }: VisualVocabCardProps) {
   const [revealed, setRevealed] = useState(false);
+  const [useNativeImage, setUseNativeImage] = useState(false);
+  const [imageFailed, setImageFailed] = useState(false);
   const showImmersive = immersive && !!targetDefinition && !revealed;
+  const showImage = !!imageUrl && !imageFailed;
+  const usePexelsDirect = !!imageUrl?.includes('pexels.com');
+
+  useEffect(() => {
+    setUseNativeImage(false);
+    setImageFailed(false);
+  }, [imageUrl]);
 
   return (
     <div
@@ -49,14 +62,29 @@ export function VisualVocabCard({
         className="relative w-full overflow-hidden"
         style={{ aspectRatio: '1 / 1', backgroundColor: 'var(--color-surface-raised)' }}
       >
-        {imageUrl ? (
-          <Image
-            src={imageUrl}
-            alt={imageAlt ?? word}
-            fill
-            className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-            sizes="(max-width: 640px) 45vw, 220px"
-          />
+        {showImage ? (
+          useNativeImage || usePexelsDirect ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={imageUrl}
+              alt={imageAlt ?? word}
+              className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+              onError={() => setImageFailed(true)}
+            />
+          ) : (
+            <Image
+              src={imageUrl}
+              alt={imageAlt ?? word}
+              fill
+              className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+              sizes="(max-width: 640px) 45vw, 220px"
+              onError={() => setUseNativeImage(true)}
+            />
+          )
+        ) : isImageLoading ? (
+          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[var(--color-surface-raised)] to-transparent">
+            <Loader2 size={24} className="animate-spin text-[var(--color-primary)] opacity-70" />
+          </div>
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[var(--color-surface-raised)] to-transparent">
             <span

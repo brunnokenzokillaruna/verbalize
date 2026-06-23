@@ -33,6 +33,21 @@ export interface UserDocument {
     progressChanges: Array<{ language: SupportedLanguage; from: string; to: string }>;
     migratedAt?: Timestamp;
   };
+
+  /** Oral and written production attempt counters (optional — lazy backfill). */
+  productionStats?: {
+    oralAttempts: number;
+    oralAccepted: number;
+    freeWriteAttempts: number;
+    freeWriteAccepted: number;
+    lastUpdated?: Timestamp;
+  };
+
+  /** Immersion preference for UI instructions. */
+  immersionMode?: 'auto' | 'always' | 'never';
+
+  /** Last scenario summary for narrative continuity within a theme arc. */
+  lastScenarioSummary?: string;
 }
 
 // ─── Vocabulary & SRS ─────────────────────────────────────────────────────────
@@ -46,6 +61,10 @@ export interface UserVocabularyDocument {
   translation: string;
   imageUrl?: string;
   wordType?: 'verb' | 'noun';
+  entryType?: 'word' | 'chunk' | 'collocation' | 'expression' | 'phrasal_verb';
+  productionCount?: number;
+  encounterCount?: number;
+  knowledgeMode?: 'passive' | 'active';
 
   // SRS Data
   firstSeen: Timestamp;
@@ -119,16 +138,32 @@ export interface PregeneratedLessonDocument {
   uid: string;
   lessonId: string;
   status?: 'generating' | 'ready' | 'failed';
+  schemaVersion?: number;
   hook?: HookResult;
   grammarBridge?: GrammarBridgeResult;
   exercises?: Exercise[];
   missionBriefing?: MissionBriefingResult; // MISS lessons only
+  checkpointSession?: CheckpointSessionResult; // REVIEW lessons only
   createdAt: Timestamp;
 }
 
 // ─── Lesson ───────────────────────────────────────────────────────────────────
 
-export type LessonStage = 'intro' | 'vocabulary' | 'hook' | 'role-play' | 'phonetics' | 'mission' | 'grammar' | 'practice' | 'review';
+export type LessonStage =
+  | 'intro'
+  | 'vocabulary'
+  | 'hook'
+  | 'role-play'
+  | 'phonetics'
+  | 'mission'
+  | 'grammar'
+  | 'practice'
+  | 'review'
+  | 'complete'
+  | 'briefing'
+  | 'comprehension'
+  | 'production'
+  | 'debrief';
 
 export type SupportedLanguage = 'fr' | 'en';
 
@@ -145,6 +180,7 @@ export type ExerciseType =
   | 'word-bank-translation'
   | 'bridge-choice'
   | 'listen-and-select'
+  | 'listening-comprehension'
   | 'social-roleplay'
   | 'scrambled-conversation'
   | 'interactive-subtitles'
@@ -196,6 +232,7 @@ export interface HookResult {
   curiosidade?: string;                              // engaging fun fact in casual PT-BR, every lesson
   phoneticsTip?: PhoneticsTipResult;                 // PRON only
   missionBriefing?: MissionBriefingResult;           // MISS only
+  newChunks?: Array<{ phrase: string; translation: string; entryType: 'chunk' | 'collocation' | 'expression' | 'phrasal_verb' }>;
 }
 
 export interface GrammarBridgeResult {
@@ -266,7 +303,7 @@ export interface VocabImageResult {
 
 // ─── Curriculum & Lesson Engine ───────────────────────────────────────────────
 
-export type LessonTag = 'GRAM' | 'VOC' | 'DIAL' | 'MISS' | 'PRON' | 'VERB' | 'EXPR' | 'CULT';
+export type LessonTag = 'GRAM' | 'VOC' | 'DIAL' | 'MISS' | 'PRON' | 'VERB' | 'EXPR' | 'CULT' | 'REVIEW';
 
 export interface LessonDefinition {
   id: string;
@@ -276,6 +313,23 @@ export interface LessonDefinition {
   uiTitle?: string;
   grammarFocus: string;
   theme: string;
+  arcCharacters?: { learner?: string; local?: string };
+  arcSummary?: string;
+}
+
+export interface CheckpointComprehensionQuestion {
+  questionPt: string;
+  options: string[];
+  correctIndex: number;
+  explanationPt: string;
+}
+
+export interface CheckpointSessionResult {
+  briefing: string;
+  dialogueAudio: string;
+  comprehensionQuestions: CheckpointComprehensionQuestion[];
+  productionExercises: Exercise[];
+  coveredTopics: string[];
 }
 
 // ─── Exercise Data Types ──────────────────────────────────────────────────────
@@ -426,6 +480,14 @@ export interface ListenAndSelectData {
   translation: string;
 }
 
+export interface ListeningComprehensionData {
+  dialogueAudio: string;
+  questionPt: string;
+  options: string[];
+  correctIndex: number;
+  explanationPt: string;
+}
+
 export type Exercise =
   | { type: 'context-choice';         data: ContextChoiceData }
   | { type: 'sentence-builder';       data: SentenceBuilderData }
@@ -434,6 +496,7 @@ export type Exercise =
   | { type: 'word-bank-translation';  data: WordBankTranslationData }
   | { type: 'bridge-choice';          data: BridgeChoiceData }
   | { type: 'listen-and-select';      data: ListenAndSelectData }
+  | { type: 'listening-comprehension'; data: ListeningComprehensionData }
   | { type: 'audio-dictation';        data: DictationData }
   | { type: 'error-correction';       data: ErrorCorrectionData }
   | { type: 'speak-repeat';           data: SpeakRepeatData }

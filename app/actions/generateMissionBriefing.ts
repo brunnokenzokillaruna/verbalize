@@ -67,7 +67,7 @@ Rules:
 - keyPhrases must match the lesson's grammar focus
 - stakes must be a REAL consequence, never vague ("Você fica perdido", "Você perde o ingresso")`;
 
-    return await callGeminiJSON<MissionBriefingResult>(prompt, systemPrompt, 1200, 0);
+    return await callGeminiJSON<MissionBriefingResult>(prompt, systemPrompt, 1200, 0, 'standard');
   } catch (err) {
     console.error('[generateMissionBriefing] Error:', err);
     return null;

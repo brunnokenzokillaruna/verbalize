@@ -7,6 +7,7 @@ export type ExerciseTypeId =
   | 'word-bank-translation'
   | 'bridge-choice'
   | 'listen-and-select'
+  | 'listening-comprehension'
   | 'audio-dictation'
   | 'speak-repeat'
   | 'sentence-builder'
@@ -17,6 +18,21 @@ export type ExerciseTypeId =
   | 'grammar-trap'
   | 'minimal-pair'
   | 'conjugation-speed';
+
+export const PRACTICE_EXERCISE_COUNT = 5;
+
+/** Bump when pregenerated exercise composition changes (e.g. mandatory production). */
+export const PREGEN_SCHEMA_VERSION = 4;
+
+/** When true, every lesson practice session must include at least one production exercise. */
+export const ENFORCE_PRODUCTION_PER_LESSON =
+  process.env.NEXT_PUBLIC_ENFORCE_PRODUCTION !== 'false';
+
+export const HOOK_LISTEN_FIRST =
+  process.env.NEXT_PUBLIC_HOOK_LISTEN_FIRST === 'true';
+
+export const SEPARATE_PASSIVE_SRS =
+  process.env.NEXT_PUBLIC_SEPARATE_PASSIVE_SRS === 'true';
 
 export const LANG_LABEL: Record<SupportedLanguage, string> = {
   fr: 'French',
@@ -36,22 +52,23 @@ export const TIER_1_TYPES: ExerciseTypeId[] = [
   'sentence-builder',
   'context-choice',
   'speak-repeat',
+  'listening-comprehension',
   'interactive-subtitles',
   'scrambled-conversation',
+  'word-bank-translation',
 ];
 
 export const TIER_2_ADDITIONS: ExerciseTypeId[] = [
   'error-correction',
   'social-roleplay',
   'logic-connectors',
-  'word-bank-translation',
   'bridge-choice',
   'listen-and-select',
+  'reverse-translation',
 ];
 
 export const TIER_3_ADDITIONS: ExerciseTypeId[] = [
   'audio-dictation',
-  'reverse-translation',
 ];
 
 export function getAllowedExerciseTypes(
@@ -59,7 +76,11 @@ export function getAllowedExerciseTypes(
   knownVocabCount: number,
 ): ExerciseTypeId[] {
   if (level === 'A1' && knownVocabCount < 30) {
-    return TIER_1_TYPES;
+    const types = [...TIER_1_TYPES];
+    if (knownVocabCount >= 15) {
+      types.push('reverse-translation');
+    }
+    return types;
   }
   if (level === 'A1' || (level === 'A2' && knownVocabCount < 60)) {
     return [...TIER_1_TYPES, ...TIER_2_ADDITIONS];

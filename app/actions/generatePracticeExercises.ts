@@ -1,16 +1,87 @@
 'use server';
 
 import { callGeminiJSON } from '@/services/gemini';
-import { enforceVariety, pinTagExclusiveFirst, varietyNeedsRegeneration } from '@/utils/exerciseVariety';
+import {
+  enforceVariety,
+  pinProductionLast,
+  pinTagExclusiveFirst,
+  varietyNeedsRegeneration,
+} from '@/utils/exerciseVariety';
 import type { Exercise } from '@/types';
 import {
   getAllowedExerciseTypes,
   getTagExclusiveType,
+  PRACTICE_EXERCISE_COUNT,
   type ExerciseTypeId,
 } from '@/lib/practiceExercises/constants';
 import { buildPracticeExercisePrompt } from '@/lib/practiceExercises/promptBuilder';
 import type { GeneratePracticeParams } from '@/lib/practiceExercises/types';
 import { validateAndSanitizeExercises } from '@/lib/practiceExercises/validateGeneratedExercises';
+import {
+  buildProductionRetrySuffix,
+  ensureMinimumProduction,
+  sessionHasProduction,
+} from '@/lib/practiceExercises/ensureMinimumProduction';
+import { resolveRequiredProductionType } from '@/lib/practiceExercises/productionTypes';
+
+const MAX_GENERATION_ATTEMPTS_LIVE = 2;
+
+function buildRetrySuffix(attempt: number, allowedTypes: ExerciseTypeId[]): string {
+  return `
+
+RETRY NOTICE (attempt ${attempt}): Your previous response did not yield ${PRACTICE_EXERCISE_COUNT} valid exercises.
+Generate EXACTLY ${PRACTICE_EXERCISE_COUNT} exercises. Use ONLY these types: ${allowedTypes.map((t) => `'${t}'`).join(', ')}.
+Each exercise must be fully valid — incomplete or disallowed types will be discarded.`;
+}
+
+async function processGeneratedExercises(
+  exercises: Exercise[],
+  allowedSet: Set<ExerciseTypeId>,
+  language: GeneratePracticeParams['language'],
+  tagExclusive: ExerciseTypeId | null,
+  params: GeneratePracticeParams,
+): Promise<Exercise[]> {
+  const dedupedValidated = await validateAndSanitizeExercises(exercises, allowedSet, language);
+
+  const requiredProduction = resolveRequiredProductionType(
+    params.level,
+    params.knownVocabulary.length,
+    [...allowedSet],
+  );
+
+  let finalExercises = pinTagExclusiveFirst(dedupedValidated, tagExclusive);
+  finalExercises = enforceVariety(
+    finalExercises,
+    [...allowedSet] as ExerciseTypeId[],
+    tagExclusive,
+    PRACTICE_EXERCISE_COUNT,
+    requiredProduction,
+  );
+
+  finalExercises = await ensureMinimumProduction(finalExercises, {
+    level: params.level,
+    vocabCount: params.knownVocabulary.length,
+    tag: params.tag,
+    language: params.language,
+    grammarFocus: params.grammarFocus,
+    theme: params.theme ?? '',
+    dialogue: params.dialogue,
+    newVocabulary: params.newVocabulary,
+    allowedTypes: [...allowedSet],
+  });
+
+  if (requiredProduction) {
+    finalExercises = pinProductionLast(finalExercises, requiredProduction);
+  }
+
+  if (!sessionHasProduction(finalExercises)) {
+    console.warn(
+      `[generatePracticeExercises] Session lacks production exercise (tag=${params.tag}, level=${params.level})`,
+    );
+  }
+
+  return finalExercises.slice(0, PRACTICE_EXERCISE_COUNT);
+}
 
 /**
  * Generates exactly 5 practice exercises via Gemini.
@@ -23,7 +94,8 @@ import { validateAndSanitizeExercises } from '@/lib/practiceExercises/validateGe
 export async function generatePracticeExercises(
   params: GeneratePracticeParams,
 ): Promise<Exercise[] | null> {
-  const { tag, level, knownVocabulary, language } = params;
+  const { tag, level, knownVocabulary, language, maxAttempts } = params;
+  const attemptLimit = maxAttempts ?? MAX_GENERATION_ATTEMPTS_LIVE;
 
   const allowedTypes = getAllowedExerciseTypes(level, knownVocabulary.length);
   const allowedSet = new Set(allowedTypes);
@@ -33,30 +105,66 @@ export async function generatePracticeExercises(
   if (tag === 'VERB') allowedSet.add('conjugation-speed');
 
   const tagExclusive = getTagExclusiveType(tag);
+  const requiredProduction = resolveRequiredProductionType(
+    level,
+    knownVocabulary.length,
+    [...allowedSet],
+  );
+  const { systemPrompt, prompt: basePrompt } = buildPracticeExercisePrompt(params);
 
   try {
-    const { systemPrompt, prompt } = buildPracticeExercisePrompt(params);
-    const exercises = await callGeminiJSON<Exercise[]>(prompt, systemPrompt, 3072);
+    let bestEffort: Exercise[] = [];
 
-    if (!Array.isArray(exercises) || exercises.length < 3) {
-      console.error('[generatePracticeExercises] Unexpected response shape or too few exercises');
-      return null;
+    for (let attempt = 1; attempt <= attemptLimit; attempt++) {
+      let prompt = attempt === 1
+        ? basePrompt
+        : basePrompt + buildRetrySuffix(attempt, [...allowedSet] as ExerciseTypeId[]);
+
+      if (attempt >= 2 && requiredProduction) {
+        prompt += buildProductionRetrySuffix(requiredProduction);
+      }
+
+      const exercises = await callGeminiJSON<Exercise[]>(prompt, systemPrompt, 3072, undefined, 'standard');
+
+      if (!Array.isArray(exercises) || exercises.length < PRACTICE_EXERCISE_COUNT) {
+        console.warn(
+          `[generatePracticeExercises] Attempt ${attempt}: expected ${PRACTICE_EXERCISE_COUNT} exercises, got ${Array.isArray(exercises) ? exercises.length : 'invalid'}`,
+        );
+        continue;
+      }
+
+      const finalExercises = await processGeneratedExercises(
+        exercises,
+        allowedSet,
+        language,
+        tagExclusive,
+        params,
+      );
+
+      if (finalExercises.length > bestEffort.length) {
+        bestEffort = finalExercises;
+      }
+
+      if (finalExercises.length >= PRACTICE_EXERCISE_COUNT) {
+        if (varietyNeedsRegeneration(finalExercises)) {
+          console.warn('[generatePracticeExercises] Variety insufficient after enforcement — returning set anyway');
+        }
+        return finalExercises;
+      }
+
+      console.warn(
+        `[generatePracticeExercises] Attempt ${attempt}: only ${finalExercises.length} exercises passed validation`,
+      );
     }
 
-    const dedupedValidated = await validateAndSanitizeExercises(exercises, allowedSet, language);
+    if (bestEffort.length >= PRACTICE_EXERCISE_COUNT) {
+      return bestEffort;
+    }
 
-    let finalExercises = pinTagExclusiveFirst(dedupedValidated, tagExclusive);
-    finalExercises = enforceVariety(
-      finalExercises,
-      [...allowedSet] as ExerciseTypeId[],
-      tagExclusive,
+    console.error(
+      `[generatePracticeExercises] Failed to produce ${PRACTICE_EXERCISE_COUNT} exercises after ${attemptLimit} attempts (best: ${bestEffort.length})`,
     );
-
-    if (varietyNeedsRegeneration(finalExercises) && finalExercises.length >= 3) {
-      console.warn('[generatePracticeExercises] Variety insufficient after enforcement — returning best-effort set');
-    }
-
-    return finalExercises.length > 0 ? finalExercises : null;
+    return null;
   } catch (err) {
     console.error('[generatePracticeExercises] Error:', err);
     return null;

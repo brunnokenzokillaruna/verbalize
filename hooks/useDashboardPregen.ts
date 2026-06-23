@@ -1,19 +1,38 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { devLog } from '@/lib/devLog';
+import { isAggressivePregenEnabled } from '@/lib/geminiDevGuard';
 import { pregenerateNextLesson } from '@/app/actions/pregenerateNextLesson';
 import { getPregeneratedLesson, getUserVocabulary } from '@/services/firestore';
 import type { LessonDefinition, UserDocument } from '@/types';
 import type { User } from 'firebase/auth';
+
+const PREGEN_GENERATING_TIMEOUT_MS = 5 * 60 * 1000;
+
+function pregenCreatedAtMs(createdAt: { toMillis?: () => number; seconds?: number } | null | undefined): number {
+  if (!createdAt) return 0;
+  if (typeof createdAt.toMillis === 'function') return createdAt.toMillis();
+  return (createdAt.seconds ?? 0) * 1000;
+}
 
 export function useDashboardPregen(
   user: User | null,
   profile: UserDocument | null,
   activeLesson: LessonDefinition | undefined,
 ) {
+  const firedRef = useRef<string | null>(null);
+
   useEffect(() => {
     if (!user || !profile || !activeLesson) return;
+    if (!isAggressivePregenEnabled()) {
+      devLog('[Dashboard Pregen] Skipped — aggressive pregen disabled (dev/preview mode).');
+      return;
+    }
 
     const lessonId = activeLesson.id;
+    const dedupKey = `${user.uid}_${lessonId}`;
+    if (firedRef.current === dedupKey) return;
+    firedRef.current = dedupKey;
+
     const language = profile.currentTargetLanguage;
 
     (async () => {
@@ -27,10 +46,7 @@ export function useDashboardPregen(
 
         const isTimedOut = (createdAt: { toMillis?: () => number; seconds?: number } | null | undefined) => {
           if (!createdAt) return true;
-          const createdMs = createdAt.toMillis
-            ? createdAt.toMillis()
-            : (createdAt.seconds ?? 0) * 1000;
-          return Date.now() - createdMs > 5 * 60 * 1000;
+          return Date.now() - pregenCreatedAtMs(createdAt) > PREGEN_GENERATING_TIMEOUT_MS;
         };
 
         if (

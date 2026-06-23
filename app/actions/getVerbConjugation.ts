@@ -124,7 +124,7 @@ ${
 - Keep examples simple (A1-B1 level vocabulary).
 - "translation" must be the Brazilian Portuguese infinitive (e.g., "ser/estar" for "être").`;
 
-    const data = await callGeminiJSON<VerbDocument>(prompt, systemPrompt, 900);
+    const data = await callGeminiJSON<VerbDocument>(prompt, systemPrompt, 900, undefined, 'lightweight');
 
     if (!data || !data.infinitive || !data.conjugations?.present) {
       console.error('[getVerbConjugation] Invalid response from Gemini');

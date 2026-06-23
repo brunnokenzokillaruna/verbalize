@@ -7,6 +7,7 @@ import { LanguageFlag } from '@/components/LanguageFlag';
 import { SectionLabel } from '@/components/profile/SectionLabel';
 import { PROFESSIONS, GOALS, INTERESTS } from '@/components/profile/constants';
 import type { SupportedLanguage } from '@/types';
+import type { ImmersionMode } from '@/lib/immersion';
 
 function SelectPill({
   label,
@@ -47,6 +48,8 @@ type ProfileLearningSectionProps = {
   onGoalChange: (value: string) => void;
   onToggleInterest: (label: string) => void;
   onLanguageChange: (lang: SupportedLanguage) => void;
+  immersionMode: ImmersionMode;
+  onImmersionModeChange: (mode: ImmersionMode) => void;
 };
 
 export function ProfileLearningSection({
@@ -62,6 +65,8 @@ export function ProfileLearningSection({
   onGoalChange,
   onToggleInterest,
   onLanguageChange,
+  immersionMode,
+  onImmersionModeChange,
 }: ProfileLearningSectionProps) {
   const [showProfessions, setShowProfessions] = useState(!professionPill);
   const [showGoals, setShowGoals] = useState(!goal);
@@ -271,6 +276,29 @@ export function ProfileLearningSection({
               </button>
             );
           })}
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-border bg-surface p-5 flex flex-col gap-3">
+        <SectionLabel>Modo imersão</SectionLabel>
+        <p className="text-xs text-text-muted">
+          A partir de B2, instruções de exercício podem aparecer no idioma-alvo (automático) ou sempre que você preferir.
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {(
+            [
+              ['auto', 'Automático (B2+)'],
+              ['always', 'Sempre imersivo'],
+              ['never', 'Sempre em PT-BR'],
+            ] as const
+          ).map(([mode, label]) => (
+            <SelectPill
+              key={mode}
+              label={label}
+              selected={immersionMode === mode}
+              onClick={() => onImmersionModeChange(mode)}
+            />
+          ))}
         </div>
       </div>
     </div>

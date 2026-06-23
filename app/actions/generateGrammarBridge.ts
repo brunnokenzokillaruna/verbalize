@@ -304,7 +304,7 @@ Regras Cruciais:
     - survivalTip: cobrir todos os usos ou dar mnemônico que não omita nenhum.
     - NUNCA ensine um uso na fase Estruturar e omita na Síntese — o aluno precisa sair com a visão completa da lição.`;
 
-    const raw = await callGeminiJSON<GrammarBridgeResult>(prompt, systemPrompt, 3500);
+    const raw = await callGeminiJSON<GrammarBridgeResult>(prompt, systemPrompt, 3500, undefined, 'standard');
     return normalizeGrammarBridgeResult(raw, language);
   } catch (err) {
     console.error('[generateGrammarBridge] Error:', err);

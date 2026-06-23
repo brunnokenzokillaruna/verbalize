@@ -65,6 +65,7 @@ export function LessonVocabularyScreen({
         {[...new Set(newVocabulary)].map((word, idx) => {
           const img = vocabImages[word];
           const translation = vocabTranslations[word] ?? word;
+          const isImageLoading = !(word in vocabImages);
           return (
             <div
               key={word}
@@ -80,6 +81,7 @@ export function LessonVocabularyScreen({
                 language={language}
                 imageUrl={img?.imageUrl}
                 imageAlt={img?.imageAlt}
+                isImageLoading={isImageLoading}
                 targetDefinition={useImmersive ? targetDefinitions?.[word] : undefined}
                 immersive={useImmersive}
               />

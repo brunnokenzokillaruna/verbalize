@@ -33,6 +33,8 @@ function getCorrectAnswerForBanner(
       return exercise.data.options[exercise.data.correctIndex];
     case 'listen-and-select':
       return exercise.data.options[exercise.data.correctIndex];
+    case 'listening-comprehension':
+      return exercise.data.options[exercise.data.correctIndex];
     case 'image-match':
       return exercise.data.targetWord;
     default:
@@ -45,6 +47,7 @@ export function useLessonExerciseHandlers(
   playSound: PlaySoundFn,
   playCompletionSound: () => void,
   finishLesson: () => void,
+  onProductionContinue?: () => void,
 ) {
   const store = useLessonStore();
   const [exerciseAnswer, setExerciseAnswer] = useState<boolean | null>(null);
@@ -52,9 +55,17 @@ export function useLessonExerciseHandlers(
   const [submitTrigger, setSubmitTrigger] = useState(0);
 
   const phase = store.phase;
-  const currentExercise = store.exercises[store.exerciseIndex];
+  const currentExercise =
+    phase === 'production'
+      ? store.exercises[store.checkpointProductionIndex]
+      : store.exercises[store.exerciseIndex];
   const currentReviewExercise = store.reviewExercises[store.reviewIndex];
-  const activeExercise = phase === 'review' ? currentReviewExercise : currentExercise;
+  const activeExercise =
+    phase === 'review'
+      ? currentReviewExercise
+      : phase === 'production'
+        ? currentExercise
+        : currentExercise;
 
   const checkState = useMemo(() => {
     if (exerciseAnswer !== null) {
@@ -78,6 +89,11 @@ export function useLessonExerciseHandlers(
     (correct: boolean) => {
       if (exerciseAnswer !== null) return;
       setExerciseAnswer(correct);
+      if (phase === 'production') {
+        store.recordCheckpointProduction(correct);
+        playSound(correct ? 'correct' : 'incorrect');
+        return;
+      }
       if (correct) {
         store.recordCorrect();
         playSound('correct');
@@ -87,7 +103,7 @@ export function useLessonExerciseHandlers(
         playSound('incorrect');
       }
     },
-    [exerciseAnswer, store, playSound],
+    [exerciseAnswer, phase, store, playSound],
   );
 
   const handleCheck = useCallback(() => {
@@ -109,6 +125,12 @@ export function useLessonExerciseHandlers(
   );
 
   const handleContinue = useCallback(async () => {
+    if (phase === 'production' && onProductionContinue) {
+      resetExerciseState();
+      onProductionContinue();
+      return;
+    }
+
     const isLast = store.exerciseIndex >= store.exercises.length - 1;
     if (!isLast) {
       resetExerciseState();
@@ -166,7 +188,7 @@ export function useLessonExerciseHandlers(
     } finally {
       store.setIsLoading(false);
     }
-  }, [store, user, resetExerciseState, finishLesson, playCompletionSound]);
+  }, [store, user, phase, onProductionContinue, resetExerciseState, finishLesson, playCompletionSound]);
 
   const handleReviewContinue = useCallback(() => {
     const isLastReview = store.reviewIndex >= store.reviewExercises.length - 1;

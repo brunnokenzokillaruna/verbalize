@@ -131,7 +131,7 @@ Final rules:
 - "soundsLike" must be readable by any Brazilian with no linguistics background
 - Before outputting, re-read each "soundsLike" and ask: would a Brazilian reading this out loud actually sound close to the native? If you wrote "BÔ-Ã" for "bon", STOP and fix it to "BOM".`;
 
-    return await callGeminiJSON<PhoneticsTipResult>(prompt, systemPrompt, 1500, 0);
+    return await callGeminiJSON<PhoneticsTipResult>(prompt, systemPrompt, 1500, 0, 'standard');
   } catch (err) {
     console.error('[generatePhoneticsTip] Error:', err);
     return null;

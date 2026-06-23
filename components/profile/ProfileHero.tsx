@@ -19,6 +19,9 @@ export function ProfileHero({ profile, mistakeCount = 0 }: ProfileHeroProps) {
 
   const streak = getEffectiveStreak(profile);
   const language = profile.currentTargetLanguage as SupportedLanguage;
+  const oralAttempts = profile.productionStats?.oralAttempts ?? 0;
+  const oralAccepted = profile.productionStats?.oralAccepted ?? 0;
+  const oralRate = oralAttempts > 0 ? Math.round((oralAccepted / oralAttempts) * 100) : null;
 
   return (
     <div
@@ -75,6 +78,12 @@ export function ProfileHero({ profile, mistakeCount = 0 }: ProfileHeroProps) {
           />
         )}
       </div>
+      {oralRate !== null && (
+        <p className="mt-3 text-xs text-text-muted">
+          Você produz confortavelmente ~{oralRate}% das vezes que tenta falar (
+          {oralAccepted}/{oralAttempts} aceitas).
+        </p>
+      )}
     </div>
   );
 }

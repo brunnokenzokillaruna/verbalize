@@ -11,6 +11,7 @@ import {
   normalizeErrorCorrectionData,
   normalizeErrorText,
   resolveErrorHighlightIndex,
+  shouldHighlightErrorSpan,
 } from '@/utils/errorCorrection';
 
 interface ErrorCorrectionExerciseProps {
@@ -86,12 +87,13 @@ export function ErrorCorrectionExercise({
   }
 
   const highlightIdx = resolveErrorHighlightIndex(exercise);
+  const showHighlight = shouldHighlightErrorSpan(exercise) && highlightIdx >= 0;
   const before =
-    highlightIdx >= 0
+    showHighlight
       ? exercise.sentence_with_error.slice(0, highlightIdx)
       : exercise.sentence_with_error;
   const after =
-    highlightIdx >= 0
+    showHighlight
       ? exercise.sentence_with_error.slice(highlightIdx + exercise.error_word.length)
       : '';
 
@@ -107,28 +109,30 @@ export function ErrorCorrectionExercise({
       <div className="rounded-xl p-6 bg-[var(--color-surface-raised)]/30 border border-[var(--color-border)]">
         <p className="font-display text-xl leading-relaxed text-[var(--color-text-primary)]">
           {before}
-          <span
-            className="mx-1 px-1.5 py-0.5 rounded-lg font-bold border-b-2 transition-all duration-300"
-            style={{
-              backgroundColor: answered
-                ? isCorrect
-                  ? 'var(--color-success-bg)'
-                  : 'var(--color-error-bg)'
-                : 'var(--color-primary-light)',
-              borderColor: answered
-                ? isCorrect
-                  ? 'var(--color-success)'
-                  : 'var(--color-error)'
-                : 'var(--color-primary)',
-              color: answered
-                ? isCorrect
-                  ? 'var(--color-success)'
-                  : 'var(--color-error)'
-                : 'var(--color-primary-dark)',
-            }}
-          >
-            {exercise.error_word}
-          </span>
+          {showHighlight ? (
+            <span
+              className="mx-1 px-1.5 py-0.5 rounded-lg font-bold border-b-2 transition-all duration-300"
+              style={{
+                backgroundColor: answered
+                  ? isCorrect
+                    ? 'var(--color-success-bg)'
+                    : 'var(--color-error-bg)'
+                  : 'var(--color-primary-light)',
+                borderColor: answered
+                  ? isCorrect
+                    ? 'var(--color-success)'
+                    : 'var(--color-error)'
+                  : 'var(--color-primary)',
+                color: answered
+                  ? isCorrect
+                    ? 'var(--color-success)'
+                    : 'var(--color-error)'
+                  : 'var(--color-primary-dark)',
+              }}
+            >
+              {exercise.error_word}
+            </span>
+          ) : null}
           {after}
         </p>
 

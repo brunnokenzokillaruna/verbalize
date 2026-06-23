@@ -19,14 +19,37 @@ export async function validateAndSanitizeExercises(
       if (ok) {
         Object.assign(ex.data, normalized);
       } else {
-        console.warn('[generatePracticeExercises] Dropped malformed error-correction exercise');
+        console.warn(
+          '[generatePracticeExercises] Dropped error-correction exercise (malformed or displacement/reorder fix — use sentence-builder or grammar-trap instead)',
+        );
       }
       return ok;
     }
     if (ex.type === 'audio-dictation' || ex.type === 'speak-repeat') {
-      const text = (ex.data as { text: string }).text?.trim();
+      const d = ex.data as { text?: string; translation?: string };
+      const text = d.text?.trim();
       if (!text) {
         console.warn(`[generatePracticeExercises] Dropped ${ex.type} with empty text`);
+        return false;
+      }
+      if (!d.translation?.trim()) {
+        console.warn(`[generatePracticeExercises] Dropped ${ex.type} with empty translation`);
+        return false;
+      }
+      return true;
+    }
+    if (ex.type === 'reverse-translation') {
+      const d = ex.data as {
+        portuguese_sentence?: string;
+        target_translation?: string;
+        acceptable_variants?: string[];
+      };
+      if (!d.portuguese_sentence?.trim() || !d.target_translation?.trim()) {
+        console.warn('[generatePracticeExercises] Dropped reverse-translation with missing sentence fields');
+        return false;
+      }
+      if (!Array.isArray(d.acceptable_variants) || d.acceptable_variants.length === 0) {
+        console.warn('[generatePracticeExercises] Dropped reverse-translation with empty acceptable_variants');
         return false;
       }
       return true;
@@ -159,7 +182,10 @@ export async function validateAndSanitizeExercises(
     }
     if (ex.type === 'word-bank-translation') {
       const d = ex.data as { words: string[]; correctOrder: string[]; portuguese_sentence?: string };
-      if (!d.portuguese_sentence || !d.words?.length || !d.correctOrder?.length) return false;
+      if (!d.portuguese_sentence?.trim() || !d.words?.length || !d.correctOrder?.length) {
+        console.warn('[generatePracticeExercises] Dropped malformed word-bank-translation');
+        return false;
+      }
       const sortedWords = [...d.words].map(w => w.trim()).sort();
       const sortedCorrect = [...d.correctOrder].map(w => w.trim()).sort();
       if (sortedWords.join(',') !== sortedCorrect.join(',')) {
@@ -176,6 +202,19 @@ export async function validateAndSanitizeExercises(
     if (ex.type === 'listen-and-select') {
       const d = ex.data as { audioText?: string; options?: string[]; correctIndex?: number; translation?: string };
       if (!d.audioText || !d.translation || !Array.isArray(d.options) || d.options.length < 3) return false;
+      if (typeof d.correctIndex !== 'number' || d.correctIndex < 0 || d.correctIndex >= d.options.length) return false;
+      return true;
+    }
+    if (ex.type === 'listening-comprehension') {
+      const d = ex.data as {
+        dialogueAudio?: string;
+        questionPt?: string;
+        options?: string[];
+        correctIndex?: number;
+        explanationPt?: string;
+      };
+      if (!d.dialogueAudio?.trim() || !d.questionPt?.trim() || !d.explanationPt?.trim()) return false;
+      if (!Array.isArray(d.options) || d.options.length < 2) return false;
       if (typeof d.correctIndex !== 'number' || d.correctIndex < 0 || d.correctIndex >= d.options.length) return false;
       return true;
     }

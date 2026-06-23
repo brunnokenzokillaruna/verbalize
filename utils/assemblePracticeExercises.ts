@@ -1,5 +1,8 @@
 import type { Exercise, LessonTag } from '@/types';
-import { enforceVariety, pinTagExclusiveFirst } from '@/utils/exerciseVariety';
+import { PRACTICE_EXERCISE_COUNT } from '@/lib/practiceExercises/constants';
+import { sessionHasProduction } from '@/lib/practiceExercises/productionTypes';
+import { devLog } from '@/lib/devLog';
+import { pinTagExclusiveFirst } from '@/utils/exerciseVariety';
 
 const TAG_EXCLUSIVE: Partial<Record<LessonTag, Exercise['type']>> = {
   GRAM: 'grammar-trap',
@@ -35,7 +38,7 @@ export function injectImageMatchIntoPool(
   );
   if (replaceIdx >= 0) {
     result[replaceIdx] = imageMatch;
-  } else if (result.length < 6) {
+  } else if (result.length < PRACTICE_EXERCISE_COUNT + 1) {
     result.push(imageMatch);
   }
   return result;
@@ -49,12 +52,25 @@ export function assemblePracticeSession(
 ): Exercise[] {
   const tagExclusive = TAG_EXCLUSIVE[tag] ?? null;
 
-  let merged = [...aiExercises, ...clientExercises];
+  let merged = [...aiExercises];
   merged = skipGrammarTrapIfQuizPassed(merged, tag, bridgeQuizPassed);
   merged = pinTagExclusiveFirst(merged, tagExclusive);
 
-  const types = new Set(merged.map((e) => e.type));
-  merged = enforceVariety(merged, [...types] as Exercise['type'][], tagExclusive);
+  for (const clientEx of clientExercises) {
+    if (clientEx.type === 'image-match') {
+      merged = injectImageMatchIntoPool(merged, clientEx);
+    } else {
+      merged.push(clientEx);
+    }
+  }
+
+  if (merged.length > PRACTICE_EXERCISE_COUNT) {
+    merged = merged.slice(0, PRACTICE_EXERCISE_COUNT);
+  }
+
+  if (!sessionHasProduction(merged)) {
+    devLog(`[assemblePracticeSession] Warning: merged session has no production exercise (tag=${tag})`);
+  }
 
   return merged;
 }

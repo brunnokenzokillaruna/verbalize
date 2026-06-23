@@ -26,11 +26,18 @@ type ReviewExerciseKind =
   | 'reverse-translation'
   | 'word-bank-translation';
 
+function isChunkPhrase(word: string): boolean {
+  return word.trim().includes(' ');
+}
+
 function pickReviewType(
   index: number,
-  word: { imageUrl?: string },
+  word: { word: string; imageUrl?: string },
   level: ProficiencyLevel,
 ): ReviewExerciseKind {
+  if (isChunkPhrase(word.word)) {
+    return level === 'A1' ? 'word-bank-translation' : 'reverse-translation';
+  }
   const cycle: ReviewExerciseKind[] =
     level === 'A1'
       ? ['context-choice', 'context-choice', 'reverse-translation']
@@ -58,8 +65,12 @@ export async function generateVocabReview(
   const exerciseDescriptions = reviewWords
     .map((w, i) => {
       const type = pickReviewType(i, w, level);
+      const chunkNote = isChunkPhrase(w.word)
+        ? `- This is a multi-word chunk/expression — use the FULL phrase "${w.word}" verbatim in the target sentence (not just one word).`
+        : '';
       if (type === 'context-choice') {
         return `Item ${i + 1} — word: "${w.word}" (PT: ${w.translation}) — type "context-choice"
+${chunkNote}
 - Write an ORIGINAL ${langLabel} sentence where "${w.word}" is the key word
 - "sentence": replace "${w.word}" with ___
 - "blankWord": "${w.word}"
@@ -106,7 +117,7 @@ Output a JSON array with exactly ${reviewWords.length} objects, each with "word"
 ${jsonTemplate}
 ]`;
 
-    const result = await callGeminiJSON<VocabReviewItem[]>(prompt, systemPrompt, 2048);
+    const result = await callGeminiJSON<VocabReviewItem[]>(prompt, systemPrompt, 2048, undefined, 'standard');
 
     if (!Array.isArray(result) || result.length === 0) {
       console.error('[generateVocabReview] Unexpected response shape');

@@ -50,7 +50,7 @@ Output ONLY this JSON:
   "curiosidade": "your fun fact here"
 }`;
 
-    const result = await callGeminiJSON<{ curiosidade: string }>(prompt, systemPrompt, 600, 0);
+    const result = await callGeminiJSON<{ curiosidade: string }>(prompt, systemPrompt, 600, 0, 'standard');
     return result?.curiosidade?.trim() || null;
   } catch (err) {
     console.error('[generateCuriosidade] Error:', err);
