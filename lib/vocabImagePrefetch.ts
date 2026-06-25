@@ -1,5 +1,6 @@
 import { devLog } from '@/lib/devLog';
 import { getVocabImage } from '@/app/actions/getVocabImage';
+import { sanitizeVocabularyToken } from '@/lib/hookSanitize';
 import type { HookResult, LessonDefinition, VocabImageResult } from '@/types';
 
 type PrefetchVocabImagesParams = {
@@ -17,7 +18,7 @@ export async function prefetchVocabImages({
   lesson,
   setVocabImage,
 }: PrefetchVocabImagesParams): Promise<void> {
-  const words = hook.newVocabulary;
+  const words = hook.newVocabulary.map(sanitizeVocabularyToken);
   const dialogue = hook.dialogue;
   const language = lesson.language;
 

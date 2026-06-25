@@ -21,6 +21,7 @@ type LessonPhaseContentProps = {
   exerciseAnswer: boolean | null;
   setIsExerciseReady: (ready: boolean) => void;
   submitTrigger: number;
+  exerciseRetryKey?: number;
   currentExercise?: Exercise;
   currentReviewExercise?: Exercise;
   isPlaying: boolean;
@@ -42,6 +43,7 @@ export function LessonPhaseContent({
   exerciseAnswer,
   setIsExerciseReady,
   submitTrigger,
+  exerciseRetryKey = 0,
   currentExercise,
   currentReviewExercise,
   isPlaying,
@@ -125,6 +127,7 @@ export function LessonPhaseContent({
           onAnswer={onAnswer}
           setIsExerciseReady={setIsExerciseReady}
           submitTrigger={submitTrigger}
+          exerciseRetryKey={exerciseRetryKey}
         />
       )}
 
@@ -169,6 +172,7 @@ export function LessonPhaseContent({
           language={store.lesson.language}
           briefing={store.missionBriefing}
           intentMode={['B1', 'B2', 'C1', 'C2'].includes(store.lesson.level)}
+          rolePlayConsequences={store.hook.rolePlayConsequences}
           onComplete={(spoken, total) => store.completeRolePlay(spoken, total)}
         />
       )}
@@ -194,6 +198,7 @@ export function LessonPhaseContent({
           onAnswer={onAnswer}
           setIsExerciseReady={setIsExerciseReady}
           submitTrigger={submitTrigger}
+          exerciseRetryKey={exerciseRetryKey}
         />
       )}
 
@@ -209,6 +214,7 @@ export function LessonPhaseContent({
           onAnswer={onReviewAnswer}
           setIsExerciseReady={setIsExerciseReady}
           submitTrigger={submitTrigger}
+          exerciseRetryKey={exerciseRetryKey}
         />
       )}
     </>

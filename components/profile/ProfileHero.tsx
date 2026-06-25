@@ -1,7 +1,11 @@
 import type { ReactNode } from 'react';
-import { Flame, BookOpen } from 'lucide-react';
+import { Flame, BookOpen, Mic, PenLine, MessageCircle } from 'lucide-react';
 import { LanguageFlag } from '@/components/LanguageFlag';
 import { getEffectiveStreak } from '@/lib/stats';
+import {
+  getCumulativeProductionBreakdown,
+  getWeeklyProductionBreakdown,
+} from '@/lib/productionStatsHelpers';
 import type { UserDocument, SupportedLanguage } from '@/types';
 
 type ProfileHeroProps = {
@@ -19,9 +23,26 @@ export function ProfileHero({ profile, mistakeCount = 0 }: ProfileHeroProps) {
 
   const streak = getEffectiveStreak(profile);
   const language = profile.currentTargetLanguage as SupportedLanguage;
-  const oralAttempts = profile.productionStats?.oralAttempts ?? 0;
-  const oralAccepted = profile.productionStats?.oralAccepted ?? 0;
-  const oralRate = oralAttempts > 0 ? Math.round((oralAccepted / oralAttempts) * 100) : null;
+  const weeklyProduction = getWeeklyProductionBreakdown(profile);
+  const cumulative = getCumulativeProductionBreakdown(profile);
+  const oralRate =
+    cumulative.oralAttempts > 0
+      ? Math.round((cumulative.oralAccepted / cumulative.oralAttempts) * 100)
+      : null;
+  const spontaneousRate =
+    cumulative.oralSpontaneousAttempts > 0
+      ? Math.round(
+          (cumulative.oralSpontaneousAccepted / cumulative.oralSpontaneousAttempts) * 100,
+        )
+      : null;
+  const showWeeklyBreakdown =
+    weeklyProduction.oralEcho > 0 ||
+    weeklyProduction.oralSpontaneous > 0 ||
+    weeklyProduction.written > 0;
+  const showCumulativeBreakdown =
+    cumulative.oralAccepted > 0 ||
+    cumulative.writtenAccepted > 0 ||
+    cumulative.oralSpontaneousAccepted > 0;
 
   return (
     <div
@@ -78,11 +99,60 @@ export function ProfileHero({ profile, mistakeCount = 0 }: ProfileHeroProps) {
           />
         )}
       </div>
-      {oralRate !== null && (
-        <p className="mt-3 text-xs text-text-muted">
-          Você produz confortavelmente ~{oralRate}% das vezes que tenta falar (
-          {oralAccepted}/{oralAttempts} aceitas).
-        </p>
+
+      {(showWeeklyBreakdown || showCumulativeBreakdown) && (
+        <div className="mt-4 flex flex-col gap-2">
+          {showWeeklyBreakdown && (
+            <div className="flex flex-wrap gap-2">
+              <p className="w-full text-[10px] font-black uppercase tracking-widest text-text-muted">
+                Produção esta semana
+              </p>
+              {weeklyProduction.oralEcho > 0 && (
+                <span className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold bg-[rgba(225,29,72,0.08)] text-[#e11d48] border border-[rgba(225,29,72,0.2)]">
+                  <Mic size={12} />
+                  {weeklyProduction.oralEcho} eco
+                </span>
+              )}
+              {weeklyProduction.oralSpontaneous > 0 && (
+                <span className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold bg-[rgba(124,58,237,0.08)] text-[#7c3aed] border border-[rgba(124,58,237,0.2)]">
+                  <MessageCircle size={12} />
+                  {weeklyProduction.oralSpontaneous}{' '}
+                  {weeklyProduction.oralSpontaneous === 1 ? 'espontânea' : 'espontâneas'}
+                </span>
+              )}
+              {weeklyProduction.written > 0 && (
+                <span className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold bg-[rgba(13,148,136,0.08)] text-[#0d9488] border border-[rgba(13,148,136,0.2)]">
+                  <PenLine size={12} />
+                  {weeklyProduction.written}{' '}
+                  {weeklyProduction.written === 1 ? 'escrita' : 'escritas'}
+                </span>
+              )}
+            </div>
+          )}
+          {showCumulativeBreakdown && (
+            <p className="text-xs text-text-muted leading-relaxed">
+              {cumulative.oralAccepted > 0 && oralRate !== null && (
+                <>
+                  Oral: {cumulative.oralAccepted}/{cumulative.oralAttempts} aceitas (~{oralRate}
+                  %).
+                </>
+              )}
+              {cumulative.oralSpontaneousAccepted > 0 && spontaneousRate !== null && (
+                <>
+                  {' '}
+                  Espontânea: {cumulative.oralSpontaneousAccepted}/
+                  {cumulative.oralSpontaneousAttempts} (~{spontaneousRate}%).
+                </>
+              )}
+              {cumulative.writtenAccepted > 0 && (
+                <>
+                  {' '}
+                  Escrita: {cumulative.writtenAccepted}/{cumulative.writtenAttempts} aceitas.
+                </>
+              )}
+            </p>
+          )}
+        </div>
       )}
     </div>
   );

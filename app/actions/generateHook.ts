@@ -2,6 +2,8 @@
 
 import { callGeminiJSON } from '@/services/gemini';
 import { validateDialogueCoherence } from '@/lib/validateDialogueCoherence';
+import { buildMinimalHookPrompt, type HookGenerationParams } from '@/lib/hookGeneration/buildHookContext';
+import { sanitizeDialogueText, sanitizeVocabularyToken, stripMarkdownEmphasis } from '@/lib/hookSanitize';
 import type { SupportedLanguage, ProficiencyLevel, HookResult, LessonTag } from '@/types';
 
 const LANG_LABEL: Record<SupportedLanguage, string> = {
@@ -9,19 +11,7 @@ const LANG_LABEL: Record<SupportedLanguage, string> = {
   en: 'English',
 };
 
-interface GenerateHookParams {
-  language: SupportedLanguage;
-  level: ProficiencyLevel;
-  tag: LessonTag;
-  interests: string[];
-  theme: string;
-  uiTitle?: string;
-  grammarFocus: string;
-  knownVocabulary: string[];
-  arcCharacters?: { learner?: string; local?: string };
-  arcSummary?: string;
-  lastScenarioSummary?: string;
-}
+export type GenerateHookParams = HookGenerationParams;
 
 function pickNames(
   language: SupportedLanguage,
@@ -197,14 +187,20 @@ function normalizeHookResult(
   nameA: string,
   nameB: string,
 ): HookResult {
-  result.dialogue = stripForbiddenFillers(result.dialogue);
+  result.dialogue = sanitizeDialogueText(stripForbiddenFillers(result.dialogue));
   result.dialogue = fixDialogueLabels(result.dialogue, nameA, nameB);
 
   result.newVocabulary = [...new Set(
     result.newVocabulary
-      .map((w: string) => w.trim().toLowerCase())
+      .map((w: string) => sanitizeVocabularyToken(w))
       .filter((w: string) => w.length > 0),
   )];
+
+  if (result.dialogueTranslations) {
+    result.dialogueTranslations = result.dialogueTranslations.map((line) =>
+      stripMarkdownEmphasis(line),
+    );
+  }
 
   if (result.dialogueVerbs) {
     result.dialogueVerbs = [...new Set(
@@ -244,6 +240,27 @@ function normalizeHookResult(
       }));
   }
 
+  if (result.rolePlayConsequences?.length) {
+    const dialogueLines = result.dialogue.split('\n').filter((l) => l.trim());
+    result.rolePlayConsequences = result.rolePlayConsequences
+      .filter(
+        (c) =>
+          typeof c.npcLineIndex === 'number' &&
+          c.npcLineIndex >= 0 &&
+          c.npcLineIndex < dialogueLines.length &&
+          c.alternateText?.trim() &&
+          !/^você\s*:/i.test((dialogueLines[c.npcLineIndex]?.split(':')[0] ?? '').trim()),
+      )
+      .map((c) => ({
+        npcLineIndex: c.npcLineIndex,
+        alternateText: c.alternateText.trim(),
+        alternateTranslation: c.alternateTranslation?.trim(),
+      }));
+    if (result.rolePlayConsequences.length === 0) {
+      delete result.rolePlayConsequences;
+    }
+  }
+
   return result;
 }
 
@@ -256,9 +273,9 @@ ${breaks.map((b) => `- ${b}`).join('\n')}`;
 
 /**
  * MINIMAL hook: generates ONLY the critical-path fields so the user can start
- * the lesson in 1-2 seconds. Secondary fields (grammarBridge, curiosidade,
- * phoneticsTip, missionBriefing, imageKeywords, vocabTranslations) are fetched
- * in parallel by useLessonBootstrap via smaller focused actions.
+ * the lesson quickly. Heavy fields (vocabTranslations, imageKeywords,
+ * imageMatchOptions, grammarBridge, curiosidade, phoneticsTip, missionBriefing)
+ * are fetched in parallel by useLessonBootstrap via smaller focused actions.
  */
 export async function generateHook(params: GenerateHookParams): Promise<HookResult | null> {
   const {
@@ -336,7 +353,8 @@ Regras de Humanidade:
 - Use português brasileiro natural, de conversa (ex: "só pra você saber", "olha que legal", "né").
 - Proibido usar palavras como "essencial", "crucial", "fundamental", "nuance", "unificar".
 - Seja conciso e direto.
-Respond with ONLY valid JSON, no markdown, no explanation.`;
+Respond with ONLY valid JSON, no markdown, no explanation.
+NEVER wrap words in ** or ^^ — the app highlights vocabulary; use plain text only.`;
 
   const isEarlyLearner = knownVocabulary.length < 30;
   let normalizedKnown = knownVocabulary.map((w) => w.toLowerCase());
@@ -456,38 +474,31 @@ Output ONLY this JSON object (no extra text):
   "dialogueTranslations": ["<pt-BR line 1>", "<pt-BR line 2>", ...],
   "newVocabulary": ${newVocabTemplate},
   "dialogueVerbs": ["verb_infinitive_1", "verb_infinitive_2", ...],
-  "grammarFocus": "one sentence describing the grammar used",
-  "imageKeywords": {
-    "<vocab word 1>": "short English Pexels search term (3-5 words, single object, neutral background)",
-    "<vocab word 2>": "..."
-  },
-  "imageMatchOptions": {
-    "<vocab word 1>": {
-      "distractors": ["<other vocab word>", "<word from different semantic field>", "<another distinct word>"],
-      "semanticFields": ["food", "transport", "object"]
-    }
-  },
-  "vocabTranslations": {
-    "<vocab word 1>": { "translation": "pt-BR word/phrase", "explanation": "dica de uso em PT-BR SIMPLES, ≤15 palavras — linguagem de amigo, sem jargão gramatical (nada de 'substantivo feminino', 'locução adverbial', 'distinção semântica'). Prefira exemplos concretos a termos técnicos.", "example": "one sentence in ${lang} using the word" },
-    "<vocab word 2>": { "translation": "...", "explanation": "...", "example": "..." }
-  }${tag === 'EXPR' || tag === 'CULT' ? `,
+  "grammarFocus": "one sentence describing the grammar used"${tag === 'EXPR' || tag === 'CULT' ? `,
   "newChunks": [
     { "phrase": "<multi-word expression in ${lang}>", "translation": "<pt-BR>", "entryType": "expression" }
+  ]` : ''}${tag === 'MISS' ? `,
+  "rolePlayConsequences": [
+    {
+      "npcLineIndex": 2,
+      "alternateText": "NPC line in ${lang} with slightly colder tone",
+      "alternateTranslation": "PT-BR translation"
+    }
   ]` : ''}
 }
 
 Rules:
 - dialogue must have between ${minLines} and ${maxLines} lines
-- newVocabulary: EXACTLY 2 DISTINCT NON-VERB words (nouns, adjectives, or adverbs). Both must appear in the dialogue. Choose words that fit the scene naturally — do not break the conversation to force a word in.
+- dialogueTranslations: one short PT-BR string per dialogue line (max 15 words each)
+- newVocabulary: EXACTLY 2 DISTINCT NON-VERB words as plain lowercase strings (no **, no quotes). Both must appear verbatim in the dialogue.
 - dialogueVerbs: List EVERY verb used in the dialogue in its infinitive form.
 - NEVER include days of the week, months of the year, or proper nouns in newVocabulary.
-- imageKeywords: one concise English Pexels search term per vocabulary word.
-- imageMatchOptions: for each vocab word, 3 distractor words from VISUALLY DISTINCT semantic fields (not synonyms). semanticFields must all be different (e.g. food vs furniture vs transport).
-- vocabTranslations: provide for all 2 vocabulary words.`;
+- Do NOT include imageKeywords, imageMatchOptions, or vocabTranslations — those are fetched separately.${tag === 'MISS' ? `
+- rolePlayConsequences: optional — at most 1 alternate NPC line when the learner's previous turn was inadequate.` : ''}`;
 
   try {
     const fetchHook = async (generationPrompt: string): Promise<HookResult | null> => {
-      const raw = await callGeminiJSON<HookResult>(generationPrompt, systemPrompt, 2048, 0, 'critical');
+      const raw = await callGeminiJSON<HookResult>(generationPrompt, systemPrompt, 4096, 0, 'critical');
       if (!raw?.dialogue || raw?.newVocabulary?.length !== 2) {
         console.error('[generateHook] Invalid minimal hook response');
         return null;
@@ -545,6 +556,25 @@ Rules:
     return first;
   } catch (err) {
     console.error('[generateHook] Error:', err);
+    return null;
+  }
+}
+
+/**
+ * Stage 1 — fast path: dialogue + vocabulary only (~50% smaller prompt, standard tier).
+ * Verbs, chunks, and roleplay consequences load via enrichHookMetadata in background.
+ */
+export async function generateMinimalHook(params: GenerateHookParams): Promise<HookResult | null> {
+  const { prompt, systemPrompt, nameA, nameB } = buildMinimalHookPrompt(params);
+  try {
+    const raw = await callGeminiJSON<HookResult>(prompt, systemPrompt, 2048, 0, 'standard');
+    if (!raw?.dialogue || raw?.newVocabulary?.length !== 2) {
+      console.error('[generateMinimalHook] Invalid response');
+      return null;
+    }
+    return normalizeHookResult(raw, nameA, nameB);
+  } catch (err) {
+    console.error('[generateMinimalHook] Error:', err);
     return null;
   }
 }

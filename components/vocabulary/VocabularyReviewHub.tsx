@@ -10,7 +10,8 @@ import {
   Loader2,
   Zap,
 } from 'lucide-react';
-import { REVIEW_SESSION_SIZE } from '@/utils/reviewSession';
+import { REVIEW_SESSION_SIZE, countPassiveOnlyInSession } from '@/utils/reviewSession';
+import { isPassiveOnlyVocabulary } from '@/lib/vocabKnowledgeMode';
 import { SRS_BAR_COLOR } from '@/components/vocabulary/SrsBar';
 import type { ReviewMode } from '@/hooks/useVocabReview';
 import type { UserVocabularyDocument } from '@/types';
@@ -132,9 +133,22 @@ export function VocabularyReviewHub({
   const [startingMode, setStartingMode] = useState<ReviewMode | null>(null);
 
   const sessionCount = sessionPreview.length;
+  const passiveInSession = countPassiveOnlyInSession(sessionPreview);
   const sessionsLeft = Math.ceil(dueCount / REVIEW_SESSION_SIZE);
   const reviewedToday = Math.max(0, initialDueCount - dueCount);
   const remainingAfterSession = Math.max(0, dueCount - sessionCount);
+  const queueSubtitle = [
+    passiveInSession > 0
+      ? `${passiveInSession} ${passiveInSession === 1 ? 'priorizada' : 'priorizadas'} para produção`
+      : null,
+    remainingAfterSession > 0
+      ? `${remainingAfterSession} ficam para a próxima rodada`
+      : passiveInSession === 0
+        ? 'Todas as pendentes nesta sessão'
+        : null,
+  ]
+    .filter(Boolean)
+    .join(' · ');
 
   async function handleStart(mode: ReviewMode) {
     setStartingMode(mode);
@@ -238,11 +252,7 @@ export function VocabularyReviewHub({
             <p className="text-xs font-bold text-text-primary">
               Fila da sessão
             </p>
-            <p className="text-[10px] text-text-muted mt-0.5">
-              {remainingAfterSession > 0
-                ? `${remainingAfterSession} ficam para a próxima rodada`
-                : 'Todas as pendentes nesta sessão'}
-            </p>
+            <p className="text-[10px] text-text-muted mt-0.5">{queueSubtitle}</p>
           </div>
           <button
             type="button"
@@ -260,15 +270,17 @@ export function VocabularyReviewHub({
           {sessionPreview.map((item) => {
             const level = Math.min(Math.max(item.srsLevel ?? 0, 0), 5);
             const color = SRS_BAR_COLOR[level];
+            const passiveOnly = isPassiveOnlyVocabulary(item);
             return (
               <span
                 key={item.word}
                 className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold border"
                 style={{
-                  backgroundColor: 'var(--color-bg)',
-                  borderColor: 'var(--color-border)',
+                  backgroundColor: passiveOnly ? 'var(--color-primary-light)' : 'var(--color-bg)',
+                  borderColor: passiveOnly ? 'color-mix(in srgb, var(--color-primary) 35%, var(--color-border))' : 'var(--color-border)',
                   color: 'var(--color-text-primary)',
                 }}
+                title={passiveOnly ? 'Ainda não produzida — prioridade na revisão' : undefined}
               >
                 <span
                   className="h-1.5 w-1.5 rounded-full shrink-0"

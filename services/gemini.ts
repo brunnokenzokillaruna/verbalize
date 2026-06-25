@@ -281,6 +281,49 @@ export async function callGemini(
   throw lastError || new Error('All Gemini models failed in callGemini');
 }
 
+function salvageTruncatedJson(cleaned: string): string {
+  let result = cleaned.trimEnd();
+  result = result.replace(/,\s*"[^"]*"?\s*:?\s*"?[^"\\]*(?:\\.[^"\\]*)*$/m, '');
+  result = result.replace(/,\s*$/m, '');
+
+  let inString = false;
+  let escaped = false;
+  let openBraces = 0;
+  let openBrackets = 0;
+
+  for (const ch of result) {
+    if (escaped) {
+      escaped = false;
+      continue;
+    }
+    if (ch === '\\') {
+      escaped = true;
+      continue;
+    }
+    if (ch === '"') {
+      inString = !inString;
+      continue;
+    }
+    if (inString) continue;
+    if (ch === '{') openBraces++;
+    else if (ch === '}') openBraces--;
+    else if (ch === '[') openBrackets++;
+    else if (ch === ']') openBrackets--;
+  }
+
+  if (inString) result += '"';
+  while (openBrackets > 0) {
+    result += ']';
+    openBrackets--;
+  }
+  while (openBraces > 0) {
+    result += '}';
+    openBraces--;
+  }
+
+  return result;
+}
+
 function parseGeminiJsonResponse<T>(raw: string): T {
   let cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim();
 
@@ -296,6 +339,14 @@ function parseGeminiJsonResponse<T>(raw: string): T {
   try {
     return JSON.parse(cleaned) as T;
   } catch {
+    const salvaged = salvageTruncatedJson(cleaned);
+    if (salvaged !== cleaned) {
+      try {
+        return JSON.parse(salvaged) as T;
+      } catch {
+        // fall through to error below
+      }
+    }
     throw new SyntaxError(`Gemini response was not valid JSON:\n${cleaned.slice(0, 500)}`);
   }
 }

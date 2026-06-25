@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronDown, Loader2, Languages, Lightbulb, XCircle } from 'lucide-react';
-import type { ReverseTranslationData } from '@/types';
+import type { ReverseTranslationData, ProficiencyLevel } from '@/types';
 import { isAccentOnlyDiff } from '@/utils/accent';
 import { validateReverseTranslation } from '@/app/actions/validateAnswer';
 import { incrementProductionStats } from '@/services/firestore';
@@ -9,6 +9,7 @@ import { useAuthStore } from '@/store/authStore';
 interface ReverseTranslationInputProps {
   data: ReverseTranslationData;
   language: string;
+  level?: ProficiencyLevel;
   onAnswer: (correct: boolean) => void;
   answered: boolean;
   setIsExerciseReady: (ready: boolean) => void;
@@ -27,13 +28,18 @@ type AnswerStatus = 'idle' | 'validating' | 'correct' | 'accent-warning' | 'wron
 
 export function ReverseTranslationInput({ 
   data, 
-  language, 
+  language,
+  level,
   onAnswer, 
   answered,
   setIsExerciseReady,
   submitTrigger
 }: ReverseTranslationInputProps) {
   const { user } = useAuthStore();
+  const showHint =
+    !!data.hint &&
+    !!level &&
+    !(['A2', 'B1', 'B2', 'C1', 'C2'] as ProficiencyLevel[]).includes(level);
 
   function reportProduction(correct: boolean) {
     if (user) incrementProductionStats(user.uid, 'freeWrite', correct).catch(console.error);
@@ -265,7 +271,7 @@ export function ReverseTranslationInput({
       )}
 
       {/* Optional hint (collapsible) */}
-      {data.hint && (
+      {showHint && (
         <div className="flex flex-col gap-2.5 mt-1">
           <button
             type="button"

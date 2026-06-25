@@ -9,6 +9,8 @@ import { UserTurn } from '@/components/lesson/mission-roleplay/UserTurn';
 import { MAX_PAST_LINES } from '@/components/lesson/mission-roleplay/missionTheme';
 import type { LessonMissionRolePlayProps } from '@/components/lesson/mission-roleplay/types';
 import { useMissionRolePlay } from '@/hooks/useMissionRolePlay';
+import { recordOralExerciseOutcome } from '@/lib/oralExerciseTracking';
+import { useAuthStore } from '@/store/authStore';
 import type { MissionBriefingResult } from '@/types';
 
 export type { LessonMissionRolePlayProps } from '@/components/lesson/mission-roleplay/types';
@@ -23,8 +25,10 @@ export function LessonMissionRolePlay({
   language,
   intentMode = false,
   briefing,
+  rolePlayConsequences,
   onComplete,
 }: Props) {
+  const { user } = useAuthStore();
   const {
     lines,
     totalSpeakable,
@@ -50,6 +54,7 @@ export function LessonMissionRolePlay({
     dialogueTranslations,
     language,
     intentMode,
+    rolePlayConsequences,
     onComplete,
   });
 
@@ -103,8 +108,14 @@ export function LessonMissionRolePlay({
               onToggleHint={() => setShowHint((s) => !s)}
               onRecord={startRecording}
               onStopRecord={stopRecording}
-              onSkip={() => advance(false)}
-              onConfirm={() => advance(true)}
+              onSkip={() => {
+                recordOralExerciseOutcome(user?.uid, 'skipped');
+                advance(false);
+              }}
+              onConfirm={() => {
+                recordOralExerciseOutcome(user?.uid, 'completed');
+                advance(recState === 'review-correct');
+              }}
               onRetry={startRecording}
               onPlayTarget={playCurrentLine}
             />

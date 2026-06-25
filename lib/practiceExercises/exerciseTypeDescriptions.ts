@@ -20,7 +20,8 @@ export function buildTypeDescriptions(langLabel: string): Record<ExerciseTypeId,
     'reverse-translation': `type "reverse-translation":
    - "portuguese_sentence" (PT-BR) → "target_translation" (${langLabel}).
    - "acceptable_variants" (2-4 alternative phrasings).
-   - "hint" (optional grammar tip in PT-BR).`,
+   - "hint" (optional grammar tip in PT-BR).
+   - Optional chain fields: "linkedExerciseId" (e.g. "chain-1") and "chainAnchorPhrase" (${langLabel} phrase shared with a paired listening-comprehension exercise).`,
     'word-bank-translation': `type "word-bank-translation":
    - "portuguese_sentence" (PT-BR sentence to translate).
    - "correctOrder" (array of ${langLabel} words in correct order).
@@ -46,11 +47,16 @@ export function buildTypeDescriptions(langLabel: string): Record<ExerciseTypeId,
    - "options" (3 answer choices in PT-BR — 1 correct, 2 plausible distractors).
    - "correctIndex" (0-based).
    - "explanationPt" (short PT-BR explanation after answering).
+   - Optional chain fields: "linkedExerciseId" (e.g. "chain-1") and "chainAnchorPhrase" (one key ${langLabel} phrase from dialogueAudio for a paired production exercise).
    - The student listens WITHOUT seeing the dialogue text — test comprehension, not transcription.`,
     'audio-dictation': `type "audio-dictation":
    - Short ORIGINAL sentence. "text" (${langLabel}), "translation" (PT-BR).`,
     'speak-repeat': `type "speak-repeat":
    - Short ORIGINAL sentence. "text" (${langLabel}), "translation" (PT-BR).`,
+    shadowing: `type "shadowing":
+   - Short ORIGINAL sentence (6-14 words) for speak-along practice.
+   - "text" (${langLabel}), "translation" (PT-BR).
+   - "tip" (optional PT-BR): brief note on rhythm, liaison, or intonation to mimic.`,
     'sentence-builder': `type "sentence-builder":
    - Short ORIGINAL sentence (3-8 words).
    - "correctOrder" (array of words in the correct order), "words" (array of the EXACT same words, shuffled), "translation" (PT-BR).
@@ -98,6 +104,10 @@ export function buildTypeDescriptions(langLabel: string): Record<ExerciseTypeId,
    - "sentenceContext" (target language): a sentence using the correctWord naturally.
    - "translation" (PT-BR): translation of the sentence.
    - "tip" (PT-BR): a pronunciation tip to help distinguish the two sounds.`,
+    'minimal-pair-production': `type "minimal-pair-production":
+   - Same data schema as "minimal-pair" (wordA, wordB, correctWord, sentenceContext, translation, tip).
+   - The learner will SPEAK the correct word aloud (not multiple choice).
+   - Choose pairs where oral production clearly distinguishes the sounds.`,
     'conjugation-speed': `type "conjugation-speed":
    - This exercise tests quick verb conjugation.
    - "verb" (infinitive form in target language).
@@ -107,5 +117,101 @@ export function buildTypeDescriptions(langLabel: string): Record<ExerciseTypeId,
    - "options" (array of EXACTLY 4 UNIQUE strings: 1 correct + 3 highly plausible but wrong conjugations of the SAME verb. No duplicates allowed.).
    - "exampleSentence" (target language): a complete sentence using the correct form.
    - "translation" (PT-BR): translation of the example sentence.`,
+    'listen-and-respond': `type "listen-and-respond":
+   - "dialogueAudio" (3-4 line ORIGINAL ${langLabel} dialogue — Speaker: line format; last line is a question or request TO the learner).
+   - "promptLine" (${langLabel}): the final line the learner must respond to.
+   - "contextPt" (PT-BR): situation setup for the learner.
+   - "evaluationCriteria" (PT-BR): rubric for acceptable responses (intent, register, key ideas).
+   - "acceptableThemes" (array of 2-4 PT-BR phrases describing valid response ideas).
+   - "exampleResponse" (${langLabel}): one natural example answer (not the only valid answer).`,
+    'free-roleplay': `type "free-roleplay":
+   - "context" (PT-BR): situational setup.
+   - "promptLine" (${langLabel}): what the interlocutor says.
+   - "evaluationCriteria" (PT-BR): what a good response must accomplish.
+   - "acceptableThemes" (2-4 PT-BR valid response ideas).
+   - "exampleResponse" (${langLabel}): model answer.
+   - "explanation" (PT-BR): why the example works pragmatically.`,
+    'micro-message': `type "micro-message":
+   - "context" (PT-BR): chat/email scenario (informal register).
+   - "incomingMessage" (${langLabel}): message received.
+   - "translation" (PT-BR): hint for incoming message.
+   - "evaluationCriteria" (PT-BR): what the reply must include.
+   - "exampleResponse" (${langLabel}): natural short reply (1-2 sentences).`,
+    paraphrase: `type "paraphrase":
+   - "source_sentence" (${langLabel}): original sentence the learner saw.
+   - "source_translation" (PT-BR): meaning of the source sentence.
+   - "target_paraphrase" (${langLabel}): one valid paraphrase (same meaning, different wording — at least 2 words changed).
+   - "acceptable_variants" (2-4 alternative paraphrases with same meaning).
+   - "hint" (optional PT-BR tip about synonym or structure change).`,
+    'fill-gap-production': `type "fill-gap-production":
+   - "sentence" (${langLabel} sentence with exactly one "___" blank for a key word).
+   - "blankWord" (correct word to type — NOT multiple choice).
+   - "translation" (PT-BR translation of the full sentence).
+   - "acceptable_variants" (0-2 acceptable alternate spellings or forms).`,
+    'translation-with-constraint': `type "translation-with-constraint":
+   - "portuguese_sentence" (PT-BR sentence to translate).
+   - "required_chunk" (${langLabel}): a word or short phrase FROM THIS LESSON's key vocabulary or dialogue — the learner MUST include it in their translation.
+   - "target_translation" (${langLabel}): model answer that naturally includes required_chunk.
+   - "acceptable_variants" (2-4 valid alternatives that also include required_chunk).
+   - "constraint_explanation" (PT-BR): why this chunk is required/natural here.`,
+    'voicemail-dictation': `type "voicemail-dictation":
+   - A longer voicemail message (2-4 sentences in ${langLabel}) the learner listens to.
+   - "audioText" (${langLabel}): the full voicemail (natural spoken register, 25-60 words).
+   - "contextPt" (PT-BR): scenario setup (e.g. "Correio de voz do chefe").
+   - "expected_summary" (PT-BR): 1-2 sentence summary of the key message.
+   - "acceptable_summaries" (2-3 valid PT-BR summary variants).
+   - "key_points" (optional array of 2-3 PT-BR bullet ideas covered in the message).`,
+    'inference-tone': `type "inference-tone":
+   - Two short utterances in ${langLabel} that differ in TONE/REGISTER (not just vocabulary) — e.g. polite vs impatient, sincere vs sarcastic, formal vs casual.
+   - "contextPt" (PT-BR scenario).
+   - "questionPt" (PT-BR): which audio matches a target tone? e.g. "Qual fala soa mais impaciente?"
+   - "targetTonePt" (PT-BR): the tone tested, e.g. "impaciência".
+   - "audioTextA", "audioTextB" (${langLabel}): two DIFFERENT sentences expressing contrasting attitudes in the same situation.
+   - "labelA", "labelB" (PT-BR): short tone labels for each audio (for feedback).
+   - "correctOption": "A" or "B" — which audio matches questionPt.
+   - "explanationPt" (PT-BR): why the correct utterance carries that tone.`,
+    'connected-speech': `type "connected-speech":
+   - Sentence in ${langLabel} featuring a clear connected-speech phenomenon (French: liaison, elision, enchaînement; English: linking, reduction).
+   - "audioText" (${langLabel}): full sentence for TTS (same as expected_transcription in standard orthography).
+   - "translation" (PT-BR).
+   - "contextPt" (PT-BR): brief scenario.
+   - "phenomenonPt" (PT-BR): name the phenomenon, e.g. "Liaison entre 'les' e 'amis'".
+   - "segmentedForm" (PT-BR or ${langLabel}): words separated visually, e.g. "les | amis" or "an | apple".
+   - "linkedForm" (PT-BR): how it sounds when connected, e.g. "les‿z‿amis" or "a-napple".
+   - "expected_transcription" (${langLabel}): standard spelling the learner should write after listening.
+   - "acceptable_variants" (1-3 valid spelling variants).
+   - "explanationPt" (PT-BR): 1-2 sentences on the pronunciation rule.`,
+    'story-continuation': `type "story-continuation":
+   - Micro-narrative: learner continues an incomplete story in ${langLabel}.
+   - "storyOpening" (2-3 sentences in ${langLabel}) — ends on an open moment (pending action, question, or cliffhanger). NOT a complete story.
+   - "storyTranslation" (PT-BR translation of storyOpening).
+   - "contextPt" (PT-BR): who, where, when — narrative setup.
+   - "promptPt" (PT-BR): task, e.g. "Continue a história com 1-2 frases".
+   - "evaluationCriteria" (PT-BR): rubric for coherence, tense consistency, logical next beat.
+   - "acceptableThemes" (2-4 PT-BR directions/themes that count as valid continuations).
+   - "exampleContinuation" (${langLabel}): 1-2 sentences continuing naturally.
+   - "explanationPt" (PT-BR): why the example works (link, tense, narrative logic).
+   - Use lesson vocabulary; do NOT copy the lesson dialogue verbatim.`,
+    'spot-the-register': `type "spot-the-register":
+   - Short dialogue (2-4 lines in ${langLabel}) where ONE line uses the WRONG register for the situation (too formal, too informal, wrong tu/vous, etc.).
+   - "context" (PT-BR scenario with social relationship and setting).
+   - "dialogueLines" (array of 2-4 ${langLabel} lines in order).
+   - "wrongLineIndex" (0-based index of the line with inappropriate register).
+   - "registerIssuePt" (PT-BR): what is wrong, e.g. "Informal demais para falar com o gerente".
+   - "targetRegisterPt" (PT-BR): expected register, e.g. "Formal e respeitoso (vous)".
+   - "evaluationCriteria" (PT-BR): rubric for rewriting with correct register while keeping the same intent.
+   - "acceptableThemes" (2-3 PT-BR acceptable directions for the rewrite).
+   - "correctedLine" (${langLabel}): the wrong line rewritten with appropriate register (same meaning).
+   - "explanationPt" (PT-BR): why the original fails socially and why the correction fits.`,
+    'prompted-monologue': `type "prompted-monologue":
+   - Extended oral production: learner speaks 30-60 seconds (aim for 3-6 sentences) on a given topic in ${langLabel}.
+   - "contextPt" (PT-BR scenario — who/where/why they are speaking).
+   - "promptPt" (PT-BR topic question, e.g. "Fale sobre sua rotina de manhã").
+   - "speakingGoalPt" (PT-BR): duration/scope cue, e.g. "Fale por 30-60 segundos, 3-5 frases".
+   - "evaluationCriteria" (PT-BR): rubric — coherence, vocabulary from lesson, complete answer to prompt.
+   - "acceptableThemes" (2-4 PT-BR themes/points the answer should touch).
+   - "exampleMonologue" (${langLabel}): 3-6 sentence model answer (not necessarily read aloud by learner).
+   - "keyPoints" (optional array of 2-3 PT-BR bullet ideas to cover).
+   - "explanationPt" (PT-BR): why the model monologue works structurally.`,
   };
 }

@@ -44,6 +44,7 @@ interface LessonState {
   /** Full AI tooltip payloads keyed by tooltipCacheKey — instant word clicks. */
   wordTooltips: Record<string, TranslateWordResult>;
   knownVocabulary: string[]; // words the user already learned (from Firestore)
+  masteredVocabulary: string[]; // words with SRS level ≥4
 
   // Practice exercises
   exercises: Exercise[];
@@ -79,6 +80,9 @@ interface LessonState {
   checkpointProductionCorrect: number;
   checkpointPassed: boolean;
 
+  /** True when the learner accepted at least one spontaneous production attempt this session. */
+  spontaneousProductionAccepted: boolean;
+
   setCheckpointSession: (session: CheckpointSessionResult) => void;
   recordComprehensionAnswer: (correct: boolean) => void;
   nextComprehensionQuestion: () => void;
@@ -93,6 +97,7 @@ interface LessonState {
 
   setPhase: (phase: LessonPhase) => void;
   setKnownVocabulary: (words: string[]) => void;
+  setMasteredVocabulary: (words: string[]) => void;
   setHook: (hook: HookResult) => void;
   mergeHook: (partial: Partial<HookResult>) => void;
   setMissionBriefing: (briefing: MissionBriefingResult) => void;
@@ -105,6 +110,7 @@ interface LessonState {
   setIsLoading: (loading: boolean) => void;
   setBridgeQuizPassed: (passed: boolean) => void;
   setDiscoveredVerbs: (verbs: string[]) => void;
+  markSpontaneousProductionAccepted: () => void;
 
   /** Record a correct answer for the current practice exercise. */
   recordCorrect: () => void;
@@ -143,6 +149,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
   vocabTranslations: {},
   wordTooltips: {},
   knownVocabulary: [],
+  masteredVocabulary: [],
   discoveredVerbs: [],
   exercises: [],
   exerciseIndex: 0,
@@ -163,6 +170,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
   checkpointProductionIndex: 0,
   checkpointProductionCorrect: 0,
   checkpointPassed: false,
+  spontaneousProductionAccepted: false,
 
   // ── Actions ────────────────────────────────────────────────────────────────
 
@@ -178,6 +186,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       vocabTranslations: {},
       wordTooltips: {},
       knownVocabulary: [],
+      masteredVocabulary: [],
       discoveredVerbs: [],
       exercises: [],
       exerciseIndex: 0,
@@ -198,12 +207,14 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       checkpointProductionIndex: 0,
       checkpointProductionCorrect: 0,
       checkpointPassed: false,
+      spontaneousProductionAccepted: false,
     }),
 
   setPhase: (phase) => set({ phase }),
   setIsLoading: (isLoading) => set({ isLoading }),
   setBridgeQuizPassed: (bridgeQuizPassed) => set({ bridgeQuizPassed }),
   setKnownVocabulary: (knownVocabulary) => set({ knownVocabulary }),
+  setMasteredVocabulary: (masteredVocabulary) => set({ masteredVocabulary }),
 
   setHook: (hook) => set({
     hook: { ...hook, newVocabulary: [...new Set(hook.newVocabulary)] },
@@ -225,6 +236,9 @@ export const useLessonStore = create<LessonState>((set, get) => ({
     }),
 
   setDiscoveredVerbs: (verbs: string[]) => set({ discoveredVerbs: verbs }),
+
+  markSpontaneousProductionAccepted: () =>
+    set({ spontaneousProductionAccepted: true }),
 
   setGrammarBridge: (grammarBridge) => set({ grammarBridge, isLoading: false }),
 
@@ -306,6 +320,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       vocabTranslations: {},
       wordTooltips: {},
       knownVocabulary: [],
+      masteredVocabulary: [],
       discoveredVerbs: [],
       exercises: [],
       exerciseIndex: 0,
@@ -326,5 +341,6 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       checkpointProductionIndex: 0,
       checkpointProductionCorrect: 0,
       checkpointPassed: false,
+      spontaneousProductionAccepted: false,
     }),
 }));

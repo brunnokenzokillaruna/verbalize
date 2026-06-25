@@ -1,6 +1,7 @@
 import React from 'react';
 import { Loader2 } from 'lucide-react';
 import { VisualVocabCard } from './VisualVocabCard';
+import { sanitizeVocabularyToken } from '@/lib/hookSanitize';
 
 import type { SupportedLanguage, ProficiencyLevel } from '@/types';
 
@@ -63,12 +64,13 @@ export function LessonVocabularyScreen({
       {/* Vocabulary Card Grid - Balanced 2-column Grid */}
       <div className="grid grid-cols-2 gap-3 sm:gap-4 pb-4">
         {[...new Set(newVocabulary)].map((word, idx) => {
-          const img = vocabImages[word];
-          const translation = vocabTranslations[word] ?? word;
-          const isImageLoading = !(word in vocabImages);
+          const cleanWord = sanitizeVocabularyToken(word);
+          const img = vocabImages[cleanWord] ?? vocabImages[word];
+          const translation = vocabTranslations[cleanWord] ?? vocabTranslations[word] ?? cleanWord;
+          const isImageLoading = !(cleanWord in vocabImages) && !(word in vocabImages);
           return (
             <div
-              key={word}
+              key={cleanWord}
               className="animate-slide-up-spring"
               style={{ 
                 animationDelay: `${idx * 100}ms`, 
@@ -76,7 +78,7 @@ export function LessonVocabularyScreen({
               }}
             >
               <VisualVocabCard
-                word={word}
+                word={cleanWord}
                 translation={translation}
                 language={language}
                 imageUrl={img?.imageUrl}

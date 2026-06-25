@@ -1,6 +1,7 @@
 'use client';
 
-import { CheckCircle2, XCircle, ChevronRight, Loader2 } from 'lucide-react';
+import { useState } from 'react';
+import { CheckCircle2, XCircle, ChevronRight, Loader2, Lightbulb } from 'lucide-react';
 
 export type CheckButtonState = 'idle' | 'disabled' | 'correct' | 'incorrect';
 
@@ -8,6 +9,8 @@ interface CheckButtonProps {
   state: CheckButtonState;
   correctAnswer?: string;
   hint?: string;
+  retryNotice?: string | null;
+  elaborationHint?: string | null;
   onCheck: () => void;
   onContinue: () => void;
   loading?: boolean;
@@ -17,10 +20,13 @@ export function CheckButton({
   state,
   correctAnswer,
   hint,
+  retryNotice,
+  elaborationHint,
   onCheck,
   onContinue,
   loading = false,
 }: CheckButtonProps) {
+  const [showElaboration, setShowElaboration] = useState(false);
   const isResult = state === 'correct' || state === 'incorrect';
   const isCorrect = state === 'correct';
 
@@ -34,7 +40,15 @@ export function CheckButton({
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-20 mx-auto max-w-lg md:max-w-2xl lg:max-w-4xl">
-      {/* Result feedback banner */}
+      {retryNotice && !isResult && (
+        <div
+          className="border-t-4 border-amber-500 px-5 py-3"
+          style={{ backgroundColor: 'var(--color-warning-bg)' }}
+        >
+          <p className="text-sm font-semibold text-amber-700">{retryNotice}</p>
+        </div>
+      )}
+
       <div
         style={{
           backgroundColor: isCorrect
@@ -44,7 +58,7 @@ export function CheckButton({
               : 'transparent',
           transition: 'all 300ms ease',
           overflow: 'hidden',
-          maxHeight: isResult ? '120px' : '0px',
+          maxHeight: isResult ? (showElaboration && elaborationHint ? '200px' : '120px') : '0px',
           borderTop: isResult
             ? `4px solid ${isCorrect ? 'var(--color-success)' : 'var(--color-error)'}`
             : 'none',
@@ -57,7 +71,7 @@ export function CheckButton({
             ) : (
               <XCircle size={22} style={{ color: 'var(--color-error)', flexShrink: 0, marginTop: 1 }} />
             )}
-            <div>
+            <div className="min-w-0 flex-1">
               <p
                 className="font-bold text-base"
                 style={{ color: isCorrect ? 'var(--color-success)' : 'var(--color-error)' }}
@@ -67,9 +81,7 @@ export function CheckButton({
               {!isCorrect && correctAnswer && (
                 <p className="mt-0.5 text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>
                   Resposta certa:{' '}
-                  <span className="font-bold text-[var(--color-text-primary)]">
-                    {correctAnswer}
-                  </span>
+                  <span className="font-bold text-[var(--color-text-primary)]">{correctAnswer}</span>
                 </p>
               )}
               {hint && (
@@ -77,12 +89,26 @@ export function CheckButton({
                   {hint}
                 </p>
               )}
+              {isCorrect && elaborationHint && !showElaboration && (
+                <button
+                  type="button"
+                  onClick={() => setShowElaboration(true)}
+                  className="mt-2 flex items-center gap-1.5 text-xs font-bold text-[var(--color-primary)]"
+                >
+                  <Lightbulb size={14} />
+                  Por que funciona?
+                </button>
+              )}
+              {isCorrect && showElaboration && elaborationHint && (
+                <p className="mt-2 text-sm leading-relaxed text-[var(--color-text-secondary)]">
+                  {elaborationHint}
+                </p>
+              )}
             </div>
           </div>
         )}
       </div>
 
-      {/* CTA button */}
       <div
         className="px-5 pt-3"
         style={{ backgroundColor: 'var(--color-bg)', paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}
@@ -108,10 +134,7 @@ export function CheckButton({
                   : state === 'incorrect'
                     ? 'var(--color-error)'
                     : 'var(--color-primary)',
-            color:
-              state === 'disabled'
-                ? 'var(--color-text-muted)'
-                : 'var(--color-text-inverse)',
+            color: state === 'disabled' ? 'var(--color-text-muted)' : 'var(--color-text-inverse)',
             borderBottomWidth: state === 'disabled' ? '1px' : '4px',
             borderBottomColor: state === 'disabled' ? 'var(--color-border)' : 'rgba(0, 0, 0, 0.35)',
             boxShadow:

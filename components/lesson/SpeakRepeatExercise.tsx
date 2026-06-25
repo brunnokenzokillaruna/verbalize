@@ -6,6 +6,7 @@ import { AudioPlayerButton } from './AudioPlayerButton';
 import { useVoiceRecorder } from '@/hooks/useVoiceRecorder';
 import { transcribeSpeech } from '@/app/actions/transcribeSpeech';
 import { incrementProductionStats } from '@/services/firestore';
+import { recordOralExerciseOutcome } from '@/lib/oralExerciseTracking';
 import { useAuthStore } from '@/store/authStore';
 import type { SpeakRepeatData, SupportedLanguage } from '@/types';
 
@@ -79,7 +80,7 @@ export function SpeakRepeatExercise({
   useEffect(() => {
     if (submitTrigger === initialSubmitTriggerRef.current) return;
     if (phase !== 'answered') {
-      submit(isCorrect ?? true);
+      submit(isCorrect ?? true, phase !== 'review');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [submitTrigger]);
@@ -131,9 +132,12 @@ export function SpeakRepeatExercise({
     }
   }
 
-  function submit(correct: boolean) {
+  function submit(correct: boolean, skipped = false) {
     setPhase('answered');
-    if (user) incrementProductionStats(user.uid, 'oral', correct).catch(console.error);
+    if (user) {
+      incrementProductionStats(user.uid, 'oral', correct).catch(console.error);
+      recordOralExerciseOutcome(user.uid, skipped ? 'skipped' : 'completed');
+    }
     onAnswer(correct);
   }
 
@@ -247,7 +251,7 @@ export function SpeakRepeatExercise({
             {/* Primary action — full width, no wrap */}
             <button
               type="button"
-              onClick={() => submit(true)}
+              onClick={() => submit(isCorrect ?? true, false)}
               className="flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl py-3.5 text-sm font-bold tracking-wide transition-all duration-200 ease-out bg-[var(--color-primary)] text-white shadow-lg shadow-[var(--color-primary)]/30 hover:brightness-110 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-[var(--color-primary)]/40 active:scale-[0.98] active:translate-y-0"
             >
               <Send size={16} />
@@ -267,7 +271,7 @@ export function SpeakRepeatExercise({
 
               <button
                 type="button"
-                onClick={() => submit(true)}
+                onClick={() => submit(isCorrect ?? true, true)}
                 className="flex items-center justify-center gap-1.5 rounded-xl px-4 py-3 text-xs font-bold uppercase tracking-widest transition-all duration-200 ease-out bg-[var(--color-surface-raised)] text-[var(--color-text-primary)] border border-[var(--color-border)] hover:bg-[var(--color-bg)] hover:border-[var(--color-primary)]/40 hover:-translate-y-0.5 active:scale-[0.98] active:translate-y-0"
               >
                 Pular
@@ -283,7 +287,7 @@ export function SpeakRepeatExercise({
         <div className="flex flex-col gap-2.5">
           <button
             type="button"
-            onClick={() => submit(true)}
+            onClick={() => submit(true, true)}
             className="flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl py-3.5 text-sm font-bold tracking-wide transition-all duration-200 ease-out bg-[var(--color-primary)] text-white shadow-lg shadow-[var(--color-primary)]/30 hover:brightness-110 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-[var(--color-primary)]/40 active:scale-[0.98] active:translate-y-0"
           >
             <Send size={16} />
@@ -292,7 +296,7 @@ export function SpeakRepeatExercise({
 
           <button
             type="button"
-            onClick={() => submit(true)}
+            onClick={() => submit(true, true)}
             className="flex w-full items-center justify-center gap-1.5 rounded-xl px-4 py-3 text-xs font-bold uppercase tracking-widest transition-all duration-200 ease-out bg-[var(--color-surface-raised)] text-[var(--color-text-primary)] border border-[var(--color-border)] hover:bg-[var(--color-bg)] hover:border-[var(--color-primary)]/40 hover:-translate-y-0.5 active:scale-[0.98] active:translate-y-0"
           >
             Pular

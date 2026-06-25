@@ -15,7 +15,7 @@ import {
 } from './productionTypes';
 import { validateAndSanitizeExercises } from './validateGeneratedExercises';
 
-function findReplaceIndexForProduction(
+export function findReplaceIndexForProduction(
   exercises: Exercise[],
   tagExclusive: ExerciseTypeId | null,
 ): number {
@@ -76,7 +76,7 @@ function firstDialogueLine(dialogue: string): string {
   return line.replace(/^[^:]+:\s*/, '').trim();
 }
 
-function buildFallbackProductionExercise(
+export function buildFallbackProductionExercise(
   requiredType: ExerciseTypeId,
   ctx: EnsureProductionContext,
 ): Exercise | null {
@@ -189,7 +189,7 @@ export async function ensureMinimumProduction(
   const hasRequired = exercises.some((ex) => ex.type === requiredType);
   if (hasRequired) return exercises;
 
-  const tagExclusive = getTagExclusiveType(ctx.tag);
+  const tagExclusive = getTagExclusiveType(ctx.tag, ctx.level);
   const result = [...exercises];
 
   let generated = buildFallbackProductionExercise(requiredType, ctx);

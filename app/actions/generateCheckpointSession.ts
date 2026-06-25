@@ -8,6 +8,7 @@ import { getAllowedExerciseTypes } from '@/lib/practiceExercises/constants';
 import type {
   CheckpointSessionResult,
   Exercise,
+  ListenAndRespondData,
   ProficiencyLevel,
   SupportedLanguage,
 } from '@/types';
@@ -25,6 +26,27 @@ interface GenerateCheckpointSessionParams {
   theme: string;
   uiTitle?: string;
   knownVocabulary: string[];
+}
+
+function buildFallbackListenAndRespond(
+  dialogueAudio: string,
+  language: SupportedLanguage,
+  theme: string,
+): Exercise {
+  const lines = dialogueAudio.split('\n').filter((l) => l.includes(':'));
+  const lastNpc = [...lines].reverse().find((l) => !/^você\s*:/i.test(l.split(':')[0] ?? ''));
+  const promptLine = lastNpc
+    ? lastNpc.replace(/^[^:]+:\s*/, '').trim()
+    : 'Comment puis-je vous aider ?';
+  const data: ListenAndRespondData = {
+    dialogueAudio: lines.slice(0, 4).join('\n') || dialogueAudio.slice(0, 400),
+    promptLine,
+    contextPt: `Responda em ${LANG_LABEL[language]} sobre: ${theme}.`,
+    evaluationCriteria: 'Resposta educada e relevante ao contexto do diálogo.',
+    acceptableThemes: ['resposta natural ao contexto', 'tom educado'],
+    exampleResponse: promptLine,
+  };
+  return { type: 'listen-and-respond', data };
 }
 
 export async function generateCheckpointSession(
@@ -75,15 +97,18 @@ Generate JSON with this EXACT structure:
       "data": {
         "portuguese_sentence": "Frase em PT-BR",
         "target_translation": "Correct ${LANG_LABEL[params.language]} sentence",
-        "acceptable_variants": ["alt phrasing"],
-        "hint": ""
+        "acceptable_variants": ["alt phrasing"]
       }
     },
     {
-      "type": "speak-repeat",
+      "type": "listen-and-respond",
       "data": {
-        "text": "Short ${LANG_LABEL[params.language]} sentence to speak",
-        "translation": "PT-BR translation"
+        "dialogueAudio": "Same dialogue as above (or last 3-4 lines)",
+        "promptLine": "Last NPC question from the dialogue",
+        "contextPt": "Situação em PT-BR",
+        "evaluationCriteria": "What a good spoken response must accomplish",
+        "acceptableThemes": ["theme 1", "theme 2"],
+        "exampleResponse": "Natural ${LANG_LABEL[params.language]} response"
       }
     }
   ],
@@ -92,8 +117,9 @@ Generate JSON with this EXACT structure:
 
 Rules:
 - Exactly 2 comprehensionQuestions
-- Exactly 2 productionExercises: one reverse-translation, one speak-repeat
-- NO hints in production exercises (omit hint field or use empty string)
+- Exactly 2 productionExercises: one reverse-translation, one listen-and-respond (oral spontaneous production AFTER listening comprehension)
+- NO hints in production exercises
+- listen-and-respond must reference the checkpoint dialogueAudio — student listens then responds orally
 - Dialogue must NOT be copied from any real textbook — create original scenario within theme "${params.theme}"`;
 
   try {
@@ -105,16 +131,37 @@ Rules:
     }
 
     const allowedSet = new Set(
-      getAllowedExerciseTypes(params.level, params.knownVocabulary.length),
+      getAllowedExerciseTypes(params.level, params.knownVocabulary.length, 'REVIEW'),
     );
     allowedSet.add('reverse-translation');
-    allowedSet.add('speak-repeat');
+    allowedSet.add('listen-and-respond');
 
-    const productionExercises = await validateAndSanitizeExercises(
+    let productionExercises = await validateAndSanitizeExercises(
       parsed.data.productionExercises as unknown as Exercise[],
       allowedSet,
       params.language,
     );
+
+    if (!productionExercises.some((ex) => ex.type === 'listen-and-respond')) {
+      productionExercises = [
+        ...productionExercises,
+        buildFallbackListenAndRespond(parsed.data.dialogueAudio, params.language, params.theme),
+      ];
+    }
+
+    if (!productionExercises.some((ex) => ex.type === 'reverse-translation')) {
+      productionExercises = [
+        {
+          type: 'reverse-translation',
+          data: {
+            portuguese_sentence: `Traduza algo sobre: ${params.theme}.`,
+            target_translation: 'Example sentence',
+            acceptable_variants: ['Example sentence'],
+          },
+        } as Exercise,
+        ...productionExercises,
+      ];
+    }
 
     if (productionExercises.length < 2) {
       console.error('[generateCheckpointSession] Not enough valid production exercises');

@@ -11,8 +11,15 @@ import {
 import { buildTypeDescriptions } from './exerciseTypeDescriptions';
 import { buildTagGuidance } from './tagGuidance';
 import { buildGrammarFocusExerciseGuidance } from './grammarFocusExerciseGuidance';
+import { buildChainPromptBlock } from './chainExercises';
+import { pickInterleavingWords, buildInterleavingPromptBlock } from './interleaving';
 import { resolveRequiredProductionType } from './productionTypes';
 import type { GeneratePracticeParams } from './types';
+
+export function buildDialogueAnchorBlock(): string {
+  return `
+DIALOGUE ANCHOR (mandatory): Every exercise scenario must connect to the lesson theme and reuse vocabulary or situational context from the dialogue above — but NEVER copy dialogue sentences verbatim. Invent new sentences that feel like the same situation.`;
+}
 
 export function buildGrammarBridgeExerciseBlock(bridge: GrammarBridgeResult | null | undefined): string {
   if (!bridge) return '';
@@ -56,16 +63,21 @@ export function buildPracticeExercisePrompt(params: GeneratePracticeParams): {
   const levelDesc = LEVEL_EXERCISE_DESCRIPTORS[level];
   const isEarlyLearner = knownVocabulary.length < 30;
 
-  const allowedTypes = getAllowedExerciseTypes(level, knownVocabulary.length);
+  const allowedTypes = getAllowedExerciseTypes(level, knownVocabulary.length, tag);
   const allowedSet = new Set(allowedTypes);
   const typeDescriptions = buildTypeDescriptions(LANG_LABEL[language]);
 
   // Inject tag-exclusive exercise types into the pool
   if (tag === 'GRAM') allowedSet.add('grammar-trap');
-  if (tag === 'PRON') allowedSet.add('minimal-pair');
+  if (tag === 'PRON') {
+    allowedSet.add('minimal-pair');
+    if (['A2', 'B1', 'B2', 'C1', 'C2'].includes(level)) {
+      allowedSet.add('minimal-pair-production');
+    }
+  }
   if (tag === 'VERB') allowedSet.add('conjugation-speed');
 
-  const tagExclusive = getTagExclusiveType(tag);
+  const tagExclusive = getTagExclusiveType(tag, level);
 
   const requiredProduction = resolveRequiredProductionType(
     level,
@@ -102,8 +114,25 @@ export function buildPracticeExercisePrompt(params: GeneratePracticeParams): {
 
   const grammarBridgeBlock = buildGrammarBridgeExerciseBlock(grammarBridge);
 
+  const interleavingWords = pickInterleavingWords(knownVocabulary, newVocabulary);
+  const interleavingBlock = buildInterleavingPromptBlock(interleavingWords);
+
+  const hasChainTypes =
+    allowedSet.has('listening-comprehension') &&
+    (allowedSet.has('reverse-translation') || allowedSet.has('listen-and-respond'));
+  const chainBlock = buildChainPromptBlock(hasChainTypes);
+  const dialogueAnchorBlock = buildDialogueAnchorBlock();
+  const constraintBlock = allowedSet.has('translation-with-constraint')
+    ? `\nTRANSLATION-WITH-CONSTRAINT RULE: "required_chunk" MUST come from this lesson's key vocabulary or dialogue — the learner must use that chunk in their written translation. All acceptable_variants must also contain required_chunk.`
+    : '';
+
   const curatedAnchorBlock = theme
     ? `\nCURATED LESSON ANCHOR (all exercise scenarios MUST stay within this — do NOT invent unrelated situations):\n- Theme: "${theme}"${uiTitle ? `\n- Scenario: "${uiTitle}"` : ''}`
+    : '';
+
+  const isA2Plus = ['A2', 'B1', 'B2', 'C1', 'C2'].includes(level);
+  const reverseTranslationHintRule = isA2Plus
+    ? `\nREVERSE-TRANSLATION RULE: For level ${level}, do NOT include the "hint" field in reverse-translation exercises — the learner must produce without scaffolding.`
     : '';
 
   const grammarAccuracyBlock = `
@@ -132,12 +161,12 @@ ${previousTopicsBlock}
 ${grammarBridgeBlock}
 
 TAG-SPECIFIC EXERCISE BALANCE (follow this strictly):
-${tagGuidance}${grammarFocusGuidance}${productionRuleBlock}
+${tagGuidance}${grammarFocusGuidance}${productionRuleBlock}${interleavingBlock}${chainBlock}${dialogueAnchorBlock}${constraintBlock}
 
 CRITICAL RULE: Do NOT copy or reuse any sentence from the dialogue above. Every exercise sentence must be ORIGINAL — newly created by you. The sentences should be related to the lesson's theme and grammar focus, but must be completely different from the dialogue lines.
 
 LEVEL CONSTRAINTS — all sentences you write must follow these rules: ${levelDesc}
-${vocabConstraint}
+${vocabConstraint}${reverseTranslationHintRule}
 ${grammarAccuracyBlock}
 
 Generate exactly ${PRACTICE_EXERCISE_COUNT} exercises as a JSON array. Choose varied types from the following pool for a balanced practice session. You MUST use ONLY the types listed below — any other type is forbidden.
@@ -150,6 +179,41 @@ ${poolSection}
 
 --- OUTPUT FORMAT ---
 Return a JSON array of ${PRACTICE_EXERCISE_COUNT} objects, each with "type" and "data".
+Example for listen-and-respond:
+{
+  "type": "listen-and-respond",
+  "data": {
+    "dialogueAudio": "Serveur: Bonjour !\\nClient: Bonjour.\\nServeur: Qu'est-ce que je vous sers ?",
+    "promptLine": "Qu'est-ce que je vous sers ?",
+    "contextPt": "Você está em um café em Paris e o garçom pergunta o que você quer.",
+    "evaluationCriteria": "Pedir algo do cardápio com educação.",
+    "acceptableThemes": ["pedir bebida ou comida", "usar por favor ou s'il vous plaît"],
+    "exampleResponse": "Je voudrais un café, s'il vous plaît."
+  }
+}
+Example for free-roleplay:
+{
+  "type": "free-roleplay",
+  "data": {
+    "context": "Você está no balcão de uma padaria em Paris.",
+    "promptLine": "Bonjour ! Qu'est-ce que je vous mets ?",
+    "evaluationCriteria": "Pedir um item do cardápio de forma educada e natural.",
+    "acceptableThemes": ["pedir pão ou doce", "tom educado"],
+    "exampleResponse": "Bonjour ! Je voudrais une baguette, s'il vous plaît.",
+    "explanation": "Je voudrais + item é a forma natural de pedir; Bonjour mantém o registro educado."
+  }
+}
+Example for micro-message:
+{
+  "type": "micro-message",
+  "data": {
+    "context": "Seu colega francês mandou mensagem confirmando o horário do café.",
+    "incomingMessage": "Salut ! On se voit à 15h au café ?",
+    "translation": "Oi! A gente se vê às 15h no café?",
+    "evaluationCriteria": "Confirmar ou sugerir outro horário de forma informal e clara.",
+    "exampleResponse": "Oui, parfait ! À tout à l'heure 😊"
+  }
+}
 Example for social-roleplay:
 {
   "type": "social-roleplay",

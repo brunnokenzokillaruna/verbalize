@@ -4,6 +4,7 @@ import { useVoiceRecorder } from '@/hooks/useVoiceRecorder';
 import { useSoundEffects } from '@/hooks/useSoundEffects';
 import { useAuthStore } from '@/store/authStore';
 import { incrementProductionStats } from '@/services/firestore';
+import { markSpontaneousProductionAccepted } from '@/lib/sessionProductionTracking';
 import { transcribeSpeech } from '@/app/actions/transcribeSpeech';
 import { evaluateFreeResponse } from '@/app/actions/evaluateFreeResponse';
 import { getFixedVoiceName } from '@/lib/voiceConfig';
@@ -13,30 +14,46 @@ import {
   similarity,
 } from '@/components/lesson/mission-roleplay/utils';
 import type { RecState } from '@/components/lesson/mission-roleplay/types';
-import type { SupportedLanguage } from '@/types';
+import type { RolePlayConsequence, SupportedLanguage } from '@/types';
 
 type UseMissionRolePlayOptions = {
   dialogue: string;
   dialogueTranslations?: string[];
   language: SupportedLanguage;
   intentMode: boolean;
+  rolePlayConsequences?: RolePlayConsequence[];
   onComplete: (spoken: number, totalSpeakable: number) => void;
 };
+
+function buildConsequenceMap(
+  consequences: RolePlayConsequence[] | undefined,
+): Map<number, RolePlayConsequence> {
+  const map = new Map<number, RolePlayConsequence>();
+  for (const c of consequences ?? []) {
+    map.set(c.npcLineIndex, c);
+  }
+  return map;
+}
 
 export function useMissionRolePlay({
   dialogue,
   dialogueTranslations,
   language,
   intentMode,
+  rolePlayConsequences,
   onComplete,
 }: UseMissionRolePlayOptions) {
   const { user } = useAuthStore();
   const statsLoggedRef = useRef(false);
-  const lines = useMemo(
+  const baseLines = useMemo(
     () => parseDialogueLines(dialogue, dialogueTranslations),
     [dialogue, dialogueTranslations],
   );
-  const totalSpeakable = useMemo(() => lines.filter((l) => l.isUserLine).length, [lines]);
+  const consequenceMap = useMemo(
+    () => buildConsequenceMap(rolePlayConsequences),
+    [rolePlayConsequences],
+  );
+  const totalSpeakable = useMemo(() => baseLines.filter((l) => l.isUserLine).length, [baseLines]);
 
   const [currentIdx, setCurrentIdx] = useState(0);
   const [spokenCount, setSpokenCount] = useState(0);
@@ -46,6 +63,21 @@ export function useMissionRolePlay({
   const [recordError, setRecordError] = useState('');
   const [evalFeedback, setEvalFeedback] = useState('');
   const [evalCorrected, setEvalCorrected] = useState('');
+  const [consequenceIndices, setConsequenceIndices] = useState<Set<number>>(() => new Set());
+
+  const lines = useMemo(() => {
+    return baseLines.map((line) => {
+      if (!consequenceIndices.has(line.rawIndex)) return line;
+      const alt = consequenceMap.get(line.rawIndex);
+      if (!alt) return line;
+      return {
+        ...line,
+        text: alt.alternateText,
+        translation: alt.alternateTranslation ?? line.translation,
+        isConsequenceTone: true,
+      };
+    });
+  }, [baseLines, consequenceIndices, consequenceMap]);
 
   const fixedVoice = useMemo(() => getFixedVoiceName(language), [language]);
   const { speak, stop: stopAudio } = useAudio(fixedVoice);
@@ -88,20 +120,47 @@ export function useMissionRolePlay({
     statsLoggedRef.current = false;
   }, [currentIdx]);
 
+  const scheduleConsequenceForFailedTurn = useCallback(
+    (userLineIndex: number) => {
+      const nextNpcIdx = baseLines.findIndex(
+        (l, i) => i > userLineIndex && !l.isUserLine && consequenceMap.has(i),
+      );
+      if (nextNpcIdx < 0) return;
+      setConsequenceIndices((prev) => {
+        if (prev.has(nextNpcIdx)) return prev;
+        const next = new Set(prev);
+        next.add(nextNpcIdx);
+        return next;
+      });
+    },
+    [baseLines, consequenceMap],
+  );
+
   const advance = useCallback(
-    (spokeSuccessfully: boolean) => {
-      if (spokeSuccessfully) setSpokenCount((c) => c + 1);
+    (accepted: boolean) => {
+      if (current?.isUserLine && !accepted) {
+        scheduleConsequenceForFailedTurn(currentIdx);
+      }
+      if (accepted) setSpokenCount((c) => c + 1);
       if (isLast) {
         if (!completedRef.current) {
           completedRef.current = true;
-          onComplete(spokeSuccessfully ? spokenCount + 1 : spokenCount, totalSpeakable);
+          onComplete(accepted ? spokenCount + 1 : spokenCount, totalSpeakable);
         }
         setRecState('done');
         return;
       }
       setCurrentIdx((i) => i + 1);
     },
-    [isLast, onComplete, spokenCount, totalSpeakable],
+    [
+      current,
+      currentIdx,
+      isLast,
+      onComplete,
+      scheduleConsequenceForFailedTurn,
+      spokenCount,
+      totalSpeakable,
+    ],
   );
 
   const startRecording = useCallback(async () => {
@@ -151,12 +210,15 @@ export function useMissionRolePlay({
         const contextLines = lines
           .slice(Math.max(0, currentIdx - 3), currentIdx)
           .map((l) => `${l.speaker}: ${l.text}`);
+        const npcLine = lines.slice(0, currentIdx).reverse().find((l) => !l.isUserLine);
         const evalResult = await evaluateFreeResponse({
           transcript: said,
           intent: current.translation || '',
           language,
           previousContext: contextLines,
           expectedLine: current.text,
+          promptLine: npcLine?.text,
+          preferGemini: true,
         });
 
         if (evalResult.error) {
@@ -170,7 +232,10 @@ export function useMissionRolePlay({
         const accepted = evalResult.isCorrect;
         if (user && !statsLoggedRef.current) {
           statsLoggedRef.current = true;
-          incrementProductionStats(user.uid, 'oral', accepted).catch(console.error);
+          incrementProductionStats(user.uid, 'oralSpontaneous', accepted).catch(console.error);
+          if (accepted) {
+            markSpontaneousProductionAccepted('oralSpontaneous');
+          }
         }
         setRecState(accepted ? 'review-correct' : 'review-retry');
       } else {

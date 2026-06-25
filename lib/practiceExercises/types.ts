@@ -20,4 +20,6 @@ export interface GeneratePracticeParams {
   grammarBridge?: GrammarBridgeResult | null;
   /** Override retry count (pregen uses 1, live path uses 2). */
   maxAttempts?: number;
+  /** Words with SRS level ≥4 — used for adaptive tier-down (recognition → production). */
+  masteredVocabulary?: string[];
 }

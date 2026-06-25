@@ -114,6 +114,9 @@ export default function LessonPage() {
     exerciseAnswer,
     setIsExerciseReady,
     submitTrigger,
+    exerciseRetryKey,
+    retryNotice,
+    elaborationHint,
     currentExercise,
     currentReviewExercise,
     checkState,
@@ -241,6 +244,7 @@ export default function LessonPage() {
           exerciseAnswer={exerciseAnswer}
           setIsExerciseReady={setIsExerciseReady}
           submitTrigger={submitTrigger}
+          exerciseRetryKey={exerciseRetryKey}
           currentExercise={currentExercise}
           currentReviewExercise={currentReviewExercise}
           isPlaying={isPlaying}
@@ -271,8 +275,11 @@ export default function LessonPage() {
 
       {(phase === 'practice' || phase === 'review' || phase === 'production') && (
         <CheckButton
+          key={`${phase}-${phase === 'review' ? store.reviewIndex : phase === 'production' ? store.checkpointProductionIndex : store.exerciseIndex}-${exerciseRetryKey}`}
           state={checkState}
           correctAnswer={correctAnswerForBanner}
+          retryNotice={retryNotice}
+          elaborationHint={elaborationHint}
           onCheck={handleCheck}
           onContinue={
             phase === 'review'

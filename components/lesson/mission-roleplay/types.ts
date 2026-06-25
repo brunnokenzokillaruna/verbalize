@@ -15,6 +15,8 @@ export interface DialogueLine {
   text: string;
   translation?: string;
   isUserLine: boolean;
+  /** NPC line swapped because the learner's previous turn was inadequate. */
+  isConsequenceTone?: boolean;
 }
 
 export interface LessonMissionRolePlayProps {
@@ -22,5 +24,6 @@ export interface LessonMissionRolePlayProps {
   dialogueTranslations?: string[];
   language: SupportedLanguage;
   intentMode?: boolean;
+  rolePlayConsequences?: import('@/types').RolePlayConsequence[];
   onComplete: (spoken: number, totalSpeakable: number) => void;
 }

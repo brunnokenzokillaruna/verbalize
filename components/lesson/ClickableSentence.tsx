@@ -82,11 +82,12 @@ export function ClickableSentence({
             <ClickableWord key={i} word={token.value} isPunctuation />
           );
         }
-        const clean = token.value.replace(/[.,!?;:]/g, '');
+        const clean = token.value.replace(/\*+/g, '').replace(/[.,!?;:]/g, '');
+        const displayWord = token.value.replace(/\*+/g, '');
         return (
           <ClickableWord
             key={i}
-            word={token.value}
+            word={displayWord}
             isNewVocabulary={matchesVocab(clean, newVocabulary)}
             isNewVerb={matchesVocab(clean, newVerbs)}
             onWordClick={onWordClick}

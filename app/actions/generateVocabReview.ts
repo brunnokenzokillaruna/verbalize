@@ -1,5 +1,6 @@
 'use server';
 
+import { isPassiveOnlyVocabulary } from '@/lib/vocabKnowledgeMode';
 import { callGeminiJSON } from '@/services/gemini';
 import { REVIEW_SESSION_SIZE } from '@/utils/reviewSession';
 import type { Exercise, SupportedLanguage, ProficiencyLevel } from '@/types';
@@ -15,7 +16,13 @@ export interface VocabReviewItem {
 }
 
 interface GenerateVocabReviewParams {
-  words: Array<{ word: string; translation: string; imageUrl?: string }>;
+  words: Array<{
+    word: string;
+    translation: string;
+    imageUrl?: string;
+    productionCount?: number;
+    knowledgeMode?: 'passive' | 'active';
+  }>;
   language: SupportedLanguage;
   level: ProficiencyLevel;
   knownVocabulary?: string[];
@@ -32,12 +39,22 @@ function isChunkPhrase(word: string): boolean {
 
 function pickReviewType(
   index: number,
-  word: { word: string; imageUrl?: string },
+  word: GenerateVocabReviewParams['words'][number],
   level: ProficiencyLevel,
 ): ReviewExerciseKind {
   if (isChunkPhrase(word.word)) {
     return level === 'A1' ? 'word-bank-translation' : 'reverse-translation';
   }
+
+  const passiveOnly = isPassiveOnlyVocabulary(word);
+
+  if (passiveOnly) {
+    if (level === 'A1') {
+      return index % 2 === 0 ? 'word-bank-translation' : 'reverse-translation';
+    }
+    return index % 3 === 0 ? 'word-bank-translation' : 'reverse-translation';
+  }
+
   const cycle: ReviewExerciseKind[] =
     level === 'A1'
       ? ['context-choice', 'context-choice', 'reverse-translation']

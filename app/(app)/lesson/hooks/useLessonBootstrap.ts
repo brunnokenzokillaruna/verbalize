@@ -5,18 +5,20 @@ import { useAuthStore } from '@/store/authStore';
 import { useLessonStore } from '@/store/lessonStore';
 import { getNextLesson, getLessonById, getNextLessonId, getPreviousTopics } from '@/lib/curriculum';
 import { getInitialPhase } from './useLessonFlow';
-import { generateHook } from '@/app/actions/generateHook';
+import { generateHook, generateMinimalHook } from '@/app/actions/generateHook';
+import { enrichHookMetadata } from '@/app/actions/enrichHookMetadata';
 import { generateGrammarBridge } from '@/app/actions/generateGrammarBridge';
 import { generatePhoneticsTip } from '@/app/actions/generatePhoneticsTip';
 import { generateMissionBriefing } from '@/app/actions/generateMissionBriefing';
 import { generatePracticeExercises } from '@/app/actions/generatePracticeExercises';
 import { generateCheckpointSession } from '@/app/actions/generateCheckpointSession';
-import { PREGEN_SCHEMA_VERSION } from '@/lib/practiceExercises/constants';
+import { isPregenSchemaCurrent, PREGEN_SCHEMA_VERSION } from '@/lib/practiceExercises/constants';
 import { pregenerateNextLesson } from '@/app/actions/pregenerateNextLesson';
 import { isAggressivePregenEnabled } from '@/lib/geminiDevGuard';
-import { translateWord } from '@/app/actions/translateWord';
+import { translateWord, translateWordsBatch } from '@/app/actions/translateWord';
 import { prefetchVocabImages } from '@/lib/vocabImagePrefetch';
-import { getPregeneratedLesson, deletePregeneratedLesson, getUserVocabulary, upsertVocabularyItem, tryStartPregeneratingLesson, abortPregeneratedLesson } from '@/services/firestore';
+import { fetchPregeneratedLessonWithWait } from '@/lib/waitForPregeneratedLesson';
+import { deletePregeneratedLesson, getUserVocabulary, upsertVocabularyItem, tryStartPregeneratingLesson, abortPregeneratedLesson } from '@/services/firestore';
 import { tooltipCacheKey } from '@/lib/wordTooltipUtils';
 import type { GrammarBridgeResult, Exercise, LessonTag, MissionBriefingResult, HookResult, PregeneratedLessonDocument } from '@/types';
 
@@ -28,15 +30,17 @@ function applyPregenCache(
   grammarBridgePrefetchRef: React.MutableRefObject<Promise<GrammarBridgeResult | null> | null>,
   exercisesPrefetchRef: React.MutableRefObject<Promise<Exercise[] | null> | null>,
 ): HookResult {
-  const schemaOk =
-    pregenDoc.schemaVersion === undefined ||
-    pregenDoc.schemaVersion >= PREGEN_SCHEMA_VERSION;
+  const schemaOk = isPregenSchemaCurrent(pregenDoc.schemaVersion);
 
   if (pregenDoc.grammarBridge) {
     grammarBridgePrefetchRef.current = Promise.resolve(pregenDoc.grammarBridge);
   }
   if (schemaOk && pregenDoc.exercises && pregenDoc.exercises.length > 0) {
     exercisesPrefetchRef.current = Promise.resolve(pregenDoc.exercises);
+  } else if (!schemaOk && pregenDoc.exercises?.length) {
+    devLog(
+      `[Timing] Cache pregen exercises STALE (schema ${pregenDoc.schemaVersion ?? 'none'} < ${PREGEN_SCHEMA_VERSION}) — regenerating exercises`,
+    );
   }
   if (pregenDoc.missionBriefing) {
     store.setMissionBriefing(pregenDoc.missionBriefing);
@@ -93,28 +97,14 @@ export function useLessonBootstrap({
       devLog(`[Timing] ⏱ Lição iniciando: ${lesson.id}`);
       try {
         let hook = null;
+        const vocabLoadPromise = user
+          ? getUserVocabulary(user.uid, lesson.language)
+          : Promise.resolve([]);
+
         if (user) {
           try {
             const tPregen = performance.now();
-            let pregenDoc = await getPregeneratedLesson(user.uid, lesson.id);
-            
-            // Polling loop if lesson is currently generating
-            if (pregenDoc?.status === 'generating') {
-              devLog(`[Timing] Lição está sendo gerada em background. Iniciando polling...`);
-              let attempts = 0;
-              const maxAttempts = 90; // 3 minutes — matches pregen runway for hook + grammar + exercises
-              while (pregenDoc?.status === 'generating' && attempts < maxAttempts) {
-                await new Promise((resolve) => setTimeout(resolve, 2000));
-                attempts++;
-                try {
-                  pregenDoc = await getPregeneratedLesson(user.uid, lesson.id);
-                  devLog(`[Timing] Polling tentativa ${attempts}/${maxAttempts}: status = ${pregenDoc?.status ?? 'deleted'}`);
-                } catch {
-                  // Catch errors (like permission-denied or deletion) safely
-                  break;
-                }
-              }
-            }
+            const pregenDoc = await fetchPregeneratedLessonWithWait(user.uid, lesson.id);
 
             if (pregenDoc?.hook) {
               hook = applyPregenCache(pregenDoc, store, grammarBridgePrefetchRef, exercisesPrefetchRef);
@@ -134,10 +124,14 @@ export function useLessonBootstrap({
         }
 
         const tVocab = performance.now();
-        const vocabDocs = user ? await getUserVocabulary(user.uid, lesson.language) : [];
+        const vocabDocs = await vocabLoadPromise;
         const knownVocabulary = vocabDocs.map((v) => v.word.toLowerCase());
+        const masteredVocabulary = vocabDocs
+          .filter((v) => (v.srsLevel ?? 0) >= 4)
+          .map((v) => v.word.toLowerCase());
         store.setKnownVocabulary(knownVocabulary);
-        devLog(`[Timing] Vocabulário do usuário: ${(performance.now() - tVocab).toFixed(0)}ms (${knownVocabulary.length} palavras conhecidas)`);
+        store.setMasteredVocabulary(masteredVocabulary);
+        devLog(`[Timing] Vocabulário do usuário: ${(performance.now() - tVocab).toFixed(0)}ms (${knownVocabulary.length} palavras conhecidas, ${masteredVocabulary.length} dominadas)`);
 
         if (lesson.tag === 'REVIEW') {
           let checkpoint = useLessonStore.getState().checkpointSession;
@@ -201,28 +195,27 @@ export function useLessonBootstrap({
           let acquiredPregenLock = false;
 
           if (user) {
-            acquiredPregenLock = await tryStartPregeneratingLesson(user.uid, lesson.id);
+            try {
+              acquiredPregenLock = await tryStartPregeneratingLesson(user.uid, lesson.id);
+            } catch (err) {
+              console.warn('[useLessonBootstrap] pregen lock unavailable:', err);
+              acquiredPregenLock = false;
+            }
+
             if (!acquiredPregenLock) {
-              devLog(`[Timing] Outro processo está gerando a lição — aguardando pregen...`);
-              let pregenDoc = await getPregeneratedLesson(user.uid, lesson.id);
-              let attempts = 0;
-              const maxAttempts = 90;
-              while (!pregenDoc?.hook && pregenDoc?.status === 'generating' && attempts < maxAttempts) {
-                await new Promise((resolve) => setTimeout(resolve, 2000));
-                attempts++;
-                pregenDoc = await getPregeneratedLesson(user.uid, lesson.id);
-              }
+              devLog(`[Timing] Lock pregen indisponível — verificando cache uma vez...`);
+              const pregenDoc = await fetchPregeneratedLessonWithWait(user.uid, lesson.id);
               if (pregenDoc?.hook) {
                 hook = applyPregenCache(pregenDoc, store, grammarBridgePrefetchRef, exercisesPrefetchRef);
                 deletePregeneratedLesson(user.uid, lesson.id).catch(console.error);
-                devLog(`[Timing] Hook recebido do pregen após polling: ${(performance.now() - tHook).toFixed(0)}ms`);
+                devLog(`[Timing] Hook recebido do pregen após lock: ${(performance.now() - tHook).toFixed(0)}ms`);
               }
             }
           }
 
           if (!hook) {
-            devLog(`[Timing] Gerando hook via Gemini...`);
-            hook = await generateHook({
+            devLog(`[Timing] Gerando hook mínimo via Gemini...`);
+            hook = await generateMinimalHook({
               language: lesson.language,
               level: lesson.level,
               tag: lesson.tag,
@@ -235,7 +228,23 @@ export function useLessonBootstrap({
               arcSummary: lesson.arcSummary,
               lastScenarioSummary: profile.lastScenarioSummary,
             });
-            devLog(`[Timing] generateHook: ${(performance.now() - tHook).toFixed(0)}ms`);
+            if (!hook) {
+              devLog(`[Timing] Hook mínimo falhou — tentando generateHook completo...`);
+              hook = await generateHook({
+                language: lesson.language,
+                level: lesson.level,
+                tag: lesson.tag,
+                interests: profile.interests ?? [],
+                theme: lesson.theme,
+                uiTitle: lesson.uiTitle,
+                grammarFocus: lesson.grammarFocus,
+                knownVocabulary,
+                arcCharacters: lesson.arcCharacters,
+                arcSummary: lesson.arcSummary,
+                lastScenarioSummary: profile.lastScenarioSummary,
+              });
+            }
+            devLog(`[Timing] generateMinimalHook: ${(performance.now() - tHook).toFixed(0)}ms`);
 
             if (user && acquiredPregenLock) {
               // Clear generating marker — hook lives in client store only.
@@ -271,6 +280,22 @@ export function useLessonBootstrap({
           const tag = lesson.tag;
           const focus = lesson.grammarFocus;
           const dialogue = hook.dialogue;
+
+          const needsHookEnrichment =
+            !hook.dialogueVerbs?.length ||
+            ((tag === 'EXPR' || tag === 'CULT') && !hook.newChunks?.length) ||
+            (tag === 'MISS' && !hook.rolePlayConsequences?.length);
+
+          if (needsHookEnrichment) {
+            const tEnrich = performance.now();
+            enrichHookMetadata({ dialogue, language: lang, tag, level: lesson.level })
+              .then((partial) => {
+                if (Object.keys(partial).length === 0) return;
+                useLessonStore.getState().mergeHook(partial);
+                devLog(`[Timing] ✅ Hook metadata enriquecido: ${(performance.now() - tEnrich).toFixed(0)}ms`);
+              })
+              .catch(console.error);
+          }
 
           if (tag === 'PRON' && !hook.phoneticsTip) {
             generatePhoneticsTip({ dialogue, grammarFocus: focus, language: lang })
@@ -398,6 +423,7 @@ export function useLessonBootstrap({
             language,
             level: lesson.level,
             knownVocabulary: store.knownVocabulary,
+            masteredVocabulary: store.masteredVocabulary,
             previousTopics: getPreviousTopics(language, lesson.id),
             grammarBridge: bridge ?? hook.grammarBridge ?? null,
           });
@@ -426,6 +452,7 @@ export function useLessonBootstrap({
           language,
           level: lesson.level,
           knownVocabulary: store.knownVocabulary,
+          masteredVocabulary: store.masteredVocabulary,
           previousTopics: getPreviousTopics(language, lesson.id),
         })
           .then((result) => {
@@ -450,7 +477,24 @@ export function useLessonBootstrap({
       devLog(`[Timing] Traduções do vocabulário: vindas do hook (0ms)`);
     } else {
       const tTrans = performance.now();
-      (async () => {
+      void (async () => {
+        const batch = await translateWordsBatch(words, language);
+        if (batch?.length) {
+          for (const item of batch) {
+            if (!item.translation) continue;
+            store.setVocabTranslation(item.word, item.translation);
+            store.cacheWordTooltip(tooltipCacheKey(item.word, language, false), {
+              translation: item.translation,
+              explanation: '',
+              example: '',
+            });
+          }
+          devLog(
+            `[Timing] Traduções do vocabulário (batch): ${(performance.now() - tTrans).toFixed(0)}ms (${batch.length} palavras, 1 chamada Gemini)`,
+          );
+          return;
+        }
+
         for (const word of words) {
           const t = performance.now();
           const result = await translateWord(word, dialogue, language);
@@ -458,11 +502,10 @@ export function useLessonBootstrap({
             store.setVocabTranslation(word, result.translation);
             store.cacheWordTooltip(tooltipCacheKey(word, language, false), result);
           }
-          devLog(`[Timing] Tradução '${word}': ${(performance.now() - t).toFixed(0)}ms`);
-          await new Promise((resolve) => setTimeout(resolve, 300)); // small cooldown
+          devLog(`[Timing] Tradução '${word}' (fallback): ${(performance.now() - t).toFixed(0)}ms`);
         }
       })();
-      devLog(`[Timing] Traduções iniciadas sequencialmente (${words.length} palavras): ${(performance.now() - tTrans).toFixed(0)}ms`);
+      devLog(`[Timing] Traduções iniciadas (${words.length} palavras, batch): ${(performance.now() - tTrans).toFixed(0)}ms`);
     }
 
     const tImages = performance.now();
@@ -515,7 +558,7 @@ export function useLessonBootstrap({
     if (!nextLesson) return;
 
     devLog(`[Timing] 🔮 Pregen próxima lição disparado (background): ${nextLessonId}`);
-    pregenerateNextLesson(user.uid, nextLesson, profile.interests ?? [], store.knownVocabulary).catch(console.error);
+    pregenerateNextLesson(user.uid, nextLesson, profile.interests ?? [], store.knownVocabulary, store.masteredVocabulary).catch(console.error);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [store.phase]);
 

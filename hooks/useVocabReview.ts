@@ -1,7 +1,8 @@
 import { useState, useCallback, useMemo } from 'react';
 import { generateVocabReview } from '@/app/actions/generateVocabReview';
 import type { VocabReviewItem } from '@/app/actions/generateVocabReview';
-import { updateVocabSrsAfterReview } from '@/services/firestore';
+import { updateVocabSrsAfterReview, markVocabularyProduced } from '@/services/firestore';
+import { isProductionExerciseType } from '@/lib/practiceExercises/productionTypes';
 import { getLessonById, getNextLesson } from '@/lib/curriculum';
 import { pickReviewSession } from '@/utils/reviewSession';
 import {
@@ -108,11 +109,18 @@ export function useVocabReview(
   }, [user, rawDueToday.length, prepareSession]);
 
   const saveResults = useCallback(
-    async (reviewResults: ReviewResult[]) => {
+    async (reviewResults: ReviewResult[], exercises?: VocabReviewItem[]) => {
       if (!user) return;
       setSavingResults(true);
       await Promise.all(
-        reviewResults.map((r) => updateVocabSrsAfterReview(user.uid, r.word, language, r.correct)),
+        reviewResults.map(async (r) => {
+          await updateVocabSrsAfterReview(user.uid, r.word, language, r.correct);
+          if (!r.correct || !exercises) return;
+          const item = exercises.find((e) => e.word === r.word);
+          if (item && isProductionExerciseType(item.exercise.type)) {
+            await markVocabularyProduced(user.uid, r.word, language);
+          }
+        }),
       );
       await loadVocabulary();
       setSavingResults(false);
@@ -159,6 +167,8 @@ export function useVocabReview(
             word: v.word,
             translation: v.translation,
             imageUrl: v.imageUrl,
+            productionCount: v.productionCount,
+            knowledgeMode: v.knowledgeMode,
           })),
           language,
           level,
@@ -179,8 +189,8 @@ export function useVocabReview(
   );
 
   const finishAndClose = useCallback(
-    async (reviewResults: ReviewResult[]) => {
-      await saveResults(reviewResults);
+    async (reviewResults: ReviewResult[], exercises?: VocabReviewItem[]) => {
+      await saveResults(reviewResults, exercises);
       closeAllReview();
     },
     [saveResults, closeAllReview],
@@ -285,6 +295,8 @@ export function useVocabReview(
           word: v.word,
           translation: v.translation,
           imageUrl: v.imageUrl,
+          productionCount: v.productionCount,
+          knowledgeMode: v.knowledgeMode,
         })),
         language,
         level,
@@ -328,7 +340,10 @@ export function useVocabReview(
     }
   }, [answered, lastCorrect, reviewItems, cardIdx, results]);
 
-  const finishContextReview = useCallback(() => finishAndClose(results), [finishAndClose, results]);
+  const finishContextReview = useCallback(
+    () => finishAndClose(results, reviewItems),
+    [finishAndClose, results, reviewItems],
+  );
 
   return {
     rawDueToday,

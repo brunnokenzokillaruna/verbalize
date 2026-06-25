@@ -8,10 +8,17 @@ import {
 import { useLessonStore } from '@/store/lessonStore';
 import { buildMistakeContext } from '@/app/(app)/lesson/utils';
 import { formatErrorCorrectionAnswer } from '@/utils/errorCorrection';
+import { getLocalElaborationHint } from '@/lib/elaborationHints';
+import {
+  DESIRABLE_DIFFICULTY_MAX_WRONG,
+  hasRetriesRemaining,
+  supportsDesirableDifficulty,
+} from '@/lib/practiceExercises/desirableDifficulty';
+import { markExerciseProductionVocabulary } from '@/lib/vocabProductionTracking';
 import type { Exercise } from '@/types';
 import type { User } from 'firebase/auth';
 
-type PlaySoundFn = (name: 'correct' | 'incorrect') => void;
+type PlaySoundFn = (name: 'correct' | 'incorrect', options?: { soft?: boolean }) => void;
 
 function getCorrectAnswerForBanner(
   exercise: Exercise | undefined,
@@ -26,6 +33,7 @@ function getCorrectAnswerForBanner(
     case 'grammar-trap':
       return exercise.data.options.find((o) => o.isCorrect)?.sentence;
     case 'minimal-pair':
+    case 'minimal-pair-production':
       return exercise.data.correctWord;
     case 'conjugation-speed':
       return exercise.data.correctForm;
@@ -35,8 +43,32 @@ function getCorrectAnswerForBanner(
       return exercise.data.options[exercise.data.correctIndex];
     case 'listening-comprehension':
       return exercise.data.options[exercise.data.correctIndex];
+    case 'listen-and-respond':
+      return exercise.data.exampleResponse;
+    case 'free-roleplay':
+      return exercise.data.exampleResponse;
+    case 'micro-message':
+      return exercise.data.exampleResponse;
     case 'image-match':
       return exercise.data.targetWord;
+    case 'fill-gap-production':
+      return exercise.data.blankWord;
+    case 'translation-with-constraint':
+      return exercise.data.target_translation;
+    case 'voicemail-dictation':
+      return exercise.data.expected_summary;
+    case 'inference-tone':
+      return exercise.data.correctOption === 'A'
+        ? exercise.data.audioTextA
+        : exercise.data.audioTextB;
+    case 'connected-speech':
+      return exercise.data.expected_transcription;
+    case 'story-continuation':
+      return exercise.data.exampleContinuation;
+    case 'spot-the-register':
+      return exercise.data.correctedLine;
+    case 'prompted-monologue':
+      return exercise.data.exampleMonologue;
     default:
       return undefined;
   }
@@ -53,6 +85,9 @@ export function useLessonExerciseHandlers(
   const [exerciseAnswer, setExerciseAnswer] = useState<boolean | null>(null);
   const [isExerciseReady, setIsExerciseReady] = useState(false);
   const [submitTrigger, setSubmitTrigger] = useState(0);
+  const [wrongAttempts, setWrongAttempts] = useState(0);
+  const [exerciseRetryKey, setExerciseRetryKey] = useState(0);
+  const [retryNotice, setRetryNotice] = useState<string | null>(null);
 
   const phase = store.phase;
   const currentExercise =
@@ -79,16 +114,42 @@ export function useLessonExerciseHandlers(
     [activeExercise, exerciseAnswer],
   );
 
+  const elaborationHint = useMemo(() => {
+    if (exerciseAnswer !== true || !activeExercise) return null;
+    return getLocalElaborationHint(activeExercise);
+  }, [exerciseAnswer, activeExercise]);
+
   const resetExerciseState = useCallback(() => {
     setExerciseAnswer(null);
     setIsExerciseReady(false);
     setSubmitTrigger(0);
+    setWrongAttempts(0);
+    setExerciseRetryKey(0);
+    setRetryNotice(null);
   }, []);
 
-  const handleAnswer = useCallback(
+  const finalizeAnswer = useCallback(
     (correct: boolean) => {
-      if (exerciseAnswer !== null) return;
       setExerciseAnswer(correct);
+      setRetryNotice(null);
+
+      const exercise =
+        phase === 'production'
+          ? store.exercises[store.checkpointProductionIndex]
+          : phase === 'review'
+            ? store.reviewExercises[store.reviewIndex]
+            : store.exercises[store.exerciseIndex];
+
+      if (correct && exercise && store.lesson) {
+        markExerciseProductionVocabulary(
+          user?.uid,
+          store.lesson.language,
+          exercise,
+          [...(store.hook?.newVocabulary ?? []), ...(store.hook?.newChunks?.map((c) => c.phrase) ?? [])],
+          true,
+        );
+      }
+
       if (phase === 'production') {
         store.recordCheckpointProduction(correct);
         playSound(correct ? 'correct' : 'incorrect');
@@ -103,7 +164,36 @@ export function useLessonExerciseHandlers(
         playSound('incorrect');
       }
     },
-    [exerciseAnswer, phase, store, playSound],
+    [phase, store, playSound, user?.uid],
+  );
+
+  const handleAnswer = useCallback(
+    (correct: boolean) => {
+      if (exerciseAnswer !== null) return;
+
+      const exercise =
+        phase === 'production'
+          ? store.exercises[store.checkpointProductionIndex]
+          : phase === 'review'
+            ? store.reviewExercises[store.reviewIndex]
+            : store.exercises[store.exerciseIndex];
+
+      if (
+        !correct &&
+        exercise &&
+        supportsDesirableDifficulty(exercise.type) &&
+        hasRetriesRemaining(wrongAttempts)
+      ) {
+        setWrongAttempts((n) => n + 1);
+        setExerciseRetryKey((k) => k + 1);
+        setRetryNotice('Quase! Tente de novo — você ainda tem mais uma tentativa.');
+        playSound('incorrect', { soft: true });
+        return;
+      }
+
+      finalizeAnswer(correct);
+    },
+    [exerciseAnswer, phase, store, wrongAttempts, finalizeAnswer, playSound],
   );
 
   const handleCheck = useCallback(() => {
@@ -113,7 +203,23 @@ export function useLessonExerciseHandlers(
   const handleReviewAnswer = useCallback(
     (correct: boolean) => {
       if (exerciseAnswer !== null) return;
+
+      const exercise = store.reviewExercises[store.reviewIndex];
+      if (
+        !correct &&
+        exercise &&
+        supportsDesirableDifficulty(exercise.type) &&
+        hasRetriesRemaining(wrongAttempts)
+      ) {
+        setWrongAttempts((n) => n + 1);
+        setExerciseRetryKey((k) => k + 1);
+        setRetryNotice('Quase! Tente de novo — você ainda tem mais uma tentativa.');
+        playSound('incorrect', { soft: true });
+        return;
+      }
+
       setExerciseAnswer(correct);
+      setRetryNotice(null);
       if (correct) {
         store.recordReviewCorrect();
         playSound('correct');
@@ -121,7 +227,7 @@ export function useLessonExerciseHandlers(
         playSound('incorrect');
       }
     },
-    [exerciseAnswer, store, playSound],
+    [exerciseAnswer, store, wrongAttempts, playSound],
   );
 
   const handleContinue = useCallback(async () => {
@@ -214,10 +320,13 @@ export function useLessonExerciseHandlers(
     isExerciseReady,
     setIsExerciseReady,
     submitTrigger,
+    exerciseRetryKey,
+    retryNotice,
     currentExercise,
     currentReviewExercise,
     checkState,
     correctAnswerForBanner,
+    elaborationHint,
     resetExerciseState,
     handleAnswer,
     handleCheck,
@@ -226,3 +335,5 @@ export function useLessonExerciseHandlers(
     handleReviewContinue,
   };
 }
+
+export { DESIRABLE_DIFFICULTY_MAX_WRONG };

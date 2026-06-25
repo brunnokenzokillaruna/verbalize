@@ -12,6 +12,22 @@ export function buildMistakeContext(exercise: Exercise): string {
       return `Audio dictation: "${exercise.data.text}"`;
     case 'speak-repeat':
       return `Speak & repeat: "${exercise.data.text}"`;
+    case 'shadowing':
+      return `Shadowing: "${exercise.data.text}"`;
+    case 'translation-with-constraint':
+      return `Constraint translation: "${exercise.data.portuguese_sentence}" → must include "${exercise.data.required_chunk}"`;
+    case 'voicemail-dictation':
+      return `Voicemail summary: heard "${exercise.data.audioText.slice(0, 80)}..." → "${exercise.data.expected_summary}"`;
+    case 'inference-tone':
+      return `Tone inference: ${exercise.data.questionPt} — correct: ${exercise.data.correctOption} (${exercise.data.targetTonePt})`;
+    case 'connected-speech':
+      return `Connected speech: ${exercise.data.phenomenonPt} — "${exercise.data.expected_transcription}"`;
+    case 'story-continuation':
+      return `Story continuation: "${exercise.data.storyOpening.slice(0, 60)}..." → "${exercise.data.exampleContinuation}"`;
+    case 'spot-the-register':
+      return `Register fix: line ${exercise.data.wrongLineIndex + 1} → "${exercise.data.correctedLine}" (${exercise.data.registerIssuePt})`;
+    case 'prompted-monologue':
+      return `Prompted monologue: "${exercise.data.promptPt}" → "${exercise.data.exampleMonologue.slice(0, 80)}..."`;
     case 'sentence-builder':
       return `Sentence builder: correct order "${exercise.data.correctOrder.join(' ')}"`;
     case 'social-roleplay':
@@ -25,6 +41,7 @@ export function buildMistakeContext(exercise: Exercise): string {
     case 'grammar-trap':
       return `Grammar trap: "${exercise.data.options.find(o => o.isCorrect)?.sentence}" — trapRule: "${exercise.data.trapRule}"`;
     case 'minimal-pair':
+    case 'minimal-pair-production':
       return `Minimal pair: context "${exercise.data.sentenceContext}" — correct word: "${exercise.data.correctWord}" vs wrong option.`;
     case 'conjugation-speed':
       return `Conjugation speed: "${exercise.data.pronoun}" + "${exercise.data.verb}" — correct form: "${exercise.data.correctForm}"`;
@@ -38,6 +55,16 @@ export function buildMistakeContext(exercise: Exercise): string {
       return `Listen and select: "${exercise.data.audioText}"`;
     case 'listening-comprehension':
       return `Listening comprehension: "${exercise.data.questionPt}" — correct: "${exercise.data.options[exercise.data.correctIndex]}"`;
+    case 'listen-and-respond':
+      return `Listen and respond: "${exercise.data.promptLine}" — example: "${exercise.data.exampleResponse}"`;
+    case 'free-roleplay':
+      return `Free roleplay: "${exercise.data.promptLine}" — example: "${exercise.data.exampleResponse}"`;
+    case 'micro-message':
+      return `Micro message: "${exercise.data.incomingMessage}" — example reply: "${exercise.data.exampleResponse}"`;
+    case 'paraphrase':
+      return `Paraphrase: "${exercise.data.source_sentence}" → "${exercise.data.target_paraphrase}"`;
+    case 'fill-gap-production':
+      return `Fill gap: "${exercise.data.sentence}" — correct: "${exercise.data.blankWord}"`;
   }
 }
 

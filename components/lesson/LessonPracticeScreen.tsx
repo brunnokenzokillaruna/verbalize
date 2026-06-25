@@ -17,6 +17,20 @@ import { WordBankTranslation } from './WordBankTranslation';
 import { BridgeChoiceExercise } from './BridgeChoiceExercise';
 import { ListenAndSelectExercise } from './ListenAndSelectExercise';
 import { ListeningComprehensionExercise } from './ListeningComprehensionExercise';
+import { ListenAndRespondExercise } from './ListenAndRespondExercise';
+import { FreeRoleplayExercise } from './FreeRoleplayExercise';
+import { MicroMessageExercise } from './MicroMessageExercise';
+import { ParaphraseExercise } from './ParaphraseExercise';
+import { FillGapProductionExercise } from './FillGapProductionExercise';
+import { MinimalPairProductionExercise } from './MinimalPairProductionExercise';
+import { ShadowingExercise } from './ShadowingExercise';
+import { TranslationWithConstraintExercise } from './TranslationWithConstraintExercise';
+import { VoicemailDictationExercise } from './VoicemailDictationExercise';
+import { InferenceToneExercise } from './InferenceToneExercise';
+import { ConnectedSpeechExercise } from './ConnectedSpeechExercise';
+import { StoryContinuationExercise } from './StoryContinuationExercise';
+import { SpotTheRegisterExercise } from './SpotTheRegisterExercise';
+import { PromptedMonologueExercise } from './PromptedMonologueExercise';
 import {
   ExerciseSessionHeader,
   ExerciseTypeShell,
@@ -33,6 +47,7 @@ interface LessonPracticeScreenProps {
   level?: ProficiencyLevel;
   immersionMode?: ImmersionMode;
   lessonTag?: LessonTag;
+  exerciseRetryKey?: number;
   onAnswer: (correct: boolean) => void;
   setIsExerciseReady: (ready: boolean) => void;
   submitTrigger: number;
@@ -62,6 +77,7 @@ export function LessonPracticeScreen({
   onAnswer,
   setIsExerciseReady,
   submitTrigger,
+  exerciseRetryKey = 0,
 }: LessonPracticeScreenProps) {
   const common = sharedProps(
     exerciseAnswer,
@@ -81,6 +97,7 @@ export function LessonPracticeScreen({
           <ReverseTranslationInput
             data={currentExercise.data}
             language={language}
+            level={level}
             {...common}
           />
         );
@@ -144,6 +161,14 @@ export function LessonPracticeScreen({
             {...common}
           />
         );
+      case 'minimal-pair-production':
+        return (
+          <MinimalPairProductionExercise
+            data={currentExercise.data}
+            language={language}
+            {...common}
+          />
+        );
       case 'conjugation-speed':
         return (
           <ConjugationSpeedExercise
@@ -152,13 +177,121 @@ export function LessonPracticeScreen({
             {...common}
           />
         );
-      default:
-        return null;
+      case 'listen-and-respond':
+        return (
+          <ListenAndRespondExercise
+            data={currentExercise.data}
+            language={language}
+            level={level}
+            {...common}
+          />
+        );
+      case 'free-roleplay':
+        return (
+          <FreeRoleplayExercise
+            data={currentExercise.data}
+            language={language}
+            {...common}
+          />
+        );
+      case 'micro-message':
+        return (
+          <MicroMessageExercise
+            data={currentExercise.data}
+            language={language}
+            {...common}
+          />
+        );
+      case 'paraphrase':
+        return (
+          <ParaphraseExercise
+            data={currentExercise.data}
+            language={language}
+            level={level}
+            {...common}
+          />
+        );
+      case 'fill-gap-production':
+        return (
+          <FillGapProductionExercise
+            data={currentExercise.data}
+            language={language}
+            {...common}
+          />
+        );
+      case 'shadowing':
+        return (
+          <ShadowingExercise
+            data={currentExercise.data}
+            language={language}
+            {...common}
+          />
+        );
+      case 'translation-with-constraint':
+        return (
+          <TranslationWithConstraintExercise
+            data={currentExercise.data}
+            language={language}
+            {...common}
+          />
+        );
+      case 'voicemail-dictation':
+        return (
+          <VoicemailDictationExercise
+            data={currentExercise.data}
+            language={language}
+            {...common}
+          />
+        );
+      case 'inference-tone':
+        return (
+          <InferenceToneExercise
+            data={currentExercise.data}
+            language={language}
+            {...common}
+          />
+        );
+      case 'connected-speech':
+        return (
+          <ConnectedSpeechExercise
+            data={currentExercise.data}
+            language={language}
+            {...common}
+          />
+        );
+      case 'story-continuation':
+        return (
+          <StoryContinuationExercise
+            data={currentExercise.data}
+            language={language}
+            {...common}
+          />
+        );
+      case 'spot-the-register':
+        return (
+          <SpotTheRegisterExercise
+            data={currentExercise.data}
+            language={language}
+            {...common}
+          />
+        );
+      case 'prompted-monologue':
+        return (
+          <PromptedMonologueExercise
+            data={currentExercise.data}
+            language={language}
+            {...common}
+          />
+        );
+      default: {
+        const _exhaustive: never = currentExercise;
+        return _exhaustive;
+      }
     }
   }
 
   return (
-    <div key={exerciseIndex} className="flex flex-col gap-6 animate-slide-up-spring">
+    <div key={`${exerciseIndex}-${exerciseRetryKey}`} className="flex flex-col gap-6 animate-slide-up-spring">
       <ExerciseSessionHeader
         type={currentExercise.type}
         exerciseIndex={exerciseIndex}

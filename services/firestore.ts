@@ -15,10 +15,15 @@ import {
   Timestamp,
 } from 'firebase/firestore';
 import { getDb } from './firebase';
-import { SEPARATE_PASSIVE_SRS, PREGEN_SCHEMA_VERSION } from '@/lib/practiceExercises/constants';
+import { getPregenGeneratingTimeoutMs } from '@/lib/pregenTiming';
+import {
+  isPregenSchemaCurrent,
+  PREGEN_SCHEMA_VERSION,
+  SEPARATE_PASSIVE_SRS,
+} from '@/lib/practiceExercises/constants';
 import type { UserDocument, UserVocabularyDocument, ImageCacheDocument, VerbDocument, LessonMistakeDocument, PregeneratedLessonDocument, SupportedLanguage, ProficiencyLevel, LessonLogDocument } from '@/types';
 import { calculateNextReview } from '@/lib/srs';
-import { getNextLessonId, getLessonsForLanguage } from '@/lib/curriculum';
+import { getNextLessonId, getLessonsForLanguage, getLessonById } from '@/lib/curriculum';
 import {
   buildCurriculumSyncNotice,
   buildUserCurriculumMigrationUpdates,
@@ -33,6 +38,7 @@ import { logCurriculum } from '@/lib/curriculumLogger';
 import type { CurriculumSyncNotice, CurriculumSyncReport } from '@/types/curriculumSync';
 import { getEffectiveStreak } from '@/lib/stats';
 import { stripUndefinedDeep } from '@/utils/stripUndefined';
+import { getWeekStartISO, computeSpontaneousSessionRate } from '@/lib/productionStatsHelpers';
 
 // ─── Users ────────────────────────────────────────────────────────────────────
 
@@ -40,6 +46,12 @@ export interface SyncUserProfileResult {
   profile: UserDocument;
   notice: CurriculumSyncNotice | null;
   report: CurriculumSyncReport;
+}
+
+export async function fetchUserProfile(uid: string): Promise<UserDocument | null> {
+  const snap = await getDoc(doc(await getDb(), 'users', uid));
+  if (!snap.exists()) return null;
+  return snap.data() as UserDocument;
 }
 
 export async function syncUserProfile(uid: string): Promise<SyncUserProfileResult | null> {
@@ -357,8 +369,8 @@ export async function recordPassiveEncounter(
   });
 }
 
-/** Active production success — advances SRS. */
-export async function recordActiveSuccess(
+/** Active production success — marks word as produced; advances SRS when passive SRS is split. */
+export async function markVocabularyProduced(
   uid: string,
   word: string,
   language: SupportedLanguage,
@@ -374,20 +386,114 @@ export async function recordActiveSuccess(
 
   const docRef = snap.docs[0].ref;
   const existing = snap.docs[0].data() as UserVocabularyDocument;
-  const { newLevel, nextReview } = calculateNextReview(existing.srsLevel, true);
+  const productionCount = (existing.productionCount ?? 0) + 1;
+
+  if (SEPARATE_PASSIVE_SRS) {
+    const { newLevel, nextReview } = calculateNextReview(existing.srsLevel, true);
+    await updateDoc(docRef, {
+      srsLevel: newLevel,
+      knowledgeMode: 'active',
+      productionCount,
+      lastReview: serverTimestamp(),
+      nextReview: Timestamp.fromDate(nextReview),
+    });
+    return;
+  }
+
   await updateDoc(docRef, {
-    srsLevel: newLevel,
     knowledgeMode: 'active',
-    productionCount: (existing.productionCount ?? 0) + 1,
-    lastReview: serverTimestamp(),
-    nextReview: Timestamp.fromDate(nextReview),
+    productionCount,
   });
+}
+
+/** @deprecated Use markVocabularyProduced */
+export async function recordActiveSuccess(
+  uid: string,
+  word: string,
+  language: SupportedLanguage,
+): Promise<void> {
+  await markVocabularyProduced(uid, word, language);
 }
 
 export async function incrementProductionStats(
   uid: string,
-  kind: 'oral' | 'freeWrite',
+  kind: 'oral' | 'oralSpontaneous' | 'freeWrite',
   accepted: boolean,
+): Promise<void> {
+  const userRef = doc(await getDb(), 'users', uid);
+  const snap = await getDoc(userRef);
+  if (!snap.exists()) return;
+
+  const profile = snap.data() as UserDocument;
+  const stats = profile.productionStats ?? {
+    oralAttempts: 0,
+    oralAccepted: 0,
+    oralSpontaneousAttempts: 0,
+    oralSpontaneousAccepted: 0,
+    freeWriteAttempts: 0,
+    freeWriteAccepted: 0,
+  };
+
+  const next = {
+    oralAttempts: stats.oralAttempts ?? 0,
+    oralAccepted: stats.oralAccepted ?? 0,
+    oralSpontaneousAttempts: stats.oralSpontaneousAttempts ?? 0,
+    oralSpontaneousAccepted: stats.oralSpontaneousAccepted ?? 0,
+    freeWriteAttempts: stats.freeWriteAttempts ?? 0,
+    freeWriteAccepted: stats.freeWriteAccepted ?? 0,
+  };
+
+  if (kind === 'oral') {
+    next.oralAttempts += 1;
+    if (accepted) next.oralAccepted += 1;
+  } else if (kind === 'oralSpontaneous') {
+    next.oralSpontaneousAttempts += 1;
+    if (accepted) next.oralSpontaneousAccepted += 1;
+  } else {
+    next.freeWriteAttempts += 1;
+    if (accepted) next.freeWriteAccepted += 1;
+  }
+
+  const weekStart = getWeekStartISO();
+  const prevWeek = stats.weeklyWeekStart;
+  let weeklyAccepted = stats.weeklyAccepted ?? 0;
+  let weeklyOralAccepted = stats.weeklyOralAccepted ?? 0;
+  let weeklyOralSpontaneousAccepted = stats.weeklyOralSpontaneousAccepted ?? 0;
+  let weeklyWriteAccepted = stats.weeklyWriteAccepted ?? 0;
+  if (prevWeek !== weekStart) {
+    weeklyAccepted = 0;
+    weeklyOralAccepted = 0;
+    weeklyOralSpontaneousAccepted = 0;
+    weeklyWriteAccepted = 0;
+  }
+  if (accepted) {
+    weeklyAccepted += 1;
+    if (kind === 'freeWrite') {
+      weeklyWriteAccepted += 1;
+    } else {
+      weeklyOralAccepted += 1;
+      if (kind === 'oralSpontaneous') {
+        weeklyOralSpontaneousAccepted += 1;
+      }
+    }
+  }
+
+  await updateDoc(userRef, {
+    productionStats: {
+      ...next,
+      weeklyAccepted,
+      weeklyOralAccepted,
+      weeklyOralSpontaneousAccepted,
+      weeklyWriteAccepted,
+      weeklyWeekStart: weekStart,
+      lastUpdated: serverTimestamp(),
+    },
+  });
+}
+
+export async function incrementOralExerciseOutcome(
+  uid: string,
+  outcome: 'completed' | 'skipped',
 ): Promise<void> {
   const userRef = doc(await getDb(), 'users', uid);
   const snap = await getDoc(userRef);
@@ -400,18 +506,18 @@ export async function incrementProductionStats(
     freeWriteAttempts: 0,
     freeWriteAccepted: 0,
   };
-
-  const next = { ...stats };
-  if (kind === 'oral') {
-    next.oralAttempts += 1;
-    if (accepted) next.oralAccepted += 1;
-  } else {
-    next.freeWriteAttempts += 1;
-    if (accepted) next.freeWriteAccepted += 1;
-  }
+  const oralExerciseCompleted = stats.oralExerciseCompleted ?? 0;
+  const oralExerciseSkipped = stats.oralExerciseSkipped ?? 0;
 
   await updateDoc(userRef, {
-    productionStats: { ...next, lastUpdated: serverTimestamp() },
+    productionStats: {
+      ...stats,
+      oralExerciseCompleted:
+        outcome === 'completed' ? oralExerciseCompleted + 1 : oralExerciseCompleted,
+      oralExerciseSkipped:
+        outcome === 'skipped' ? oralExerciseSkipped + 1 : oralExerciseSkipped,
+      lastUpdated: serverTimestamp(),
+    },
   });
 }
 
@@ -442,6 +548,22 @@ export async function getRecentLessonStats(uid: string): Promise<RecentLessonSta
   return { lessonsLast7Days, averageScoreLast7Days };
 }
 
+export async function getRecentSpontaneousSessionStats(
+  uid: string,
+  days = 7,
+): Promise<import('@/lib/productionStatsHelpers').SpontaneousSessionStats> {
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - days);
+
+  const q = query(collection(await getDb(), 'lesson_logs'), where('uid', '==', uid));
+  const snap = await getDocs(q);
+  const recent = snap.docs
+    .map((d) => d.data() as LessonLogDocument)
+    .filter((log) => log.completedAt?.toDate?.() >= cutoff);
+
+  return computeSpontaneousSessionRate(recent, (lessonId) => getLessonById(lessonId)?.tag);
+}
+
 // ─── Lesson Log ───────────────────────────────────────────────────────────────
 
 /**
@@ -452,9 +574,18 @@ export async function logLesson(data: {
   lessonId: string;
   language: SupportedLanguage;
   score: number;
+  lessonTag?: LessonLogDocument['lessonTag'];
+  hadSpontaneousProductionAccepted?: boolean;
 }): Promise<void> {
   await addDoc(collection(await getDb(), 'lesson_logs'), {
-    ...data,
+    ...stripUndefinedDeep({
+      uid: data.uid,
+      lessonId: data.lessonId,
+      language: data.language,
+      score: data.score,
+      lessonTag: data.lessonTag,
+      hadSpontaneousProductionAccepted: data.hadSpontaneousProductionAccepted,
+    }),
     completedAt: serverTimestamp(),
   });
 }
@@ -787,12 +918,26 @@ function pregeneratedDocId(uid: string, lessonId: string) {
   return `${uid}_${lessonId}`;
 }
 
-const PREGEN_GENERATING_TIMEOUT_MS = 5 * 60 * 1000;
+function isFirestorePermissionDenied(err: unknown): boolean {
+  if (typeof err !== 'object' || err === null || !('code' in err)) return false;
+  return (err as { code?: string }).code === 'permission-denied';
+}
 
 function pregenCreatedAtMs(createdAt: PregeneratedLessonDocument['createdAt']): number {
   if (!createdAt) return 0;
   if (typeof createdAt.toMillis === 'function') return createdAt.toMillis();
   return (createdAt.seconds ?? 0) * 1000;
+}
+
+/** True when a generating lock is older than the allowed window (shorter in dev). */
+export function isPregenGeneratingStale(
+  doc: PregeneratedLessonDocument | null | undefined,
+  maxAgeMs = getPregenGeneratingTimeoutMs(),
+): boolean {
+  if (!doc || doc.status !== 'generating') return false;
+  const created = pregenCreatedAtMs(doc.createdAt);
+  if (created <= 0) return true;
+  return Date.now() - created >= maxAgeMs;
 }
 
 /**
@@ -804,25 +949,33 @@ export async function tryStartPregeneratingLesson(uid: string, lessonId: string)
   const id = pregeneratedDocId(uid, lessonId);
   const ref = doc(db, 'lesson_pregen', id);
 
-  return runTransaction(db, async (tx) => {
-    const snap = await tx.get(ref);
-    if (snap.exists()) {
-      const data = snap.data() as PregeneratedLessonDocument;
-      if (data.status === 'ready') return false;
-      if (data.status === 'generating') {
-        const age = Date.now() - pregenCreatedAtMs(data.createdAt);
-        if (age < PREGEN_GENERATING_TIMEOUT_MS) return false;
+  try {
+    return await runTransaction(db, async (tx) => {
+      const snap = await tx.get(ref);
+      if (snap.exists()) {
+        const data = snap.data() as PregeneratedLessonDocument;
+        if (data.status === 'ready' && isPregenSchemaCurrent(data.schemaVersion)) return false;
+        if (data.status === 'generating') {
+          const age = Date.now() - pregenCreatedAtMs(data.createdAt);
+          if (age < getPregenGeneratingTimeoutMs()) return false;
+        }
       }
-    }
 
-    tx.set(ref, {
-      uid,
-      lessonId,
-      status: 'generating',
-      createdAt: serverTimestamp(),
+      tx.set(ref, {
+        uid,
+        lessonId,
+        status: 'generating',
+        createdAt: serverTimestamp(),
+      });
+      return true;
     });
-    return true;
-  });
+  } catch (err) {
+    if (isFirestorePermissionDenied(err)) {
+      console.warn('[tryStartPregeneratingLesson] Permission denied — skipping pregen lock');
+      return false;
+    }
+    throw err;
+  }
 }
 
 /**
@@ -873,8 +1026,16 @@ export async function getPregeneratedLesson(
   uid: string,
   lessonId: string,
 ): Promise<PregeneratedLessonDocument | null> {
-  const snap = await getDoc(doc(await getDb(), 'lesson_pregen', pregeneratedDocId(uid, lessonId)));
-  return snap.exists() ? (snap.data() as PregeneratedLessonDocument) : null;
+  try {
+    const snap = await getDoc(doc(await getDb(), 'lesson_pregen', pregeneratedDocId(uid, lessonId)));
+    return snap.exists() ? (snap.data() as PregeneratedLessonDocument) : null;
+  } catch (err) {
+    if (isFirestorePermissionDenied(err)) {
+      console.warn('[getPregeneratedLesson] Permission denied — treating as cache miss');
+      return null;
+    }
+    throw err;
+  }
 }
 
 /**

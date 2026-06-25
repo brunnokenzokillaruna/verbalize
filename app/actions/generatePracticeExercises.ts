@@ -1,12 +1,7 @@
 'use server';
 
 import { callGeminiJSON } from '@/services/gemini';
-import {
-  enforceVariety,
-  pinProductionLast,
-  pinTagExclusiveFirst,
-  varietyNeedsRegeneration,
-} from '@/utils/exerciseVariety';
+import { varietyNeedsRegeneration } from '@/utils/exerciseVariety';
 import type { Exercise } from '@/types';
 import {
   getAllowedExerciseTypes,
@@ -16,13 +11,9 @@ import {
 } from '@/lib/practiceExercises/constants';
 import { buildPracticeExercisePrompt } from '@/lib/practiceExercises/promptBuilder';
 import type { GeneratePracticeParams } from '@/lib/practiceExercises/types';
-import { validateAndSanitizeExercises } from '@/lib/practiceExercises/validateGeneratedExercises';
-import {
-  buildProductionRetrySuffix,
-  ensureMinimumProduction,
-  sessionHasProduction,
-} from '@/lib/practiceExercises/ensureMinimumProduction';
+import { buildProductionRetrySuffix } from '@/lib/practiceExercises/ensureMinimumProduction';
 import { resolveRequiredProductionType } from '@/lib/practiceExercises/productionTypes';
+import { composePracticeSession } from '@/lib/practiceExercises/sessionComposition';
 
 const MAX_GENERATION_ATTEMPTS_LIVE = 2;
 
@@ -32,55 +23,6 @@ function buildRetrySuffix(attempt: number, allowedTypes: ExerciseTypeId[]): stri
 RETRY NOTICE (attempt ${attempt}): Your previous response did not yield ${PRACTICE_EXERCISE_COUNT} valid exercises.
 Generate EXACTLY ${PRACTICE_EXERCISE_COUNT} exercises. Use ONLY these types: ${allowedTypes.map((t) => `'${t}'`).join(', ')}.
 Each exercise must be fully valid — incomplete or disallowed types will be discarded.`;
-}
-
-async function processGeneratedExercises(
-  exercises: Exercise[],
-  allowedSet: Set<ExerciseTypeId>,
-  language: GeneratePracticeParams['language'],
-  tagExclusive: ExerciseTypeId | null,
-  params: GeneratePracticeParams,
-): Promise<Exercise[]> {
-  const dedupedValidated = await validateAndSanitizeExercises(exercises, allowedSet, language);
-
-  const requiredProduction = resolveRequiredProductionType(
-    params.level,
-    params.knownVocabulary.length,
-    [...allowedSet],
-  );
-
-  let finalExercises = pinTagExclusiveFirst(dedupedValidated, tagExclusive);
-  finalExercises = enforceVariety(
-    finalExercises,
-    [...allowedSet] as ExerciseTypeId[],
-    tagExclusive,
-    PRACTICE_EXERCISE_COUNT,
-    requiredProduction,
-  );
-
-  finalExercises = await ensureMinimumProduction(finalExercises, {
-    level: params.level,
-    vocabCount: params.knownVocabulary.length,
-    tag: params.tag,
-    language: params.language,
-    grammarFocus: params.grammarFocus,
-    theme: params.theme ?? '',
-    dialogue: params.dialogue,
-    newVocabulary: params.newVocabulary,
-    allowedTypes: [...allowedSet],
-  });
-
-  if (requiredProduction) {
-    finalExercises = pinProductionLast(finalExercises, requiredProduction);
-  }
-
-  if (!sessionHasProduction(finalExercises)) {
-    console.warn(
-      `[generatePracticeExercises] Session lacks production exercise (tag=${params.tag}, level=${params.level})`,
-    );
-  }
-
-  return finalExercises.slice(0, PRACTICE_EXERCISE_COUNT);
 }
 
 /**
@@ -94,17 +36,22 @@ async function processGeneratedExercises(
 export async function generatePracticeExercises(
   params: GeneratePracticeParams,
 ): Promise<Exercise[] | null> {
-  const { tag, level, knownVocabulary, language, maxAttempts } = params;
+  const { tag, level, knownVocabulary, maxAttempts } = params;
   const attemptLimit = maxAttempts ?? MAX_GENERATION_ATTEMPTS_LIVE;
 
-  const allowedTypes = getAllowedExerciseTypes(level, knownVocabulary.length);
+  const allowedTypes = getAllowedExerciseTypes(level, knownVocabulary.length, tag);
   const allowedSet = new Set(allowedTypes);
 
   if (tag === 'GRAM') allowedSet.add('grammar-trap');
-  if (tag === 'PRON') allowedSet.add('minimal-pair');
+  if (tag === 'PRON') {
+    allowedSet.add('minimal-pair');
+    if (['A2', 'B1', 'B2', 'C1', 'C2'].includes(level)) {
+      allowedSet.add('minimal-pair-production');
+    }
+  }
   if (tag === 'VERB') allowedSet.add('conjugation-speed');
 
-  const tagExclusive = getTagExclusiveType(tag);
+  const tagExclusive = getTagExclusiveType(tag, level);
   const requiredProduction = resolveRequiredProductionType(
     level,
     knownVocabulary.length,
@@ -133,12 +80,11 @@ export async function generatePracticeExercises(
         continue;
       }
 
-      const finalExercises = await processGeneratedExercises(
+      const finalExercises = await composePracticeSession(
         exercises,
         allowedSet,
-        language,
-        tagExclusive,
         params,
+        tagExclusive,
       );
 
       if (finalExercises.length > bestEffort.length) {

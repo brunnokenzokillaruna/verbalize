@@ -38,8 +38,24 @@ export interface UserDocument {
   productionStats?: {
     oralAttempts: number;
     oralAccepted: number;
+    /** Spontaneous oral production (not echo/repeat). Phase 0+. */
+    oralSpontaneousAttempts?: number;
+    oralSpontaneousAccepted?: number;
     freeWriteAttempts: number;
     freeWriteAccepted: number;
+    /** Accepted production sentences this week (resets each Monday UTC). */
+    weeklyAccepted?: number;
+    /** Oral accepted this week (echo + spontaneous). */
+    weeklyOralAccepted?: number;
+    /** Spontaneous oral accepted this week (subset of weeklyOralAccepted). */
+    weeklyOralSpontaneousAccepted?: number;
+    /** Written accepted this week (free production). */
+    weeklyWriteAccepted?: number;
+    weeklyWeekStart?: string;
+    /** Oral exercises finished with recording/evaluation (not skip / no-mic bypass). */
+    oralExerciseCompleted?: number;
+    /** Oral exercises skipped or bypassed without recording. */
+    oralExerciseSkipped?: number;
     lastUpdated?: Timestamp;
   };
 
@@ -108,6 +124,10 @@ export interface LessonLogDocument {
   lessonId: string;
   completedAt: Timestamp;
   score: number; // 0–100
+  /** Lesson tag at completion time (for analytics). */
+  lessonTag?: LessonTag;
+  /** Learner accepted at least one spontaneous production attempt in this session. */
+  hadSpontaneousProductionAccepted?: boolean;
 }
 
 // ─── Verbs ────────────────────────────────────────────────────────────────────
@@ -187,7 +207,21 @@ export type ExerciseType =
   | 'logic-connectors'
   | 'grammar-trap'
   | 'minimal-pair'
-  | 'conjugation-speed';
+  | 'minimal-pair-production'
+  | 'conjugation-speed'
+  | 'listen-and-respond'
+  | 'free-roleplay'
+  | 'micro-message'
+  | 'paraphrase'
+  | 'fill-gap-production'
+  | 'shadowing'
+  | 'translation-with-constraint'
+  | 'voicemail-dictation'
+  | 'inference-tone'
+  | 'connected-speech'
+  | 'story-continuation'
+  | 'spot-the-register'
+  | 'prompted-monologue';
 
 // ─── Server Action Result Types ───────────────────────────────────────────────
 
@@ -232,7 +266,16 @@ export interface HookResult {
   curiosidade?: string;                              // engaging fun fact in casual PT-BR, every lesson
   phoneticsTip?: PhoneticsTipResult;                 // PRON only
   missionBriefing?: MissionBriefingResult;           // MISS only
+  /** MISS only — alternate NPC lines when the learner's previous turn was inadequate. */
+  rolePlayConsequences?: RolePlayConsequence[];
   newChunks?: Array<{ phrase: string; translation: string; entryType: 'chunk' | 'collocation' | 'expression' | 'phrasal_verb' }>;
+}
+
+export interface RolePlayConsequence {
+  /** 0-based index of the NPC dialogue line to swap when the preceding user turn failed. */
+  npcLineIndex: number;
+  alternateText: string;
+  alternateTranslation?: string;
 }
 
 export interface GrammarBridgeResult {
@@ -353,6 +396,8 @@ export interface ReverseTranslationData {
   target_translation: string;
   acceptable_variants: string[];
   hint?: string;
+  linkedExerciseId?: string;
+  chainAnchorPhrase?: string;
 }
 
 export interface DictationData {
@@ -434,6 +479,94 @@ export interface MinimalPairData {
   tip: string;             // PT-BR: pronunciation tip to distinguish the pair
 }
 
+/** Phase 5 P6 — extended spontaneous monologue from a prompt (oral production). */
+export interface PromptedMonologueData {
+  contextPt: string;
+  promptPt: string;
+  speakingGoalPt: string;
+  evaluationCriteria: string;
+  acceptableThemes: string[];
+  exampleMonologue: string;
+  keyPoints?: string[];
+  explanationPt: string;
+}
+
+/** Phase 5 P5 — rewrite a dialogue line with wrong register. */
+export interface SpotTheRegisterData {
+  context: string;
+  dialogueLines: string[];
+  wrongLineIndex: number;
+  registerIssuePt: string;
+  targetRegisterPt: string;
+  evaluationCriteria: string;
+  acceptableThemes: string[];
+  correctedLine: string;
+  explanationPt: string;
+}
+
+/** Phase 5 P5 — continue a micro-narrative with free written production. */
+export interface StoryContinuationData {
+  storyOpening: string;
+  storyTranslation: string;
+  contextPt: string;
+  promptPt: string;
+  evaluationCriteria: string;
+  acceptableThemes: string[];
+  exampleContinuation: string;
+  explanationPt: string;
+}
+
+/** Phase 5 P4 — listen for liaison/linking and transcribe connected speech. */
+export interface ConnectedSpeechData {
+  audioText: string;
+  translation: string;
+  contextPt: string;
+  phenomenonPt: string;
+  segmentedForm: string;
+  linkedForm: string;
+  expected_transcription: string;
+  acceptable_variants: string[];
+  explanationPt: string;
+}
+
+/** Phase 5 P4 — compare two utterances and infer tone/register. */
+export interface InferenceToneData {
+  contextPt: string;
+  questionPt: string;
+  targetTonePt: string;
+  audioTextA: string;
+  audioTextB: string;
+  labelA: string;
+  labelB: string;
+  correctOption: 'A' | 'B';
+  explanationPt: string;
+}
+
+/** Phase 5 P3 — listen to a longer voicemail, summarize in PT-BR. */
+export interface VoicemailDictationData {
+  audioText: string;
+  contextPt: string;
+  expected_summary: string;
+  acceptable_summaries: string[];
+  key_points?: string[];
+}
+
+/** Phase 5 P3 — translate PT→target but must include a lesson chunk. */
+export interface TranslationWithConstraintData {
+  portuguese_sentence: string;
+  required_chunk: string;
+  target_translation: string;
+  acceptable_variants: string[];
+  constraint_explanation?: string;
+}
+
+/** Phase 5 P2 — speak along with continuous audio (shadowing). */
+export interface ShadowingData {
+  text: string;
+  translation: string;
+  tip?: string;
+}
+
 export interface ConjugationSpeedData {
   verb: string;            // Infinitive form
   pronoun: string;         // Subject pronoun (e.g. "je", "il", "nous")
@@ -486,6 +619,56 @@ export interface ListeningComprehensionData {
   options: string[];
   correctIndex: number;
   explanationPt: string;
+  linkedExerciseId?: string;
+  chainAnchorPhrase?: string;
+}
+
+/** Phase 1 — listen to dialogue, respond orally (spontaneous). */
+export interface ListenAndRespondData {
+  dialogueAudio: string;
+  promptLine: string;
+  contextPt: string;
+  evaluationCriteria: string;
+  acceptableThemes: string[];
+  exampleResponse: string;
+  linkedExerciseId?: string;
+  chainAnchorPhrase?: string;
+}
+
+/** Phase 2 — situational roleplay with free written/spoken response. */
+export interface FreeRoleplayData {
+  context: string;
+  promptLine: string;
+  evaluationCriteria: string;
+  acceptableThemes: string[];
+  exampleResponse: string;
+  explanation: string;
+}
+
+/** Phase 2 — informal written reply (chat/message). */
+export interface MicroMessageData {
+  context: string;
+  incomingMessage: string;
+  translation: string;
+  evaluationCriteria: string;
+  exampleResponse: string;
+}
+
+/** Phase 5 — rewrite same meaning with different words (written production). */
+export interface ParaphraseData {
+  source_sentence: string;
+  source_translation: string;
+  target_paraphrase: string;
+  acceptable_variants: string[];
+  hint?: string;
+}
+
+/** Phase 5 — open blank production (not MCQ). */
+export interface FillGapProductionData {
+  sentence: string;
+  blankWord: string;
+  translation: string;
+  acceptable_variants?: string[];
 }
 
 export type Exercise =
@@ -506,4 +689,18 @@ export type Exercise =
   | { type: 'logic-connectors';       data: LogicConnectorsData }
   | { type: 'grammar-trap';           data: GrammarTrapData }
   | { type: 'minimal-pair';           data: MinimalPairData }
-  | { type: 'conjugation-speed';      data: ConjugationSpeedData };
+  | { type: 'minimal-pair-production'; data: MinimalPairData }
+  | { type: 'conjugation-speed';      data: ConjugationSpeedData }
+  | { type: 'listen-and-respond';     data: ListenAndRespondData }
+  | { type: 'free-roleplay';          data: FreeRoleplayData }
+  | { type: 'micro-message';          data: MicroMessageData }
+  | { type: 'paraphrase';             data: ParaphraseData }
+  | { type: 'fill-gap-production';    data: FillGapProductionData }
+  | { type: 'shadowing';              data: ShadowingData }
+  | { type: 'translation-with-constraint'; data: TranslationWithConstraintData }
+  | { type: 'voicemail-dictation';       data: VoicemailDictationData }
+  | { type: 'inference-tone';            data: InferenceToneData }
+  | { type: 'connected-speech';          data: ConnectedSpeechData }
+  | { type: 'story-continuation';        data: StoryContinuationData }
+  | { type: 'spot-the-register';        data: SpotTheRegisterData }
+  | { type: 'prompted-monologue';      data: PromptedMonologueData };

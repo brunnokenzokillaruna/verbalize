@@ -20,6 +20,12 @@ export function LocalTurn({ line, language, onReplay, onNext }: LocalTurnProps) 
       <div className="flex-1 min-w-0 flex flex-col items-end gap-2">
         <p className="text-xs font-bold uppercase tracking-wide text-verb">{line.speaker}</p>
 
+        {line.isConsequenceTone && (
+          <p className="text-[10px] font-bold uppercase tracking-wide text-error/80">
+            Tom mais tenso — sua resposta anterior não convenceu
+          </p>
+        )}
+
         <div className="w-full max-w-[min(100%,20rem)] rounded-2xl rounded-tr-md border border-verb/20 bg-surface px-4 py-3.5 text-right">
           <p className="grammar-body font-semibold text-text-primary leading-relaxed">{line.text}</p>
           {line.translation && (

@@ -23,6 +23,7 @@ async function runPregenerateNextLesson(
   lesson: LessonDefinition,
   interests: string[],
   knownVocabulary: string[],
+  masteredVocabulary: string[] = [],
 ): Promise<boolean> {
   if (!isAggressivePregenEnabled()) {
     console.info(`[pregenerateNextLesson] Skipped ${lesson.id} — pregen disabled (dev/preview).`);
@@ -91,6 +92,7 @@ async function runPregenerateNextLesson(
     language: lesson.language,
     level: lesson.level,
     knownVocabulary,
+    masteredVocabulary,
     previousTopics: getPreviousTopics(lesson.language, lesson.id),
     grammarBridge,
     maxAttempts: 1,
@@ -121,6 +123,7 @@ export async function pregenerateNextLesson(
   lesson: LessonDefinition,
   interests: string[],
   knownVocabulary: string[],
+  masteredVocabulary: string[] = [],
 ): Promise<boolean> {
   const key = `${uid}_${lesson.id}`;
   const existing = pregenInFlight.get(key);
@@ -128,7 +131,7 @@ export async function pregenerateNextLesson(
 
   const promise = (async () => {
     try {
-      return await runPregenerateNextLesson(uid, lesson, interests, knownVocabulary);
+      return await runPregenerateNextLesson(uid, lesson, interests, knownVocabulary, masteredVocabulary);
     } catch (err) {
       console.error('[pregenerateNextLesson] Error:', err);
       await abortPregeneratedLesson(uid, lesson.id).catch(() => {});

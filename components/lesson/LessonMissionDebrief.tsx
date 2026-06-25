@@ -3,7 +3,9 @@
 import { CheckCircle2, MapPin, Mic, Target, Sparkles } from 'lucide-react';
 import { AudioPlayerButton } from '@/components/lesson/AudioPlayerButton';
 import { MissionStepGuide } from '@/components/lesson/mission-roleplay/MissionStepGuide';
+import { ProductionWeekStat } from '@/components/lesson/ProductionWeekStat';
 import type { MissionBriefingResult, SupportedLanguage } from '@/types';
+import type { WeeklyProductionBreakdown } from '@/lib/productionStatsHelpers';
 
 interface LessonMissionDebriefProps {
   briefing: MissionBriefingResult;
@@ -13,6 +15,7 @@ interface LessonMissionDebriefProps {
   newVocabulary: string[];
   linesSpoken?: number;
   totalSpeakable?: number;
+  weeklyProduction?: WeeklyProductionBreakdown;
   onExit: () => void;
 }
 
@@ -24,6 +27,7 @@ export function LessonMissionDebrief({
   newVocabulary,
   linesSpoken = 0,
   totalSpeakable = 0,
+  weeklyProduction,
   onExit,
 }: LessonMissionDebriefProps) {
   const pct = totalExercises > 0
@@ -132,6 +136,8 @@ export function LessonMissionDebrief({
             </span>
           </div>
         </div>
+
+        {weeklyProduction && <ProductionWeekStat breakdown={weeklyProduction} />}
 
         {briefing.keyPhrases.length > 0 && (
           <div className="flex flex-col gap-2.5">

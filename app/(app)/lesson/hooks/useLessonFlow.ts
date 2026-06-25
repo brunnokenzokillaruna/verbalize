@@ -9,6 +9,7 @@ import { generatePracticeExercises } from '@/app/actions/generatePracticeExercis
 import { getVerbConjugation } from '@/app/actions/getVerbConjugation';
 import { logLesson, updateLessonStats, upsertVocabularyItem, saveLessonMistake, updateUser } from '@/services/firestore';
 import { sessionHasProduction } from '@/lib/practiceExercises/productionTypes';
+import { applyAdaptiveTier } from '@/lib/practiceExercises/adaptiveTier';
 import { assemblePracticeSession, injectImageMatchIntoPool } from '@/utils/assemblePracticeExercises';
 import { buildImageMatchFromLessonVocab } from '@/utils/imageMatchBuilder';
 import type { GrammarBridgeResult, Exercise, LessonTag } from '@/types';
@@ -64,6 +65,7 @@ export function useLessonFlow({
       language: store.lesson.language,
       level: store.lesson.level,
       knownVocabulary: store.knownVocabulary,
+      masteredVocabulary: store.masteredVocabulary,
       previousTopics: getPreviousTopics(store.lesson.language, store.lesson.id),
       grammarBridge: store.grammarBridge,
     });
@@ -101,11 +103,14 @@ export function useLessonFlow({
       clientExercises,
       store.lesson.tag,
       store.bridgeQuizPassed,
+      store.lesson.level,
     );
 
     if (store.lesson.tag !== 'VOC' || !clientExercises.length) {
       merged = injectImageMatchIntoPool(merged, imageMatchForPool);
     }
+
+    merged = applyAdaptiveTier(merged, store.masteredVocabulary);
 
     if (merged.length === 0) {
       console.error('[useLessonFlow] Empty practice session — staying on grammar phase');
@@ -257,6 +262,8 @@ export function useLessonFlow({
         lessonId: store.lesson.id,
         language: store.lesson.language,
         score,
+        lessonTag: store.lesson.tag,
+        hadSpontaneousProductionAccepted: store.spontaneousProductionAccepted,
       }).catch(console.error);
 
       if (profile) {
@@ -282,6 +289,8 @@ export function useLessonFlow({
       lessonId: store.lesson.id,
       language: store.lesson.language,
       score,
+      lessonTag: store.lesson.tag,
+      hadSpontaneousProductionAccepted: store.spontaneousProductionAccepted,
     }).catch(console.error);
 
     if (profile && store.lesson) {

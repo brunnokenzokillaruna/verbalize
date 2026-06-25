@@ -1,10 +1,13 @@
 import React from 'react';
 import { Trophy } from 'lucide-react';
+import { ProductionWeekStat } from '@/components/lesson/ProductionWeekStat';
+import type { WeeklyProductionBreakdown } from '@/lib/productionStatsHelpers';
 
 interface LessonCompleteScreenProps {
   totalExercises: number;
   correctExercises: number;
   newVocabulary: string[];
+  weeklyProduction?: WeeklyProductionBreakdown;
   onExit: () => void;
 }
 
@@ -12,6 +15,7 @@ export function LessonCompleteScreen({
   totalExercises,
   correctExercises,
   newVocabulary,
+  weeklyProduction,
   onExit,
 }: LessonCompleteScreenProps) {
   const pct = totalExercises > 0 ? Math.min(Math.round((correctExercises / totalExercises) * 100), 100) : 100;
@@ -111,6 +115,8 @@ export function LessonCompleteScreen({
           />
         </div>
       </div>
+
+      {weeklyProduction && <ProductionWeekStat breakdown={weeklyProduction} />}
 
       {/* Learned words passport box */}
       {newVocabulary.length > 0 && (

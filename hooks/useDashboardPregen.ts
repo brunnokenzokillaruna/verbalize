@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { devLog } from '@/lib/devLog';
 import { isAggressivePregenEnabled } from '@/lib/geminiDevGuard';
+import { isPregenSchemaCurrent } from '@/lib/practiceExercises/constants';
 import { pregenerateNextLesson } from '@/app/actions/pregenerateNextLesson';
 import { getPregeneratedLesson, getUserVocabulary } from '@/services/firestore';
 import type { LessonDefinition, UserDocument } from '@/types';
@@ -49,19 +50,33 @@ export function useDashboardPregen(
           return Date.now() - pregenCreatedAtMs(createdAt) > PREGEN_GENERATING_TIMEOUT_MS;
         };
 
+        const isStaleReady =
+          cached?.status === 'ready' && !isPregenSchemaCurrent(cached.schemaVersion);
+
         if (
           !cached ||
           cached.status === 'failed' ||
+          isStaleReady ||
           (cached.status === 'generating' && isTimedOut(cached.createdAt))
         ) {
-          devLog(`[Dashboard Pregen] 🔮 Active lesson ${lessonId} is a cache MISS. Pregenerating in background...`);
+          if (isStaleReady && cached) {
+            devLog(
+              `[Dashboard Pregen] 🔄 Active lesson ${lessonId} cache STALE (schema ${cached.schemaVersion ?? 'none'}) — regenerating...`,
+            );
+          } else {
+            devLog(`[Dashboard Pregen] 🔮 Active lesson ${lessonId} is a cache MISS. Pregenerating in background...`);
+          }
           const userVocabulary = await getUserVocabulary(user.uid, language);
           const knownVocabulary = userVocabulary.map((v) => v.word.toLowerCase());
+          const masteredVocabulary = userVocabulary
+            .filter((v) => (v.srsLevel ?? 0) >= 4)
+            .map((v) => v.word.toLowerCase());
           const ok = await pregenerateNextLesson(
             user.uid,
             activeLesson,
             profile.interests ?? [],
             knownVocabulary,
+            masteredVocabulary,
           );
           if (ok) {
             devLog(`[Dashboard Pregen] ✅ Active lesson ${lessonId} pregeneration complete.`);

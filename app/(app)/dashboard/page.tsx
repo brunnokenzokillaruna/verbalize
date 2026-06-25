@@ -7,6 +7,7 @@ import { DashboardTopBar } from '@/components/dashboard/DashboardTopBar';
 import { DashboardBanner } from '@/components/dashboard/DashboardBanner';
 import { LessonPath } from '@/components/dashboard/LessonPath';
 import { DashboardProgressFooter } from '@/components/dashboard/DashboardProgressFooter';
+import { DashboardProductionCard } from '@/components/dashboard/DashboardProductionCard';
 import { DashboardProfileDrawer } from '@/components/dashboard/DashboardProfileDrawer';
 import { LanguageSwitchOverlay } from '@/components/dashboard/LanguageSwitchOverlay';
 import { LANG_LABEL, THEME_COLORS } from '@/components/dashboard/constants';
@@ -17,7 +18,7 @@ import { useSoundEffects } from '@/hooks/useSoundEffects';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { useDashboardPregen } from '@/hooks/useDashboardPregen';
 import { logOut } from '@/services/auth';
-import { updateUser, syncUserProfile, logLesson, updateLessonStats, getUserVocabulary, getRecentLessonStats } from '@/services/firestore';
+import { updateUser, syncUserProfile, logLesson, updateLessonStats, getUserVocabulary, getRecentLessonStats, getRecentSpontaneousSessionStats } from '@/services/firestore';
 import { SkipLessonModal } from '@/components/ui/SkipLessonModal';
 import type { LessonDefinition } from '@/types';
 import { getLessonsForLanguage } from '@/lib/curriculum';
@@ -29,6 +30,8 @@ import {
 } from '@/components/dashboard/CurriculumSyncNotice';
 import { getEffectiveStreak } from '@/lib/stats';
 import { computeVocabCounts } from '@/utils/vocabPageHelpers';
+import type { SpontaneousSessionStats } from '@/lib/productionStatsHelpers';
+import { computeVocabRetentionComparison, type VocabRetentionComparison } from '@/lib/vocabRetentionStats';
 import type { ProficiencyLevel, SupportedLanguage } from '@/types';
 
 export default function DashboardPage() {
@@ -67,6 +70,10 @@ export default function DashboardPage() {
   const [masteredCount, setMasteredCount] = useState<number | undefined>();
   const [lessonsLast7Days, setLessonsLast7Days] = useState<number | undefined>();
   const [averageScoreLast7Days, setAverageScoreLast7Days] = useState<number | undefined>();
+  const [spontaneousSessionStats, setSpontaneousSessionStats] = useState<
+    SpontaneousSessionStats | undefined
+  >();
+  const [vocabRetention, setVocabRetention] = useState<VocabRetentionComparison | undefined>();
 
   const currentLessonRef = useRef<HTMLDivElement | null>(null);
   const hasScrolledToCurrentRef = useRef(false);
@@ -155,14 +162,17 @@ export default function DashboardPage() {
     Promise.all([
       getUserVocabulary(user.uid, profile.currentTargetLanguage),
       getRecentLessonStats(user.uid),
+      getRecentSpontaneousSessionStats(user.uid),
     ])
-      .then(([vocab, lessonStats]) => {
+      .then(([vocab, lessonStats, sessionStats]) => {
         if (cancelled) return;
         const counts = computeVocabCounts(vocab);
         setDueTodayCount(counts.dueTodayCount);
         setMasteredCount(counts.masteredCount);
         setLessonsLast7Days(lessonStats.lessonsLast7Days);
         setAverageScoreLast7Days(lessonStats.averageScoreLast7Days);
+        setSpontaneousSessionStats(sessionStats);
+        setVocabRetention(computeVocabRetentionComparison(vocab));
       })
       .catch(console.error);
 
@@ -341,6 +351,14 @@ export default function DashboardPage() {
           onNodeKeyDown={handleNodeKeyDown}
           onToggleModal={handleToggleModal}
           onCloseModal={closeModal}
+        />
+
+        <DashboardProductionCard
+          profile={profile}
+          sessionStats={spontaneousSessionStats}
+          vocabRetention={vocabRetention}
+          nextLessonTag={activeLessonObj?.tag}
+          onStartNextLesson={() => router.push(`/lesson?id=${activeLessonObj.id}`)}
         />
 
         <DashboardProgressFooter

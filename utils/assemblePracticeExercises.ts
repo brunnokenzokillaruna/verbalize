@@ -1,14 +1,8 @@
-import type { Exercise, LessonTag } from '@/types';
-import { PRACTICE_EXERCISE_COUNT } from '@/lib/practiceExercises/constants';
+import type { Exercise, LessonTag, ProficiencyLevel } from '@/types';
+import { getTagExclusiveType, PRACTICE_EXERCISE_COUNT } from '@/lib/practiceExercises/constants';
 import { sessionHasProduction } from '@/lib/practiceExercises/productionTypes';
 import { devLog } from '@/lib/devLog';
 import { pinTagExclusiveFirst } from '@/utils/exerciseVariety';
-
-const TAG_EXCLUSIVE: Partial<Record<LessonTag, Exercise['type']>> = {
-  GRAM: 'grammar-trap',
-  PRON: 'minimal-pair',
-  VERB: 'conjugation-speed',
-};
 
 export function skipGrammarTrapIfQuizPassed(
   exercises: Exercise[],
@@ -49,8 +43,9 @@ export function assemblePracticeSession(
   clientExercises: Exercise[],
   tag: LessonTag,
   bridgeQuizPassed: boolean,
+  level?: ProficiencyLevel,
 ): Exercise[] {
-  const tagExclusive = TAG_EXCLUSIVE[tag] ?? null;
+  const tagExclusive = getTagExclusiveType(tag, level);
 
   let merged = [...aiExercises];
   merged = skipGrammarTrapIfQuizPassed(merged, tag, bridgeQuizPassed);

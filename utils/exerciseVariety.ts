@@ -1,10 +1,15 @@
 import { PRACTICE_EXERCISE_COUNT } from '@/lib/practiceExercises/constants';
-import { isProductionExerciseType } from '@/lib/practiceExercises/productionTypes';
+import {
+  isProductionExerciseType,
+  ORAL_PRODUCTION_TYPES,
+  WRITTEN_PRODUCTION_TYPES,
+} from '@/lib/practiceExercises/productionTypes';
 import type { Exercise, ExerciseType } from '@/types';
 
 const TAG_EXCLUSIVE_TYPES: ExerciseType[] = [
   'grammar-trap',
   'minimal-pair',
+  'minimal-pair-production',
   'conjugation-speed',
 ];
 
@@ -43,6 +48,38 @@ export function protectProductionSlot(
   if (productionIndices.length !== 1) return exercises;
 
   return exercises;
+}
+
+/**
+ * Dual production order: oral penultimate, written last (when both exist).
+ * Falls back to pinProductionLast when only one production slot is present.
+ */
+export function pinProductionOrder(
+  exercises: Exercise[],
+  productionType: ExerciseType | null,
+): Exercise[] {
+  if (exercises.length <= 1) return exercises;
+
+  const oralTypes = ORAL_PRODUCTION_TYPES as readonly string[];
+  const writtenTypes = WRITTEN_PRODUCTION_TYPES as readonly string[];
+
+  let oralIdx = -1;
+  let writtenIdx = -1;
+  for (let i = exercises.length - 1; i >= 0; i--) {
+    const t = exercises[i]!.type;
+    if (writtenIdx < 0 && writtenTypes.includes(t)) writtenIdx = i;
+    if (oralIdx < 0 && oralTypes.includes(t)) oralIdx = i;
+    if (oralIdx >= 0 && writtenIdx >= 0) break;
+  }
+
+  if (oralIdx >= 0 && writtenIdx >= 0 && oralIdx !== writtenIdx) {
+    const result = exercises.filter((_, i) => i !== oralIdx && i !== writtenIdx);
+    result.push(exercises[oralIdx]!);
+    result.push(exercises[writtenIdx]!);
+    return result;
+  }
+
+  return pinProductionLast(exercises, productionType);
 }
 
 /** Move production exercise to last slot (after receptive drills). */

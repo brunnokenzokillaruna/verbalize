@@ -11,6 +11,14 @@
 
 const SRS_INTERVALS_DAYS = [1, 3, 7, 14, 30, 90] as const;
 
+export { SRS_INTERVALS_DAYS };
+
+/** Scheduled review interval in days for an SRS level (0–5). */
+export function getSrsIntervalDays(level: number): number {
+  const clamped = Math.max(0, Math.min(level, SRS_INTERVALS_DAYS.length - 1));
+  return SRS_INTERVALS_DAYS[clamped];
+}
+
 export interface SrsUpdate {
   newLevel: number;
   nextReview: Date;

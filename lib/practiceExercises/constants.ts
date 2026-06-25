@@ -1,4 +1,4 @@
-import type { SupportedLanguage, ProficiencyLevel } from '@/types';
+import type { SupportedLanguage, ProficiencyLevel, LessonTag } from '@/types';
 
 export type ExerciseTypeId =
   | 'context-choice'
@@ -17,12 +17,31 @@ export type ExerciseTypeId =
   | 'logic-connectors'
   | 'grammar-trap'
   | 'minimal-pair'
-  | 'conjugation-speed';
+  | 'minimal-pair-production'
+  | 'conjugation-speed'
+  | 'listen-and-respond'
+  | 'free-roleplay'
+  | 'micro-message'
+  | 'paraphrase'
+  | 'fill-gap-production'
+  | 'shadowing'
+  | 'translation-with-constraint'
+  | 'voicemail-dictation'
+  | 'inference-tone'
+  | 'connected-speech'
+  | 'story-continuation'
+  | 'spot-the-register'
+  | 'prompted-monologue';
 
 export const PRACTICE_EXERCISE_COUNT = 5;
 
 /** Bump when pregenerated exercise composition changes (e.g. mandatory production). */
-export const PREGEN_SCHEMA_VERSION = 4;
+export const PREGEN_SCHEMA_VERSION = 19;
+
+/** Documents without schemaVersion are treated as version 0 (stale). */
+export function isPregenSchemaCurrent(schemaVersion?: number): boolean {
+  return (schemaVersion ?? 0) >= PREGEN_SCHEMA_VERSION;
+}
 
 /** When true, every lesson practice session must include at least one production exercise. */
 export const ENFORCE_PRODUCTION_PER_LESSON =
@@ -61,40 +80,90 @@ export const TIER_1_TYPES: ExerciseTypeId[] = [
 export const TIER_2_ADDITIONS: ExerciseTypeId[] = [
   'error-correction',
   'social-roleplay',
+  'free-roleplay',
+  'micro-message',
   'logic-connectors',
   'bridge-choice',
   'listen-and-select',
   'reverse-translation',
+  'listen-and-respond',
+  'paraphrase',
+  'fill-gap-production',
+  'minimal-pair-production',
+  'shadowing',
+  'translation-with-constraint',
+  'inference-tone',
+  'connected-speech',
+  'story-continuation',
+  'spot-the-register',
+  'prompted-monologue',
 ];
 
 export const TIER_3_ADDITIONS: ExerciseTypeId[] = [
   'audio-dictation',
+  'voicemail-dictation',
 ];
 
 export function getAllowedExerciseTypes(
   level: ProficiencyLevel,
   knownVocabCount: number,
+  tag?: LessonTag,
 ): ExerciseTypeId[] {
+  const applyB1Filter = (types: ExerciseTypeId[]): ExerciseTypeId[] => {
+    if (tag === 'REVIEW' || tag === 'VERB') return types;
+    if (!['B1', 'B2', 'C1', 'C2'].includes(level)) return types;
+    return types.filter((t) => t !== 'context-choice' && t !== 'conjugation-speed');
+  };
+
+  const applyA2OralFilter = (types: ExerciseTypeId[]): ExerciseTypeId[] => {
+    if (['A2', 'B1', 'B2', 'C1', 'C2'].includes(level)) return types;
+    return types.filter(
+      (t) => t !== 'minimal-pair-production' && t !== 'shadowing' && t !== 'connected-speech',
+    );
+  };
+
+  const applyB1PlusFilter = (types: ExerciseTypeId[]): ExerciseTypeId[] => {
+    if (['B1', 'B2', 'C1', 'C2'].includes(level)) return types;
+    return types.filter(
+      (t) =>
+        t !== 'inference-tone' &&
+        t !== 'story-continuation' &&
+        t !== 'spot-the-register' &&
+        t !== 'prompted-monologue',
+    );
+  };
+
   if (level === 'A1' && knownVocabCount < 30) {
     const types = [...TIER_1_TYPES];
     if (knownVocabCount >= 15) {
       types.push('reverse-translation');
     }
-    return types;
+    return applyB1PlusFilter(applyA2OralFilter(applyB1Filter(types)));
   }
   if (level === 'A1' || (level === 'A2' && knownVocabCount < 60)) {
-    return [...TIER_1_TYPES, ...TIER_2_ADDITIONS];
+    return applyB1PlusFilter(applyA2OralFilter(applyB1Filter([...TIER_1_TYPES, ...TIER_2_ADDITIONS])));
   }
   const tier3Eligible = !['A1'].includes(level) || knownVocabCount >= 60;
   if (!tier3Eligible) {
-    return [...TIER_1_TYPES, ...TIER_2_ADDITIONS];
+    return applyB1PlusFilter(applyA2OralFilter(applyB1Filter([...TIER_1_TYPES, ...TIER_2_ADDITIONS])));
   }
-  return [...TIER_1_TYPES, ...TIER_2_ADDITIONS, ...TIER_3_ADDITIONS];
+  return applyB1PlusFilter(
+    applyA2OralFilter(applyB1Filter([...TIER_1_TYPES, ...TIER_2_ADDITIONS, ...TIER_3_ADDITIONS])),
+  );
 }
 
-export function getTagExclusiveType(tag: string): ExerciseTypeId | null {
+export function getPronExclusiveType(level: ProficiencyLevel): ExerciseTypeId {
+  return ['A2', 'B1', 'B2', 'C1', 'C2'].includes(level)
+    ? 'minimal-pair-production'
+    : 'minimal-pair';
+}
+
+export function getTagExclusiveType(
+  tag: string,
+  level?: ProficiencyLevel,
+): ExerciseTypeId | null {
   if (tag === 'GRAM') return 'grammar-trap';
-  if (tag === 'PRON') return 'minimal-pair';
+  if (tag === 'PRON') return level ? getPronExclusiveType(level) : 'minimal-pair';
   if (tag === 'VERB') return 'conjugation-speed';
   return null;
 }
