@@ -21,6 +21,8 @@ export function buildTypeDescriptions(langLabel: string): Record<ExerciseTypeId,
    - "portuguese_sentence" (PT-BR) → "target_translation" (${langLabel}).
    - "acceptable_variants" (2-4 alternative phrasings).
    - "hint" (optional grammar tip in PT-BR).
+   - PT-BR ADVERB CLARITY: when the target uses an adverb (-ment / vite / -ly), write portuguese_sentence with explicit "-mente" (or "logo"/"depressa") — NOT colloquial "rápido/direto/forte" after a noun (e.g. avoid "organizar o mercado rápido"; prefer "organizar o mercado rapidamente").
+   - If target_translation uses a French adverb like "rapidement", include "vite" (or equivalent) in acceptable_variants.
    - Optional chain fields: "linkedExerciseId" (e.g. "chain-1") and "chainAnchorPhrase" (${langLabel} phrase shared with a paired listening-comprehension exercise).`,
     'word-bank-translation': `type "word-bank-translation":
    - "portuguese_sentence" (PT-BR sentence to translate).
@@ -48,7 +50,9 @@ export function buildTypeDescriptions(langLabel: string): Record<ExerciseTypeId,
    - "correctIndex" (0-based).
    - "explanationPt" (short PT-BR explanation after answering).
    - Optional chain fields: "linkedExerciseId" (e.g. "chain-1") and "chainAnchorPhrase" (one key ${langLabel} phrase from dialogueAudio for a paired production exercise).
-   - The student listens WITHOUT seeing the dialogue text — test comprehension, not transcription.`,
+   - The student listens WITHOUT seeing the dialogue text — test comprehension, not transcription.
+   - CRITICAL COHERENCE: options[correctIndex] MUST express the SAME intent as dialogueAudio and explanationPt. If the dialogue says "pour manger" / "to eat", the correct PT-BR answer must say "comer" (or equivalent), NEVER "descansar". Self-check: read explanationPt aloud — it must justify the marked correct option, not a different option.
+   - PT-BR ONLY in questionPt, options, and explanationPt (outside quotes): NEVER use ${langLabel} lesson words — always the Portuguese meaning (e.g. "torre de igreja", NOT "clocher"; "gramado", NOT "gazon"). ${langLabel} may appear ONLY inside quotes when citing a dialogue line verbatim.`,
     'audio-dictation': `type "audio-dictation":
    - Short ORIGINAL sentence. "text" (${langLabel}), "translation" (PT-BR).`,
     'speak-repeat': `type "speak-repeat":

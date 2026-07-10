@@ -3,6 +3,7 @@
 import { callGeminiJSON } from '@/services/gemini';
 import { validateDialogueCoherence } from '@/lib/validateDialogueCoherence';
 import { buildMinimalHookPrompt, type HookGenerationParams } from '@/lib/hookGeneration/buildHookContext';
+import { filterHookVocabularyForKnownWords } from '@/lib/hookVocabulary';
 import { sanitizeDialogueText, sanitizeVocabularyToken, stripMarkdownEmphasis } from '@/lib/hookSanitize';
 import type { SupportedLanguage, ProficiencyLevel, HookResult, LessonTag } from '@/types';
 
@@ -271,6 +272,60 @@ CORREÇÕES OBRIGATÓRIAS (o diálogo anterior falhou no nexo — reescreva comp
 ${breaks.map((b) => `- ${b}`).join('\n')}`;
 }
 
+function finalizeHookResult(
+  result: HookResult,
+  nameA: string,
+  nameB: string,
+  knownVocabulary: string[] = [],
+): HookResult {
+  let hook = normalizeHookResult(result, nameA, nameB);
+  if (knownVocabulary.length > 0) {
+    hook = filterHookVocabularyForKnownWords(hook, knownVocabulary);
+  }
+  return hook;
+}
+
+async function resolveHookCoherence(
+  first: HookResult,
+  retryWithCorrections: (breaks: string[]) => Promise<HookResult | null>,
+  logPrefix: string,
+): Promise<HookResult> {
+  const coherenceFirst = await validateDialogueCoherence(first.dialogue);
+  if (!coherenceFirst) {
+    console.warn(`[${logPrefix}] Coherence judge unavailable — accepting first dialogue`);
+    return first;
+  }
+  if (coherenceFirst.pass) {
+    console.log(`[${logPrefix}] Coherence pass (score ${coherenceFirst.score})`);
+    return first;
+  }
+
+  console.warn(
+    `[${logPrefix}] Coherence fail (score ${coherenceFirst.score}) — retrying:`,
+    coherenceFirst.breaks,
+  );
+
+  const second = await retryWithCorrections(coherenceFirst.breaks);
+  if (!second) {
+    console.warn(`[${logPrefix}] Retry generation failed — keeping first dialogue`);
+    return first;
+  }
+
+  const coherenceSecond = await validateDialogueCoherence(second.dialogue);
+  if (!coherenceSecond) return second;
+  if (coherenceSecond.pass || coherenceSecond.score > coherenceFirst.score) {
+    console.log(
+      `[${logPrefix}] Retry coherence (${coherenceFirst.score} → ${coherenceSecond.score})`,
+    );
+    return second;
+  }
+
+  console.log(
+    `[${logPrefix}] Keeping first dialogue (scores: first=${coherenceFirst.score}, retry=${coherenceSecond.score})`,
+  );
+  return first;
+}
+
 /**
  * MINIMAL hook: generates ONLY the critical-path fields so the user can start
  * the lesson quickly. Heavy fields (vocabTranslations, imageKeywords,
@@ -427,6 +482,7 @@ ACTION AND SEMANTICS:
 - FETCH vs SEARCH (FR: chercher vs aller chercher/récupérer): If the speaker already said WHERE the object is, use "aller la/le chercher", "récupérer", "vais la prendre" — NOT "chercher" (unknown location). EN: "go get it" not "look for it" when location is known.
 - NO PHANTOM PROPS: Do NOT introduce new objects or places (tree, bench, cupboard) unless mentioned in the previous 1-2 lines or part of the opening scene. Do NOT invent a location just to teach a preposition (e.g. no "under a tree" to use "sous").
 - PRESENT MOMENT: Keep the dialogue in present/immediate future. No past-tense anecdotes ("I waited 10 minutes...") unless explicitly reminiscing.
+- PREMISE ALIGNMENT: If speaker A frames something as boring, bad, or unpleasant (e.g. "weekend ennuyeux"), speaker B must agree, disagree, or nuance that framing — NOT reply with only enthusiastic positives that contradict the premise.
 - ENDING: If someone will go get something, end with them leaving or about to leave — NOT suddenly "I found it" without the fetch action.
 
 ❌ BAD — vocabulary checklist (NEVER produce this):
@@ -459,6 +515,15 @@ Mathis: "Oui, et mes chaussettes propres aussi. Tu as tout, toi ?"
 Sarah: "Ah non, j'ai oublié ma serviette !"
 Mathis: "Pas grave, j'en ai une. On y va ?"
 Sarah: "Allez, on y va !"
+
+❌ BAD — boring weekend premise broken (NEVER produce this):
+Camille: "Tu as passé un bon week-end ?"
+Victor: "Oui, j'ai visité le musée, le théâtre, la basilique — c'était génial !" ← contradicts if Camille later says the weekend was boring
+
+✅ GOOD — premise stays consistent:
+Camille: "Ton week-end était ennuyeux, non ?"
+Victor: "Un peu, oui. Mais la fresque au musée m'a quand même plu."
+Camille: "Ah bon ? Moi, l'ascension m'a fatiguée."
 
 Before returning JSON, re-read line by line: does line N make sense because of line N-1? If not, rewrite.
 ${knownVocabInstruction}
@@ -497,63 +562,23 @@ Rules:
 - rolePlayConsequences: optional — at most 1 alternate NPC line when the learner's previous turn was inadequate.` : ''}`;
 
   try {
-    const fetchHook = async (generationPrompt: string): Promise<HookResult | null> => {
-      const raw = await callGeminiJSON<HookResult>(generationPrompt, systemPrompt, 4096, 0, 'critical');
+    const fetchHook = async (correction = ''): Promise<HookResult | null> => {
+      const raw = await callGeminiJSON<HookResult>(prompt + correction, systemPrompt, 4096, 0, 'critical');
       if (!raw?.dialogue || raw?.newVocabulary?.length !== 2) {
         console.error('[generateHook] Invalid minimal hook response');
         return null;
       }
-      return normalizeHookResult(raw, nameA, nameB);
+      return finalizeHookResult(raw, nameA, nameB, knownVocabulary);
     };
 
-    const first = await fetchHook(prompt);
+    const first = await fetchHook();
     if (!first) return null;
 
-    const coherenceFirst = await validateDialogueCoherence(first.dialogue);
-    if (!coherenceFirst) {
-      console.warn('[generateHook] Coherence judge unavailable — accepting first dialogue');
-      return first;
-    }
-
-    if (coherenceFirst.pass || coherenceFirst.score >= 6) {
-      console.log(`[generateHook] Coherence pass (score ${coherenceFirst.score})`);
-      return first;
-    }
-
-    if (coherenceFirst.score > 4) {
-      console.warn(
-        `[generateHook] Coherence marginal (score ${coherenceFirst.score}) — keeping first dialogue without retry`,
-      );
-      return first;
-    }
-
-    console.warn(
-      `[generateHook] Coherence fail (score ${coherenceFirst.score}) — retrying:`,
-      coherenceFirst.breaks,
+    return resolveHookCoherence(
+      first,
+      (breaks) => fetchHook(buildCoherenceCorrectionBlock(breaks)),
+      'generateHook',
     );
-
-    const retryPrompt = prompt + buildCoherenceCorrectionBlock(coherenceFirst.breaks);
-    const second = await fetchHook(retryPrompt);
-
-    if (!second) {
-      console.warn('[generateHook] Retry generation failed — keeping first dialogue');
-      return first;
-    }
-
-    const coherenceSecond = await validateDialogueCoherence(second.dialogue);
-    if (!coherenceSecond) return second;
-
-    if (coherenceSecond.score > coherenceFirst.score) {
-      console.log(
-        `[generateHook] Retry improved coherence (${coherenceFirst.score} → ${coherenceSecond.score})`,
-      );
-      return second;
-    }
-
-    console.log(
-      `[generateHook] Keeping first dialogue (scores: first=${coherenceFirst.score}, retry=${coherenceSecond.score})`,
-    );
-    return first;
   } catch (err) {
     console.error('[generateHook] Error:', err);
     return null;
@@ -566,13 +591,25 @@ Rules:
  */
 export async function generateMinimalHook(params: GenerateHookParams): Promise<HookResult | null> {
   const { prompt, systemPrompt, nameA, nameB } = buildMinimalHookPrompt(params);
+  const { knownVocabulary } = params;
   try {
-    const raw = await callGeminiJSON<HookResult>(prompt, systemPrompt, 2048, 0, 'standard');
-    if (!raw?.dialogue || raw?.newVocabulary?.length !== 2) {
-      console.error('[generateMinimalHook] Invalid response');
-      return null;
-    }
-    return normalizeHookResult(raw, nameA, nameB);
+    const fetchHook = async (correction = ''): Promise<HookResult | null> => {
+      const raw = await callGeminiJSON<HookResult>(prompt + correction, systemPrompt, 2048, 0, 'standard');
+      if (!raw?.dialogue || raw?.newVocabulary?.length !== 2) {
+        console.error('[generateMinimalHook] Invalid response');
+        return null;
+      }
+      return finalizeHookResult(raw, nameA, nameB, knownVocabulary);
+    };
+
+    const first = await fetchHook();
+    if (!first) return null;
+
+    return resolveHookCoherence(
+      first,
+      (breaks) => fetchHook(buildCoherenceCorrectionBlock(breaks)),
+      'generateMinimalHook',
+    );
   } catch (err) {
     console.error('[generateMinimalHook] Error:', err);
     return null;

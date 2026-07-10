@@ -39,6 +39,13 @@ import type { CurriculumSyncNotice, CurriculumSyncReport } from '@/types/curricu
 import { getEffectiveStreak } from '@/lib/stats';
 import { stripUndefinedDeep } from '@/utils/stripUndefined';
 import { getWeekStartISO, computeSpontaneousSessionRate } from '@/lib/productionStatsHelpers';
+import {
+  buildVocabDocId,
+  canonicalVocabKey,
+  dedupeVocabularyItems,
+  mergeVocabularyGroup,
+} from '@/lib/vocabCanonical';
+import { cleanWordToken } from '@/lib/wordTooltipUtils';
 
 // ─── Users ────────────────────────────────────────────────────────────────────
 
@@ -235,6 +242,103 @@ export async function deleteUserData(uid: string): Promise<void> {
 
 // ─── Vocabulary ───────────────────────────────────────────────────────────────
 
+async function resolveVocabularyDocRef(
+  uid: string,
+  language: SupportedLanguage,
+  word: string,
+) {
+  const db = await getDb();
+  const docRef = doc(db, 'user_vocabulary', buildVocabDocId(uid, language, word));
+  const primary = await getDoc(docRef);
+  if (primary.exists()) return docRef;
+
+  const wordKey = canonicalVocabKey(word);
+  const snap = await getDocs(
+    query(
+      collection(db, 'user_vocabulary'),
+      where('uid', '==', uid),
+      where('language', '==', language),
+    ),
+  );
+  const legacy = snap.docs.find((d) => canonicalVocabKey(String(d.data().word ?? '')) === wordKey);
+  return legacy?.ref ?? docRef;
+}
+
+async function consolidateLegacyVocabularySiblings(
+  uid: string,
+  language: SupportedLanguage,
+  wordKey: string,
+  canonicalDocId: string,
+): Promise<void> {
+  const db = await getDb();
+  const snap = await getDocs(
+    query(
+      collection(db, 'user_vocabulary'),
+      where('uid', '==', uid),
+      where('language', '==', language),
+    ),
+  );
+
+  const siblings = snap.docs
+    .map((d) => ({ id: d.id, ...d.data() } as UserVocabularyDocument))
+    .filter((item) => canonicalVocabKey(item.word) === wordKey);
+
+  if (siblings.length <= 1) return;
+
+  const merged = mergeVocabularyGroup(siblings);
+  const canonicalRef = doc(db, 'user_vocabulary', canonicalDocId);
+  await setDoc(
+    canonicalRef,
+    stripUndefinedDeep({
+      uid,
+      language,
+      word: merged.word,
+      wordKey,
+      translation: merged.translation,
+      imageUrl: merged.imageUrl,
+      wordType: merged.wordType,
+      entryType: merged.entryType,
+      knowledgeMode: merged.knowledgeMode,
+      productionCount: merged.productionCount,
+      encounterCount: merged.encounterCount,
+      srsLevel: merged.srsLevel,
+      mistakeCount: merged.mistakeCount,
+      firstSeen: merged.firstSeen,
+      lastReview: merged.lastReview,
+      nextReview: merged.nextReview,
+    }),
+    { merge: true },
+  );
+
+  await Promise.all(
+    siblings
+      .filter((item) => item.id !== canonicalDocId)
+      .map((item) => deleteDoc(doc(db, 'user_vocabulary', item.id))),
+  );
+}
+
+async function consolidateAllDuplicateVocabulary(
+  uid: string,
+  language: SupportedLanguage,
+  items: UserVocabularyDocument[],
+): Promise<void> {
+  const groups = new Map<string, UserVocabularyDocument[]>();
+  for (const item of items) {
+    const key = canonicalVocabKey(item.word);
+    const group = groups.get(key) ?? [];
+    group.push(item);
+    groups.set(key, group);
+  }
+
+  await Promise.all(
+    [...groups.entries()]
+      .filter(([, group]) => group.length > 1)
+      .map(([wordKey, group]) =>
+        consolidateLegacyVocabularySiblings(uid, language, wordKey, buildVocabDocId(uid, language, group[0].word)),
+      ),
+  );
+}
+
 export async function getVocabularyDueForReview(
   uid: string,
   language: 'fr' | 'en',
@@ -247,7 +351,8 @@ export async function getVocabularyDueForReview(
     where('nextReview', '<=', now),
   );
   const snap = await getDocs(q);
-  return snap.docs.map((d) => d.data() as UserVocabularyDocument);
+  const items = snap.docs.map((d) => ({ id: d.id, ...d.data() } as UserVocabularyDocument));
+  return dedupeVocabularyItems(items);
 }
 
 export async function addVocabularyItem(
@@ -278,21 +383,35 @@ export async function upsertVocabularyItem(
     return;
   }
 
-  const q = query(
-    collection(await getDb(), 'user_vocabulary'),
-    where('uid', '==', uid),
-    where('language', '==', language),
-    where('word', '==', word),
-  );
-  const snap = await getDocs(q);
+  const db = await getDb();
+  const displayWord = cleanWordToken(word);
+  const wordKey = canonicalVocabKey(displayWord);
+  const docRef = doc(db, 'user_vocabulary', buildVocabDocId(uid, language, displayWord));
 
-  if (snap.empty) {
-    // First encounter — create at srsLevel 0
+  await runTransaction(db, async (transaction) => {
+    const snap = await transaction.get(docRef);
+    if (snap.exists()) {
+      const existing = snap.data() as UserVocabularyDocument;
+      const { newLevel, nextReview } = calculateNextReview(existing.srsLevel, true);
+      transaction.update(docRef, stripUndefinedDeep({
+        wordKey,
+        srsLevel: newLevel,
+        lastReview: serverTimestamp(),
+        nextReview: Timestamp.fromDate(nextReview),
+        ...(imageUrl && { imageUrl }),
+        ...(translation && translation !== displayWord && { translation }),
+        ...(wordType && !existing.wordType && { wordType }),
+        ...(entryType && !existing.entryType && { entryType }),
+      }));
+      return;
+    }
+
     const { newLevel, nextReview } = calculateNextReview(0, true);
-    await addDoc(collection(await getDb(), 'user_vocabulary'), {
+    transaction.set(docRef, stripUndefinedDeep({
       uid,
       language,
-      word,
+      word: displayWord,
+      wordKey,
       translation,
       ...(imageUrl && { imageUrl }),
       ...(wordType && { wordType }),
@@ -302,22 +421,12 @@ export async function upsertVocabularyItem(
       firstSeen: serverTimestamp(),
       lastReview: serverTimestamp(),
       nextReview: Timestamp.fromDate(nextReview),
-    });
-  } else {
-    // Already exists — advance SRS level and refresh imageUrl/translation if provided
-    const docRef = snap.docs[0].ref;
-    const existing = snap.docs[0].data() as UserVocabularyDocument;
-    const { newLevel, nextReview } = calculateNextReview(existing.srsLevel, true);
-    await updateDoc(docRef, {
-      srsLevel: newLevel,
-      lastReview: serverTimestamp(),
-      nextReview: Timestamp.fromDate(nextReview),
-      // Refresh imageUrl when provided (fixes stale/missing images)
-      ...(imageUrl && { imageUrl }),
-      // Refresh translation when it was a placeholder
-      ...(translation && translation !== word && { translation }),
-    });
-  }
+    }));
+  });
+
+  void consolidateLegacyVocabularySiblings(uid, language, wordKey, docRef.id).catch((err) => {
+    console.warn('[upsertVocabularyItem] Legacy vocab consolidation failed:', err);
+  });
 }
 
 /** Passive exposure — does not advance SRS when SEPARATE_PASSIVE_SRS is enabled. */
@@ -330,42 +439,47 @@ export async function recordPassiveEncounter(
   wordType?: 'verb' | 'noun',
   entryType?: UserVocabularyDocument['entryType'],
 ): Promise<void> {
-  const q = query(
-    collection(await getDb(), 'user_vocabulary'),
-    where('uid', '==', uid),
-    where('language', '==', language),
-    where('word', '==', word),
-  );
-  const snap = await getDocs(q);
+  const db = await getDb();
+  const displayWord = cleanWordToken(word);
+  const wordKey = canonicalVocabKey(displayWord);
+  const docRef = doc(db, 'user_vocabulary', buildVocabDocId(uid, language, displayWord));
 
-  if (snap.empty) {
-    await addDoc(collection(await getDb(), 'user_vocabulary'), {
-      uid,
-      language,
-      word,
-      translation,
+  await runTransaction(db, async (transaction) => {
+    const snap = await transaction.get(docRef);
+    if (!snap.exists()) {
+      transaction.set(docRef, stripUndefinedDeep({
+        uid,
+        language,
+        word: displayWord,
+        wordKey,
+        translation,
+        ...(imageUrl && { imageUrl }),
+        ...(wordType && { wordType }),
+        ...(entryType && { entryType }),
+        knowledgeMode: 'passive',
+        encounterCount: 1,
+        productionCount: 0,
+        srsLevel: 0,
+        mistakeCount: 0,
+        firstSeen: serverTimestamp(),
+        lastReview: serverTimestamp(),
+        nextReview: Timestamp.fromDate(new Date()),
+      }));
+      return;
+    }
+
+    const existing = snap.data() as UserVocabularyDocument;
+    transaction.update(docRef, stripUndefinedDeep({
+      wordKey,
+      encounterCount: (existing.encounterCount ?? 0) + 1,
       ...(imageUrl && { imageUrl }),
-      ...(wordType && { wordType }),
-      ...(entryType && { entryType }),
-      knowledgeMode: 'passive',
-      encounterCount: 1,
-      productionCount: 0,
-      srsLevel: 0,
-      mistakeCount: 0,
-      firstSeen: serverTimestamp(),
-      lastReview: serverTimestamp(),
-      nextReview: Timestamp.fromDate(new Date()),
-    });
-    return;
-  }
+      ...(translation && translation !== displayWord && { translation }),
+      ...(entryType && !existing.entryType && { entryType }),
+    }));
+  });
 
-  const docRef = snap.docs[0].ref;
-  const existing = snap.docs[0].data() as UserVocabularyDocument;
-  await updateDoc(docRef, {
-    encounterCount: (existing.encounterCount ?? 0) + 1,
-    ...(imageUrl && { imageUrl }),
-    ...(translation && translation !== word && { translation }),
-    ...(entryType && !existing.entryType && { entryType }),
+  void consolidateLegacyVocabularySiblings(uid, language, wordKey, docRef.id).catch((err) => {
+    console.warn('[recordPassiveEncounter] Legacy vocab consolidation failed:', err);
   });
 }
 
@@ -375,17 +489,11 @@ export async function markVocabularyProduced(
   word: string,
   language: SupportedLanguage,
 ): Promise<void> {
-  const q = query(
-    collection(await getDb(), 'user_vocabulary'),
-    where('uid', '==', uid),
-    where('language', '==', language),
-    where('word', '==', word),
-  );
-  const snap = await getDocs(q);
-  if (snap.empty) return;
+  const docRef = await resolveVocabularyDocRef(uid, language, word);
+  const snap = await getDoc(docRef);
+  if (!snap.exists()) return;
 
-  const docRef = snap.docs[0].ref;
-  const existing = snap.docs[0].data() as UserVocabularyDocument;
+  const existing = snap.data() as UserVocabularyDocument;
   const productionCount = (existing.productionCount ?? 0) + 1;
 
   if (SEPARATE_PASSIVE_SRS) {
@@ -696,7 +804,16 @@ export async function getUserVocabulary(
     where('language', '==', language),
   );
   const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() } as UserVocabularyDocument));
+  const items = snap.docs.map((d) => ({ id: d.id, ...d.data() } as UserVocabularyDocument));
+  const deduped = dedupeVocabularyItems(items);
+
+  if (deduped.length < items.length) {
+    void consolidateAllDuplicateVocabulary(uid, language, items).catch((err) => {
+      console.warn('[getUserVocabulary] Duplicate vocab consolidation failed:', err);
+    });
+  }
+
+  return deduped;
 }
 
 /**
@@ -709,15 +826,10 @@ export async function updateVocabTranslation(
   language: SupportedLanguage,
   translation: string,
 ): Promise<void> {
-  const q = query(
-    collection(await getDb(), 'user_vocabulary'),
-    where('uid', '==', uid),
-    where('language', '==', language),
-    where('word', '==', word),
-  );
-  const snap = await getDocs(q);
-  if (!snap.empty) {
-    await updateDoc(snap.docs[0].ref, { translation });
+  const docRef = await resolveVocabularyDocRef(uid, language, word);
+  const snap = await getDoc(docRef);
+  if (snap.exists()) {
+    await updateDoc(docRef, { translation, wordKey: canonicalVocabKey(word) });
   }
 }
 
@@ -731,15 +843,10 @@ export async function updateVocabImage(
   language: SupportedLanguage,
   imageUrl: string,
 ): Promise<void> {
-  const q = query(
-    collection(await getDb(), 'user_vocabulary'),
-    where('uid', '==', uid),
-    where('language', '==', language),
-    where('word', '==', word),
-  );
-  const snap = await getDocs(q);
-  if (!snap.empty) {
-    await updateDoc(snap.docs[0].ref, { imageUrl });
+  const docRef = await resolveVocabularyDocRef(uid, language, word);
+  const snap = await getDoc(docRef);
+  if (snap.exists()) {
+    await updateDoc(docRef, { imageUrl, wordKey: canonicalVocabKey(word) });
   }
 }
 
@@ -754,17 +861,11 @@ export async function updateVocabSrsAfterReview(
   language: SupportedLanguage,
   correct: boolean,
 ): Promise<void> {
-  const q = query(
-    collection(await getDb(), 'user_vocabulary'),
-    where('uid', '==', uid),
-    where('language', '==', language),
-    where('word', '==', word),
-  );
-  const snap = await getDocs(q);
-  if (snap.empty) return;
+  const docRef = await resolveVocabularyDocRef(uid, language, word);
+  const snap = await getDoc(docRef);
+  if (!snap.exists()) return;
 
-  const docRef = snap.docs[0].ref;
-  const existing = snap.docs[0].data() as UserVocabularyDocument;
+  const existing = snap.data() as UserVocabularyDocument;
   const { newLevel, nextReview } = calculateNextReview(existing.srsLevel, correct);
 
   await updateDoc(docRef, {
@@ -806,11 +907,11 @@ export async function getCachedImage(word: string): Promise<ImageCacheDocument |
 }
 
 export async function saveImageCache(word: string, data: Omit<ImageCacheDocument, 'word' | 'createdAt'>) {
-  await setDoc(doc(await getDb(), 'image_cache', word), {
+  await setDoc(doc(await getDb(), 'image_cache', word), stripUndefinedDeep({
     ...data,
     word,
     createdAt: serverTimestamp(),
-  });
+  }));
 }
 
 export async function getAllImageCache(): Promise<ImageCacheDocument[]> {

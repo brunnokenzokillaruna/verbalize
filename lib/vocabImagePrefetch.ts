@@ -31,7 +31,11 @@ export async function prefetchVocabImages({
     words.map(async (word) => {
       const t = performance.now();
       const precomputedKeyword = hook.imageKeywords?.[word];
-      const result = await getVocabImage(word, dialogue, language, [], precomputedKeyword);
+      const translation = hook.vocabTranslations?.[word]?.translation;
+      const result = await getVocabImage(word, dialogue, language, [], precomputedKeyword, {
+        translation,
+        precomputedKeyword,
+      });
       setVocabImage(word, result);
       devLog(`[Timing] Imagem '${word}': ${(performance.now() - t).toFixed(0)}ms`);
       return { word, result };
@@ -55,7 +59,10 @@ export async function prefetchVocabImages({
 
   for (const { word, fallback } of refetchWords) {
     const precomputedKeyword = hook.imageKeywords?.[word];
-    const result = await getVocabImage(word, dialogue, language, [...usedUrls], precomputedKeyword);
+    const result = await getVocabImage(word, dialogue, language, [...usedUrls], precomputedKeyword, {
+      translation: hook.vocabTranslations?.[word]?.translation,
+      precomputedKeyword,
+    });
 
     if (result?.imageUrl && !usedUrls.includes(result.imageUrl)) {
       setVocabImage(word, result);

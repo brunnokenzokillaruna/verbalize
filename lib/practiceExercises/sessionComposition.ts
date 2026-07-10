@@ -25,7 +25,9 @@ export async function composePracticeSession(
   params: GeneratePracticeParams,
   tagExclusive: ExerciseTypeId | null,
 ): Promise<Exercise[]> {
-  let result = await validateAndSanitizeExercises(exercises, allowedSet, params.language);
+  let result = await validateAndSanitizeExercises(exercises, allowedSet, params.language, {
+    lessonVocabulary: params.newVocabulary,
+  });
 
   result = applyAdaptiveTier(result, params.masteredVocabulary ?? []);
 

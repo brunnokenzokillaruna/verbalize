@@ -4,6 +4,8 @@ import { callGeminiJSON } from '@/services/gemini';
 import { getCheckpointWindow, formatCheckpointRange } from '@/lib/curriculum/checkpointWindow';
 import { checkpointSessionSchema } from '@/lib/schemas/checkpoint';
 import { validateAndSanitizeExercises } from '@/lib/practiceExercises/validateGeneratedExercises';
+import { isCheckpointComprehensionConsistent } from '@/lib/practiceExercises/validateChoiceConsistency';
+import { isListeningComprehensionPtBrPure } from '@/lib/practiceExercises/validatePtBrText';
 import { getAllowedExerciseTypes } from '@/lib/practiceExercises/constants';
 import type {
   CheckpointSessionResult,
@@ -117,6 +119,8 @@ Generate JSON with this EXACT structure:
 
 Rules:
 - Exactly 2 comprehensionQuestions
+- Each comprehensionQuestion: options[correctIndex] MUST match dialogueAudio meaning; explanationPt must justify that same option (never contradict it — e.g. if dialogue says "pour manger", correct answer must be about eating, not resting)
+- comprehensionQuestions: questionPt, options, and explanationPt MUST be Brazilian Portuguese only — NEVER insert ${LANG_LABEL[params.language]} words like lesson vocabulary (use Portuguese meanings: "torre de igreja" not "clocher"). Target language only inside quotes when citing dialogue verbatim.
 - Exactly 2 productionExercises: one reverse-translation, one listen-and-respond (oral spontaneous production AFTER listening comprehension)
 - NO hints in production exercises
 - listen-and-respond must reference the checkpoint dialogueAudio — student listens then responds orally
@@ -135,6 +139,31 @@ Rules:
     );
     allowedSet.add('reverse-translation');
     allowedSet.add('listen-and-respond');
+
+    const comprehensionQuestions = parsed.data.comprehensionQuestions.filter((question) => {
+      const consistent = isCheckpointComprehensionConsistent({
+        ...question,
+        dialogueAudio: parsed.data.dialogueAudio,
+      });
+      const ptBrPure = isListeningComprehensionPtBrPure({
+        questionPt: question.questionPt,
+        options: question.options,
+        explanationPt: question.explanationPt,
+        lessonVocabulary: [],
+        dialogueAudio: parsed.data.dialogueAudio,
+      });
+      if (!consistent) {
+        console.warn('[generateCheckpointSession] Dropped comprehension question — answer contradicts dialogue/explanation');
+      } else if (!ptBrPure) {
+        console.warn('[generateCheckpointSession] Dropped comprehension question — PT-BR text contains untranslated target-language vocabulary');
+      }
+      return consistent && ptBrPure;
+    });
+
+    if (comprehensionQuestions.length === 0) {
+      console.error('[generateCheckpointSession] No valid comprehension questions after consistency check');
+      return null;
+    }
 
     let productionExercises = await validateAndSanitizeExercises(
       parsed.data.productionExercises as unknown as Exercise[],
@@ -170,6 +199,7 @@ Rules:
 
     return {
       ...parsed.data,
+      comprehensionQuestions,
       productionExercises: productionExercises.slice(0, 2),
     };
   } catch (err) {

@@ -5,7 +5,7 @@ import { Book } from 'lucide-react';
 import { SrsBar, SRS_BAR_COLOR, SRS_LABELS, formatNextReview } from './SrsBar';
 import { VocabEnrichButton } from './VocabEnrichButton';
 import type { UserVocabularyDocument, SupportedLanguage } from '@/types';
-import { getCachedImage } from '@/services/firestore';
+import { getVocabImage } from '@/app/actions/getVocabImage';
 import { isMissingImage, isMissingTranslation } from '@/utils/vocabHelpers';
 
 export function VocabCard({
@@ -39,24 +39,35 @@ export function VocabCard({
   }, [item.imageUrl]);
 
   React.useEffect(() => {
-    if (imageUrl) return;
     let active = true;
     const fetchImage = async () => {
       try {
-        const cached = await getCachedImage(`${item.word}_${language}`);
-        if (active && cached?.imageUrl) {
-          setImageUrl(cached.imageUrl);
-          onImageLoaded?.(item.word, cached.imageUrl);
+        const result = await getVocabImage(
+          item.word,
+          item.translation || item.word,
+          language,
+          [],
+          undefined,
+          {
+            translation: !missingTranslation ? item.translation : undefined,
+            allowCached: true,
+          },
+        );
+        if (active && result?.imageUrl) {
+          setImageUrl(result.imageUrl);
+          if (result.imageUrl !== item.imageUrl) {
+            onImageLoaded?.(item.word, result.imageUrl);
+          }
         }
       } catch (err) {
         console.error('Error fetching image for', item.word, err);
       }
     };
-    fetchImage();
+    void fetchImage();
     return () => {
       active = false;
     };
-  }, [item.word, language, imageUrl, onImageLoaded]);
+  }, [item.word, item.translation, language, item.imageUrl, missingTranslation, onImageLoaded]);
 
   return (
     <div

@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import type { GrammarBridgeResult, SupportedLanguage } from '@/types';
 import { sanitizeBridgeExample } from '@/lib/grammarBridgeValidation';
+import { applyPtBrLocalizationFixes } from '@/lib/grammarBridge/ptBrLocalization';
 import { stripUndefinedDeep } from '@/utils/stripUndefined';
 
 const wordLimit = (max: number) =>
@@ -152,6 +153,7 @@ function normalizeTrap(
 export function normalizeGrammarBridgeResult(
   raw: GrammarBridgeResult | null | undefined,
   language: SupportedLanguage = 'fr',
+  grammarFocus?: string,
 ): GrammarBridgeResult | null {
   if (!raw) return null;
 
@@ -212,5 +214,7 @@ export function normalizeGrammarBridgeResult(
   }) as GrammarBridgeResult;
 
   normalized.bridge = sanitizeBridgeExample(normalized, language);
-  return normalized;
+  return grammarFocus
+    ? applyPtBrLocalizationFixes(normalized, grammarFocus, language)
+    : normalized;
 }

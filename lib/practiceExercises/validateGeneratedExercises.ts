@@ -2,12 +2,24 @@ import { isValidErrorCorrectionExercise, normalizeErrorCorrectionData } from '@/
 import type { ConjugationSpeedData, ErrorCorrectionData, Exercise, SupportedLanguage } from '@/types';
 import type { ExerciseTypeId } from './constants';
 import { fixConjugationSpeedExercise } from './fixConjugationSpeed';
+import { sanitizeReverseTranslationExercise } from '@/lib/reverseTranslationPtAdverb';
+import {
+  isListenAndSelectConsistent,
+  isMcqAnswerConsistent,
+} from './validateChoiceConsistency';
+import { isListeningComprehensionPtBrPure } from './validatePtBrText';
+
+export interface ValidateExercisesOptions {
+  lessonVocabulary?: string[];
+}
 
 export async function validateAndSanitizeExercises(
   exercises: Exercise[],
   allowedSet: Set<ExerciseTypeId>,
   language: SupportedLanguage,
+  options: ValidateExercisesOptions = {},
 ): Promise<Exercise[]> {
+  const lessonVocabulary = options.lessonVocabulary ?? [];
   const validated = exercises.filter((ex) => {
     if (!allowedSet.has(ex.type as ExerciseTypeId)) {
       console.warn(`[generatePracticeExercises] Dropped ${ex.type} — not allowed at this level/progress`);
@@ -43,11 +55,18 @@ export async function validateAndSanitizeExercises(
         portuguese_sentence?: string;
         target_translation?: string;
         acceptable_variants?: string[];
+        hint?: string;
       };
       if (!d.portuguese_sentence?.trim() || !d.target_translation?.trim()) {
         console.warn('[generatePracticeExercises] Dropped reverse-translation with missing sentence fields');
         return false;
       }
+      Object.assign(d, sanitizeReverseTranslationExercise({
+        portuguese_sentence: d.portuguese_sentence,
+        target_translation: d.target_translation,
+        acceptable_variants: Array.isArray(d.acceptable_variants) ? d.acceptable_variants : [],
+        hint: d.hint,
+      }));
       if (!Array.isArray(d.acceptable_variants) || d.acceptable_variants.length === 0) {
         console.warn('[generatePracticeExercises] Dropped reverse-translation with empty acceptable_variants');
         return false;
@@ -197,12 +216,21 @@ export async function validateAndSanitizeExercises(
       const d = ex.data as { scenario?: string; question?: string; options?: string[]; correctIndex?: number; explanation?: string };
       if (!d.question || !d.explanation || !Array.isArray(d.options) || d.options.length < 3) return false;
       if (typeof d.correctIndex !== 'number' || d.correctIndex < 0 || d.correctIndex >= d.options.length) return false;
+      const correctOption = d.options[d.correctIndex] ?? '';
+      if (!isMcqAnswerConsistent({ correctOption, explanation: d.explanation })) {
+        console.warn('[generatePracticeExercises] Dropped bridge-choice — correct option contradicts explanation');
+        return false;
+      }
       return true;
     }
     if (ex.type === 'listen-and-select') {
       const d = ex.data as { audioText?: string; options?: string[]; correctIndex?: number; translation?: string };
       if (!d.audioText || !d.translation || !Array.isArray(d.options) || d.options.length < 3) return false;
       if (typeof d.correctIndex !== 'number' || d.correctIndex < 0 || d.correctIndex >= d.options.length) return false;
+      if (!isListenAndSelectConsistent(d.audioText, d.options, d.correctIndex)) {
+        console.warn('[generatePracticeExercises] Dropped listen-and-select — correct transcription does not match audioText');
+        return false;
+      }
       return true;
     }
     if (ex.type === 'listening-comprehension') {
@@ -216,6 +244,25 @@ export async function validateAndSanitizeExercises(
       if (!d.dialogueAudio?.trim() || !d.questionPt?.trim() || !d.explanationPt?.trim()) return false;
       if (!Array.isArray(d.options) || d.options.length < 2) return false;
       if (typeof d.correctIndex !== 'number' || d.correctIndex < 0 || d.correctIndex >= d.options.length) return false;
+      const correctOption = d.options[d.correctIndex] ?? '';
+      if (!isMcqAnswerConsistent({
+        correctOption,
+        explanation: d.explanationPt,
+        sourceText: d.dialogueAudio,
+      })) {
+        console.warn('[generatePracticeExercises] Dropped listening-comprehension — correct option contradicts dialogue/explanation');
+        return false;
+      }
+      if (!isListeningComprehensionPtBrPure({
+        questionPt: d.questionPt,
+        options: d.options,
+        explanationPt: d.explanationPt,
+        lessonVocabulary,
+        dialogueAudio: d.dialogueAudio,
+      })) {
+        console.warn('[generatePracticeExercises] Dropped listening-comprehension — PT-BR text contains untranslated target-language vocabulary');
+        return false;
+      }
       return true;
     }
     if (ex.type === 'listen-and-respond') {

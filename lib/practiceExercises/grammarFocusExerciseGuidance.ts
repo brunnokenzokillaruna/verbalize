@@ -61,7 +61,20 @@ export function buildGrammarFocusExerciseGuidance(
       return `
 ⚠️ POSIÇÃO DE ADVÉRBIO — EVITE error-correction com reordenação ⚠️
 - Não use "error-correction" quando a correção muda a ordem advérbio + verbo.
-- Prefira "sentence-builder" para o aluno montar a ordem correta.`;
+- Prefira "sentence-builder" para o aluno montar a ordem correta.
+- Em "reverse-translation", use portuguese_sentence com advérbio explícito ("rapidamente", não "rápido" ambíguo após substantivo) quando a tradução-alvo usar advérbio (-ment / vite).`;
+    }
+
+    const isDuration =
+      focus.includes('pendant') ||
+      focus.includes('duração') ||
+      focus.includes('duracao');
+
+    if (isDuration) {
+      return `
+⚠️ PENDANT / DURAÇÃO — LOCALIZAÇÃO PT-BR NOS EXERCÍCIOS ⚠️
+- Em reverse-translation e word-bank-translation: prefira portuguese_sentence com "durante + período" (ex: "Eu trabalhei durante duas horas"), não só "por duas horas".
+- Em listening-comprehension e bridge-choice: opções/explicações em PT-BR devem usar "durante" quando a ideia for duração equivalente a pendant.`;
     }
   }
 

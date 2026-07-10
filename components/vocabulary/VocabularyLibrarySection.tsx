@@ -160,7 +160,7 @@ export function VocabularyLibrarySection({
             <div className="flex flex-col gap-2">
               {previewItems.map((item) => (
                 <VocabListRow
-                  key={item.word}
+                  key={item.id}
                   item={item}
                   language={language}
                   onEnrich={onEnrich}
@@ -269,7 +269,7 @@ export function VocabularyLibrarySection({
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                   {resultItems.map((item, idx) => (
                     <VocabCard
-                      key={item.word}
+                      key={item.id}
                       item={item}
                       language={language}
                       animDelay={idx * 30}
@@ -283,7 +283,7 @@ export function VocabularyLibrarySection({
                 <div className="flex flex-col gap-2">
                   {resultItems.map((item) => (
                     <VocabListRow
-                      key={item.word}
+                      key={item.id}
                       item={item}
                       language={language}
                       onEnrich={onEnrich}

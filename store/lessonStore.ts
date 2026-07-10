@@ -37,7 +37,7 @@ interface LessonState {
 
   // Generated content
   hook: HookResult | null;
-  missionBriefing: MissionBriefingResult | null; // MISS only — fetched in parallel with hook so it renders first
+  missionBriefing: MissionBriefingResult | null; // MISS only — generated from hook dialogue for role-play alignment
   grammarBridge: GrammarBridgeResult | null;
   vocabImages: Record<string, VocabImageResult | null>; // keyed by word
   vocabTranslations: Record<string, string>; // keyed by word → PT-BR translation

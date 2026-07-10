@@ -19,6 +19,8 @@ import { translateWord, translateWordsBatch } from '@/app/actions/translateWord'
 import { prefetchVocabImages } from '@/lib/vocabImagePrefetch';
 import { fetchPregeneratedLessonWithWait } from '@/lib/waitForPregeneratedLesson';
 import { deletePregeneratedLesson, getUserVocabulary, upsertVocabularyItem, tryStartPregeneratingLesson, abortPregeneratedLesson } from '@/services/firestore';
+import { canonicalVocabKey } from '@/lib/vocabCanonical';
+import { filterHookVocabularyForKnownWords } from '@/lib/hookVocabulary';
 import { tooltipCacheKey } from '@/lib/wordTooltipUtils';
 import type { GrammarBridgeResult, Exercise, LessonTag, MissionBriefingResult, HookResult, PregeneratedLessonDocument } from '@/types';
 
@@ -125,10 +127,10 @@ export function useLessonBootstrap({
 
         const tVocab = performance.now();
         const vocabDocs = await vocabLoadPromise;
-        const knownVocabulary = vocabDocs.map((v) => v.word.toLowerCase());
+        const knownVocabulary = vocabDocs.map((v) => canonicalVocabKey(v.word));
         const masteredVocabulary = vocabDocs
           .filter((v) => (v.srsLevel ?? 0) >= 4)
-          .map((v) => v.word.toLowerCase());
+          .map((v) => canonicalVocabKey(v.word));
         store.setKnownVocabulary(knownVocabulary);
         store.setMasteredVocabulary(masteredVocabulary);
         devLog(`[Timing] Vocabulário do usuário: ${(performance.now() - tVocab).toFixed(0)}ms (${knownVocabulary.length} palavras conhecidas, ${masteredVocabulary.length} dominadas)`);
@@ -157,37 +159,6 @@ export function useLessonBootstrap({
           store.setIsLoading(false);
           setHookError(true);
           return;
-        }
-
-        // ── MISS fast-path: fire the briefing in parallel with the hook so the
-        // mission screen renders as soon as the (shorter) briefing arrives,
-        // without waiting for the full hook dialogue. Skip if the hook came
-        // from cache and already has the briefing bundled somehow.
-        let briefingPromise: Promise<MissionBriefingResult | null> | null = null;
-        if (lesson.tag === 'MISS' && !hook) {
-          const tBrief = performance.now();
-          devLog(`[Timing] 🚀 Prefetch mission briefing iniciado (em paralelo com hook)`);
-          briefingPromise = generateMissionBriefing({
-            grammarFocus: lesson.grammarFocus,
-            theme: lesson.theme,
-            uiTitle: lesson.uiTitle,
-            language: lesson.language,
-          })
-            .then((briefing) => {
-              devLog(`[Timing] ✅ Mission briefing pronto: ${(performance.now() - tBrief).toFixed(0)}ms`);
-              if (briefing) {
-                const s = useLessonStore.getState();
-                s.setMissionBriefing(briefing);
-                // Enter mission phase immediately if we're still in loading —
-                // the user sees the briefing while the hook keeps generating.
-                if (s.phase === 'loading') s.setPhase('mission');
-              }
-              return briefing;
-            })
-            .catch((err) => {
-              console.error('[useLessonBootstrap] mission briefing error:', err);
-              return null;
-            });
         }
 
         if (!hook) {
@@ -254,7 +225,29 @@ export function useLessonBootstrap({
         }
 
         if (hook) {
+          hook = filterHookVocabularyForKnownWords(hook, knownVocabulary);
           store.setHook(hook);
+
+          // MISS briefing must be derived from the hook dialogue so objectives
+          // match the role-play scene (never generate briefing in parallel).
+          if (lesson.tag === 'MISS' && !useLessonStore.getState().missionBriefing) {
+            const tBrief = performance.now();
+            devLog(`[Timing] Gerando mission briefing a partir do diálogo...`);
+            const briefing = await generateMissionBriefing({
+              grammarFocus: lesson.grammarFocus,
+              theme: lesson.theme,
+              uiTitle: lesson.uiTitle,
+              language: lesson.language,
+              dialogue: hook.dialogue,
+            }).catch((err) => {
+              console.error('[useLessonBootstrap] mission briefing error:', err);
+              return null;
+            });
+            if (briefing) {
+              store.setMissionBriefing(briefing);
+              devLog(`[Timing] ✅ Mission briefing pronto: ${(performance.now() - tBrief).toFixed(0)}ms`);
+            }
+          }
 
           if (!vocabImagesFiredRef.current) {
             vocabImagesFiredRef.current = true;
@@ -265,8 +258,6 @@ export function useLessonBootstrap({
             }).catch((err) => console.error('[Prefetch] vocab images error:', err));
           }
 
-          // For MISS, the briefing may have already flipped the phase to
-          // 'mission' — only set initial phase if we're still in loading.
           const currentPhase = useLessonStore.getState().phase;
           if (currentPhase === 'loading') {
             const initialPhase = getInitialPhase(lesson.tag);
@@ -305,21 +296,6 @@ export function useLessonBootstrap({
               .catch(console.error);
           }
 
-          // Briefing fallback: hook came from pregen cache (so the parallel
-          // fast-path above didn't run) but the briefing wasn't cached.
-          if (tag === 'MISS' && !briefingPromise && !useLessonStore.getState().missionBriefing) {
-            generateMissionBriefing({
-              grammarFocus: focus,
-              theme: lesson.theme,
-              uiTitle: lesson.uiTitle,
-              language: lang,
-              dialogue,
-            })
-              .then((briefing) => {
-                if (briefing) useLessonStore.getState().setMissionBriefing(briefing);
-              })
-              .catch(console.error);
-          }
         } else {
           store.setIsLoading(false);
           setHookError(true);
@@ -338,8 +314,10 @@ export function useLessonBootstrap({
     if (!user || !store.hook?.dialogueVerbs || !store.lesson) return;
     
     const language = store.lesson.language;
-    const knownSet = new Set(store.knownVocabulary.map(v => v.toLowerCase()));
-    const newVerbsFound = store.hook.dialogueVerbs.filter(v => !knownSet.has(v.toLowerCase()));
+    const knownSet = new Set(store.knownVocabulary);
+    const newVerbsFound = store.hook.dialogueVerbs.filter(
+      (v) => !knownSet.has(canonicalVocabKey(v)),
+    );
 
     if (newVerbsFound.length === 0) return;
 
@@ -359,7 +337,7 @@ export function useLessonBootstrap({
 
     // Update store's knownVocabulary so they don't get re-registered and
     // so the UI can use them if needed.
-    store.setKnownVocabulary([...store.knownVocabulary, ...newVerbsFound]);
+    store.setKnownVocabulary([...store.knownVocabulary, ...newVerbsFound.map(canonicalVocabKey)]);
     store.setDiscoveredVerbs(newVerbsFound);
   }, [user, store.hook, store.lesson]);
 

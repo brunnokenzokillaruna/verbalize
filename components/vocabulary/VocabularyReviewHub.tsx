@@ -273,7 +273,7 @@ export function VocabularyReviewHub({
             const passiveOnly = isPassiveOnlyVocabulary(item);
             return (
               <span
-                key={item.word}
+                key={item.id}
                 className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold border"
                 style={{
                   backgroundColor: passiveOnly ? 'var(--color-primary-light)' : 'var(--color-bg)',

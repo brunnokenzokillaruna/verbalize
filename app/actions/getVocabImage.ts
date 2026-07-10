@@ -1,71 +1,42 @@
 'use server';
 
-import { callGemini } from '@/services/gemini';
-import { searchPexels } from '@/services/pexels';
+import { searchPexelsPhotos } from '@/services/pexels';
 import { getCachedImage, saveImageCache } from '@/services/firestore';
 import { sanitizeVocabularyToken } from '@/lib/hookSanitize';
+import {
+  buildVisualSearchKeyword,
+  pickValidatedPhoto,
+} from '@/lib/vocabImageSearch';
 import type { SupportedLanguage, VocabImageResult } from '@/types';
 
-const LANG_LABEL: Record<SupportedLanguage, string> = {
-  fr: 'French',
-  en: 'English',
-};
-
-function buildSimplePexelsKeyword(word: string): string {
-  const cleaned = sanitizeVocabularyToken(word).replace(/-/g, ' ');
-  return `${cleaned} isolated neutral background`;
+function buildImageCachePayload(
+  language: SupportedLanguage,
+  imageUrl: string,
+  photographer: string,
+  searchKeyword: string,
+  translation?: string,
+  approved = true,
+) {
+  return {
+    language,
+    imageUrl,
+    photographer,
+    searchKeyword,
+    approved,
+    ...(translation ? { translation } : {}),
+  };
 }
 
-async function searchPexelsWithKeyword(
-  keyword: string,
-  cacheKey: string,
-  language: SupportedLanguage,
-  excludeUrls: string[],
-): Promise<VocabImageResult | null> {
-  for (let page = 1; page <= 3; page++) {
-    const photo = await searchPexels(keyword, page);
-    if (!photo) break;
-
-    if (!excludeUrls.includes(photo.imageUrl)) {
-      if (page === 1) {
-        await saveImageCache(cacheKey, {
-          language,
-          imageUrl: photo.imageUrl,
-          photographer: photo.photographer,
-        });
-      }
-      return { imageUrl: photo.imageUrl, imageAlt: photo.photographer };
-    }
-  }
-  return null;
-}
-
-async function resolveGeminiKeyword(
-  word: string,
-  sentence: string,
-  language: SupportedLanguage,
-): Promise<string | null> {
-  const keywordPrompt = `Generate a highly precise search keyword string to query Pexels for the ${LANG_LABEL[language]} word "${word}" in this sentence context: "${sentence}".
-
-Rules:
-- Focus on a single object or action.
-- Avoid complex scenes with multiple people.
-- Prefer neutral backgrounds and single subjects.
-- Output ONLY the search query string in English (e.g., "coffee cup isolated white background").
-- No explanation, no punctuation, just the keyword string.`;
-
-  try {
-    return (await callGemini(keywordPrompt, undefined, 150, 0, 'lightweight')).trim();
-  } catch (err) {
-    console.warn('[getVocabImage] Gemini keyword failed — using local fallback:', err);
-    return null;
-  }
+export interface GetVocabImageOptions {
+  translation?: string;
+  precomputedKeyword?: string;
+  /** When false, always re-search even if a cached image exists (unless admin-approved). */
+  allowCached?: boolean;
 }
 
 /**
- * Returns an image URL for a vocabulary word.
- * Flow: Firestore cache → Pexels (local keyword) → Gemini keyword → Pexels again
- * Pass `excludeUrls` to avoid returning an image already used by another word.
+ * Returns a validated image URL for a vocabulary word.
+ * Flow: approved cache → Pexels (multiple candidates) → Gemini validation → cache
  */
 export async function getVocabImage(
   word: string,
@@ -73,32 +44,78 @@ export async function getVocabImage(
   language: SupportedLanguage,
   excludeUrls: string[] = [],
   precomputedKeyword?: string,
+  options?: GetVocabImageOptions,
 ): Promise<VocabImageResult | null> {
   try {
     const cleanWord = sanitizeVocabularyToken(word);
     const cacheKey = `${cleanWord}_${language}`;
+    const translation = options?.translation?.trim();
+    const keywordHint = options?.precomputedKeyword ?? precomputedKeyword;
     const cached = await getCachedImage(cacheKey);
-    if (cached && !excludeUrls.includes(cached.imageUrl)) {
+
+    if (
+      options?.allowCached !== false &&
+      cached?.approved &&
+      cached.imageUrl &&
+      !excludeUrls.includes(cached.imageUrl)
+    ) {
       return { imageUrl: cached.imageUrl, imageAlt: cached.photographer };
     }
 
-    const keywordCandidates = [
-      precomputedKeyword?.trim(),
-      buildSimplePexelsKeyword(cleanWord),
-    ].filter((k): k is string => !!k);
+    const keyword = await buildVisualSearchKeyword(
+      cleanWord,
+      language,
+      translation,
+      sentence,
+      keywordHint,
+    );
 
-    for (const keyword of keywordCandidates) {
-      const result = await searchPexelsWithKeyword(keyword, cacheKey, language, excludeUrls);
-      if (result) return result;
+    const candidates = await searchPexelsPhotos(keyword, { perPage: 8, maxPages: 2 });
+    const validated = await pickValidatedPhoto(
+      candidates,
+      cleanWord,
+      language,
+      keyword,
+      translation,
+      excludeUrls,
+    );
+
+    if (validated) {
+      await saveImageCache(cacheKey, buildImageCachePayload(
+        language,
+        validated.imageUrl,
+        validated.photographer,
+        keyword,
+        translation,
+      ));
+      return { imageUrl: validated.imageUrl, imageAlt: validated.photographer };
     }
 
-    const geminiKeyword = await resolveGeminiKeyword(cleanWord, sentence, language);
-    if (geminiKeyword) {
-      const result = await searchPexelsWithKeyword(geminiKeyword, cacheKey, language, excludeUrls);
-      if (result) return result;
+    if (translation) {
+      const fallbackKeyword = `${translation} photo isolated`;
+      if (fallbackKeyword !== keyword) {
+        const fallbackCandidates = await searchPexelsPhotos(fallbackKeyword, { perPage: 8, maxPages: 1 });
+        const fallbackValidated = await pickValidatedPhoto(
+          fallbackCandidates,
+          cleanWord,
+          language,
+          fallbackKeyword,
+          translation,
+          excludeUrls,
+        );
+        if (fallbackValidated) {
+          await saveImageCache(cacheKey, buildImageCachePayload(
+            language,
+            fallbackValidated.imageUrl,
+            fallbackValidated.photographer,
+            fallbackKeyword,
+            translation,
+          ));
+          return { imageUrl: fallbackValidated.imageUrl, imageAlt: fallbackValidated.photographer };
+        }
+      }
     }
 
-    if (cached) return { imageUrl: cached.imageUrl, imageAlt: cached.photographer };
     return null;
   } catch (err) {
     console.error('[getVocabImage] Error:', err);

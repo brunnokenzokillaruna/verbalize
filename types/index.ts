@@ -74,6 +74,7 @@ export interface UserVocabularyDocument {
   language: 'fr' | 'en';
 
   word: string;
+  wordKey?: string;
   translation: string;
   imageUrl?: string;
   wordType?: 'verb' | 'noun';
@@ -93,13 +94,14 @@ export interface UserVocabularyDocument {
 // ─── Image Cache ──────────────────────────────────────────────────────────────
 
 export interface ImageCacheDocument {
-  word: string; // Document ID (e.g., "apple_isolated")
+  word: string; // Document ID (e.g., "gazon_fr")
   language: string;
   imageUrl: string;
   photographer: string;
   createdAt: Timestamp;
-  approved?: boolean;    // true = approved for visual exercises
-  translation?: string;  // pt-BR translation, cached for admin display
+  approved?: boolean;    // true = validated for learners
+  translation?: string;  // pt-BR meaning used for image search
+  searchKeyword?: string;
 }
 
 // ─── Lesson Mistakes ──────────────────────────────────────────────────────────

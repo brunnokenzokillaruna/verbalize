@@ -2,6 +2,10 @@
 
 import { callGeminiJSON } from '@/services/gemini';
 import { normalizeGrammarBridgeResult } from '@/lib/schemas/grammarBridge';
+import {
+  buildDurationGrammarFocusGuidance,
+  buildPtBrLocalizationPromptBlock,
+} from '@/lib/grammarBridge/ptBrLocalization';
 import type { SupportedLanguage, GrammarBridgeResult, LessonTag } from '@/types';
 
 function buildTagBridgeGuidance(tag: LessonTag | undefined): string {
@@ -137,6 +141,8 @@ REGRAS EXTRA PARA LIÇÃO DE VERBO:
 
     const tagGuidance = buildTagBridgeGuidance(tag);
     const focusGuidance = buildGrammarFocusGuidance(grammarFocus, language);
+    const durationGuidance = buildDurationGrammarFocusGuidance(grammarFocus, language);
+    const ptBrLocalizationBlock = buildPtBrLocalizationPromptBlock();
 
     const prompt = `Explique o padrão gramatical "${grammarFocus}" para um brasileiro aprendendo ${LANG_LABEL[language]}.
 
@@ -146,6 +152,8 @@ Contexto do diálogo:
 ORIENTAÇÃO POR TIPO DE LIÇÃO (tag: ${tag ?? 'GRAM'}):
 ${tagGuidance}
 ${focusGuidance}
+${durationGuidance}
+${ptBrLocalizationBlock}
 
 Você está falando com um falante nativo de português brasileiro. Use isso a seu favor: compare diretamente com o português, aponte os erros clássicos que brasileiros cometem e explique POR QUÊ a estrutura funciona diferente.
 
@@ -305,7 +313,7 @@ Regras Cruciais:
     - NUNCA ensine um uso na fase Estruturar e omita na Síntese — o aluno precisa sair com a visão completa da lição.`;
 
     const raw = await callGeminiJSON<GrammarBridgeResult>(prompt, systemPrompt, 3500, undefined, 'standard');
-    return normalizeGrammarBridgeResult(raw, language);
+    return normalizeGrammarBridgeResult(raw, language, grammarFocus);
   } catch (err) {
     console.error('[generateGrammarBridge] Error:', err);
     return null;

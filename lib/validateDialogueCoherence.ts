@@ -22,12 +22,13 @@ export async function validateDialogueCoherence(
 Dialogue:
 ${dialogue}
 
-Answer these 5 questions internally, then output JSON:
+Answer these 6 questions internally, then output JSON:
 1. Is each line B a plausible response or reaction to line A?
 2. Do action roles stay consistent (who waits vs who goes)?
 3. Does any new object or place appear without prior setup?
 4. Does any verb imply "search/look for" when the location was already stated (use "go get" instead)?
 5. Does the ending follow logically from announced actions (no magic resolutions)?
+6. If one speaker frames something as boring, bad, or unpleasant, do the other speaker's replies stay consistent with that framing (agree, disagree, or nuance — not only enthusiastic positives)?
 
 Output ONLY this JSON:
 {
@@ -36,7 +37,7 @@ Output ONLY this JSON:
 }
 
 Rules for breaks:
-- List ONLY concrete coherence failures (role flip, phantom object, wrong verb, magic resolution, false causal link, topic jump).
+- List ONLY concrete coherence failures (role flip, phantom object, wrong verb, magic resolution, false causal link, topic jump, premise/tonal contradiction).
 - If the dialogue is coherent, return an empty breaks array.
 - score must reflect overall nexo quality.`;
 

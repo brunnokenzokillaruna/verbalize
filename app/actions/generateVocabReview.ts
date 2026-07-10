@@ -1,6 +1,7 @@
 'use server';
 
 import { isPassiveOnlyVocabulary } from '@/lib/vocabKnowledgeMode';
+import { REVERSE_TRANSLATION_PT_ADVERB_PROMPT_RULE, sanitizeReverseTranslationExercise } from '@/lib/reverseTranslationPtAdverb';
 import { callGeminiJSON } from '@/services/gemini';
 import { REVIEW_SESSION_SIZE } from '@/utils/reviewSession';
 import type { Exercise, SupportedLanguage, ProficiencyLevel } from '@/types';
@@ -104,7 +105,7 @@ ${chunkNote}
       return `Item ${i + 1} — word: "${w.word}" (PT: ${w.translation}) — type "reverse-translation"
 - "portuguese_sentence": natural PT-BR sentence whose correct ${langLabel} translation uses "${w.word}"
 - "target_translation": ${langLabel} sentence containing "${w.word}"
-- "acceptable_variants": 1-2 alternative phrasings (or [])`;
+- "acceptable_variants": 1-2 alternative phrasings with natural adverb synonyms when relevant (e.g. "vite" for "rapidement")`;
     })
     .join('\n\n');
 
@@ -129,6 +130,8 @@ ${vocabConstraint}
 
 ${exerciseDescriptions}
 
+${REVERSE_TRANSLATION_PT_ADVERB_PROMPT_RULE}
+
 Output a JSON array with exactly ${reviewWords.length} objects, each with "word" and "exercise" keys:
 [
 ${jsonTemplate}
@@ -152,11 +155,20 @@ ${jsonTemplate}
           portuguese_sentence?: string;
           target_translation?: string;
           acceptable_variants?: unknown;
+          hint?: string;
         };
         if (!d.portuguese_sentence || !d.target_translation) return false;
-        if (!Array.isArray(d.acceptable_variants)) {
-          (d as Record<string, unknown>).acceptable_variants = [];
-        }
+        Object.assign(
+          d,
+          sanitizeReverseTranslationExercise({
+            portuguese_sentence: d.portuguese_sentence,
+            target_translation: d.target_translation,
+            acceptable_variants: Array.isArray(d.acceptable_variants)
+              ? (d.acceptable_variants as string[])
+              : [],
+            hint: typeof d.hint === 'string' ? d.hint : undefined,
+          }),
+        );
         return true;
       }
       if (item.exercise.type === 'word-bank-translation') {

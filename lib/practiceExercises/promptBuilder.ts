@@ -11,10 +11,12 @@ import {
 import { buildTypeDescriptions } from './exerciseTypeDescriptions';
 import { buildTagGuidance } from './tagGuidance';
 import { buildGrammarFocusExerciseGuidance } from './grammarFocusExerciseGuidance';
+import { REVERSE_TRANSLATION_PT_ADVERB_PROMPT_RULE } from '@/lib/reverseTranslationPtAdverb';
 import { buildChainPromptBlock } from './chainExercises';
 import { pickInterleavingWords, buildInterleavingPromptBlock } from './interleaving';
 import { resolveRequiredProductionType } from './productionTypes';
 import type { GeneratePracticeParams } from './types';
+import { buildPtBrVocabRule } from './validatePtBrText';
 
 export function buildDialogueAnchorBlock(): string {
   return `
@@ -132,7 +134,10 @@ export function buildPracticeExercisePrompt(params: GeneratePracticeParams): {
 
   const isA2Plus = ['A2', 'B1', 'B2', 'C1', 'C2'].includes(level);
   const reverseTranslationHintRule = isA2Plus
-    ? `\nREVERSE-TRANSLATION RULE: For level ${level}, do NOT include the "hint" field in reverse-translation exercises — the learner must produce without scaffolding.`
+    ? `\nREVERSE-TRANSLATION RULE: For level ${level}, do NOT include the "hint" field in reverse-translation exercises — the learner must produce without scaffolding. Still follow the PT-BR adverb clarity rule below (use explicit "-mente" in portuguese_sentence instead of relying on a hint).`
+    : '';
+  const reverseTranslationAdverbRule = allowedSet.has('reverse-translation')
+    ? REVERSE_TRANSLATION_PT_ADVERB_PROMPT_RULE
     : '';
 
   const grammarAccuracyBlock = `
@@ -146,6 +151,11 @@ export function buildPracticeExercisePrompt(params: GeneratePracticeParams): {
 - TRAP ERROR VERIFICATION:
   - The incorrect options must contain ONLY the intended error stemming from Portuguese interference. They must NOT contain accidental/unintended errors, nor should they be grammatically correct sentences marked as false. Double-check that the "isCorrect" boolean is not inverted.
 - SELF-CHECK CHALLENGE: Before generating the final JSON array, mentally verify: "Is the correct option actually correct? Are the distractors actually incorrect? Did I match the adjective gender to the noun gender correctly?"
+- MULTIPLE-CHOICE COHERENCE (listening-comprehension, bridge-choice, listen-and-select):
+  - options[correctIndex] must mean the same thing as explanationPt / explanation AND the audio source (dialogueAudio or audioText).
+  - Never mark an option correct when the explanation describes a different action (e.g. dialogue/explanation about eating but correct answer about resting).
+  - For listen-and-select: the correct option must be an exact or near-exact transcription of audioText.
+${buildPtBrVocabRule(language)}
 `;
 
   const systemPrompt = `You are a language exercise generator for Brazilian Portuguese speakers learning ${LANG_LABEL[language]}. The student is Brazilian — use scenarios, cultural references, and situations that are engaging and relevant for a Brazilian learner (e.g., a Brazilian tourist in Paris, a Brazilian professional in a French meeting, a Brazilian student abroad, ordering food in Lyon, asking for directions in London). Respond with ONLY a valid JSON array, no markdown, no explanation.`;
@@ -166,7 +176,7 @@ ${tagGuidance}${grammarFocusGuidance}${productionRuleBlock}${interleavingBlock}$
 CRITICAL RULE: Do NOT copy or reuse any sentence from the dialogue above. Every exercise sentence must be ORIGINAL — newly created by you. The sentences should be related to the lesson's theme and grammar focus, but must be completely different from the dialogue lines.
 
 LEVEL CONSTRAINTS — all sentences you write must follow these rules: ${levelDesc}
-${vocabConstraint}${reverseTranslationHintRule}
+${vocabConstraint}${reverseTranslationHintRule}${reverseTranslationAdverbRule}
 ${grammarAccuracyBlock}
 
 Generate exactly ${PRACTICE_EXERCISE_COUNT} exercises as a JSON array. Choose varied types from the following pool for a balanced practice session. You MUST use ONLY the types listed below — any other type is forbidden.

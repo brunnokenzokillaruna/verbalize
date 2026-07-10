@@ -2,6 +2,7 @@ import { useState, useCallback, type Dispatch, type SetStateAction } from 'react
 import { translateWordsBatch } from '@/app/actions/translateWord';
 import { getVocabImage } from '@/app/actions/getVocabImage';
 import { updateVocabTranslation, updateVocabImage } from '@/services/firestore';
+import { findVocabularyItem, wordsMatchCanonically } from '@/lib/vocabCanonical';
 import { isMissingImage, isMissingTranslation } from '@/utils/vocabHelpers';
 import type { UserVocabularyDocument, SupportedLanguage } from '@/types';
 import type { User } from 'firebase/auth';
@@ -18,7 +19,7 @@ export function useVocabEnrich(
     async (word: string) => {
       if (!user || enrichingWords.has(word)) return;
 
-      const item = items.find((v) => v.word === word);
+      const item = findVocabularyItem(items, word);
       if (!item) return;
 
       const needsTranslation = isMissingTranslation(item);
@@ -42,7 +43,9 @@ export function useVocabEnrich(
 
         if (needsImage) {
           const context = translation && translation !== word ? translation : item.word;
-          const imgResult = await getVocabImage(word, context, language);
+          const imgResult = await getVocabImage(word, context, language, [], undefined, {
+            translation: translation !== word ? translation : undefined,
+          });
           if (imgResult?.imageUrl) {
             imageUrl = imgResult.imageUrl;
             await updateVocabImage(user.uid, word, language, imageUrl);
@@ -51,7 +54,7 @@ export function useVocabEnrich(
 
         if (translation !== item.translation || imageUrl !== item.imageUrl) {
           setItems((prev) =>
-            prev.map((v) => (v.word === word ? { ...v, translation, imageUrl } : v)),
+            prev.map((v) => (wordsMatchCanonically(v.word, word) ? { ...v, translation, imageUrl } : v)),
           );
         }
       } catch (err) {

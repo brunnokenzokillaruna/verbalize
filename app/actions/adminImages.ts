@@ -155,6 +155,7 @@ export async function replaceImageCacheEntry(
   photographer: string,
 ): Promise<void> {
   await updateImageCache(cacheKey, imageUrl, photographer);
+  await approveImageCache(cacheKey);
 }
 
 export async function approveImageCacheEntry(cacheKey: string): Promise<void> {

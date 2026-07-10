@@ -9,6 +9,7 @@ const FR_SYNONYM_GROUPS: string[][] = [
   ['chercher', 'trouver', 'retrouver'],
   ['manger', 'dejeuner', 'diner'],
   ['beau', 'joli', 'magnifique'],
+  ['rapidement', 'vite', 'promptement'],
   ['fast', 'quick', 'rapid'],
   ['big', 'large', 'huge'],
   ['small', 'little', 'tiny'],
@@ -74,6 +75,32 @@ function tokenOverlapScore(user: string, reference: string): number {
   return matched / refTokens.length;
 }
 
+/**
+ * Detects French adjective used where the reference expects -ment adverb
+ * (e.g. "rapide" vs "rapidement" — common BP interference).
+ */
+function usesAdjectiveInsteadOfAdverb(user: string, reference: string): boolean {
+  const userTokens = normalize(user).split(' ').filter(Boolean);
+  const refTokens = normalize(reference).split(' ').filter(Boolean);
+  if (userTokens.length !== refTokens.length) return false;
+
+  for (let i = 0; i < refTokens.length; i++) {
+    const ref = refTokens[i];
+    const usr = userTokens[i];
+    if (
+      ref.endsWith('ment') &&
+      ref.length > 5 &&
+      usr !== ref &&
+      ref.startsWith(usr) &&
+      usr.length >= 4
+    ) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 export interface ReverseTranslationValidation {
   accepted: boolean;
   note?: string;
@@ -97,12 +124,22 @@ export function validateReverseTranslationLocal(
   }
 
   for (const ref of references) {
+    if (usesAdjectiveInsteadOfAdverb(userAnswer, ref)) {
+      continue;
+    }
     if (similarityRatio(userAnswer, ref) >= 0.85) {
       return { accepted: true };
     }
     if (tokenOverlapScore(userAnswer, ref) >= 0.85) {
       return { accepted: true };
     }
+  }
+
+  if (usesAdjectiveInsteadOfAdverb(userAnswer, expectedAnswer)) {
+    return {
+      accepted: false,
+      note: 'Use o advérbio (ex.: "rapidement", "vite"), não o adjetivo ("rapide"). Em português falamos "rápido", mas em francês a tradução correta aqui é um advérbio.',
+    };
   }
 
   if (tokenOverlapScore(userAnswer, expectedAnswer) >= 0.7) {

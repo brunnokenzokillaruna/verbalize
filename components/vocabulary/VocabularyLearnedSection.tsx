@@ -35,7 +35,7 @@ export function VocabularyLearnedSection({
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {learned.map((item, idx) => (
             <VocabCard
-              key={item.word}
+              key={item.id}
               item={item}
               language={language}
               animDelay={idx * 35}
@@ -49,7 +49,7 @@ export function VocabularyLearnedSection({
         <div className="flex flex-col gap-3">
           {learned.map((item) => (
             <VocabListRow
-              key={item.word}
+              key={item.id}
               item={item}
               language={language}
               onEnrich={onEnrich}
