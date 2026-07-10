@@ -22,7 +22,7 @@ import { deletePregeneratedLesson, getUserVocabulary, upsertVocabularyItem, tryS
 import { canonicalVocabKey } from '@/lib/vocabCanonical';
 import { filterHookVocabularyForKnownWords } from '@/lib/hookVocabulary';
 import { tooltipCacheKey } from '@/lib/wordTooltipUtils';
-import type { GrammarBridgeResult, Exercise, LessonTag, MissionBriefingResult, HookResult, PregeneratedLessonDocument } from '@/types';
+import type { GrammarBridgeResult, Exercise, LessonTag, HookResult, PregeneratedLessonDocument } from '@/types';
 
 const TAGS_WITH_GRAMMAR_PHASE: ReadonlySet<LessonTag> = new Set(['GRAM', 'VERB', 'CULT', 'VOC', 'DIAL', 'EXPR']);
 
@@ -512,7 +512,6 @@ export function useLessonBootstrap({
       pregenFiredRef.current = false;
       vocabImagesFiredRef.current = false;
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [store.phase]);
 
   // Pre-generate the NEXT lesson's full payload (hook + bridge + exercises)
