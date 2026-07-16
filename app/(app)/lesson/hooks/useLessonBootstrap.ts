@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { useLessonStore } from '@/store/lessonStore';
 import { getNextLesson, getLessonById, getNextLessonId, getPreviousTopics } from '@/lib/curriculum';
-import { getInitialPhase } from './useLessonFlow';
 import { generateHook, generateMinimalHook } from '@/app/actions/generateHook';
 import { enrichHookMetadata } from '@/app/actions/enrichHookMetadata';
 import { generateGrammarBridge } from '@/app/actions/generateGrammarBridge';
@@ -17,6 +16,7 @@ import { pregenerateNextLesson } from '@/app/actions/pregenerateNextLesson';
 import { isAggressivePregenEnabled } from '@/lib/geminiDevGuard';
 import { translateWord, translateWordsBatch } from '@/app/actions/translateWord';
 import { prefetchVocabImages } from '@/lib/vocabImagePrefetch';
+import { getLessonSceneImage } from '@/app/actions/getLessonSceneImage';
 import { fetchPregeneratedLessonWithWait } from '@/lib/waitForPregeneratedLesson';
 import { deletePregeneratedLesson, getUserVocabulary, upsertVocabularyItem, tryStartPregeneratingLesson, abortPregeneratedLesson } from '@/services/firestore';
 import { canonicalVocabKey } from '@/lib/vocabCanonical';
@@ -92,6 +92,20 @@ export function useLessonBootstrap({
       (requestedLessonId ? getLessonById(requestedLessonId) : undefined) ??
       getNextLesson(language, profile.lessonProgress?.[language]);
     store.init(lesson, profile.interests ?? []);
+
+    // Show cover immediately while hook/scene load in the background.
+    store.setPhase('intro');
+
+    // Scene/cover image only needs LessonDefinition — start before hook generation.
+    // Cache hit is cheap; always refetch on new lesson init (retry-safe).
+    getLessonSceneImage({
+      lessonId: lesson.id,
+      theme: lesson.theme,
+      uiTitle: lesson.uiTitle,
+      language: lesson.language,
+    })
+      .then((img) => useLessonStore.getState().setSceneImage(img))
+      .catch((err) => console.error('[Prefetch] scene image error:', err));
 
     (async () => {
       store.setIsLoading(true);
@@ -258,10 +272,11 @@ export function useLessonBootstrap({
             }).catch((err) => console.error('[Prefetch] vocab images error:', err));
           }
 
+          // Stay on intro until the learner taps "Começar" (advanceFromIntro).
+          // REVIEW still jumps straight to briefing above.
           const currentPhase = useLessonStore.getState().phase;
           if (currentPhase === 'loading') {
-            const initialPhase = getInitialPhase(lesson.tag);
-            store.setPhase(initialPhase);
+            store.setPhase('intro');
           }
           devLog(`[Timing] ✅ Bootstrap total: ${(performance.now() - t0).toFixed(0)}ms → fase '${useLessonStore.getState().phase}'`);
 

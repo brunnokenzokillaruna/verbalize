@@ -13,6 +13,11 @@ type LessonContinueButtonProps = {
 };
 
 function getNextLabel(phase: LessonPhase, lessonTag?: LessonTag): string {
+  if (phase === 'intro') {
+    if (lessonTag === 'MISS') return 'Missão';
+    if (lessonTag === 'REVIEW') return 'Briefing';
+    return 'Vocabulário';
+  }
   if (phase === 'briefing') return 'Começar checkpoint';
   if (phase === 'comprehension') return 'Próxima pergunta';
   if (phase === 'debrief') return 'Concluir';
@@ -77,6 +82,8 @@ export function LessonContinueButton({
             <Loader2 size={18} className="animate-spin" />
             <span className="text-sm">Sincronizando…</span>
           </>
+        ) : phase === 'intro' ? (
+          <>Começar lição →</>
         ) : phase === 'hook' ? (
           <>Entendido!</>
         ) : phase === 'mission' ? (

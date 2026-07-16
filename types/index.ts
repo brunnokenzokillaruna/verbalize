@@ -94,7 +94,7 @@ export interface UserVocabularyDocument {
 // ─── Image Cache ──────────────────────────────────────────────────────────────
 
 export interface ImageCacheDocument {
-  word: string; // Document ID (e.g., "gazon_fr")
+  word: string; // Document ID (e.g., "gazon_fr" or "scene_fr-a1-001")
   language: string;
   imageUrl: string;
   photographer: string;
@@ -102,6 +102,8 @@ export interface ImageCacheDocument {
   approved?: boolean;    // true = validated for learners
   translation?: string;  // pt-BR meaning used for image search
   searchKeyword?: string;
+  /** vocab = word flashcard; lesson_scene = shared cover/dialogue scene */
+  kind?: 'vocab' | 'lesson_scene';
 }
 
 // ─── Lesson Mistakes ──────────────────────────────────────────────────────────

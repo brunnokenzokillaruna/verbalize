@@ -18,6 +18,10 @@ function parseKey(cacheKey: string): { word: string; lang: string } {
   return m ? { word: m[1], lang: m[2] } : { word: cacheKey, lang: '' };
 }
 
+function isLessonSceneKey(cacheKey: string): boolean {
+  return cacheKey.startsWith('scene_');
+}
+
 // ── Actions ───────────────────────────────────────────────────────────────────
 
 /**
@@ -39,13 +43,15 @@ export async function fetchAllImageCache(): Promise<ImageCacheDocument[]> {
  * Translates a batch of cache keys that are missing pt-BR translations.
  * Called separately after images are loaded so it never blocks the UI.
  * Returns a map of cacheKey → translation.
+ * Skips lesson scene entries (scene_*) — they are not vocabulary words.
  */
 export async function translateMissingEntries(
   cacheKeys: string[],
 ): Promise<Record<string, string>> {
-  if (cacheKeys.length === 0) return {};
+  const vocabKeys = cacheKeys.filter((key) => !isLessonSceneKey(key));
+  if (vocabKeys.length === 0) return {};
 
-  const items = cacheKeys.map((key) => {
+  const items = vocabKeys.map((key) => {
     const { word, lang } = parseKey(key);
     return { key, word, language: lang === 'fr' ? 'French' : 'English' };
   });
@@ -81,44 +87,49 @@ Output ONLY the JSON object, nothing else.`;
 
 /**
  * Searches Pexels for up to 6 alternative images for a given cache key.
- * Uses Gemini to generate a relevant English image search keyword.
+ * Uses Gemini to generate a relevant English image search keyword (vocab only).
+ * Lesson scene keys (scene_*) reuse the cached searchKeyword / translation — no Gemini.
  */
 export async function fetchPexelsAlternatives(
   cacheKey: string,
   excludeUrl: string,
   translation?: string,
+  searchKeyword?: string,
 ): Promise<Array<{ imageUrl: string; photographer: string }>> {
-  const { word, lang } = parseKey(cacheKey);
-  const langLabel = lang === 'fr' ? 'French' : 'English';
+  let keyword: string;
 
-  // ── Step 1: get the translation if not provided ───────────────────────────
-  let resolvedTranslation = translation;
-  if (!resolvedTranslation) {
-    try {
-      resolvedTranslation = (
-        await callGemini(
-          `Translate the ${langLabel} word "${word}" to Portuguese (pt-BR). Reply with ONLY the translation, no explanation.`,
-          undefined,
-          64,
-          0,
-          'lightweight',
-        )
-      ).trim();
-    } catch (err) {
-      console.error('[adminImages] on-demand translation failed:', err);
+  if (isLessonSceneKey(cacheKey)) {
+    keyword = (searchKeyword ?? translation ?? cacheKey.replace(/^scene_/, '')).trim();
+  } else {
+    const { word, lang } = parseKey(cacheKey);
+    const langLabel = lang === 'fr' ? 'French' : 'English';
+
+    let resolvedTranslation = translation;
+    if (!resolvedTranslation) {
+      try {
+        resolvedTranslation = (
+          await callGemini(
+            `Translate the ${langLabel} word "${word}" to Portuguese (pt-BR). Reply with ONLY the translation, no explanation.`,
+            undefined,
+            64,
+            0,
+            'lightweight',
+          )
+        ).trim();
+      } catch (err) {
+        console.error('[adminImages] on-demand translation failed:', err);
+      }
     }
-  }
 
-  const meaningHint = resolvedTranslation
-    ? ` (meaning "${resolvedTranslation}" in Portuguese)`
-    : '';
+    const meaningHint = resolvedTranslation
+      ? ` (meaning "${resolvedTranslation}" in Portuguese)`
+      : '';
 
-  // ── Step 2: generate a precise Pexels search keyword ─────────────────────
-  let keyword = resolvedTranslation ?? word;
-  try {
-    keyword = (
-      await callGemini(
-        `Generate a precise English search query for the Pexels image library.
+    keyword = resolvedTranslation ?? word;
+    try {
+      keyword = (
+        await callGemini(
+          `Generate a precise English search query for the Pexels image library.
 The query is for the ${langLabel} word "${word}"${meaningHint}.
 
 Rules:
@@ -126,17 +137,17 @@ Rules:
 - Prefer isolated subjects on neutral backgrounds.
 - Output ONLY the search query string (e.g., "red apple isolated white background").
 - No explanation, no punctuation other than spaces.`,
-        undefined,
-        150,
-        0,
-        'lightweight',
-      )
-    ).trim();
-  } catch (err) {
-    console.error('[adminImages] keyword generation failed, fallback:', resolvedTranslation ?? word, err);
+          undefined,
+          150,
+          0,
+          'lightweight',
+        )
+      ).trim();
+    } catch (err) {
+      console.error('[adminImages] keyword generation failed, fallback:', resolvedTranslation ?? word, err);
+    }
   }
 
-  // ── Step 3: collect up to 6 Pexels results ────────────────────────────────
   const results: Array<{ imageUrl: string; photographer: string }> = [];
   for (let page = 1; page <= 8 && results.length < 6; page++) {
     const photo = await searchPexels(keyword, page);

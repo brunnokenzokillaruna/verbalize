@@ -89,6 +89,7 @@ export function LessonPhaseContent({
           onAudioButton={onAudioButton}
           onWordClick={onWordClick}
           listenFirstEnabled={HOOK_LISTEN_FIRST}
+          sceneImage={store.sceneImage}
         />
       )}
 
@@ -162,6 +163,7 @@ export function LessonPhaseContent({
         <LessonMissionScreen
           briefing={store.missionBriefing}
           language={store.lesson.language}
+          sceneImage={store.sceneImage}
         />
       )}
 

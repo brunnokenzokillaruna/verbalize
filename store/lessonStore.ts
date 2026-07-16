@@ -40,6 +40,8 @@ interface LessonState {
   missionBriefing: MissionBriefingResult | null; // MISS only — generated from hook dialogue for role-play alignment
   grammarBridge: GrammarBridgeResult | null;
   vocabImages: Record<string, VocabImageResult | null>; // keyed by word
+  /** Shared cover/dialogue scene for this lesson (cached by lessonId). */
+  sceneImage: VocabImageResult | null;
   vocabTranslations: Record<string, string>; // keyed by word → PT-BR translation
   /** Full AI tooltip payloads keyed by tooltipCacheKey — instant word clicks. */
   wordTooltips: Record<string, TranslateWordResult>;
@@ -110,6 +112,7 @@ interface LessonState {
   completeRolePlay: (spoken: number, totalSpeakable: number) => void;
   setGrammarBridge: (bridge: GrammarBridgeResult) => void;
   setVocabImage: (word: string, image: VocabImageResult | null) => void;
+  setSceneImage: (image: VocabImageResult | null) => void;
   setVocabTranslation: (word: string, translation: string) => void;
   cacheWordTooltip: (key: string, result: TranslateWordResult) => void;
   setExercises: (exercises: Exercise[]) => void;
@@ -153,6 +156,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
   missionBriefing: null,
   grammarBridge: null,
   vocabImages: {},
+  sceneImage: null,
   vocabTranslations: {},
   wordTooltips: {},
   knownVocabulary: [],
@@ -191,6 +195,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       missionBriefing: null,
       grammarBridge: null,
       vocabImages: {},
+      sceneImage: null,
       vocabTranslations: {},
       wordTooltips: {},
       knownVocabulary: [],
@@ -258,6 +263,8 @@ export const useLessonStore = create<LessonState>((set, get) => ({
     set((state) => ({
       vocabImages: { ...state.vocabImages, [word]: image },
     })),
+
+  setSceneImage: (sceneImage) => set({ sceneImage }),
 
   setVocabTranslation: (word, translation) =>
     set((state) => ({
@@ -333,6 +340,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       missionBriefing: null,
       grammarBridge: null,
       vocabImages: {},
+      sceneImage: null,
       vocabTranslations: {},
       wordTooltips: {},
       knownVocabulary: [],

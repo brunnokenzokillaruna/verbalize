@@ -17,9 +17,11 @@ import type { SupportedLanguage } from '@/types';
 
 export function ImageCacheManager() {
   const [entries, setEntries] = useState<ImageCacheDocument[]>([]);
+  const [allEntries, setAllEntries] = useState<ImageCacheDocument[]>([]);
   const [index, setIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [approving, setApproving] = useState(false);
+  const [showScenes, setShowScenes] = useState(false);
 
   // Replacement state
   const [replacing, setReplacing] = useState(false);
@@ -30,19 +32,30 @@ export function ImageCacheManager() {
   const [customPrompt, setCustomPrompt] = useState('');
   const [loadingCustom, setLoadingCustom] = useState(false);
 
+  function isSceneEntry(e: ImageCacheDocument) {
+    return e.kind === 'lesson_scene' || e.word.startsWith('scene_');
+  }
+
+  function applyFilter(all: ImageCacheDocument[], scenesMode: boolean) {
+    const filtered = scenesMode
+      ? all.filter(isSceneEntry)
+      : all.filter((e) => !e.approved);
+    setEntries(filtered);
+    setIndex(0);
+  }
+
   useEffect(() => {
     fetchAllImageCache()
       .then((all) => {
-        const unapproved = all.filter((e) => !e.approved);
-        setEntries(unapproved);
+        setAllEntries(all);
+        applyFilter(all, false);
 
-        // Translate missing entries in a separate, non-blocking step
-        const missingKeys = unapproved
-          .filter((e) => !e.translation)
+        // Translate missing entries in a separate, non-blocking step (vocab only)
+        const missingKeys = all
+          .filter((e) => !e.approved && !e.translation && !isSceneEntry(e))
           .map((e) => e.word);
 
         if (missingKeys.length > 0) {
-          // Process in chunks of 20 in parallel to stay within Gemini limits
           const CHUNK = 20;
           const chunks: string[][] = [];
           for (let i = 0; i < missingKeys.length; i += CHUNK) {
@@ -51,18 +64,30 @@ export function ImageCacheManager() {
           Promise.all(chunks.map((chunk) => translateMissingEntries(chunk)))
             .then((results) => {
               const merged = Object.assign({}, ...results) as Record<string, string>;
+              setAllEntries((prev) =>
+                prev.map((e) =>
+                  merged[e.word] ? { ...e, translation: merged[e.word] } : e,
+                ),
+              );
               setEntries((prev) =>
                 prev.map((e) =>
                   merged[e.word] ? { ...e, translation: merged[e.word] } : e,
                 ),
               );
             })
-            .catch(() => {}); // translations are non-critical
+            .catch(() => {});
         }
       })
-      .catch(() => {}) // graceful failure — entries stays []
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
+
+  function toggleScenesMode() {
+    const next = !showScenes;
+    setShowScenes(next);
+    applyFilter(allEntries, next);
+    closeReplace();
+  }
 
   const current = entries[index];
   const total = entries.length;
@@ -112,7 +137,12 @@ export function ImageCacheManager() {
     setReplacing(true);
     setLoadingAlts(true);
     try {
-      const alts = await fetchPexelsAlternatives(current.word, current.imageUrl, current.translation);
+      const alts = await fetchPexelsAlternatives(
+        current.word,
+        current.imageUrl,
+        current.translation,
+        current.searchKeyword,
+      );
       setAlternatives(alts);
       setSeenUrls([...initialExcludes, ...alts.map((a) => a.imageUrl)]);
     } finally {
@@ -146,9 +176,14 @@ export function ImageCacheManager() {
     }
   }
 
-  // ── Parse word and language from cache key (e.g. "chat_fr") ──────────────────
-  const langSuffix = current?.word.match(/_([a-z]{2})$/)?.[1] ?? '';
-  const wordDisplay = langSuffix ? current?.word.slice(0, -(langSuffix.length + 1)) : current?.word;
+  // ── Parse word and language from cache key (e.g. "chat_fr" or "scene_fr-a1-001") ──
+  const isScene = current?.kind === 'lesson_scene' || current?.word.startsWith('scene_');
+  const langSuffix = isScene ? '' : (current?.word.match(/_([a-z]{2})$/)?.[1] ?? '');
+  const wordDisplay = isScene
+    ? (current?.word.replace(/^scene_/, '') ?? '')
+    : langSuffix
+      ? current?.word.slice(0, -(langSuffix.length + 1))
+      : current?.word;
 
   if (loading) {
     return (
@@ -163,28 +198,67 @@ export function ImageCacheManager() {
 
   if (!current) {
     return (
-      <p className="py-8 text-center text-sm" style={{ color: 'var(--color-text-muted)' }}>
-        {total === 0 ? 'Todas as imagens foram revisadas.' : 'Nenhuma imagem em cache ainda.'}
-      </p>
+      <div className="flex flex-col gap-3 py-8">
+        <button
+          type="button"
+          onClick={toggleScenesMode}
+          className="mx-auto text-xs font-semibold underline"
+          style={{ color: 'var(--color-primary)' }}
+        >
+          {showScenes ? 'Ver vocabulário pendente' : 'Ver cenas de lição'}
+        </button>
+        <p className="text-center text-sm" style={{ color: 'var(--color-text-muted)' }}>
+          {showScenes
+            ? 'Nenhuma cena de lição em cache ainda.'
+            : total === 0
+              ? 'Todas as imagens foram revisadas.'
+              : 'Nenhuma imagem em cache ainda.'}
+        </p>
+      </div>
     );
   }
 
   return (
     <div className="flex flex-col gap-4">
+      <div className="flex items-center justify-between gap-2">
+        <button
+          type="button"
+          onClick={toggleScenesMode}
+          className="rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest transition-colors"
+          style={{
+            backgroundColor: showScenes ? 'var(--color-vocab-bg)' : 'var(--color-surface-raised)',
+            color: showScenes ? 'var(--color-vocab)' : 'var(--color-text-muted)',
+            border: '1px solid var(--color-border)',
+          }}
+        >
+          {showScenes ? 'Cenas de lição' : 'Vocabulário pendente'}
+        </button>
+      </div>
+
       {/* ── Counter + language badge ── */}
       <div className="flex items-center justify-between">
         <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
-          {index + 1} / {total} para revisar
+          {index + 1} / {total} {showScenes ? 'cenas' : 'para revisar'}
         </p>
-        {langSuffix && (
-          <span
-            className="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium"
-            style={{ backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)' }}
-          >
-            <LanguageFlag language={langSuffix as SupportedLanguage} size="xs" />
-            {langSuffix === 'fr' ? 'Francês' : 'Inglês'}
-          </span>
-        )}
+        <div className="flex items-center gap-2">
+          {isScene && (
+            <span
+              className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
+              style={{ backgroundColor: 'var(--color-vocab-bg)', color: 'var(--color-vocab)' }}
+            >
+              Cena de lição
+            </span>
+          )}
+          {langSuffix && (
+            <span
+              className="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium"
+              style={{ backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)' }}
+            >
+              <LanguageFlag language={langSuffix as SupportedLanguage} size="xs" />
+              {langSuffix === 'fr' ? 'Francês' : 'Inglês'}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* ── Image card with nav arrows ── */}

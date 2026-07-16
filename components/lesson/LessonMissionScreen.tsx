@@ -4,16 +4,30 @@ import { Target, MapPin, AlertTriangle, Clock, Mic, ChevronRight } from 'lucide-
 import { AudioPlayerButton } from '@/components/lesson/AudioPlayerButton';
 import { MissionStepGuide } from '@/components/lesson/mission-roleplay/MissionStepGuide';
 import { MISSION_THEME } from '@/components/lesson/mission-roleplay/missionTheme';
-import type { MissionBriefingResult, SupportedLanguage } from '@/types';
+import { LessonSceneBanner } from '@/components/lesson/LessonSceneBanner';
+import type { MissionBriefingResult, SupportedLanguage, VocabImageResult } from '@/types';
 
 interface LessonMissionScreenProps {
   briefing: MissionBriefingResult;
   language: SupportedLanguage;
+  sceneImage?: VocabImageResult | null;
 }
 
-export function LessonMissionScreen({ briefing, language }: LessonMissionScreenProps) {
+export function LessonMissionScreen({
+  briefing,
+  language,
+  sceneImage = null,
+}: LessonMissionScreenProps) {
   return (
     <div className="flex flex-col gap-5 sm:gap-6 animate-fade-in">
+      {sceneImage?.imageUrl && (
+        <LessonSceneBanner
+          sceneImage={sceneImage}
+          title="Missão"
+          subtitle="Situação real — prepare-se"
+        />
+      )}
+
       <div className="flex flex-col gap-4 sm:gap-5">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
