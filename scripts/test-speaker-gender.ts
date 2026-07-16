@@ -5,7 +5,7 @@
 import {
   inferSpeakerGender,
   resolveSpeakerGenders,
-} from '../lib/speakerGender.ts';
+} from '../lib/speakerGender';
 
 let failed = 0;
 

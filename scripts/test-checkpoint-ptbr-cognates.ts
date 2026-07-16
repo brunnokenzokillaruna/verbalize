@@ -8,7 +8,7 @@ import {
   extractDialogueContentWords,
   findLeakedTargetWord,
   isListeningComprehensionPtBrPure,
-} from '../lib/practiceExercises/validatePtBrText.ts';
+} from '../lib/practiceExercises/validatePtBrText';
 
 const dialogue = `Marie: Qu'est-ce que tu as fait ce week-end?
 Vous: J'ai vu un film avec mes amis samedi.

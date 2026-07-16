@@ -1,8 +1,8 @@
 /**
  * Run: npx tsx scripts/test-production-polish-hint.ts
  */
-import { formatProductionPolishHint, getLocalElaborationHint } from '../lib/elaborationHints.ts';
-import type { Exercise } from '../types/index.ts';
+import { formatProductionPolishHint, getLocalElaborationHint } from '../lib/elaborationHints';
+import type { Exercise } from '../types/index';
 
 let failed = 0;
 function assert(name: string, condition: boolean, detail?: string) {
