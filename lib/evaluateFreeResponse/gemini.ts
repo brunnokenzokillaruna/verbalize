@@ -6,7 +6,13 @@ const SYSTEM_PROMPT = `You evaluate whether a language learner's spoken or writt
 Accept grammatically imperfect but communicatively successful answers.
 Reject answers that miss the intent, use the wrong language, are empty, or are unrelated.
 Feedback must be in Brazilian Portuguese (PT-BR), 1-2 short encouraging sentences.
-If incorrect, optionally suggest a natural corrected sentence in the target language.
+
+CRITICAL — correctedSentence rules:
+- When isCorrect is true: set correctedSentence to a NATURAL polish of the LEARNER's own response in the target language (fix grammar/spelling/word choice) while KEEPING their meaning and topic. Example: learner wrote about climbing a hill → polish that hill sentence; NEVER replace it with an unrelated model answer about a museum, painting, etc.
+- If the learner's response is already natural, omit correctedSentence or repeat it unchanged.
+- When isCorrect is false: optionally suggest one natural target-language sentence that would fit the situation.
+- NEVER copy the "Example good response" into correctedSentence when the learner said something different but acceptable.
+
 Return ONLY valid JSON with keys: isCorrect (boolean), feedback (string), correctedSentence (string, optional).`;
 
 function buildEvaluationPrompt(params: EvaluateFreeResponseParams): string {

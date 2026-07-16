@@ -1,6 +1,13 @@
 'use server';
 
 import type { SupportedLanguage } from '@/types';
+import {
+  listSpeakersInOrder,
+  resolveSpeakerGenders,
+  speakerKeyForLine,
+  stripSpeakerPrefix,
+  type SpeakerGender,
+} from '@/lib/speakerGender';
 
 const TTS_ENDPOINT = 'https://texttospeech.googleapis.com/v1/text:synthesize';
 
@@ -134,20 +141,32 @@ function getLangFromVoice(voiceName: string): string {
   return `${parts[0]}-${parts[1]}`;
 }
 
-/** Pick two distinct voices — one female, one male — for a dialogue. */
-function pickDialoguePair(language: SupportedLanguage): [VoiceConfig, VoiceConfig] {
-  const pool = VOICE_POOLS[language];
-  const fName = pickRandom(pool.female);
-  const mName = pickRandom(pool.male);
-
-  return [
-    { languageCode: getLangFromVoice(fName), name: fName },
-    { languageCode: getLangFromVoice(mName), name: mName },
-  ];
+function voiceConfigFromName(voiceName: string): VoiceConfig {
+  return { languageCode: getLangFromVoice(voiceName), name: voiceName };
 }
 
-function stripSpeakerPrefix(line: string): string {
-  return line.replace(/^[^:]+:\s*/, '').trim();
+/**
+ * Assign a Google TTS voice per speaker, matching inferred gender.
+ * Same-gender dialogues get two distinct voices from that gender pool.
+ */
+function pickVoicesForSpeakers(
+  language: SupportedLanguage,
+  genders: Map<string, SpeakerGender>,
+): Map<string, VoiceConfig> {
+  const pool = VOICE_POOLS[language];
+  const used = { female: new Set<string>(), male: new Set<string>() };
+  const result = new Map<string, VoiceConfig>();
+
+  for (const [speaker, gender] of genders) {
+    const names = pool[gender];
+    const available = names.filter((n) => !used[gender].has(n));
+    const pickFrom = available.length > 0 ? available : names;
+    const voiceName = pickRandom(pickFrom);
+    used[gender].add(voiceName);
+    result.set(speaker, voiceConfigFromName(voiceName));
+  }
+
+  return result;
 }
 
 function escapeSsml(text: string): string {
@@ -273,9 +292,9 @@ export async function synthesizeSpeechWithVoice(
 }
 
 /**
- * Synthesizes each dialogue line with alternating random voices (female/male).
- * Picks a fresh random pair per call so each lesson sounds different.
- * Returns an array of base64 MP3 strings in the same order as the input lines.
+ * Synthesizes each dialogue line with voices matched to speaker gender
+ * (Sophie → female, Lucas → male). Same-gender pairs still get two distinct
+ * timbres from that gender pool. Returns base64 MP3 strings in line order.
  */
 export async function synthesizeDialogue(
   lines: string[],
@@ -284,11 +303,22 @@ export async function synthesizeDialogue(
   const apiKey = process.env.GOOGLE_TTS_API_KEY;
   if (!apiKey) return [];
 
-  const pair = pickDialoguePair(language);
   const nonEmpty = lines.filter((l) => l.trim().length > 0);
+  const speakers = listSpeakersInOrder(nonEmpty);
+  const genders = resolveSpeakerGenders(nonEmpty);
+  const voiceBySpeaker = pickVoicesForSpeakers(language, genders);
+  const fallbackPair = [
+    voiceConfigFromName(pickRandom(VOICE_POOLS[language].female)),
+    voiceConfigFromName(pickRandom(VOICE_POOLS[language].male)),
+  ] as const;
 
   const results = await Promise.all(
-    nonEmpty.map((line, i) => callTTS(stripSpeakerPrefix(line), pair[i % 2], apiKey)),
+    nonEmpty.map((line, i) => {
+      const speaker = speakerKeyForLine(line, i, speakers);
+      const voice =
+        voiceBySpeaker.get(speaker) ?? fallbackPair[i % 2];
+      return callTTS(stripSpeakerPrefix(line), voice, apiKey);
+    }),
   );
 
   return results.filter((r): r is string => r !== null);

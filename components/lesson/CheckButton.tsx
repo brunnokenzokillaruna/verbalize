@@ -1,7 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-import { CheckCircle2, XCircle, ChevronRight, Loader2, Lightbulb } from 'lucide-react';
+import { CheckCircle2, XCircle, ChevronRight, Loader2 } from 'lucide-react';
 
 export type CheckButtonState = 'idle' | 'disabled' | 'correct' | 'incorrect';
 
@@ -26,7 +25,6 @@ export function CheckButton({
   onContinue,
   loading = false,
 }: CheckButtonProps) {
-  const [showElaboration, setShowElaboration] = useState(false);
   const isResult = state === 'correct' || state === 'incorrect';
   const isCorrect = state === 'correct';
 
@@ -58,7 +56,7 @@ export function CheckButton({
               : 'transparent',
           transition: 'all 300ms ease',
           overflow: 'hidden',
-          maxHeight: isResult ? (showElaboration && elaborationHint ? '200px' : '120px') : '0px',
+          maxHeight: isResult ? (elaborationHint ? '220px' : '120px') : '0px',
           borderTop: isResult
             ? `4px solid ${isCorrect ? 'var(--color-success)' : 'var(--color-error)'}`
             : 'none',
@@ -89,18 +87,8 @@ export function CheckButton({
                   {hint}
                 </p>
               )}
-              {isCorrect && elaborationHint && !showElaboration && (
-                <button
-                  type="button"
-                  onClick={() => setShowElaboration(true)}
-                  className="mt-2 flex items-center gap-1.5 text-xs font-bold text-[var(--color-primary)]"
-                >
-                  <Lightbulb size={14} />
-                  Por que funciona?
-                </button>
-              )}
-              {isCorrect && showElaboration && elaborationHint && (
-                <p className="mt-2 text-sm leading-relaxed text-[var(--color-text-secondary)]">
+              {isCorrect && elaborationHint && (
+                <p className="mt-1.5 text-sm leading-relaxed text-[var(--color-text-secondary)]">
                   {elaborationHint}
                 </p>
               )}

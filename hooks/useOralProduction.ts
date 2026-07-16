@@ -3,10 +3,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { transcribeSpeech } from '@/app/actions/transcribeSpeech';
 import { useVoiceRecorder } from '@/hooks/useVoiceRecorder';
+import { formatProductionPolishHint } from '@/lib/elaborationHints';
 import { incrementProductionStats } from '@/services/firestore';
 import { recordOralExerciseOutcome } from '@/lib/oralExerciseTracking';
 import { markSpontaneousProductionAccepted } from '@/lib/sessionProductionTracking';
 import { useAuthStore } from '@/store/authStore';
+import { useLessonStore } from '@/store/lessonStore';
 import type { EvaluateFreeResponseResult } from '@/lib/evaluateFreeResponse/types';
 import type { ProductionStatKind } from '@/lib/practiceExercises/productionTypes';
 import type { SupportedLanguage } from '@/types';
@@ -98,12 +100,18 @@ export function useOralProduction({
 
   const finish = useCallback(
     (accepted: boolean, finalTranscript: string, outcome: 'completed' | 'skipped' = 'completed') => {
+      if (accepted && outcome === 'completed') {
+        const polishHint = formatProductionPolishHint(finalTranscript, evalCorrected);
+        useLessonStore.getState().setLastProductionPolishHint(polishHint);
+      } else {
+        useLessonStore.getState().setLastProductionPolishHint(null);
+      }
       setPhase('answered');
       logStats(accepted);
       logOutcome(outcome);
       onComplete?.(accepted, finalTranscript);
     },
-    [logStats, logOutcome, onComplete],
+    [logStats, logOutcome, onComplete, evalCorrected],
   );
 
   const startRecording = useCallback(async () => {

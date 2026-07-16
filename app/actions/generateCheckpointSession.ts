@@ -5,7 +5,6 @@ import { getCheckpointWindow, formatCheckpointRange } from '@/lib/curriculum/che
 import { checkpointSessionSchema } from '@/lib/schemas/checkpoint';
 import { validateAndSanitizeExercises } from '@/lib/practiceExercises/validateGeneratedExercises';
 import { isCheckpointComprehensionConsistent } from '@/lib/practiceExercises/validateChoiceConsistency';
-import { isListeningComprehensionPtBrPure } from '@/lib/practiceExercises/validatePtBrText';
 import { getAllowedExerciseTypes } from '@/lib/practiceExercises/constants';
 import type {
   CheckpointSessionResult,
@@ -140,25 +139,22 @@ Rules:
     allowedSet.add('reverse-translation');
     allowedSet.add('listen-and-respond');
 
-    const comprehensionQuestions = parsed.data.comprehensionQuestions.filter((question) => {
+    const consistentQuestions = parsed.data.comprehensionQuestions.filter((question) => {
       const consistent = isCheckpointComprehensionConsistent({
         ...question,
         dialogueAudio: parsed.data.dialogueAudio,
       });
-      const ptBrPure = isListeningComprehensionPtBrPure({
-        questionPt: question.questionPt,
-        options: question.options,
-        explanationPt: question.explanationPt,
-        lessonVocabulary: [],
-        dialogueAudio: parsed.data.dialogueAudio,
-      });
       if (!consistent) {
         console.warn('[generateCheckpointSession] Dropped comprehension question — answer contradicts dialogue/explanation');
-      } else if (!ptBrPure) {
-        console.warn('[generateCheckpointSession] Dropped comprehension question — PT-BR text contains untranslated target-language vocabulary');
       }
-      return consistent && ptBrPure;
+      return consistent;
     });
+
+    // Do NOT run dialogue-token PT-BR purity here. That check treats every FR/EN
+    // dialogue word as forbidden in Portuguese copy, which false-positives on
+    // cognates/false friends (cinema, mais, message…) and returned null →
+    // "Erro ao gerar lição". Prompt + consistency check are enough for REVIEW.
+    const comprehensionQuestions = consistentQuestions;
 
     if (comprehensionQuestions.length === 0) {
       console.error('[generateCheckpointSession] No valid comprehension questions after consistency check');

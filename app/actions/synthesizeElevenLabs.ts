@@ -1,6 +1,13 @@
 'use server';
 
 import type { SupportedLanguage } from '@/types';
+import {
+  listSpeakersInOrder,
+  resolveSpeakerGenders,
+  speakerKeyForLine,
+  stripSpeakerPrefix,
+  type SpeakerGender,
+} from '@/lib/speakerGender';
 
 /* ------------------------------------------------------------------ */
 /*  ElevenLabs Text-to-Speech — dialogue synthesis with cache          */
@@ -13,9 +20,8 @@ import type { SupportedLanguage } from '@/types';
 const ELEVENLABS_API_URL = 'https://api.elevenlabs.io/v1/text-to-speech';
 
 /* ── Voice configuration ─────────────────────────────────────────────
-   We pick two distinct voices per dialogue — one female, one male —
-   so the conversation sounds natural.  These are popular pre-made
-   voices that work well with eleven_multilingual_v2.                  */
+   One female + one male voice per language. Assigned by speaker name
+   gender (Sophie → female), not by line index.                        */
 
 interface ElevenLabsVoice {
   id: string;
@@ -121,18 +127,18 @@ async function callElevenLabs(
   }
 }
 
-/* ── Helpers ──────────────────────────────────────────────────────────*/
-
-function stripSpeakerPrefix(line: string): string {
-  return line.replace(/^[^:]+:\s*/, '').trim();
+function voiceForGender(
+  pair: { female: ElevenLabsVoice; male: ElevenLabsVoice },
+  gender: SpeakerGender,
+): ElevenLabsVoice {
+  return gender === 'female' ? pair.female : pair.male;
 }
 
 /* ── Public API ──────────────────────────────────────────────────────*/
 
 /**
- * Synthesises each dialogue line with alternating ElevenLabs voices
- * (female ↔ male), matching the exact contract of `synthesizeDialogue`
- * from Google TTS so the client hook can swap providers transparently.
+ * Synthesises each dialogue line with ElevenLabs voices matched to
+ * speaker gender (name/role), not line index.
  *
  * Returns an array of base64 MP3 strings in the same order as the
  * input lines.  Cached results are returned instantly without burning
@@ -150,13 +156,17 @@ export async function synthesizeDialogueElevenLabs(
 
   const pair = VOICE_PAIRS[language];
   const nonEmpty = lines.filter((l) => l.trim().length > 0);
+  const speakers = listSpeakersInOrder(nonEmpty);
+  const genders = resolveSpeakerGenders(nonEmpty);
 
-  // Free accounts have a limit of 2 concurrent requests. 
+  // Free accounts have a limit of 2 concurrent requests.
   // We process sequentially to avoid the HTTP 429 "Too many concurrent requests" error.
   const results: (string | null)[] = [];
   for (let i = 0; i < nonEmpty.length; i++) {
-    const line = nonEmpty[i];
-    const voice = i % 2 === 0 ? pair.female : pair.male;
+    const line = nonEmpty[i]!;
+    const speaker = speakerKeyForLine(line, i, speakers);
+    const gender = genders.get(speaker) ?? (i % 2 === 0 ? 'female' : 'male');
+    const voice = voiceForGender(pair, gender);
     const audio = await callElevenLabs(stripSpeakerPrefix(line), voice.id, language, apiKey);
     results.push(audio);
   }

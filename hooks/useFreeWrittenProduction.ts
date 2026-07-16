@@ -2,11 +2,13 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { evaluateFreeResponse } from '@/app/actions/evaluateFreeResponse';
+import { formatProductionPolishHint } from '@/lib/elaborationHints';
 import type { EvaluateFreeResponseParams } from '@/lib/evaluateFreeResponse/types';
 import type { ProductionStatKind } from '@/lib/practiceExercises/productionTypes';
 import { incrementProductionStats } from '@/services/firestore';
 import { markSpontaneousProductionAccepted } from '@/lib/sessionProductionTracking';
 import { useAuthStore } from '@/store/authStore';
+import { useLessonStore } from '@/store/lessonStore';
 
 export type FreeWrittenPhase = 'idle' | 'evaluating' | 'correct' | 'retry' | 'answered';
 
@@ -32,6 +34,7 @@ export function useFreeWrittenProduction({
   minLength = 2,
 }: UseFreeWrittenProductionOptions) {
   const { user } = useAuthStore();
+  const setLastProductionPolishHint = useLessonStore((s) => s.setLastProductionPolishHint);
   const statsLoggedRef = useRef(false);
   const initialSubmitTriggerRef = useRef(submitTrigger);
 
@@ -88,6 +91,7 @@ export function useFreeWrittenProduction({
     setPhase('evaluating');
     setFeedback('');
     setSuggested('');
+    setLastProductionPolishHint(null);
 
     const result = await evaluateFreeResponse({
       ...buildEvaluateParams(trimmed),
@@ -104,23 +108,27 @@ export function useFreeWrittenProduction({
     setSuggested(result.correctedSentence || '');
 
     if (result.isCorrect) {
+      const polishHint = formatProductionPolishHint(trimmed, result.correctedSentence);
+      setLastProductionPolishHint(polishHint);
       setPhase('correct');
       finish(true);
     } else {
       setPhase('retry');
     }
-  }, [trimmed, minLength, isLocked, buildEvaluateParams, finish]);
+  }, [trimmed, minLength, isLocked, buildEvaluateParams, finish, setLastProductionPolishHint]);
 
   const continueAnyway = useCallback(() => {
+    setLastProductionPolishHint(null);
     finish(false);
-  }, [finish]);
+  }, [finish, setLastProductionPolishHint]);
 
   const retry = useCallback(() => {
     setPhase('idle');
     setFeedback('');
     setSuggested('');
+    setLastProductionPolishHint(null);
     statsLoggedRef.current = false;
-  }, []);
+  }, [setLastProductionPolishHint]);
 
   return {
     input,

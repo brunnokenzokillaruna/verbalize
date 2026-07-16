@@ -83,6 +83,12 @@ interface LessonState {
   /** True when the learner accepted at least one spontaneous production attempt this session. */
   spontaneousProductionAccepted: boolean;
 
+  /**
+   * Polish of the learner's last accepted free-production answer (target language).
+   * Used for the green banner — never a canned unrelated exampleResponse.
+   */
+  lastProductionPolishHint: string | null;
+
   setCheckpointSession: (session: CheckpointSessionResult) => void;
   recordComprehensionAnswer: (correct: boolean) => void;
   nextComprehensionQuestion: () => void;
@@ -111,6 +117,7 @@ interface LessonState {
   setBridgeQuizPassed: (passed: boolean) => void;
   setDiscoveredVerbs: (verbs: string[]) => void;
   markSpontaneousProductionAccepted: () => void;
+  setLastProductionPolishHint: (hint: string | null) => void;
 
   /** Record a correct answer for the current practice exercise. */
   recordCorrect: () => void;
@@ -171,6 +178,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
   checkpointProductionCorrect: 0,
   checkpointPassed: false,
   spontaneousProductionAccepted: false,
+  lastProductionPolishHint: null,
 
   // ── Actions ────────────────────────────────────────────────────────────────
 
@@ -208,6 +216,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       checkpointProductionCorrect: 0,
       checkpointPassed: false,
       spontaneousProductionAccepted: false,
+      lastProductionPolishHint: null,
     }),
 
   setPhase: (phase) => set({ phase }),
@@ -239,6 +248,9 @@ export const useLessonStore = create<LessonState>((set, get) => ({
 
   markSpontaneousProductionAccepted: () =>
     set({ spontaneousProductionAccepted: true }),
+
+  setLastProductionPolishHint: (lastProductionPolishHint) =>
+    set({ lastProductionPolishHint }),
 
   setGrammarBridge: (grammarBridge) => set({ grammarBridge, isLoading: false }),
 
@@ -277,7 +289,10 @@ export const useLessonStore = create<LessonState>((set, get) => ({
     })),
 
   nextCheckpointProduction: () =>
-    set((state) => ({ checkpointProductionIndex: state.checkpointProductionIndex + 1 })),
+    set((state) => ({
+      checkpointProductionIndex: state.checkpointProductionIndex + 1,
+      lastProductionPolishHint: null,
+    })),
 
   setCheckpointPassed: (checkpointPassed) => set({ checkpointPassed }),
 
@@ -289,7 +304,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
 
   nextExercise: () => {
     const { exerciseIndex } = get();
-    set({ exerciseIndex: exerciseIndex + 1 });
+    set({ exerciseIndex: exerciseIndex + 1, lastProductionPolishHint: null });
   },
 
   setReview: (mistake, exercises) =>
@@ -298,6 +313,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       reviewExercises: exercises,
       reviewIndex: 0,
       reviewCorrectCount: 0,
+      lastProductionPolishHint: null,
     }),
 
   recordReviewCorrect: () =>
@@ -305,7 +321,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
 
   nextReviewExercise: () => {
     const { reviewIndex } = get();
-    set({ reviewIndex: reviewIndex + 1 });
+    set({ reviewIndex: reviewIndex + 1, lastProductionPolishHint: null });
   },
 
   reset: () =>
@@ -342,5 +358,6 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       checkpointProductionCorrect: 0,
       checkpointPassed: false,
       spontaneousProductionAccepted: false,
+      lastProductionPolishHint: null,
     }),
 }));

@@ -116,8 +116,8 @@ export function useLessonExerciseHandlers(
 
   const elaborationHint = useMemo(() => {
     if (exerciseAnswer !== true || !activeExercise) return null;
-    return getLocalElaborationHint(activeExercise);
-  }, [exerciseAnswer, activeExercise]);
+    return getLocalElaborationHint(activeExercise, store.lastProductionPolishHint);
+  }, [exerciseAnswer, activeExercise, store.lastProductionPolishHint]);
 
   const resetExerciseState = useCallback(() => {
     setExerciseAnswer(null);
@@ -126,7 +126,8 @@ export function useLessonExerciseHandlers(
     setWrongAttempts(0);
     setExerciseRetryKey(0);
     setRetryNotice(null);
-  }, []);
+    store.setLastProductionPolishHint(null);
+  }, [store]);
 
   const finalizeAnswer = useCallback(
     (correct: boolean) => {

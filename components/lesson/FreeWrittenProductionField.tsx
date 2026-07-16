@@ -142,10 +142,20 @@ export function FreeWrittenProductionField({
         </div>
       )}
 
-      {phase === 'correct' && feedback && (
+      {phase === 'correct' && (feedback || suggested) && (
         <div className="flex items-start gap-3 rounded-2xl p-4 border-2 border-[var(--color-success)]/30 bg-[var(--color-success)]/5">
           <CheckCircle2 size={20} className="text-[var(--color-success)] shrink-0 mt-0.5" />
-          <p className="text-sm text-[var(--color-text-secondary)]">{feedback}</p>
+          <div>
+            {feedback && (
+              <p className="text-sm text-[var(--color-text-secondary)]">{feedback}</p>
+            )}
+            {suggested &&
+              suggested.trim().toLowerCase() !== input.trim().toLowerCase() && (
+                <p className="text-sm font-semibold text-[var(--color-success)] mt-2">
+                  Versão mais natural da sua resposta: {suggested}
+                </p>
+              )}
+          </div>
         </div>
       )}
     </div>

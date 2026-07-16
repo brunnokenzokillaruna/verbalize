@@ -54,7 +54,8 @@ export function evaluateFreeResponseLocal(
       return {
         isCorrect: true,
         feedback: 'Quase lá — a ideia passou, mas dá para polir a frase.',
-        correctedSentence: params.expectedLine,
+        // Do NOT use expectedLine here — it is a canned example, not a polish
+        // of the learner's words (e.g. hill vs museum).
         evaluator: 'local',
       };
     }
@@ -78,7 +79,6 @@ export function evaluateFreeResponseLocal(
     return {
       isCorrect: true,
       feedback: 'Boa! Você se comunicou de forma clara.',
-      correctedSentence: params.expectedLine,
       evaluator: 'local',
     };
   }
@@ -87,7 +87,6 @@ export function evaluateFreeResponseLocal(
     return {
       isCorrect: true,
       feedback: 'A ideia passou — com um pouco mais de detalhe ficaria ainda melhor.',
-      correctedSentence: params.expectedLine,
       evaluator: 'local',
     };
   }

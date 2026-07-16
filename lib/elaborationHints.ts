@@ -1,17 +1,63 @@
 import type { Exercise } from '@/types';
 
+function normalizeComparable(text: string): string {
+  return text
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
+ * Hint that polishes the learner's own accepted answer — never a canned
+ * unrelated exampleResponse from exercise generation.
+ */
+export function formatProductionPolishHint(
+  learnerText: string,
+  correctedSentence: string | undefined | null,
+): string | null {
+  const polish = correctedSentence?.trim();
+  if (!polish) return null;
+  if (normalizeComparable(polish) === normalizeComparable(learnerText)) return null;
+  return `Versão mais natural da sua resposta: ${polish}`;
+}
+
+const FREE_PRODUCTION_TYPES = new Set([
+  'micro-message',
+  'free-roleplay',
+  'listen-and-respond',
+  'prompted-monologue',
+  'story-continuation',
+  'spot-the-register',
+]);
+
+export function isFreeProductionExerciseType(type: Exercise['type']): boolean {
+  return FREE_PRODUCTION_TYPES.has(type);
+}
+
 /**
  * Returns a short PT-BR elaboration line for a correct answer (local, no Gemini).
+ * For free-production types, prefer `productionPolishHint` from evaluation —
+ * never present a canned exampleResponse as if it corrected the learner's words.
  */
-export function getLocalElaborationHint(exercise: Exercise): string | null {
+export function getLocalElaborationHint(
+  exercise: Exercise,
+  productionPolishHint?: string | null,
+): string | null {
+  if (productionPolishHint) return productionPolishHint;
+
   switch (exercise.type) {
     case 'grammar-trap':
       return exercise.data.trapRule || exercise.data.explanation;
     case 'bridge-choice':
       return exercise.data.trapRule || exercise.data.explanation;
     case 'social-roleplay':
-    case 'free-roleplay':
       return exercise.data.explanation;
+    case 'free-roleplay':
+      // Pragmatic PT-BR tip only — not the French/English exampleResponse.
+      return exercise.data.explanation?.trim() || null;
     case 'listening-comprehension':
       return exercise.data.explanationPt;
     case 'inference-tone':
@@ -51,9 +97,10 @@ export function getLocalElaborationHint(exercise: Exercise): string | null {
     case 'fill-gap-production':
       return `A palavra-chave aqui é «${exercise.data.blankWord}».`;
     case 'micro-message':
-      return `Resposta natural: ${exercise.data.exampleResponse}`;
     case 'listen-and-respond':
-      return `Exemplo de resposta: ${exercise.data.exampleResponse}`;
+      // Canned exampleResponse must not appear as "the natural answer" after
+      // the learner was already accepted for a different valid reply.
+      return null;
     case 'speak-repeat':
       return exercise.data.translation;
     case 'shadowing':
