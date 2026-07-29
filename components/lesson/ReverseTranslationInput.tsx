@@ -3,8 +3,10 @@ import { ChevronDown, Loader2, Languages, Lightbulb, XCircle } from 'lucide-reac
 import type { ReverseTranslationData, ProficiencyLevel } from '@/types';
 import { isAccentOnlyDiff } from '@/utils/accent';
 import { validateReverseTranslation } from '@/app/actions/validateAnswer';
+import { formatProductionPolishHint } from '@/lib/elaborationHints';
 import { incrementProductionStats } from '@/services/firestore';
 import { useAuthStore } from '@/store/authStore';
+import { useLessonStore } from '@/store/lessonStore';
 
 interface ReverseTranslationInputProps {
   data: ReverseTranslationData;
@@ -24,7 +26,7 @@ function normalize(s: string): string {
     .trim();
 }
 
-type AnswerStatus = 'idle' | 'validating' | 'correct' | 'accent-warning' | 'wrong';
+type AnswerStatus = 'idle' | 'validating' | 'correct' | 'soft' | 'accent-warning' | 'wrong';
 
 export function ReverseTranslationInput({ 
   data, 
@@ -36,6 +38,7 @@ export function ReverseTranslationInput({
   submitTrigger
 }: ReverseTranslationInputProps) {
   const { user } = useAuthStore();
+  const setLastProductionPolishHint = useLessonStore((s) => s.setLastProductionPolishHint);
   const showHint =
     !!data.hint &&
     !!level &&
@@ -83,18 +86,21 @@ export function ReverseTranslationInput({
     if (input.trim() === '' || answered || answerStatus === 'validating') return;
 
     if (isCorrect) {
+      setLastProductionPolishHint(null);
       setAnswerStatus('correct');
       reportProduction(true);
       return;
     }
 
     if (isAccentWarning) {
+      setLastProductionPolishHint(`Tradução modelo: ${data.target_translation}`);
       setAnswerStatus('accent-warning');
       reportProduction(true);
       return;
     }
 
     setAnswerStatus('validating');
+    setLastProductionPolishHint(null);
     const result = await validateReverseTranslation(
       input,
       data.target_translation,
@@ -104,10 +110,16 @@ export function ReverseTranslationInput({
     );
 
     if (result.accepted) {
-      setAnswerStatus('correct');
+      const polish =
+        formatProductionPolishHint(input, result.correctedSentence) ||
+        (result.verdict === 'soft' && result.note ? result.note : null);
+      setLastProductionPolishHint(polish);
+      setAiNote(result.note);
+      setAnswerStatus(result.verdict === 'soft' ? 'soft' : 'correct');
       reportProduction(true);
     } else {
       setAiNote(result.note);
+      setLastProductionPolishHint(null);
       setAnswerStatus('wrong');
       reportProduction(false);
     }
@@ -161,7 +173,7 @@ export function ReverseTranslationInput({
             borderColor: 
               answerStatus === 'correct'
                 ? 'var(--color-success)'
-                : answerStatus === 'accent-warning'
+                : answerStatus === 'soft' || answerStatus === 'accent-warning'
                   ? '#d97706'
                   : answerStatus === 'wrong'
                     ? 'var(--color-error)'
@@ -169,7 +181,7 @@ export function ReverseTranslationInput({
             boxShadow: 
               answerStatus === 'correct'
                 ? '0 0 15px rgba(34, 197, 94, 0.05), inset 0 2px 4px rgba(0,0,0,0.05)'
-                : answerStatus === 'accent-warning'
+                : answerStatus === 'soft' || answerStatus === 'accent-warning'
                   ? '0 0 15px rgba(217, 119, 6, 0.05), inset 0 2px 4px rgba(0,0,0,0.05)'
                   : answerStatus === 'wrong'
                     ? '0 0 15px rgba(239, 68, 68, 0.05), inset 0 2px 4px rgba(0,0,0,0.05)'
@@ -236,6 +248,36 @@ export function ReverseTranslationInput({
         </div>
       )}
 
+      {/* Soft accept — meaning OK, form notes */}
+      {isAnswered && answerStatus === 'soft' && (
+        <div className="flex flex-col gap-3 animate-in fade-in slide-in-from-top-2 duration-400">
+          <div className="p-4.5 rounded-xl bg-amber-500/10 border border-amber-500/20">
+            <p className="text-[10px] font-black uppercase tracking-wider text-amber-600 mb-1.5">
+              Aceita — com um detalhe para polir
+            </p>
+            <p className="text-sm font-semibold text-[var(--color-text-primary)] italic leading-relaxed">
+              {data.target_translation}
+            </p>
+          </div>
+          {aiNote && (
+            <div
+              className="rounded-xl p-4.5 border-l-4 border-amber-500/40"
+              style={{ backgroundColor: 'var(--color-surface-raised)' }}
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <Lightbulb size={15} className="text-amber-500" />
+                <span className="text-[10px] font-black uppercase tracking-wider text-[var(--color-text-muted)]">
+                  O que melhorar
+                </span>
+              </div>
+              <p className="text-sm font-medium leading-relaxed text-[var(--color-text-secondary)]">
+                {aiNote}
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Correct answer display on wrong */}
       {isAnswered && answerStatus === 'wrong' && (
         <div className="flex flex-col gap-4.5 animate-in fade-in slide-in-from-top-2 duration-400">
@@ -259,7 +301,7 @@ export function ReverseTranslationInput({
               <div className="flex items-center gap-2 mb-2">
                 <Lightbulb size={15} className="text-amber-500" />
                 <span className="text-[10px] font-black uppercase tracking-wider text-[var(--color-text-muted)]">
-                  Análise Gramatical
+                  Análise
                 </span>
               </div>
               <p className="text-sm font-medium leading-relaxed text-[var(--color-text-secondary)]">

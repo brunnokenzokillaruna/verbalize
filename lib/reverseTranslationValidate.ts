@@ -1,6 +1,17 @@
 /**
- * Local validation for reverse-translation exercises — zero Gemini calls.
+ * Local validation for reverse-translation exercises (Gemini fallback).
+ * Intentionally stricter than earlier fuzzy matching — prefers fail over
+ * silently accepting meaning changes.
  */
+
+export type ReverseTranslationVerdict = 'exact' | 'acceptable' | 'soft' | 'wrong';
+
+export interface ReverseTranslationValidation {
+  accepted: boolean;
+  verdict: ReverseTranslationVerdict;
+  note?: string;
+  correctedSentence?: string;
+}
 
 const FR_SYNONYM_GROUPS: string[][] = [
   ['avoir', 'posseder', 'detenir'],
@@ -15,6 +26,25 @@ const FR_SYNONYM_GROUPS: string[][] = [
   ['small', 'little', 'tiny'],
   ['have', 'got', 'possess'],
 ];
+
+/** Pairs that look similar but change meaning — never auto-accept. */
+const MEANING_TRAPS: Array<[string, string]> = [
+  ['trop', 'tres'],
+  ['too', 'very'],
+  ['hard', 'hardly'],
+  ['peu', 'pas'],
+];
+
+const FUNCTION_WORDS = new Set([
+  'le', 'la', 'les', 'un', 'une', 'des', 'du', 'de', 'a', 'au', 'aux', 'en', 'y',
+  'je', 'tu', 'il', 'elle', 'on', 'nous', 'vous', 'ils', 'elles', 'me', 'te', 'se',
+  'mon', 'ton', 'son', 'ma', 'ta', 'sa', 'mes', 'tes', 'ses', 'ce', 'cet', 'cette', 'ces',
+  'et', 'ou', 'mais', 'donc', 'car', 'que', 'qui', 'quoi', 'dont', 'ou',
+  'the', 'a', 'an', 'to', 'of', 'in', 'on', 'at', 'for', 'with', 'and', 'or', 'but',
+  'i', 'you', 'he', 'she', 'we', 'they', 'my', 'your', 'his', 'her', 'our', 'their',
+  'is', 'are', 'was', 'were', 'am', 'be', 'been', 'have', 'has', 'had',
+  'me', 'suis', 'es', 'est', 'sommes', 'etes', 'sont', 'ai', 'as', 'avons', 'avez', 'ont',
+]);
 
 function normalize(s: string): string {
   return s
@@ -54,6 +84,12 @@ function tokenSet(s: string): Set<string> {
   return new Set(normalize(s).split(' ').filter(Boolean));
 }
 
+function contentTokens(s: string): string[] {
+  return normalize(s)
+    .split(' ')
+    .filter((t) => t.length > 0 && !FUNCTION_WORDS.has(t));
+}
+
 function sharesSynonym(tokenA: string, tokenB: string): boolean {
   if (tokenA === tokenB) return true;
   return FR_SYNONYM_GROUPS.some(
@@ -75,10 +111,20 @@ function tokenOverlapScore(user: string, reference: string): number {
   return matched / refTokens.length;
 }
 
-/**
- * Detects French adjective used where the reference expects -ment adverb
- * (e.g. "rapide" vs "rapidement" — common BP interference).
- */
+function contentOverlapScore(user: string, reference: string): number {
+  const userTokens = contentTokens(user);
+  const refTokens = contentTokens(reference);
+  if (refTokens.length === 0) return 1;
+
+  let matched = 0;
+  for (const ref of refTokens) {
+    if (userTokens.some((u) => u === ref || sharesSynonym(u, ref))) {
+      matched++;
+    }
+  }
+  return matched / refTokens.length;
+}
+
 function usesAdjectiveInsteadOfAdverb(user: string, reference: string): boolean {
   const userTokens = normalize(user).split(' ').filter(Boolean);
   const refTokens = normalize(reference).split(' ').filter(Boolean);
@@ -101,9 +147,38 @@ function usesAdjectiveInsteadOfAdverb(user: string, reference: string): boolean 
   return false;
 }
 
-export interface ReverseTranslationValidation {
-  accepted: boolean;
-  note?: string;
+function hitsMeaningTrap(user: string, reference: string): string | null {
+  const userTokens = tokenSet(user);
+  const refTokens = tokenSet(reference);
+
+  for (const [a, b] of MEANING_TRAPS) {
+    if (a === b) continue;
+    if (userTokens.has(a) && refTokens.has(b) && !userTokens.has(b)) {
+      return `"${a}" muda o sentido em relação a "${b}"`;
+    }
+    if (userTokens.has(b) && refTokens.has(a) && !userTokens.has(a)) {
+      return `"${b}" muda o sentido em relação a "${a}"`;
+    }
+  }
+  return null;
+}
+
+function softAccept(note: string, correctedSentence: string): ReverseTranslationValidation {
+  return {
+    accepted: true,
+    verdict: 'soft',
+    note,
+    correctedSentence,
+  };
+}
+
+function reject(note: string, correctedSentence?: string): ReverseTranslationValidation {
+  return {
+    accepted: false,
+    verdict: 'wrong',
+    note,
+    correctedSentence,
+  };
 }
 
 export function validateReverseTranslationLocal(
@@ -113,47 +188,59 @@ export function validateReverseTranslationLocal(
 ): ReverseTranslationValidation {
   const userNorm = normalize(userAnswer);
   if (!userNorm) {
-    return { accepted: false, note: 'Digite uma resposta antes de enviar.' };
+    return reject('Digite uma resposta antes de enviar.');
   }
 
-  const references = [expectedAnswer, ...acceptableVariants];
+  const variants = Array.isArray(acceptableVariants) ? acceptableVariants : [];
+  const references = [expectedAnswer, ...variants].filter((r) => typeof r === 'string' && r.trim());
+
   for (const ref of references) {
     if (userNorm === normalize(ref)) {
-      return { accepted: true };
+      return { accepted: true, verdict: 'exact' };
     }
   }
 
-  for (const ref of references) {
-    if (usesAdjectiveInsteadOfAdverb(userAnswer, ref)) {
-      continue;
-    }
-    if (similarityRatio(userAnswer, ref) >= 0.85) {
-      return { accepted: true };
-    }
-    if (tokenOverlapScore(userAnswer, ref) >= 0.85) {
-      return { accepted: true };
-    }
+  const trap = hitsMeaningTrap(userAnswer, expectedAnswer);
+  if (trap) {
+    return reject(
+      `Quase — mas ${trap}. Confira a frase em português e ajuste o sentido.`,
+      expectedAnswer,
+    );
   }
 
   if (usesAdjectiveInsteadOfAdverb(userAnswer, expectedAnswer)) {
-    return {
-      accepted: false,
-      note: 'Use o advérbio (ex.: "rapidement", "vite"), não o adjetivo ("rapide"). Em português falamos "rápido", mas em francês a tradução correta aqui é um advérbio.',
-    };
+    return reject(
+      'Use o advérbio (ex.: "rapidement", "vite"), não o adjetivo ("rapide"). Em português falamos "rápido", mas em francês a tradução correta aqui é um advérbio.',
+      expectedAnswer,
+    );
   }
 
-  if (tokenOverlapScore(userAnswer, expectedAnswer) >= 0.7) {
-    return { accepted: true };
+  for (const ref of references) {
+    if (usesAdjectiveInsteadOfAdverb(userAnswer, ref)) continue;
+    if (hitsMeaningTrap(userAnswer, ref)) continue;
+
+    const similarity = similarityRatio(userAnswer, ref);
+    const tokenOverlap = tokenOverlapScore(userAnswer, ref);
+    const contentOverlap = contentOverlapScore(userAnswer, ref);
+
+    // Near-exact / strong synonym match
+    if (similarity >= 0.92 || (tokenOverlap >= 0.92 && contentOverlap >= 0.9)) {
+      return { accepted: true, verdict: 'acceptable' };
+    }
+
+    // Soft: meaning content preserved, small form differences
+    if (contentOverlap >= 0.85 && similarity >= 0.78) {
+      return softAccept(
+        'Sua resposta ficou bem próxima. Confira a versão modelo para polir detalhes (artigos, ordem das palavras ou um termo mais natural).',
+        expectedAnswer,
+      );
+    }
   }
 
-  if (similarityRatio(userAnswer, expectedAnswer) >= 0.72) {
-    return { accepted: true };
-  }
-
-  return {
-    accepted: false,
-    note: 'A tradução não corresponde ao esperado. Confira a frase em português e tente de novo.',
-  };
+  return reject(
+    'A tradução não corresponde ao sentido esperado. Confira a frase em português e tente de novo.',
+    expectedAnswer,
+  );
 }
 
 export { normalize as normalizeReverseTranslation };

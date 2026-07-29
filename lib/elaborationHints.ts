@@ -91,6 +91,8 @@ export function getLocalElaborationHint(
     case 'word-bank-translation':
       return exercise.data.hint || `Ordem correta: ${exercise.data.correctOrder.join(' ')}.`;
     case 'reverse-translation':
+      // Prefer productionPolishHint (AI note / soft correction). Only fall back
+      // to the canned model line when there is no evaluation hint.
       return exercise.data.hint || `Tradução modelo: ${exercise.data.target_translation}`;
     case 'paraphrase':
       return exercise.data.hint || `Outra forma válida: ${exercise.data.target_paraphrase}`;

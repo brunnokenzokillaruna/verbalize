@@ -3,8 +3,10 @@ import { ChevronDown, Loader2, RefreshCw, Lightbulb, XCircle } from 'lucide-reac
 import type { ParaphraseData, ProficiencyLevel } from '@/types';
 import { isAccentOnlyDiff } from '@/utils/accent';
 import { validateReverseTranslation } from '@/app/actions/validateAnswer';
+import { formatProductionPolishHint } from '@/lib/elaborationHints';
 import { incrementProductionStats } from '@/services/firestore';
 import { useAuthStore } from '@/store/authStore';
+import { useLessonStore } from '@/store/lessonStore';
 
 interface ParaphraseExerciseProps {
   data: ParaphraseData;
@@ -24,7 +26,7 @@ function normalize(s: string): string {
     .trim();
 }
 
-type AnswerStatus = 'idle' | 'validating' | 'correct' | 'accent-warning' | 'wrong';
+type AnswerStatus = 'idle' | 'validating' | 'correct' | 'soft' | 'accent-warning' | 'wrong';
 
 export function ParaphraseExercise({
   data,
@@ -36,6 +38,7 @@ export function ParaphraseExercise({
   submitTrigger,
 }: ParaphraseExerciseProps) {
   const { user } = useAuthStore();
+  const setLastProductionPolishHint = useLessonStore((s) => s.setLastProductionPolishHint);
   const showHint =
     !!data.hint &&
     !!level &&
@@ -79,18 +82,21 @@ export function ParaphraseExercise({
     if (input.trim() === '' || answered || answerStatus === 'validating') return;
 
     if (isCorrect) {
+      setLastProductionPolishHint(null);
       setAnswerStatus('correct');
       reportProduction(true);
       return;
     }
 
     if (isAccentWarning) {
+      setLastProductionPolishHint(`Outra forma válida: ${data.target_paraphrase}`);
       setAnswerStatus('accent-warning');
       reportProduction(true);
       return;
     }
 
     setAnswerStatus('validating');
+    setLastProductionPolishHint(null);
     const result = await validateReverseTranslation(
       input,
       data.target_paraphrase,
@@ -100,7 +106,12 @@ export function ParaphraseExercise({
     );
 
     if (result.accepted) {
-      setAnswerStatus('correct');
+      const polish =
+        formatProductionPolishHint(input, result.correctedSentence) ||
+        (result.verdict === 'soft' && result.note ? result.note : null);
+      setLastProductionPolishHint(polish);
+      setAiNote(result.note);
+      setAnswerStatus(result.verdict === 'soft' ? 'soft' : 'correct');
       reportProduction(true);
     } else {
       setAiNote(result.note);
@@ -155,7 +166,7 @@ export function ParaphraseExercise({
             borderColor:
               answerStatus === 'correct'
                 ? 'var(--color-success)'
-                : answerStatus === 'accent-warning'
+                : answerStatus === 'soft' || answerStatus === 'accent-warning'
                   ? '#d97706'
                   : answerStatus === 'wrong'
                     ? 'var(--color-error)'
@@ -203,6 +214,28 @@ export function ParaphraseExercise({
           <p className="text-sm font-bold text-[var(--color-text-primary)] italic">
             {data.target_paraphrase}
           </p>
+        </div>
+      )}
+
+      {isAnswered && answerStatus === 'soft' && (
+        <div className="flex flex-col gap-3">
+          <div className="p-4.5 rounded-xl bg-amber-500/10 border border-amber-500/20">
+            <p className="text-[10px] font-black uppercase tracking-wider text-amber-600 mb-1.5">
+              Aceita — com um detalhe para polir
+            </p>
+            <p className="text-sm font-semibold italic">{data.target_paraphrase}</p>
+          </div>
+          {aiNote && (
+            <div className="rounded-xl p-4.5 border-l-4 border-amber-500/40 bg-[var(--color-surface-raised)]">
+              <div className="flex items-center gap-2 mb-2">
+                <Lightbulb size={15} className="text-amber-500" />
+                <span className="text-[10px] font-black uppercase tracking-wider text-[var(--color-text-muted)]">
+                  O que melhorar
+                </span>
+              </div>
+              <p className="text-sm font-medium text-[var(--color-text-secondary)]">{aiNote}</p>
+            </div>
+          )}
         </div>
       )}
 

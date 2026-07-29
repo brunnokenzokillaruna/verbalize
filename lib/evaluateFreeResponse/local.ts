@@ -75,7 +75,7 @@ export function evaluateFreeResponseLocal(
 
   const wordCount = transcript.split(/\s+/).filter(Boolean).length;
 
-  if (keywordRatio >= 0.35 || themeRatio >= 0.5 || wordCount >= 4) {
+  if (keywordRatio >= 0.35 || themeRatio >= 0.5) {
     return {
       isCorrect: true,
       feedback: 'Boa! Você se comunicou de forma clara.',

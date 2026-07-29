@@ -3,8 +3,10 @@ import { Loader2, Languages, Lightbulb, XCircle, Link2 } from 'lucide-react';
 import type { TranslationWithConstraintData } from '@/types';
 import { isAccentOnlyDiff } from '@/utils/accent';
 import { validateReverseTranslation } from '@/app/actions/validateAnswer';
+import { formatProductionPolishHint } from '@/lib/elaborationHints';
 import { incrementProductionStats } from '@/services/firestore';
 import { useAuthStore } from '@/store/authStore';
+import { useLessonStore } from '@/store/lessonStore';
 
 interface TranslationWithConstraintExerciseProps {
   data: TranslationWithConstraintData;
@@ -27,7 +29,7 @@ function includesRequiredChunk(text: string, chunk: string): boolean {
   return normalize(text).includes(normalize(chunk));
 }
 
-type AnswerStatus = 'idle' | 'validating' | 'correct' | 'accent-warning' | 'wrong';
+type AnswerStatus = 'idle' | 'validating' | 'correct' | 'soft' | 'accent-warning' | 'wrong';
 
 export function TranslationWithConstraintExercise({
   data,
@@ -38,6 +40,7 @@ export function TranslationWithConstraintExercise({
   submitTrigger,
 }: TranslationWithConstraintExerciseProps) {
   const { user } = useAuthStore();
+  const setLastProductionPolishHint = useLessonStore((s) => s.setLastProductionPolishHint);
   const [input, setInput] = useState('');
   const [answerStatus, setAnswerStatus] = useState<AnswerStatus>('idle');
   const [chunkMissing, setChunkMissing] = useState(false);
@@ -97,6 +100,7 @@ export function TranslationWithConstraintExercise({
     }
 
     setAnswerStatus('validating');
+    setLastProductionPolishHint(null);
     const result = await validateReverseTranslation(
       input,
       data.target_translation,
@@ -105,7 +109,12 @@ export function TranslationWithConstraintExercise({
       data.acceptable_variants,
     );
     if (result.accepted) {
-      setAnswerStatus('correct');
+      const polish =
+        formatProductionPolishHint(input, result.correctedSentence) ||
+        (result.verdict === 'soft' && result.note ? result.note : null);
+      setLastProductionPolishHint(polish);
+      setAiNote(result.note);
+      setAnswerStatus(result.verdict === 'soft' ? 'soft' : 'correct');
       reportProduction(true);
     } else {
       setAnswerStatus('wrong');
