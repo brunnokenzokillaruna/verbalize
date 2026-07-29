@@ -183,6 +183,7 @@ Rules:
 - ONE scene; each line reacts to the previous line
 - PREMISE ALIGNMENT: If speaker A frames something as boring, bad, or unpleasant (e.g. "weekend ennuyeux"), speaker B must agree, disagree, or nuance that framing — NOT reply with only enthusiastic positives that contradict the premise
 - Exactly 2 newVocabulary items (non-verbs, lowercase, appear in dialogue)
+- NEVER include days of the week, months of the year, speaker names, or other proper nouns in newVocabulary (e.g. Alice, Marie, Paris)
 - ${translationRule}
 - grammarFocus: one sentence describing grammar used
 - No markdown; no extra JSON fields

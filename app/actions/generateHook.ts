@@ -278,11 +278,9 @@ function finalizeHookResult(
   nameB: string,
   knownVocabulary: string[] = [],
 ): HookResult {
-  let hook = normalizeHookResult(result, nameA, nameB);
-  if (knownVocabulary.length > 0) {
-    hook = filterHookVocabularyForKnownWords(hook, knownVocabulary);
-  }
-  return hook;
+  const hook = normalizeHookResult(result, nameA, nameB);
+  // Always run: strips known words AND proper nouns / speaker labels.
+  return filterHookVocabularyForKnownWords(hook, knownVocabulary, [nameA, nameB]);
 }
 
 async function resolveHookCoherence(
