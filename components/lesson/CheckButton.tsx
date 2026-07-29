@@ -56,7 +56,7 @@ export function CheckButton({
               : 'transparent',
           transition: 'all 300ms ease',
           overflow: 'hidden',
-          maxHeight: isResult ? (elaborationHint ? '220px' : '120px') : '0px',
+          maxHeight: isResult ? (elaborationHint ? '320px' : '120px') : '0px',
           borderTop: isResult
             ? `4px solid ${isCorrect ? 'var(--color-success)' : 'var(--color-error)'}`
             : 'none',
@@ -88,7 +88,7 @@ export function CheckButton({
                 </p>
               )}
               {isCorrect && elaborationHint && (
-                <p className="mt-1.5 text-sm leading-relaxed text-[var(--color-text-secondary)]">
+                <p className="mt-1.5 text-sm leading-relaxed whitespace-pre-line text-[var(--color-text-secondary)]">
                   {elaborationHint}
                 </p>
               )}

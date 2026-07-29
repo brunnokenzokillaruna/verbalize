@@ -10,6 +10,15 @@ function normalizeComparable(text: string): string {
     .trim();
 }
 
+export function answersDifferOnlyByForm(
+  learnerText: string,
+  correctedSentence: string | undefined | null,
+): boolean {
+  const polish = correctedSentence?.trim();
+  if (!polish) return false;
+  return normalizeComparable(polish) !== normalizeComparable(learnerText);
+}
+
 /**
  * Hint that polishes the learner's own accepted answer — never a canned
  * unrelated exampleResponse from exercise generation.
@@ -21,7 +30,28 @@ export function formatProductionPolishHint(
   const polish = correctedSentence?.trim();
   if (!polish) return null;
   if (normalizeComparable(polish) === normalizeComparable(learnerText)) return null;
-  return `Versão mais natural da sua resposta: ${polish}`;
+  return `Sua frase corrigida: ${polish}`;
+}
+
+/**
+ * For reverse-translation-style exercises: show WHAT was wrong first,
+ * then the learner's own sentence with those fixes applied.
+ */
+export function formatTranslationCorrectionHint(params: {
+  learnerText: string;
+  note?: string | null;
+  correctedSentence?: string | null;
+}): string | null {
+  const parts: string[] = [];
+  const note = params.note?.trim();
+  if (note) parts.push(note);
+
+  const polish = params.correctedSentence?.trim();
+  if (polish && normalizeComparable(polish) !== normalizeComparable(params.learnerText)) {
+    parts.push(`Sua frase corrigida: ${polish}`);
+  }
+
+  return parts.length > 0 ? parts.join('\n') : null;
 }
 
 const FREE_PRODUCTION_TYPES = new Set([

@@ -152,7 +152,7 @@ export function FreeWrittenProductionField({
             {suggested &&
               suggested.trim().toLowerCase() !== input.trim().toLowerCase() && (
                 <p className="text-sm font-semibold text-[var(--color-success)] mt-2">
-                  Versão mais natural da sua resposta: {suggested}
+                  Sua frase corrigida: {suggested}
                 </p>
               )}
           </div>

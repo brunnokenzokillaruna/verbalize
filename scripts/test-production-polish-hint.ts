@@ -1,7 +1,11 @@
 /**
  * Run: npx tsx scripts/test-production-polish-hint.ts
  */
-import { formatProductionPolishHint, getLocalElaborationHint } from '../lib/elaborationHints';
+import {
+  formatProductionPolishHint,
+  formatTranslationCorrectionHint,
+  getLocalElaborationHint,
+} from '../lib/elaborationHints';
 import type { Exercise } from '../types/index';
 
 let failed = 0;
@@ -18,8 +22,7 @@ assert(
   formatProductionPolishHint(
     "j'ai montre une colline pour voir une belle vue",
     "J'ai monté une colline pour voir une belle vue.",
-  ) ===
-    "Versão mais natural da sua resposta: J'ai monté une colline pour voir une belle vue.",
+  ) === "Sua frase corrigida: J'ai monté une colline pour voir une belle vue.",
 );
 
 assert(
@@ -30,6 +33,16 @@ assert(
 assert(
   'missing polish is omitted',
   formatProductionPolishHint('anything', undefined) === null,
+);
+
+assert(
+  'translation hint lists errors then corrected learner sentence',
+  formatTranslationCorrectionHint({
+    learnerText: "Samedi, je n'ai mange q'un morceau du pain",
+    note: "Corrija: mange → mangé; q'un → qu'un; du pain → de pain.",
+    correctedSentence: "Samedi, je n'ai mangé qu'un morceau de pain",
+  }) ===
+    "Corrija: mange → mangé; q'un → qu'un; du pain → de pain.\nSua frase corrigida: Samedi, je n'ai mangé qu'un morceau de pain",
 );
 
 const micro: Exercise = {
@@ -50,8 +63,8 @@ assert(
 
 assert(
   'micro-message prefers production polish',
-  getLocalElaborationHint(micro, 'Versão mais natural da sua resposta: J\'ai monté une colline.') ===
-    'Versão mais natural da sua resposta: J\'ai monté une colline.',
+  getLocalElaborationHint(micro, "Sua frase corrigida: J'ai monté une colline.") ===
+    "Sua frase corrigida: J'ai monté une colline.",
 );
 
 if (failed) {

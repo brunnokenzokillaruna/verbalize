@@ -3,7 +3,7 @@ import { Loader2, Languages, Lightbulb, XCircle, Link2 } from 'lucide-react';
 import type { TranslationWithConstraintData } from '@/types';
 import { isAccentOnlyDiff } from '@/utils/accent';
 import { validateReverseTranslation } from '@/app/actions/validateAnswer';
-import { formatProductionPolishHint } from '@/lib/elaborationHints';
+import { formatTranslationCorrectionHint, answersDifferOnlyByForm } from '@/lib/elaborationHints';
 import { incrementProductionStats } from '@/services/firestore';
 import { useAuthStore } from '@/store/authStore';
 import { useLessonStore } from '@/store/lessonStore';
@@ -45,6 +45,7 @@ export function TranslationWithConstraintExercise({
   const [answerStatus, setAnswerStatus] = useState<AnswerStatus>('idle');
   const [chunkMissing, setChunkMissing] = useState(false);
   const [aiNote, setAiNote] = useState<string | undefined>();
+  const [correctedSentence, setCorrectedSentence] = useState<string | undefined>();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const frenchAccents = ['é', 'à', 'è', 'ù', 'ç', 'œ', 'ê', 'â', 'ô', 'î', 'ë', 'ï'];
@@ -109,16 +110,22 @@ export function TranslationWithConstraintExercise({
       data.acceptable_variants,
     );
     if (result.accepted) {
-      const polish =
-        formatProductionPolishHint(input, result.correctedSentence) ||
-        (result.verdict === 'soft' && result.note ? result.note : null);
+      const hasFormFixes = answersDifferOnlyByForm(input, result.correctedSentence);
+      const isSoft = result.verdict === 'soft' || hasFormFixes;
+      const polish = formatTranslationCorrectionHint({
+        learnerText: input,
+        note: result.note,
+        correctedSentence: result.correctedSentence,
+      });
       setLastProductionPolishHint(polish);
       setAiNote(result.note);
-      setAnswerStatus(result.verdict === 'soft' ? 'soft' : 'correct');
+      setCorrectedSentence(result.correctedSentence);
+      setAnswerStatus(isSoft ? 'soft' : 'correct');
       reportProduction(true);
     } else {
       setAnswerStatus('wrong');
       setAiNote(result.note);
+      setCorrectedSentence(result.correctedSentence || data.target_translation);
       reportProduction(false);
     }
   }
@@ -240,6 +247,27 @@ export function TranslationWithConstraintExercise({
         </div>
       )}
 
+      {isAnswered && answerStatus === 'soft' && (
+        <div className="flex flex-col gap-3 animate-in fade-in slide-in-from-top-2 duration-400">
+          <div className="p-4.5 rounded-xl bg-amber-500/10 border border-amber-500/20">
+            <p className="text-[10px] font-black uppercase tracking-wider text-amber-600 mb-1.5">
+              Aceita — com correções na sua frase
+            </p>
+            {aiNote && (
+              <p className="text-sm font-medium leading-relaxed text-[var(--color-text-secondary)] whitespace-pre-line mb-2">
+                {aiNote}
+              </p>
+            )}
+            <p className="text-[10px] font-black uppercase tracking-wider text-amber-600/80 mb-1">
+              Sua frase corrigida
+            </p>
+            <p className="text-sm font-semibold text-[var(--color-text-primary)] italic leading-relaxed">
+              {correctedSentence || data.target_translation}
+            </p>
+          </div>
+        </div>
+      )}
+
       {isAnswered && answerStatus === 'wrong' && (
         <div className="flex flex-col gap-4 animate-in fade-in slide-in-from-top-2 duration-400">
           {chunkMissing && (
@@ -258,7 +286,7 @@ export function TranslationWithConstraintExercise({
               </span>
             </div>
             <p className="text-base font-semibold text-[var(--color-text-primary)] leading-relaxed italic">
-              {data.target_translation}
+              {correctedSentence || data.target_translation}
             </p>
           </div>
 

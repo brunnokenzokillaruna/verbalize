@@ -3,7 +3,7 @@ import { ChevronDown, Loader2, RefreshCw, Lightbulb, XCircle } from 'lucide-reac
 import type { ParaphraseData, ProficiencyLevel } from '@/types';
 import { isAccentOnlyDiff } from '@/utils/accent';
 import { validateReverseTranslation } from '@/app/actions/validateAnswer';
-import { formatProductionPolishHint } from '@/lib/elaborationHints';
+import { formatTranslationCorrectionHint, answersDifferOnlyByForm } from '@/lib/elaborationHints';
 import { incrementProductionStats } from '@/services/firestore';
 import { useAuthStore } from '@/store/authStore';
 import { useLessonStore } from '@/store/lessonStore';
@@ -53,6 +53,7 @@ export function ParaphraseExercise({
   const [hintOpen, setHintOpen] = useState(false);
   const [answerStatus, setAnswerStatus] = useState<AnswerStatus>('idle');
   const [aiNote, setAiNote] = useState<string | undefined>();
+  const [correctedSentence, setCorrectedSentence] = useState<string | undefined>();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const frenchAccents = ['é', 'à', 'è', 'ù', 'ç', 'œ', 'ê', 'â', 'ô', 'î', 'ë', 'ï'];
@@ -89,7 +90,7 @@ export function ParaphraseExercise({
     }
 
     if (isAccentWarning) {
-      setLastProductionPolishHint(`Outra forma válida: ${data.target_paraphrase}`);
+      setLastProductionPolishHint(`Atenção aos acentos na sua frase: ${data.target_paraphrase}`);
       setAnswerStatus('accent-warning');
       reportProduction(true);
       return;
@@ -106,15 +107,21 @@ export function ParaphraseExercise({
     );
 
     if (result.accepted) {
-      const polish =
-        formatProductionPolishHint(input, result.correctedSentence) ||
-        (result.verdict === 'soft' && result.note ? result.note : null);
+      const hasFormFixes = answersDifferOnlyByForm(input, result.correctedSentence);
+      const isSoft = result.verdict === 'soft' || hasFormFixes;
+      const polish = formatTranslationCorrectionHint({
+        learnerText: input,
+        note: result.note,
+        correctedSentence: result.correctedSentence,
+      });
       setLastProductionPolishHint(polish);
       setAiNote(result.note);
-      setAnswerStatus(result.verdict === 'soft' ? 'soft' : 'correct');
+      setCorrectedSentence(result.correctedSentence);
+      setAnswerStatus(isSoft ? 'soft' : 'correct');
       reportProduction(true);
     } else {
       setAiNote(result.note);
+      setCorrectedSentence(result.correctedSentence || data.target_paraphrase);
       setAnswerStatus('wrong');
       reportProduction(false);
     }
@@ -221,21 +228,20 @@ export function ParaphraseExercise({
         <div className="flex flex-col gap-3">
           <div className="p-4.5 rounded-xl bg-amber-500/10 border border-amber-500/20">
             <p className="text-[10px] font-black uppercase tracking-wider text-amber-600 mb-1.5">
-              Aceita — com um detalhe para polir
+              Aceita — com correções na sua frase
             </p>
-            <p className="text-sm font-semibold italic">{data.target_paraphrase}</p>
+            {aiNote && (
+              <p className="text-sm font-medium text-[var(--color-text-secondary)] whitespace-pre-line mb-2">
+                {aiNote}
+              </p>
+            )}
+            <p className="text-[10px] font-black uppercase tracking-wider text-amber-600/80 mb-1">
+              Sua frase corrigida
+            </p>
+            <p className="text-sm font-semibold italic">
+              {correctedSentence || data.target_paraphrase}
+            </p>
           </div>
-          {aiNote && (
-            <div className="rounded-xl p-4.5 border-l-4 border-amber-500/40 bg-[var(--color-surface-raised)]">
-              <div className="flex items-center gap-2 mb-2">
-                <Lightbulb size={15} className="text-amber-500" />
-                <span className="text-[10px] font-black uppercase tracking-wider text-[var(--color-text-muted)]">
-                  O que melhorar
-                </span>
-              </div>
-              <p className="text-sm font-medium text-[var(--color-text-secondary)]">{aiNote}</p>
-            </div>
-          )}
         </div>
       )}
 
@@ -248,7 +254,9 @@ export function ParaphraseExercise({
                 Exemplo de paráfrase:
               </span>
             </div>
-            <p className="text-base font-semibold italic">{data.target_paraphrase}</p>
+            <p className="text-base font-semibold italic">
+              {correctedSentence || data.target_paraphrase}
+            </p>
           </div>
           {aiNote && (
             <div className="rounded-xl p-4.5 border-l-4 border-amber-500/40 bg-[var(--color-surface-raised)]">

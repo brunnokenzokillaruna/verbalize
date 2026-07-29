@@ -20,14 +20,24 @@ Return ONLY valid JSON:
 {
   "verdict": "exact" | "acceptable" | "soft" | "wrong",
   "feedback": "1-2 short sentences in Brazilian Portuguese",
-  "correctedSentence": "optional natural target-language sentence"
+  "correctedSentence": "optional — the LEARNER's sentence with fixes applied"
 }
 
 Verdict rules:
 - exact: same meaning and essentially the same wording as a reference (ignore punctuation/capitalization).
-- acceptable: same meaning with valid synonyms, natural word-order variants, or equivalent phrasing. Count as SUCCESS.
-- soft: meaning is preserved but there are minor form issues the learner should notice (missing/extra article, minor word order, small spelling, accent, register). Count as SUCCESS, but feedback MUST point out what to improve. Set correctedSentence to a polished version.
-- wrong: meaning changed, key word wrong, wrong tense/aspect that changes meaning, incomplete, wrong language, or unrelated. Count as FAIL. feedback explains the main error; correctedSentence = best model translation.
+- acceptable: same meaning with valid synonyms or equivalent phrasing, and NO form fixes needed. Count as SUCCESS. Omit correctedSentence (or repeat the learner text).
+- soft: meaning is preserved but there are form issues (accents, apostrophes/elision, articles de/du/des, minor spelling, minor word order). Count as SUCCESS.
+- wrong: meaning changed, key word wrong, wrong tense that changes meaning, incomplete, wrong language, or unrelated. Count as FAIL.
+
+SOFT feedback rules (critical):
+- feedback MUST list the concrete mistakes by quoting learner form → correct form.
+  Example: "Corrija: mange → mangé; q'un → qu'un; du pain → de pain; je etais → j'étais; fatigue → fatigué."
+- Do NOT give only a vague "versão mais natural" or paste a model answer without naming the errors.
+- correctedSentence MUST be the LEARNER's own sentence with ONLY those fixes applied — keep their structure and word choice. NEVER replace it with a different model translation from the reference when the learner's structure already works.
+- Prefer "soft" (not "acceptable") whenever accents, apostrophes, articles, or spelling need fixing.
+
+WRONG feedback:
+- Explain the main meaning error; correctedSentence may be the best reference translation.
 
 Meaning traps (ALWAYS wrong, never soft):
 - Intensity: "trop" (too) ≠ "très"/"muito" (very); "peu" ≠ "un peu" when sense changes.
