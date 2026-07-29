@@ -67,7 +67,7 @@ export function pickHookNames(
 function pickTopic(level: ProficiencyLevel, interests: string[]): string {
   const topics: Record<ProficiencyLevel, string[]> = {
     A1: ['greetings', 'food at home', 'family', 'daily routine'],
-    A2: ['restaurant', 'shopping', 'weekend plans', 'cooking', 'transport'],
+    A2: ['restaurant', 'shopping', 'cooking', 'transport', 'market', 'after class', 'phone call', 'weekend plans'],
     B1: ['travel', 'work', 'health', 'culture', 'technology'],
     B2: ['society', 'environment', 'business', 'media'],
     C1: ['debates', 'professional contexts', 'science'],
@@ -132,6 +132,10 @@ export function buildMinimalHookPrompt(params: HookGenerationParams): {
     .filter(Boolean)
     .join(' · ');
 
+  const antiReuse = lastScenarioSummary
+    ? `ANTI-REUSE: Do not repeat the previous scene's situation, mood adjectives, or stock openers. Invent a new micro-scene from Theme / Focus.`
+    : `SCENE VARIETY: Invent a fresh real-life micro-situation from Theme / Focus. Avoid repeating the same stock opener or mood adjective across lessons.`;
+
   const themeContext = theme
     ? `Theme: ${theme}${uiTitle ? ` · ${uiTitle}` : ''}${arcBlock ? ` · ${arcBlock}` : ''}`
     : `Topic: ${pickTopic(level, interests)}`;
@@ -177,11 +181,13 @@ Context: ${themeContext}
 Focus: ${grammarFocus}
 ${compactTagInstruction(tag, grammarFocus, uiTitle, theme)}
 ${knownBlock}
+${antiReuse}
 
 Rules:
 - ${minLines}–${maxLines} lines; each line starts with "Name: "
 - ONE scene; each line reacts to the previous line
-- PREMISE ALIGNMENT: If speaker A frames something as boring, bad, or unpleasant (e.g. "weekend ennuyeux"), speaker B must agree, disagree, or nuance that framing — NOT reply with only enthusiastic positives that contradict the premise
+- Sound like a real conversation people would have — specific to the scene, not a grammar drill
+- PREMISE ALIGNMENT: If speaker A frames something negatively (too expensive, too tiring, disappointing…), speaker B must agree, disagree, or nuance — NOT only enthusiastic positives that contradict it
 - Exactly 2 newVocabulary items (non-verbs, lowercase, appear in dialogue)
 - NEVER include days of the week, months of the year, speaker names, or other proper nouns in newVocabulary (e.g. Alice, Marie, Paris)
 - ${translationRule}

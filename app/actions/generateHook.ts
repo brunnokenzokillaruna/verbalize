@@ -51,12 +51,11 @@ const TOPICS_BY_LEVEL: Record<ProficiencyLevel, string[]> = {
     'school and school supplies', 'shopping at a small market', 'pets and animals',
     'telling the time', 'simple weather', 'numbers and ages',
   ],
-  A2: [
-    'weekend plans', 'at a restaurant', 'shopping for clothes', 'going to school',
-    'talking about family', 'describing your home', 'public transport',
-    'a visit to a doctor', 'planning a short trip', 'sports and hobbies',
-    'cooking a meal', 'a phone call with a friend',
-  ],
+    A2: [
+      'at a restaurant', 'shopping for clothes', 'going to school', 'cooking a meal',
+      'public transport', 'weekend plans', 'a phone call with a friend',
+      'at the market', 'asking for directions', 'meeting after class',
+    ],
   B1: [
     'travel plans', 'work and career', 'health and wellbeing', 'environment',
     'culture and events', 'technology (everyday)', 'education', 'food & restaurants',
@@ -348,7 +347,9 @@ export async function generateHook(params: GenerateHookParams): Promise<HookResu
 
   const arcBlock = [
     arcSummary ? `Story arc for this theme: ${arcSummary}` : '',
-    lastScenarioSummary ? `Previous scene recap: ${lastScenarioSummary}` : '',
+    lastScenarioSummary
+      ? `Previous scene recap: ${lastScenarioSummary}\nANTI-REUSE: Do NOT reuse the same situation, mood adjectives, or opening line from that recap. Invent a new micro-scene that still fits Theme / Scenario / grammar.`
+      : '',
   ].filter(Boolean).join('\n');
 
   const themeContext = theme
@@ -480,7 +481,9 @@ ACTION AND SEMANTICS:
 - FETCH vs SEARCH (FR: chercher vs aller chercher/récupérer): If the speaker already said WHERE the object is, use "aller la/le chercher", "récupérer", "vais la prendre" — NOT "chercher" (unknown location). EN: "go get it" not "look for it" when location is known.
 - NO PHANTOM PROPS: Do NOT introduce new objects or places (tree, bench, cupboard) unless mentioned in the previous 1-2 lines or part of the opening scene. Do NOT invent a location just to teach a preposition (e.g. no "under a tree" to use "sous").
 - PRESENT MOMENT: Keep the dialogue in present/immediate future. No past-tense anecdotes ("I waited 10 minutes...") unless explicitly reminiscing.
-- PREMISE ALIGNMENT: If speaker A frames something as boring, bad, or unpleasant (e.g. "weekend ennuyeux"), speaker B must agree, disagree, or nuance that framing — NOT reply with only enthusiastic positives that contradict the premise.
+- PREMISE ALIGNMENT: If speaker A frames something negatively (too expensive, too tiring, too late, disappointing…), speaker B must agree, disagree, or nuance that framing — NOT reply with only enthusiastic positives that contradict it.
+- SCENE VARIETY: Invent a fresh, realistic micro-situation from Theme / Scenario / grammar focus. Do NOT reuse the same stock weekend-recap opener or the same mood adjective across lessons. Vary places, goals, and mood (plans, errands, small problems, preferences, surprises) so consecutive lessons feel different.
+- NATURAL LIFE: The dialogue must sound like something two people would actually say in real life — reactive, specific to the scene, not a grammar worksheet in disguise.
 - ENDING: If someone will go get something, end with them leaving or about to leave — NOT suddenly "I found it" without the fetch action.
 
 ❌ BAD — vocabulary checklist (NEVER produce this):
@@ -514,14 +517,14 @@ Sarah: "Ah non, j'ai oublié ma serviette !"
 Mathis: "Pas grave, j'en ai une. On y va ?"
 Sarah: "Allez, on y va !"
 
-❌ BAD — boring weekend premise broken (NEVER produce this):
-Camille: "Tu as passé un bon week-end ?"
-Victor: "Oui, j'ai visité le musée, le théâtre, la basilique — c'était génial !" ← contradicts if Camille later says the weekend was boring
+❌ BAD — premise broken (NEVER produce this):
+Léa: "Ce resto est trop cher, non ?"
+Hugo: "Oui, et en plus c'était génial, j'adore tout !" ← contradicts the "too expensive / negative" framing without acknowledging it
 
 ✅ GOOD — premise stays consistent:
-Camille: "Ton week-end était ennuyeux, non ?"
-Victor: "Un peu, oui. Mais la fresque au musée m'a quand même plu."
-Camille: "Ah bon ? Moi, l'ascension m'a fatiguée."
+Léa: "Ce resto est trop cher, non ?"
+Hugo: "Un peu, oui… Mais le plat du jour vaut le coup."
+Léa: "Ah bon ? Moi, je vais juste prendre une entrée."
 
 Before returning JSON, re-read line by line: does line N make sense because of line N-1? If not, rewrite.
 ${knownVocabInstruction}

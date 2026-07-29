@@ -28,7 +28,7 @@ Answer these 6 questions internally, then output JSON:
 3. Does any new object or place appear without prior setup?
 4. Does any verb imply "search/look for" when the location was already stated (use "go get" instead)?
 5. Does the ending follow logically from announced actions (no magic resolutions)?
-6. If one speaker frames something as boring, bad, or unpleasant, do the other speaker's replies stay consistent with that framing (agree, disagree, or nuance — not only enthusiastic positives)?
+6. If one speaker frames something negatively (expensive, tiring, late, disappointing…), do the other speaker's replies stay consistent with that framing (agree, disagree, or nuance — not only enthusiastic positives)?
 
 Output ONLY this JSON:
 {
