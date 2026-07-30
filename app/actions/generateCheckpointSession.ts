@@ -39,8 +39,12 @@ function buildFallbackListenAndRespond(
   const promptLine = lastNpc
     ? lastNpc.replace(/^[^:]+:\s*/, '').trim()
     : 'Comment puis-je vous aider ?';
+  const speaker = lastNpc
+    ? (lastNpc.split(':')[0] ?? 'Interlocuteur').trim()
+    : 'Interlocuteur';
   const data: ListenAndRespondData = {
-    dialogueAudio: lines.slice(0, 4).join('\n') || dialogueAudio.slice(0, 400),
+    // Single interlocutor turn — do not replay the full checkpoint dialogue.
+    dialogueAudio: `${speaker}: ${promptLine}`,
     promptLine,
     contextPt: `Responda em ${LANG_LABEL[language]} sobre: ${theme}.`,
     evaluationCriteria: 'Resposta educada e relevante ao contexto do diálogo.',
@@ -104,8 +108,8 @@ Generate JSON with this EXACT structure:
     {
       "type": "listen-and-respond",
       "data": {
-        "dialogueAudio": "Same dialogue as above (or last 3-4 lines)",
-        "promptLine": "Last NPC question from the dialogue",
+        "dialogueAudio": "Recruteur: Une question — comment gérez-vous le stress ?",
+        "promptLine": "Une question — comment gérez-vous le stress ?",
         "contextPt": "Situação em PT-BR",
         "evaluationCriteria": "What a good spoken response must accomplish",
         "acceptableThemes": ["theme 1", "theme 2"],
@@ -122,7 +126,7 @@ Rules:
 - comprehensionQuestions: questionPt, options, and explanationPt MUST be Brazilian Portuguese only — NEVER insert ${LANG_LABEL[params.language]} words like lesson vocabulary (use Portuguese meanings: "torre de igreja" not "clocher"). Target language only inside quotes when citing dialogue verbatim.
 - Exactly 2 productionExercises: one reverse-translation, one listen-and-respond (oral spontaneous production AFTER listening comprehension)
 - NO hints in production exercises
-- listen-and-respond must reference the checkpoint dialogueAudio — student listens then responds orally
+- listen-and-respond: ORIGINAL short prompt from ONE interlocutor only (1–3 lines, same speaker); last line = question for the learner. Do NOT reuse dialogueAudio from the checkpoint dialogue verbatim — invent a related new prompt.
 - Dialogue must NOT be copied from any real textbook — create original scenario within theme "${params.theme}"`;
 
   try {

@@ -122,9 +122,9 @@ export function buildTypeDescriptions(langLabel: string): Record<ExerciseTypeId,
    - "exampleSentence" (target language): a complete sentence using the correct form.
    - "translation" (PT-BR): translation of the example sentence.`,
     'listen-and-respond': `type "listen-and-respond":
-   - "dialogueAudio" (3-4 line ORIGINAL ${langLabel} dialogue — Speaker: line format; last line is a question or request TO the learner).
-   - "promptLine" (${langLabel}): the final line the learner must respond to.
-   - "contextPt" (PT-BR): situation setup for the learner.
+   - "dialogueAudio" (1–3 lines in ${langLabel}, Speaker: line format): ONLY the interlocutor speaking to the learner (e.g. recruiter, waiter, friend). ONE speaker name for all lines. NEVER include the learner's lines ("Você:", "Client:", etc.). NEVER copy or paraphrase the lesson hook dialogue — invent a NEW short prompt that fits the situation.
+   - "promptLine" (${langLabel}): the final interlocutor line the learner must answer (must match the last line of dialogueAudio).
+   - "contextPt" (PT-BR): situation setup for the learner (who is speaking to them).
    - "evaluationCriteria" (PT-BR): rubric for acceptable responses (intent, register, key ideas).
    - "acceptableThemes" (array of 2-4 PT-BR phrases describing valid response ideas).
    - "exampleResponse" (${langLabel}): one natural example answer (not the only valid answer).`,

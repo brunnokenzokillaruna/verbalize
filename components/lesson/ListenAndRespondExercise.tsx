@@ -1,11 +1,12 @@
 'use client';
 
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { Ear, Volume2 } from 'lucide-react';
 import { evaluateFreeResponse } from '@/app/actions/evaluateFreeResponse';
 import { OralProductionShell } from '@/components/lesson/OralProductionShell';
 import { useDialoguePlayback } from '@/hooks/useDialoguePlayback';
 import { useOralProduction } from '@/hooks/useOralProduction';
+import { sanitizeListenAndRespondFields } from '@/lib/listenAndRespondAudio';
 import { recordOralExerciseOutcome } from '@/lib/oralExerciseTracking';
 import { useAuthStore } from '@/store/authStore';
 import type { ListenAndRespondData, ProficiencyLevel, SupportedLanguage } from '@/types';
@@ -18,6 +19,8 @@ interface ListenAndRespondExerciseProps {
   answered: boolean;
   setIsExerciseReady: (ready: boolean) => void;
   submitTrigger: number;
+  /** Lesson hook dialogue — used to avoid replaying it as the exercise audio. */
+  lessonDialogue?: string;
 }
 
 export function ListenAndRespondExercise({
@@ -28,10 +31,22 @@ export function ListenAndRespondExercise({
   answered,
   setIsExerciseReady,
   submitTrigger,
+  lessonDialogue,
 }: ListenAndRespondExerciseProps) {
   const { user } = useAuthStore();
+
+  const playbackAudio = useMemo(
+    () =>
+      sanitizeListenAndRespondFields({
+        dialogueAudio: data.dialogueAudio,
+        promptLine: data.promptLine,
+        lessonDialogue,
+      }).dialogueAudio,
+    [data.dialogueAudio, data.promptLine, lessonDialogue],
+  );
+
   const dialogue = useDialoguePlayback({
-    dialogueAudio: data.dialogueAudio,
+    dialogueAudio: playbackAudio,
     language,
     level,
   });
@@ -121,13 +136,13 @@ export function ListenAndRespondExercise({
           ? 'Carregando áudio…'
           : dialogue.isPlaying
             ? 'Reproduzindo…'
-            : 'Ouvir diálogo completo'}
+            : 'Ouvir o interlocutor'}
       </button>
 
       {!dialogue.hasListened && (
         <p className="flex items-center justify-center gap-2 text-xs text-center text-text-muted">
           <Ear size={14} />
-          Ouça o diálogo inteiro antes de responder — o texto fica oculto de propósito.
+          Ouça o que a outra pessoa diz — depois responda em voz alta. O texto fica oculto de propósito.
         </p>
       )}
 
@@ -149,7 +164,7 @@ export function ListenAndRespondExercise({
         </div>
       )}
 
-      <span className="sr-only">{data.dialogueAudio}</span>
+      <span className="sr-only">{playbackAudio}</span>
     </div>
   );
 }

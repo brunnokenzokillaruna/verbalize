@@ -48,6 +48,8 @@ interface LessonPracticeScreenProps {
   immersionMode?: ImmersionMode;
   lessonTag?: LessonTag;
   exerciseRetryKey?: number;
+  /** Hook dialogue from the lesson — keeps listen-and-respond from replaying it. */
+  lessonDialogue?: string;
   onAnswer: (correct: boolean) => void;
   setIsExerciseReady: (ready: boolean) => void;
   submitTrigger: number;
@@ -74,6 +76,7 @@ export function LessonPracticeScreen({
   level,
   immersionMode = 'auto',
   lessonTag,
+  lessonDialogue,
   onAnswer,
   setIsExerciseReady,
   submitTrigger,
@@ -183,6 +186,7 @@ export function LessonPracticeScreen({
             data={currentExercise.data}
             language={language}
             level={level}
+            lessonDialogue={lessonDialogue}
             {...common}
           />
         );

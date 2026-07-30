@@ -627,8 +627,9 @@ export interface ListeningComprehensionData {
   chainAnchorPhrase?: string;
 }
 
-/** Phase 1 — listen to dialogue, respond orally (spontaneous). */
+/** Phase 1 — listen to interlocutor prompt, respond orally (spontaneous). */
 export interface ListenAndRespondData {
+  /** 1–3 lines from ONE interlocutor only (Speaker: line). Not the lesson hook dialogue. */
   dialogueAudio: string;
   promptLine: string;
   contextPt: string;

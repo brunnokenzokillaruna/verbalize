@@ -193,12 +193,12 @@ Example for listen-and-respond:
 {
   "type": "listen-and-respond",
   "data": {
-    "dialogueAudio": "Serveur: Bonjour !\\nClient: Bonjour.\\nServeur: Qu'est-ce que je vous sers ?",
-    "promptLine": "Qu'est-ce que je vous sers ?",
-    "contextPt": "Você está em um café em Paris e o garçom pergunta o que você quer.",
-    "evaluationCriteria": "Pedir algo do cardápio com educação.",
-    "acceptableThemes": ["pedir bebida ou comida", "usar por favor ou s'il vous plaît"],
-    "exampleResponse": "Je voudrais un café, s'il vous plaît."
+    "dialogueAudio": "Recruteur: Merci d'être venu.\\nRecruteur: Que pouvez-vous nous apporter malgré votre manque d'expérience ?",
+    "promptLine": "Que pouvez-vous nous apporter malgré votre manque d'expérience ?",
+    "contextPt": "Você está em uma entrevista de emprego e o recrutador questiona sua falta de experiência.",
+    "evaluationCriteria": "Destacar motivação, aprendizado rápido ou experiências relacionadas com tom profissional.",
+    "acceptableThemes": ["motivação para aprender", "experiências transferíveis", "tom profissional"],
+    "exampleResponse": "Je suis motivé et j'apprends vite. J'ai déjà travaillé en équipe sur des projets concrets."
   }
 }
 Example for free-roleplay:

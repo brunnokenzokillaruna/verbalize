@@ -84,7 +84,7 @@ export function buildTagGuidance(
     const hasFreeProduction = allowed.has('free-roleplay') || allowed.has('micro-message');
     return [
       hasListenRespond
-        ? `- At least 1 exercise MUST be 'listen-and-respond' — the learner hears a dialogue and responds orally with their own words (not repetition).`
+        ? `- At least 1 exercise MUST be 'listen-and-respond' — the learner hears ONLY the interlocutor (1–3 lines, one speaker), then responds orally with their own words (not repetition).`
         : '',
       hasFreeProduction
         ? `- At least 1 exercise MUST be 'free-roleplay' OR 'micro-message' — the learner writes their own response (not MCQ).`
@@ -114,7 +114,7 @@ export function buildTagGuidance(
     const hasFreeProduction = allowed.has('free-roleplay') || allowed.has('micro-message');
     return [
       hasListenRespond
-        ? `- At least 1 exercise MUST be 'listen-and-respond' — spontaneous oral response after hearing a mission dialogue.`
+        ? `- At least 1 exercise MUST be 'listen-and-respond' — spontaneous oral response after hearing ONLY the interlocutor (1–3 lines, one speaker; not the lesson dialogue).`
         : '',
       hasFreeProduction
         ? `- At least 1 exercise MUST be 'free-roleplay' OR 'micro-message' for written production in the mission context.`

@@ -227,7 +227,7 @@ export const EXERCISE_TYPE_META: Record<ExerciseType, ExerciseTypeMeta> = {
   },
   'listen-and-respond': {
     title: 'Ouça e responda',
-    instruction: 'Ouça o diálogo e responda em voz alta.',
+    instruction: 'Ouça o interlocutor e responda em voz alta.',
     icon: Mic,
     accent: '#e11d48',
     accentBg: 'rgba(225, 29, 72, 0.1)',

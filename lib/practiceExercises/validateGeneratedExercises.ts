@@ -3,6 +3,7 @@ import type { ConjugationSpeedData, ErrorCorrectionData, Exercise, SupportedLang
 import type { ExerciseTypeId } from './constants';
 import { fixConjugationSpeedExercise } from './fixConjugationSpeed';
 import { sanitizeReverseTranslationExercise } from '@/lib/reverseTranslationPtAdverb';
+import { sanitizeListenAndRespondFields } from '@/lib/listenAndRespondAudio';
 import {
   isListenAndSelectConsistent,
   isMcqAnswerConsistent,
@@ -11,6 +12,7 @@ import { isListeningComprehensionPtBrPure } from './validatePtBrText';
 
 export interface ValidateExercisesOptions {
   lessonVocabulary?: string[];
+  lessonDialogue?: string;
 }
 
 export async function validateAndSanitizeExercises(
@@ -20,6 +22,7 @@ export async function validateAndSanitizeExercises(
   options: ValidateExercisesOptions = {},
 ): Promise<Exercise[]> {
   const lessonVocabulary = options.lessonVocabulary ?? [];
+  const lessonDialogue = options.lessonDialogue ?? '';
   const validated = exercises.filter((ex) => {
     if (!allowedSet.has(ex.type as ExerciseTypeId)) {
       console.warn(`[generatePracticeExercises] Dropped ${ex.type} — not allowed at this level/progress`);
@@ -286,6 +289,13 @@ export async function validateAndSanitizeExercises(
         console.warn('[generatePracticeExercises] Dropped malformed listen-and-respond');
         return false;
       }
+      const sanitized = sanitizeListenAndRespondFields({
+        dialogueAudio: d.dialogueAudio,
+        promptLine: d.promptLine,
+        lessonDialogue,
+      });
+      d.dialogueAudio = sanitized.dialogueAudio;
+      d.promptLine = sanitized.promptLine;
       return true;
     }
     if (ex.type === 'free-roleplay') {

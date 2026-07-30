@@ -125,6 +125,7 @@ export function LessonPhaseContent({
           level={store.lesson.level}
           immersionMode={immersionMode}
           lessonTag={store.lesson.tag as LessonTag}
+          lessonDialogue={store.checkpointSession?.dialogueAudio}
           onAnswer={onAnswer}
           setIsExerciseReady={setIsExerciseReady}
           submitTrigger={submitTrigger}
@@ -197,6 +198,7 @@ export function LessonPhaseContent({
           level={store.lesson.level}
           immersionMode={immersionMode}
           lessonTag={store.lesson.tag as LessonTag}
+          lessonDialogue={store.hook?.dialogue}
           onAnswer={onAnswer}
           setIsExerciseReady={setIsExerciseReady}
           submitTrigger={submitTrigger}
@@ -213,6 +215,7 @@ export function LessonPhaseContent({
           language={store.lesson.language}
           level={store.lesson.level}
           immersionMode={immersionMode}
+          lessonDialogue={store.hook?.dialogue}
           onAnswer={onReviewAnswer}
           setIsExerciseReady={setIsExerciseReady}
           submitTrigger={submitTrigger}
