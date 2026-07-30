@@ -6,21 +6,25 @@ export type CheckButtonState = 'idle' | 'disabled' | 'correct' | 'incorrect';
 
 interface CheckButtonProps {
   state: CheckButtonState;
+  /** @deprecated Analysis lives on the exercise screen — banner shows status only. */
   correctAnswer?: string;
+  /** @deprecated Analysis lives on the exercise screen — banner shows status only. */
   hint?: string;
   retryNotice?: string | null;
+  /** @deprecated Analysis lives on the exercise screen — banner shows status only. */
   elaborationHint?: string | null;
   onCheck: () => void;
   onContinue: () => void;
   loading?: boolean;
 }
 
+/**
+ * Bottom check/continue bar. Result banner shows only Correto! / Resposta incorreta —
+ * detailed corrections stay on the exercise page itself.
+ */
 export function CheckButton({
   state,
-  correctAnswer,
-  hint,
   retryNotice,
-  elaborationHint,
   onCheck,
   onContinue,
   loading = false,
@@ -56,43 +60,25 @@ export function CheckButton({
               : 'transparent',
           transition: 'all 300ms ease',
           overflow: 'hidden',
-          maxHeight: isResult ? (elaborationHint ? '320px' : '120px') : '0px',
+          maxHeight: isResult ? '88px' : '0px',
           borderTop: isResult
             ? `4px solid ${isCorrect ? 'var(--color-success)' : 'var(--color-error)'}`
             : 'none',
         }}
       >
         {isResult && (
-          <div className="flex items-start gap-3 px-5 py-4">
+          <div className="flex items-center gap-3 px-5 py-3.5">
             {isCorrect ? (
-              <CheckCircle2 size={22} style={{ color: 'var(--color-success)', flexShrink: 0, marginTop: 1 }} />
+              <CheckCircle2 size={22} style={{ color: 'var(--color-success)', flexShrink: 0 }} />
             ) : (
-              <XCircle size={22} style={{ color: 'var(--color-error)', flexShrink: 0, marginTop: 1 }} />
+              <XCircle size={22} style={{ color: 'var(--color-error)', flexShrink: 0 }} />
             )}
-            <div className="min-w-0 flex-1">
-              <p
-                className="font-bold text-base"
-                style={{ color: isCorrect ? 'var(--color-success)' : 'var(--color-error)' }}
-              >
-                {isCorrect ? 'Correto!' : 'Resposta incorreta'}
-              </p>
-              {!isCorrect && correctAnswer && (
-                <p className="mt-0.5 text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>
-                  Resposta certa:{' '}
-                  <span className="font-bold text-[var(--color-text-primary)]">{correctAnswer}</span>
-                </p>
-              )}
-              {hint && (
-                <p className="mt-0.5 text-sm" style={{ color: 'var(--color-text-muted)', fontStyle: 'italic' }}>
-                  {hint}
-                </p>
-              )}
-              {isCorrect && elaborationHint && (
-                <p className="mt-1.5 text-sm leading-relaxed whitespace-pre-line text-[var(--color-text-secondary)]">
-                  {elaborationHint}
-                </p>
-              )}
-            </div>
+            <p
+              className="font-bold text-base"
+              style={{ color: isCorrect ? 'var(--color-success)' : 'var(--color-error)' }}
+            >
+              {isCorrect ? 'Correto!' : 'Resposta incorreta'}
+            </p>
           </div>
         )}
       </div>

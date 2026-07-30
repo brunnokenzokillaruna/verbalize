@@ -10,7 +10,6 @@ import { generateMistakeReview } from '@/app/actions/generateMistakeReview';
 
 import { CheckButton } from '@/components/lesson/CheckButton';
 import { LessonPracticeScreen } from '@/components/lesson/LessonPracticeScreen';
-import { formatErrorCorrectionAnswer } from '@/utils/errorCorrection';
 import { useSoundEffects } from '@/hooks/useSoundEffects';
 import { MistakeReviewShell } from '@/components/mistakes/MistakeReviewShell';
 import { MistakeReviewIntro } from '@/components/mistakes/MistakeReviewIntro';
@@ -155,17 +154,6 @@ function ReviewContent() {
   }
 
   const currentExercise = exercises[currentIndex];
-  const correctAnswerForBanner: string | undefined = (() => {
-    if (!currentExercise || exerciseAnswer !== false) return undefined;
-    switch (currentExercise.type) {
-      case 'context-choice':
-        return currentExercise.data.blankWord;
-      case 'error-correction':
-        return formatErrorCorrectionAnswer(currentExercise.data);
-      default:
-        return undefined;
-    }
-  })();
 
   const checkState = (() => {
     if (exerciseAnswer !== null) {
@@ -290,7 +278,6 @@ function ReviewContent() {
       footer={
         <CheckButton
           state={checkState}
-          correctAnswer={correctAnswerForBanner}
           onCheck={handleCheck}
           onContinue={handleContinue}
         />

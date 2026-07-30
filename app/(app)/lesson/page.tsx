@@ -118,11 +118,9 @@ export default function LessonPage() {
     submitTrigger,
     exerciseRetryKey,
     retryNotice,
-    elaborationHint,
     currentExercise,
     currentReviewExercise,
     checkState,
-    correctAnswerForBanner,
     resetExerciseState,
     handleAnswer,
     handleCheck,
@@ -295,9 +293,7 @@ export default function LessonPage() {
         <CheckButton
           key={`${phase}-${phase === 'review' ? store.reviewIndex : phase === 'production' ? store.checkpointProductionIndex : store.exerciseIndex}-${exerciseRetryKey}`}
           state={checkState}
-          correctAnswer={correctAnswerForBanner}
           retryNotice={retryNotice}
-          elaborationHint={elaborationHint}
           onCheck={handleCheck}
           onContinue={
             phase === 'review'
