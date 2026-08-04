@@ -2,16 +2,17 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, BookOpen, BookMarked, User, Beaker } from 'lucide-react';
+import { Home, BookOpen, BookMarked, User, Beaker, Headphones } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { Logo } from '@/components/ui/Logo';
 
 const NAV_ITEMS = [
-  { href: '/dashboard',           label: 'Início',      Icon: Home       },
-  { href: '/vocabulary', label: 'Vocabulário',  Icon: BookOpen   },
-  { href: '/verbs',      label: 'Verbos',       Icon: BookMarked },
-  { href: '/profile',    label: 'Perfil',       Icon: User       },
-  { href: '/test-ui',    label: 'Lab UI',       Icon: Beaker,     adminOnly: true },
+  { href: '/dashboard',  label: 'Início',      Icon: Home       },
+  { href: '/roleplay',   label: 'Conversar',   Icon: Headphones },
+  { href: '/vocabulary', label: 'Vocabulário', Icon: BookOpen   },
+  { href: '/verbs',      label: 'Verbos',      Icon: BookMarked },
+  { href: '/profile',    label: 'Perfil',      Icon: User       },
+  { href: '/test-ui',    label: 'Lab UI',      Icon: Beaker, adminOnly: true },
 ] as const;
 
 // Hide on lesson page — focused experience, no nav distractions
