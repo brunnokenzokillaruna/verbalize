@@ -8,10 +8,16 @@ import {
   stripSpeakerPrefix,
   type SpeakerGender,
 } from '@/lib/speakerGender';
+import type { DialogueSpeakerVoice } from '@/lib/dialogueVoiceAvatars';
 
 const TTS_ENDPOINT = 'https://texttospeech.googleapis.com/v1/text:synthesize';
 
 type VoiceConfig = { languageCode: string; name: string };
+
+export type GoogleDialogueResult = {
+  chunks: string[];
+  speakerVoices: DialogueSpeakerVoice[];
+};
 
 /* ------------------------------------------------------------------ */
 /*  Voice pools — Studio, Chirp-HD, Chirp3-HD only                    */
@@ -296,17 +302,18 @@ export async function synthesizeSpeechWithVoice(
  * (Sophie → female, Lucas → male). Same-gender pairs still get two distinct
  * timbres from that gender pool. Returns base64 MP3 strings in line order.
  */
-export async function synthesizeDialogue(
+async function synthesizeDialogueResult(
   lines: string[],
   language: SupportedLanguage,
-): Promise<string[]> {
+): Promise<GoogleDialogueResult> {
   const apiKey = process.env.GOOGLE_TTS_API_KEY;
-  if (!apiKey) return [];
+  if (!apiKey) return { chunks: [], speakerVoices: [] };
 
   const nonEmpty = lines.filter((l) => l.trim().length > 0);
   const speakers = listSpeakersInOrder(nonEmpty);
   const genders = resolveSpeakerGenders(nonEmpty);
   const voiceBySpeaker = pickVoicesForSpeakers(language, genders);
+  const resolvedVoiceBySpeaker = new Map<string, string>();
   const fallbackPair = [
     voiceConfigFromName(pickRandom(VOICE_POOLS[language].female)),
     voiceConfigFromName(pickRandom(VOICE_POOLS[language].male)),
@@ -317,9 +324,30 @@ export async function synthesizeDialogue(
       const speaker = speakerKeyForLine(line, i, speakers);
       const voice =
         voiceBySpeaker.get(speaker) ?? fallbackPair[i % 2];
+      resolvedVoiceBySpeaker.set(speaker, voice.name.split('-').at(-1) ?? voice.name);
       return callTTS(stripSpeakerPrefix(line), voice, apiKey);
     }),
   );
 
-  return results.filter((r): r is string => r !== null);
+  return {
+    chunks: results.filter((r): r is string => r !== null),
+    speakerVoices: [...resolvedVoiceBySpeaker].map(([speaker, voiceName]) => ({
+      speaker,
+      voiceName,
+    })),
+  };
+}
+
+export async function synthesizeDialogue(
+  lines: string[],
+  language: SupportedLanguage,
+): Promise<string[]> {
+  return (await synthesizeDialogueResult(lines, language)).chunks;
+}
+
+export async function synthesizeDialogueWithVoices(
+  lines: string[],
+  language: SupportedLanguage,
+): Promise<GoogleDialogueResult> {
+  return synthesizeDialogueResult(lines, language);
 }

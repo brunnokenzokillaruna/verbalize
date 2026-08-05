@@ -45,19 +45,20 @@ export function useFreeWrittenProduction({
 
   const trimmed = input.trim();
   const isBusy = phase === 'evaluating';
-  const isLocked = answered || phase === 'answered' || isBusy;
+  const isSettled = phase === 'answered' || phase === 'correct';
+  const isLocked = answered || isSettled || isBusy;
 
   useEffect(() => {
-    if (answered || phase === 'answered') {
+    if (answered || isSettled) {
       setIsExerciseReady(false);
       return;
     }
     setIsExerciseReady(trimmed.length >= minLength && !isBusy);
-  }, [trimmed, minLength, isBusy, answered, phase, setIsExerciseReady]);
+  }, [trimmed, minLength, isBusy, answered, isSettled, setIsExerciseReady]);
 
   useEffect(() => {
     if (submitTrigger === initialSubmitTriggerRef.current) return;
-    if (answered || phase === 'answered' || isBusy) return;
+    if (answered || isSettled || isBusy) return;
     if (trimmed.length >= minLength) {
       void submit();
     }
@@ -78,7 +79,10 @@ export function useFreeWrittenProduction({
 
   const finish = useCallback(
     (accepted: boolean) => {
-      setPhase('answered');
+      // 'correct' is terminal for accepted answers: collapsing straight to
+      // 'answered' used to hide the evaluation of what the learner wrote,
+      // leaving only the exercise's canned explanation on screen.
+      setPhase(accepted ? 'correct' : 'answered');
       logStats(accepted);
       onAnswer(accepted);
     },
@@ -110,7 +114,6 @@ export function useFreeWrittenProduction({
     if (result.isCorrect) {
       const polishHint = formatProductionPolishHint(trimmed, result.correctedSentence);
       setLastProductionPolishHint(polishHint);
-      setPhase('correct');
       finish(true);
     } else {
       setPhase('retry');

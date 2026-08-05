@@ -4,7 +4,13 @@ import { callGeminiJSON } from '@/services/gemini';
 import { validateDialogueCoherence } from '@/lib/validateDialogueCoherence';
 import { buildMinimalHookPrompt, type HookGenerationParams } from '@/lib/hookGeneration/buildHookContext';
 import { filterHookVocabularyForKnownWords } from '@/lib/hookVocabulary';
+import { buildKnownVocabularyMatcher } from '@/lib/vocabCanonical';
 import { sanitizeDialogueText, sanitizeVocabularyToken, stripMarkdownEmphasis } from '@/lib/hookSanitize';
+import {
+  NATURAL_PT_BR_RULE,
+  normalizeToEverydayPtBr,
+  normalizeToEverydayPtBrOptional,
+} from '@/lib/naturalPtBr';
 import type { SupportedLanguage, ProficiencyLevel, HookResult, LessonTag } from '@/types';
 
 const LANG_LABEL: Record<SupportedLanguage, string> = {
@@ -198,7 +204,7 @@ function normalizeHookResult(
 
   if (result.dialogueTranslations) {
     result.dialogueTranslations = result.dialogueTranslations.map((line) =>
-      stripMarkdownEmphasis(line),
+      normalizeToEverydayPtBr(stripMarkdownEmphasis(line)),
     );
   }
 
@@ -235,7 +241,7 @@ function normalizeHookResult(
       .filter((c) => c.phrase?.trim() && c.translation?.trim())
       .map((c) => ({
         phrase: c.phrase.trim(),
-        translation: c.translation.trim(),
+        translation: normalizeToEverydayPtBr(c.translation.trim()),
         entryType: c.entryType ?? 'expression',
       }));
   }
@@ -254,7 +260,7 @@ function normalizeHookResult(
       .map((c) => ({
         npcLineIndex: c.npcLineIndex,
         alternateText: c.alternateText.trim(),
-        alternateTranslation: c.alternateTranslation?.trim(),
+        alternateTranslation: normalizeToEverydayPtBrOptional(c.alternateTranslation?.trim()),
       }));
     if (result.rolePlayConsequences.length === 0) {
       delete result.rolePlayConsequences;
@@ -416,15 +422,18 @@ NEVER wrap words in ** or ^^ — the app highlights vocabulary; use plain text o
   let targetVocabWord = '';
   if (tag === 'VOC') {
     // If grammarFocus looks like "Vocabulário: Bon", extract "bon" and remove it from known list
-    // so the AI isn't forced to exclude it from newVocabulary.
-    targetVocabWord = grammarFocus.replace(/vocabulario:|vocabulário:|vocabulary:/i, '').trim().toLowerCase();
-    if (targetVocabWord) {
+    // so the AI isn't forced to exclude it from newVocabulary. A target the learner
+    // already has stored stays excluded — it would be stripped after generation
+    // anyway, wasting one of the two slots.
+    const focusWord = grammarFocus.replace(/vocabulario:|vocabulário:|vocabulary:/i, '').trim().toLowerCase();
+    if (focusWord && !buildKnownVocabularyMatcher(knownVocabulary)(focusWord)) {
+      targetVocabWord = focusWord;
       normalizedKnown = normalizedKnown.filter((w) => w !== targetVocabWord);
     }
   }
 
   const knownVocabInstruction = normalizedKnown.length > 0
-    ? `- CRITICAL REPETITION RULE: The user has already learned the following words. You MUST NOT include any of these in 'newVocabulary': [${normalizedKnown.slice(-1000).join(', ')}]`
+    ? `- CRITICAL REPETITION RULE: The user has already learned the following words (most recently learned ones last). You MUST NOT put any of them in 'newVocabulary', and neither a plural, feminine or article-glued variant of them (if 'ami' is listed, 'amie'/'amies'/'l'ami' are all forbidden too): [${normalizedKnown.slice(-1000).join(', ')}]`
     : '';
 
   const dialogueVocabGuard = isEarlyLearner
@@ -447,9 +456,12 @@ NEVER wrap words in ** or ^^ — the app highlights vocabulary; use plain text o
 
   const intentMode = tag === 'MISS' && ['B1', 'B2', 'C1', 'C2'].includes(level);
   
-  const translationInstruction = intentMode
-    ? `- INTENT MODE TRANSLATIONS: Because this is an advanced mission, 'dialogueTranslations' for the learner's ("Você") lines MUST BE INTENTS, not literal translations. Example: "Diga que você não concorda e sugira ir de trem." or "Peça a conta e pergunte se aceitam cartão." The local's lines should remain normal natural Portuguese translations.`
-    : `- NATURAL TRANSLATIONS: 'dialogueTranslations' must be NATURAL Brazilian Portuguese — NO dictionary-style parentheticals. Just how a Brazilian would say it. Use "buscar" (go get) not "procurar" (search) when the speaker already knows where something is.`;
+  const translationInstruction = `${
+    intentMode
+      ? `- INTENT MODE TRANSLATIONS: Because this is an advanced mission, 'dialogueTranslations' for the learner's ("Você") lines MUST BE INTENTS, not literal translations. Example: "Diga que você não concorda e sugira ir de trem." or "Peça a conta e pergunte se aceitam cartão." The local's lines should remain normal natural Portuguese translations.`
+      : `- NATURAL TRANSLATIONS: 'dialogueTranslations' must be NATURAL Brazilian Portuguese — NO dictionary-style parentheticals. Just how a Brazilian would say it. Use "buscar" (go get) not "procurar" (search) when the speaker already knows where something is.`
+  }
+${NATURAL_PT_BR_RULE}`;
 
   const prompt = `${speakerIntro}
 

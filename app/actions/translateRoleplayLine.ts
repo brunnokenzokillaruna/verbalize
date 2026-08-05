@@ -2,6 +2,7 @@
 
 import { callGeminiJSON } from '@/services/gemini';
 import { LANG_LABEL } from '@/lib/practiceExercises/constants';
+import { NATURAL_PT_BR_RULE_COMPACT, normalizeToEverydayPtBr } from '@/lib/naturalPtBr';
 import type { SupportedLanguage } from '@/types';
 
 export interface TranslateRoleplayLineParams {
@@ -20,7 +21,8 @@ Rules:
 - Return ONLY valid JSON: { "translationPt": string }
 - Keep meaning, tone, and register (casual café chat stays casual).
 - Be concise — one line matching the original length roughly.
-- Do not add explanations, notes, or quotation marks around the whole sentence.`;
+- Do not add explanations, notes, or quotation marks around the whole sentence.
+- ${NATURAL_PT_BR_RULE_COMPACT}`;
 
 export async function translateRoleplayLine(
   params: TranslateRoleplayLineParams,
@@ -45,7 +47,7 @@ export async function translateRoleplayLine(
       return { translationPt: '', error: 'EMPTY' };
     }
 
-    return { translationPt };
+    return { translationPt: normalizeToEverydayPtBr(translationPt) };
   } catch (err) {
     console.warn('[translateRoleplayLine] failed:', err);
     return { translationPt: '', error: 'TRANSLATE_FAILED' };

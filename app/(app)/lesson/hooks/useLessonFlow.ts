@@ -8,6 +8,7 @@ import { generateGrammarBridge } from '@/app/actions/generateGrammarBridge';
 import { generatePracticeExercises } from '@/app/actions/generatePracticeExercises';
 import { getVerbConjugation } from '@/app/actions/getVerbConjugation';
 import { logLesson, updateLessonStats, upsertVocabularyItem, saveLessonMistake, updateUser } from '@/services/firestore';
+import { canonicalVocabKey } from '@/lib/vocabCanonical';
 import { sessionHasProduction } from '@/lib/practiceExercises/productionTypes';
 import { applyAdaptiveTier } from '@/lib/practiceExercises/adaptiveTier';
 import { assemblePracticeSession, injectImageMatchIntoPool } from '@/utils/assemblePracticeExercises';
@@ -318,6 +319,14 @@ export function useLessonFlow({
         chunk.entryType,
       ).catch(console.error);
     });
+
+    // Keep the in-session known list in sync with what was just persisted, so a
+    // pregeneration triggered later in this session cannot reuse these words.
+    const learnedNow = [
+      ...store.hook.newVocabulary,
+      ...(store.hook.newChunks?.map((chunk) => chunk.phrase) ?? []),
+    ].map(canonicalVocabKey);
+    store.setKnownVocabulary([...new Set([...store.knownVocabulary, ...learnedNow])]);
 
     if (store.hook.verbWord) {
       getVerbConjugation(store.hook.verbWord, language).catch(console.error);

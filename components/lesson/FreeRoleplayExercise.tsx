@@ -76,10 +76,15 @@ export function FreeRoleplayExercise({
           <div className="flex items-center gap-2 mb-2">
             <Lightbulb size={15} className="text-[var(--color-primary)]" />
             <span className="text-[10px] font-black uppercase tracking-wider text-[var(--color-text-muted)]">
-              Por que funciona
+              Uma resposta modelo
             </span>
           </div>
-          <p className="text-sm font-medium leading-relaxed text-[var(--color-text-secondary)]">
+          {/* The sentence must be shown, because the explanation below comments on
+              it — not on what the learner wrote. */}
+          <p className="text-sm font-semibold italic leading-relaxed text-[var(--color-text-primary)]">
+            {data.exampleResponse}
+          </p>
+          <p className="mt-2 text-sm font-medium leading-relaxed text-[var(--color-text-secondary)]">
             {data.explanation}
           </p>
         </div>

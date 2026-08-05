@@ -1,4 +1,13 @@
+import { NATURAL_PT_BR_RULE_COMPACT } from '@/lib/naturalPtBr';
+import { buildKnownVocabularyMatcher } from '@/lib/vocabCanonical';
 import type { SupportedLanguage, ProficiencyLevel, LessonTag } from '@/types';
+
+/**
+ * How many known words the fast-path prompt carries. The list is ordered oldest
+ * first, so the tail holds the words the learner just saw — the ones the model
+ * is most likely to reach for again.
+ */
+const KNOWN_WORDS_IN_PROMPT = 150;
 
 const LANG_LABEL: Record<SupportedLanguage, string> = {
   fr: 'French',
@@ -143,15 +152,17 @@ export function buildMinimalHookPrompt(params: HookGenerationParams): {
   let normalizedKnown = knownVocabulary.map((w) => w.toLowerCase());
   let targetVocabWord = '';
   if (tag === 'VOC') {
-    targetVocabWord = grammarFocus.replace(/vocabulario:|vocabulário:|vocabulary:/i, '').trim().toLowerCase();
-    if (targetVocabWord) {
+    const focusWord = grammarFocus.replace(/vocabulario:|vocabulário:|vocabulary:/i, '').trim().toLowerCase();
+    // Already-stored targets stay excluded — they get stripped after generation anyway.
+    if (focusWord && !buildKnownVocabularyMatcher(knownVocabulary)(focusWord)) {
+      targetVocabWord = focusWord;
       normalizedKnown = normalizedKnown.filter((w) => w !== targetVocabWord);
     }
   }
 
   const knownBlock =
     normalizedKnown.length > 0
-      ? `Do NOT repeat in newVocabulary: [${normalizedKnown.slice(-80).join(', ')}]`
+      ? `Already learned (most recent last) — forbidden in newVocabulary, including plural / feminine / article-glued variants: [${normalizedKnown.slice(-KNOWN_WORDS_IN_PROMPT).join(', ')}]`
       : '';
 
   const speakerIntro =
@@ -191,6 +202,7 @@ Rules:
 - Exactly 2 newVocabulary items (non-verbs, lowercase, appear in dialogue)
 - NEVER include days of the week, months of the year, speaker names, or other proper nouns in newVocabulary (e.g. Alice, Marie, Paris)
 - ${translationRule}
+- ${NATURAL_PT_BR_RULE_COMPACT}
 - grammarFocus: one sentence describing grammar used
 - No markdown; no extra JSON fields
 

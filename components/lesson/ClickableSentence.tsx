@@ -1,6 +1,7 @@
 'use client';
 
 import { ClickableWord, type WordClickPayload } from './ClickableWord';
+import { tokenizeNarratedText } from '@/lib/dialogueNarration';
 
 interface ClickableSentenceProps {
   text: string;
@@ -8,10 +9,9 @@ interface ClickableSentenceProps {
   newVocabulary?: string[];
   newVerbs?: string[];
   onWordClick?: (payload: WordClickPayload) => void;
+  narratedRange?: { start: number; end: number } | null;
   className?: string;
 }
-
-const PUNCTUATION_RE = /([.,!?;:»«\u201c\u201d\u2018\u2019"'()[\]{}])/;
 
 /** Strip diacritics so e.g. "achète" and "achete" compare equal. */
 function normalize(s: string): string {
@@ -49,24 +49,35 @@ export function ClickableSentence({
   newVocabulary = [],
   newVerbs = [],
   onWordClick,
+  narratedRange = null,
   className = '',
 }: ClickableSentenceProps) {
   type Token =
-    | { type: 'space'; value: string }
-    | { type: 'punct'; value: string }
-    | { type: 'word'; value: string };
+    | { type: 'separator'; value: string; start: number; end: number }
+    | { type: 'word'; value: string; start: number; end: number };
 
-  // Tokenize: split on spaces but keep punctuation attached for analysis
-  const tokens = text.split(/(\s+)/).flatMap((token): Token[] => {
-    if (/^\s+$/.test(token)) return [{ type: 'space', value: token }];
-    // Split punctuation away from the word
-    const parts = token.split(PUNCTUATION_RE).filter(Boolean);
-    return parts.map((p): Token =>
-      PUNCTUATION_RE.test(p)
-        ? { type: 'punct', value: p }
-        : { type: 'word', value: p },
-    );
-  });
+  const tokens: Token[] = [];
+  let cursor = 0;
+  for (const word of tokenizeNarratedText(text)) {
+    if (word.start > cursor) {
+      tokens.push({
+        type: 'separator',
+        value: text.slice(cursor, word.start),
+        start: cursor,
+        end: word.start,
+      });
+    }
+    tokens.push({ type: 'word', value: word.text, start: word.start, end: word.end });
+    cursor = word.end;
+  }
+  if (cursor < text.length) {
+    tokens.push({
+      type: 'separator',
+      value: text.slice(cursor),
+      start: cursor,
+      end: text.length,
+    });
+  }
 
   return (
     <p
@@ -74,22 +85,22 @@ export function ClickableSentence({
       style={{ color: 'var(--color-text-primary)' }}
     >
       {tokens.map((token, i) => {
-        if (token.type === 'space') {
+        if (token.type === 'separator') {
           return <span key={i}>{token.value}</span>;
         }
-        if (token.type === 'punct') {
-          return (
-            <ClickableWord key={i} word={token.value} isPunctuation />
-          );
-        }
-        const clean = token.value.replace(/\*+/g, '').replace(/[.,!?;:]/g, '');
+        const clean = token.value.replace(/\*+/g, '');
         const displayWord = token.value.replace(/\*+/g, '');
+        const isNarrating =
+          !!narratedRange &&
+          token.start < narratedRange.end &&
+          token.end > narratedRange.start;
         return (
           <ClickableWord
             key={i}
             word={displayWord}
             isNewVocabulary={matchesVocab(clean, newVocabulary)}
             isNewVerb={matchesVocab(clean, newVerbs)}
+            isNarrating={isNarrating}
             onWordClick={onWordClick}
           />
         );

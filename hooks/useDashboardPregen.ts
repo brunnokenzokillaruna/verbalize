@@ -4,6 +4,7 @@ import { isAggressivePregenEnabled } from '@/lib/geminiDevGuard';
 import { isPregenSchemaCurrent } from '@/lib/practiceExercises/constants';
 import { pregenerateNextLesson } from '@/app/actions/pregenerateNextLesson';
 import { getPregeneratedLesson, getUserVocabulary } from '@/services/firestore';
+import { canonicalVocabKey } from '@/lib/vocabCanonical';
 import type { LessonDefinition, UserDocument } from '@/types';
 import type { User } from 'firebase/auth';
 
@@ -67,10 +68,10 @@ export function useDashboardPregen(
             devLog(`[Dashboard Pregen] 🔮 Active lesson ${lessonId} is a cache MISS. Pregenerating in background...`);
           }
           const userVocabulary = await getUserVocabulary(user.uid, language);
-          const knownVocabulary = userVocabulary.map((v) => v.word.toLowerCase());
+          const knownVocabulary = userVocabulary.map((v) => canonicalVocabKey(v.word));
           const masteredVocabulary = userVocabulary
             .filter((v) => (v.srsLevel ?? 0) >= 4)
-            .map((v) => v.word.toLowerCase());
+            .map((v) => canonicalVocabKey(v.word));
           const ok = await pregenerateNextLesson(
             user.uid,
             activeLesson,

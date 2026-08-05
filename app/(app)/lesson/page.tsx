@@ -58,7 +58,14 @@ export default function LessonPage() {
     playSound,
   ]);
 
-  const { isPlaying, playingLineIdx, isLoadingAudio, handleAudioButton } = useLessonAudio(
+  const {
+    isPlaying,
+    playingLineIdx,
+    narratedRange,
+    isLoadingAudio,
+    speakerVoices,
+    handleAudioButton,
+  } = useLessonAudio(
     store.phase,
     store.lesson,
     store.hook,
@@ -265,6 +272,8 @@ export default function LessonPage() {
             isPlaying={isPlaying}
             isLoadingAudio={isLoadingAudio}
             playingLineIdx={playingLineIdx}
+            narratedRange={narratedRange}
+            speakerVoices={speakerVoices}
             onAudioButton={handleAudioButton}
             onWordClick={handleWordClick}
             onAnswer={handleAnswer}

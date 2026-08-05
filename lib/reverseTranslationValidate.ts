@@ -4,6 +4,11 @@
  * silently accepting meaning changes.
  */
 
+import {
+  fixableCorrectionSegments,
+  type CorrectionSegment,
+} from '@/lib/reverseTranslationDiff';
+
 export type ReverseTranslationVerdict = 'exact' | 'acceptable' | 'soft' | 'wrong';
 
 export interface ReverseTranslationValidation {
@@ -11,6 +16,7 @@ export interface ReverseTranslationValidation {
   verdict: ReverseTranslationVerdict;
   note?: string;
   correctedSentence?: string;
+  corrections?: CorrectionSegment[];
 }
 
 const FR_SYNONYM_GROUPS: string[][] = [
@@ -163,21 +169,44 @@ function hitsMeaningTrap(user: string, reference: string): string | null {
   return null;
 }
 
-function softAccept(note: string, correctedSentence: string): ReverseTranslationValidation {
+/**
+ * Without Gemini there is no per-mistake reasoning, but the diff still tells the
+ * learner exactly which words differ — better than a generic "confira o modelo".
+ */
+function diffCorrections(
+  userAnswer: string,
+  correctedSentence?: string,
+): CorrectionSegment[] | undefined {
+  if (!correctedSentence) return undefined;
+  const segments = fixableCorrectionSegments(userAnswer, correctedSentence);
+  return segments.length > 0 ? segments : undefined;
+}
+
+function softAccept(
+  userAnswer: string,
+  note: string,
+  correctedSentence: string,
+): ReverseTranslationValidation {
   return {
     accepted: true,
     verdict: 'soft',
     note,
     correctedSentence,
+    corrections: diffCorrections(userAnswer, correctedSentence),
   };
 }
 
-function reject(note: string, correctedSentence?: string): ReverseTranslationValidation {
+function reject(
+  userAnswer: string,
+  note: string,
+  correctedSentence?: string,
+): ReverseTranslationValidation {
   return {
     accepted: false,
     verdict: 'wrong',
     note,
     correctedSentence,
+    corrections: diffCorrections(userAnswer, correctedSentence),
   };
 }
 
@@ -188,7 +217,7 @@ export function validateReverseTranslationLocal(
 ): ReverseTranslationValidation {
   const userNorm = normalize(userAnswer);
   if (!userNorm) {
-    return reject('Digite uma resposta antes de enviar.');
+    return reject(userAnswer, 'Digite uma resposta antes de enviar.');
   }
 
   const variants = Array.isArray(acceptableVariants) ? acceptableVariants : [];
@@ -203,6 +232,7 @@ export function validateReverseTranslationLocal(
   const trap = hitsMeaningTrap(userAnswer, expectedAnswer);
   if (trap) {
     return reject(
+      userAnswer,
       `Quase — mas ${trap}. Confira a frase em português e ajuste o sentido.`,
       expectedAnswer,
     );
@@ -210,6 +240,7 @@ export function validateReverseTranslationLocal(
 
   if (usesAdjectiveInsteadOfAdverb(userAnswer, expectedAnswer)) {
     return reject(
+      userAnswer,
       'Use o advérbio (ex.: "rapidement", "vite"), não o adjetivo ("rapide"). Em português falamos "rápido", mas em francês a tradução correta aqui é um advérbio.',
       expectedAnswer,
     );
@@ -231,6 +262,7 @@ export function validateReverseTranslationLocal(
     // Soft: meaning content preserved, small form differences
     if (contentOverlap >= 0.85 && similarity >= 0.78) {
       return softAccept(
+        userAnswer,
         'Sua resposta ficou bem próxima. Confira a versão modelo para polir detalhes (artigos, ordem das palavras ou um termo mais natural).',
         expectedAnswer,
       );
@@ -238,6 +270,7 @@ export function validateReverseTranslationLocal(
   }
 
   return reject(
+    userAnswer,
     'A tradução não corresponde ao sentido esperado. Confira a frase em português e tente de novo.',
     expectedAnswer,
   );

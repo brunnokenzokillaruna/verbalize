@@ -1,5 +1,10 @@
 'use server';
 
+import {
+  NATURAL_PT_BR_RULE_COMPACT,
+  normalizeToEverydayPtBr,
+  normalizeToEverydayPtBrOptional,
+} from '@/lib/naturalPtBr';
 import { callGeminiJSON } from '@/services/gemini';
 import type { HookResult, LessonTag, ProficiencyLevel, SupportedLanguage } from '@/types';
 
@@ -53,7 +58,8 @@ Output ONLY this JSON:
 
 Rules:
 - dialogueVerbs: every verb in infinitive form (lowercase)
-- newChunks: only multi-word expressions actually in the dialogue (max 2)${tag === 'MISS' ? '\n- rolePlayConsequences: max 1 alternate NPC line if learner failed previous turn; npcLineIndex 0-based' : ''}`;
+- newChunks: only multi-word expressions actually in the dialogue (max 2)${tag === 'MISS' ? '\n- rolePlayConsequences: max 1 alternate NPC line if learner failed previous turn; npcLineIndex 0-based' : ''}
+- ${NATURAL_PT_BR_RULE_COMPACT}`;
 
   try {
     const raw = await callGeminiJSON<EnrichmentPayload>(prompt, systemPrompt, 1024, 0, 'lightweight');
@@ -70,7 +76,7 @@ Rules:
         .filter((c) => c.phrase?.trim() && c.translation?.trim())
         .map((c) => ({
           phrase: c.phrase.trim(),
-          translation: c.translation.trim(),
+          translation: normalizeToEverydayPtBr(c.translation.trim()),
           entryType: c.entryType ?? 'expression',
         }));
     }
@@ -88,7 +94,7 @@ Rules:
         .map((c) => ({
           npcLineIndex: c.npcLineIndex,
           alternateText: c.alternateText.trim(),
-          alternateTranslation: c.alternateTranslation?.trim(),
+          alternateTranslation: normalizeToEverydayPtBrOptional(c.alternateTranslation?.trim()),
         }));
     }
 

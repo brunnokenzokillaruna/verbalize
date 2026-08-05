@@ -8,6 +8,8 @@ import {
   stripSpeakerPrefix,
   type SpeakerGender,
 } from '@/lib/speakerGender';
+import type { DialogueSpeakerVoice } from '@/lib/dialogueVoiceAvatars';
+import type { CharacterAlignment } from '@/lib/dialogueNarration';
 
 /* ------------------------------------------------------------------ */
 /*  ElevenLabs Text-to-Speech — dialogue synthesis with cache          */
@@ -27,6 +29,12 @@ interface ElevenLabsVoice {
   id: string;
   name: string;
 }
+
+export type ElevenLabsDialogueResult = {
+  chunks: string[];
+  alignments: Array<CharacterAlignment | null>;
+  speakerVoices: DialogueSpeakerVoice[];
+};
 
 const VOICE_PAIRS: Record<SupportedLanguage, { female: ElevenLabsVoice; male: ElevenLabsVoice }> = {
   fr: {
@@ -52,6 +60,10 @@ const LANG_CODES: Record<SupportedLanguage, string> = {
    within a warm function the cache persists across invocations.       */
 
 const audioCache = new Map<string, string>();
+const alignedAudioCache = new Map<
+  string,
+  { audioBase64: string; alignment: CharacterAlignment | null }
+>();
 
 function cacheKey(text: string, voiceId: string, lang: string): string {
   // Simple but deterministic key — good enough for an in-memory Map.
@@ -127,6 +139,66 @@ async function callElevenLabs(
   }
 }
 
+async function callElevenLabsWithTimestamps(
+  text: string,
+  voiceId: string,
+  language: SupportedLanguage,
+  apiKey: string,
+): Promise<{ audioBase64: string; alignment: CharacterAlignment | null } | null> {
+  const key = cacheKey(text, voiceId, LANG_CODES[language]);
+  const cached = alignedAudioCache.get(key);
+  if (cached) return cached;
+
+  try {
+    const res = await fetch(
+      `${ELEVENLABS_API_URL}/${voiceId}/with-timestamps`,
+      {
+        method: 'POST',
+        headers: {
+          'xi-api-key': apiKey,
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          text,
+          model_id: 'eleven_multilingual_v2',
+          language_code: LANG_CODES[language],
+          voice_settings: {
+            stability: 0.55,
+            similarity_boost: 0.75,
+            style: 0.45,
+            speed: 0.92,
+            use_speaker_boost: true,
+          },
+        }),
+      },
+    );
+
+    if (!res.ok) {
+      const err = await res.text().catch(() => '');
+      console.error('[ElevenLabs timestamps] API error:', res.status, err);
+      return null;
+    }
+
+    const data = (await res.json()) as {
+      audio_base64?: string;
+      alignment?: CharacterAlignment | null;
+      normalized_alignment?: CharacterAlignment | null;
+    };
+    if (!data.audio_base64) return null;
+
+    const result = {
+      audioBase64: data.audio_base64,
+      alignment: data.alignment ?? data.normalized_alignment ?? null,
+    };
+    alignedAudioCache.set(key, result);
+    return result;
+  } catch (err) {
+    console.error('[ElevenLabs timestamps] Fetch error:', err);
+    return null;
+  }
+}
+
 function voiceForGender(
   pair: { female: ElevenLabsVoice; male: ElevenLabsVoice },
   gender: SpeakerGender,
@@ -144,34 +216,68 @@ function voiceForGender(
  * input lines.  Cached results are returned instantly without burning
  * any ElevenLabs credits.
  */
-export async function synthesizeDialogueElevenLabs(
+async function synthesizeDialogueElevenLabsResult(
   lines: string[],
   language: SupportedLanguage,
-): Promise<string[]> {
+): Promise<ElevenLabsDialogueResult> {
   const apiKey = process.env.ELEVENLABS_API_KEY;
   if (!apiKey) {
     console.warn('[ElevenLabs] ELEVENLABS_API_KEY not set — skipping.');
-    return [];
+    return { chunks: [], alignments: [], speakerVoices: [] };
   }
 
   const pair = VOICE_PAIRS[language];
   const nonEmpty = lines.filter((l) => l.trim().length > 0);
   const speakers = listSpeakersInOrder(nonEmpty);
   const genders = resolveSpeakerGenders(nonEmpty);
+  const voiceBySpeaker = new Map<string, string>();
 
   // Free accounts have a limit of 2 concurrent requests.
   // We process sequentially to avoid the HTTP 429 "Too many concurrent requests" error.
-  const results: (string | null)[] = [];
+  const results: Array<{
+    audioBase64: string;
+    alignment: CharacterAlignment | null;
+  } | null> = [];
   for (let i = 0; i < nonEmpty.length; i++) {
     const line = nonEmpty[i]!;
     const speaker = speakerKeyForLine(line, i, speakers);
     const gender = genders.get(speaker) ?? (i % 2 === 0 ? 'female' : 'male');
     const voice = voiceForGender(pair, gender);
-    const audio = await callElevenLabs(stripSpeakerPrefix(line), voice.id, language, apiKey);
+    voiceBySpeaker.set(speaker, voice.name);
+    const audio = await callElevenLabsWithTimestamps(
+      stripSpeakerPrefix(line),
+      voice.id,
+      language,
+      apiKey,
+    );
     results.push(audio);
   }
 
-  return results.filter((r): r is string => r !== null);
+  const successful = results.filter(
+    (
+      result,
+    ): result is { audioBase64: string; alignment: CharacterAlignment | null } =>
+      result !== null,
+  );
+  return {
+    chunks: successful.map((result) => result.audioBase64),
+    alignments: successful.map((result) => result.alignment),
+    speakerVoices: [...voiceBySpeaker].map(([speaker, voiceName]) => ({ speaker, voiceName })),
+  };
+}
+
+export async function synthesizeDialogueElevenLabs(
+  lines: string[],
+  language: SupportedLanguage,
+): Promise<string[]> {
+  return (await synthesizeDialogueElevenLabsResult(lines, language)).chunks;
+}
+
+export async function synthesizeDialogueElevenLabsWithVoices(
+  lines: string[],
+  language: SupportedLanguage,
+): Promise<ElevenLabsDialogueResult> {
+  return synthesizeDialogueElevenLabsResult(lines, language);
 }
 
 /**

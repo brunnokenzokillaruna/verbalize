@@ -11,6 +11,74 @@ export function wordsMatchCanonically(a: string, b: string): boolean {
   return canonicalVocabKey(a) === canonicalVocabKey(b);
 }
 
+/** "le pain" → "pain", "l'addition" → "addition". */
+function stripLeadingDeterminer(word: string): string {
+  return word
+    .trim()
+    .replace(/^(?:l|d|j|n|s|c|m|t|qu)['’]\s*/i, '')
+    .replace(/^(?:le|la|les|un|une|des|du|de|au|aux|the|an|a)\s+/i, '');
+}
+
+/**
+ * Stems for plural and French gender agreement, so "amies" and "ami" or
+ * "contente" and "content" resolve to a shared key.
+ */
+function inflectionVariants(key: string): string[] {
+  const variants: string[] = [];
+  const push = (stem: string) => {
+    if (stem.length >= 3) variants.push(stem);
+  };
+
+  if (key.endsWith('ies')) push(`${key.slice(0, -3)}y`);
+  if (key.endsWith('es')) {
+    push(key.slice(0, -1));
+    push(key.slice(0, -2));
+  } else if (key.endsWith('s') || key.endsWith('x')) {
+    push(key.slice(0, -1));
+  }
+
+  if (key.endsWith('euse')) push(`${key.slice(0, -4)}eux`);
+  if (key.endsWith('trice')) push(`${key.slice(0, -5)}teur`);
+  if (key.endsWith('ive')) push(`${key.slice(0, -3)}if`);
+  if (key.endsWith('lle')) push(key.slice(0, -2));
+  if (key.endsWith('e')) push(key.slice(0, -1));
+
+  return variants;
+}
+
+/** Every canonical key a word may be stored under in the learner's bank. */
+export function vocabVariantKeys(word: string): string[] {
+  const keys = new Set<string>();
+  for (const form of new Set([word, stripLeadingDeterminer(word)])) {
+    const key = canonicalVocabKey(form);
+    if (key.length < 2) continue;
+    keys.add(key);
+    for (const variant of inflectionVariants(key)) keys.add(variant);
+  }
+  return [...keys];
+}
+
+/**
+ * Tests whether a word is already in the learner's vocabulary bank, tolerating
+ * plurals, gender agreement and glued determiners. Words that only exist inside
+ * a stored multi-word entry (chunk, collocation) also count as known.
+ */
+export function buildKnownVocabularyMatcher(
+  knownWords: Iterable<string>,
+): (word: string) => boolean {
+  const knownKeys = new Set<string>();
+  for (const entry of knownWords) {
+    for (const key of vocabVariantKeys(entry)) knownKeys.add(key);
+    const parts = entry.split(/[\s'’-]+/).filter((part) => part.length >= 3);
+    if (parts.length > 1) {
+      for (const part of parts) {
+        for (const key of vocabVariantKeys(part)) knownKeys.add(key);
+      }
+    }
+  }
+  return (word: string) => vocabVariantKeys(word).some((key) => knownKeys.has(key));
+}
+
 /** Deterministic Firestore document ID — one doc per user + language + word. */
 export function buildVocabDocId(
   uid: string,
@@ -117,6 +185,13 @@ export function mergeVocabularyGroup(group: UserVocabularyDocument[]): UserVocab
     lastReview: lastReview.lastReview,
     nextReview: nextReview.nextReview,
   };
+}
+
+/** Oldest first, so `slice(-N)` yields the N most recently learned words. */
+export function sortVocabularyByFirstSeen(
+  items: UserVocabularyDocument[],
+): UserVocabularyDocument[] {
+  return [...items].sort((a, b) => timestampMillis(a.firstSeen) - timestampMillis(b.firstSeen));
 }
 
 /** Collapse duplicate cards that share the same canonical word key. */

@@ -16,6 +16,7 @@ import {
   stripSpeakerPrefix,
   type SpeakerGender,
 } from '@/lib/speakerGender';
+import type { DialogueSpeakerVoice } from '@/lib/dialogueVoiceAvatars';
 import type { SupportedLanguage } from '@/types';
 
 /* ------------------------------------------------------------------ */
@@ -46,6 +47,7 @@ export type GeminiDialogueResult = {
   mimeType: 'audio/wav';
   /** True when the whole dialogue is one audio file (no per-line highlight). */
   monolithic: boolean;
+  speakerVoices: DialogueSpeakerVoice[];
 };
 
 const dialogueCache = new Map<string, GeminiDialogueResult>();
@@ -217,6 +219,10 @@ export async function synthesizeDialogueGemini(
     chunks: [wavBase64],
     mimeType: 'audio/wav',
     monolithic: true,
+    speakerVoices: speechConfig.map(({ speaker, voice }) => ({
+      speaker,
+      voiceName: voice,
+    })),
   };
 
   dialogueCache.set(key, result);

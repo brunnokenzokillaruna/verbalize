@@ -15,6 +15,7 @@ import {
   Timestamp,
 } from 'firebase/firestore';
 import { getDb } from './firebase';
+import { normalizeHookPtBr } from '@/lib/naturalPtBr';
 import { getPregenGeneratingTimeoutMs } from '@/lib/pregenTiming';
 import {
   isPregenSchemaCurrent,
@@ -44,6 +45,7 @@ import {
   canonicalVocabKey,
   dedupeVocabularyItems,
   mergeVocabularyGroup,
+  sortVocabularyByFirstSeen,
 } from '@/lib/vocabCanonical';
 import { cleanWordToken } from '@/lib/wordTooltipUtils';
 
@@ -792,7 +794,8 @@ export async function updateLessonStats(
 // ─── Vocabulary (full list + translation patch) ───────────────────────────────
 
 /**
- * Returns all vocabulary items for a user+language (not filtered by due date).
+ * Returns all vocabulary items for a user+language (not filtered by due date),
+ * oldest first so callers can take the N most recently learned words.
  */
 export async function getUserVocabulary(
   uid: string,
@@ -805,7 +808,7 @@ export async function getUserVocabulary(
   );
   const snap = await getDocs(q);
   const items = snap.docs.map((d) => ({ id: d.id, ...d.data() } as UserVocabularyDocument));
-  const deduped = dedupeVocabularyItems(items);
+  const deduped = sortVocabularyByFirstSeen(dedupeVocabularyItems(items));
 
   if (deduped.length < items.length) {
     void consolidateAllDuplicateVocabulary(uid, language, items).catch((err) => {
@@ -1129,7 +1132,9 @@ export async function getPregeneratedLesson(
 ): Promise<PregeneratedLessonDocument | null> {
   try {
     const snap = await getDoc(doc(await getDb(), 'lesson_pregen', pregeneratedDocId(uid, lessonId)));
-    return snap.exists() ? (snap.data() as PregeneratedLessonDocument) : null;
+    if (!snap.exists()) return null;
+    const data = snap.data() as PregeneratedLessonDocument;
+    return data.hook ? { ...data, hook: normalizeHookPtBr(data.hook) } : data;
   } catch (err) {
     if (isFirestorePermissionDenied(err)) {
       console.warn('[getPregeneratedLesson] Permission denied — treating as cache miss');

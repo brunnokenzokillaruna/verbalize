@@ -20,7 +20,8 @@ import { getLessonSceneImage } from '@/app/actions/getLessonSceneImage';
 import { fetchPregeneratedLessonWithWait } from '@/lib/waitForPregeneratedLesson';
 import { deletePregeneratedLesson, getUserVocabulary, upsertVocabularyItem, tryStartPregeneratingLesson, abortPregeneratedLesson } from '@/services/firestore';
 import { canonicalVocabKey } from '@/lib/vocabCanonical';
-import { filterHookVocabularyForKnownWords } from '@/lib/hookVocabulary';
+import { filterHookVocabularyForKnownWords, filterKnownFromNewChunks } from '@/lib/hookVocabulary';
+import { collectDialogueTranslationTargets } from '@/lib/dialogueNarration';
 import { tooltipCacheKey } from '@/lib/wordTooltipUtils';
 import type { GrammarBridgeResult, Exercise, LessonTag, HookResult, PregeneratedLessonDocument } from '@/types';
 
@@ -297,6 +298,9 @@ export function useLessonBootstrap({
             enrichHookMetadata({ dialogue, language: lang, tag, level: lesson.level })
               .then((partial) => {
                 if (Object.keys(partial).length === 0) return;
+                if (partial.newChunks?.length) {
+                  partial.newChunks = filterKnownFromNewChunks(partial.newChunks, knownVocabulary);
+                }
                 useLessonStore.getState().mergeHook(partial);
                 devLog(`[Timing] ✅ Hook metadata enriquecido: ${(performance.now() - tEnrich).toFixed(0)}ms`);
               })
@@ -459,47 +463,60 @@ export function useLessonBootstrap({
       }
     }
 
+    const translatedKeys = new Set<string>();
     if (hook.vocabTranslations) {
-      words.forEach((word) => {
-        const result = hook.vocabTranslations![word];
+      for (const [word, result] of Object.entries(hook.vocabTranslations)) {
+        if (!result?.translation) continue;
+        translatedKeys.add(canonicalVocabKey(word));
+        store.setVocabTranslation(word, result.translation);
+        store.cacheWordTooltip(tooltipCacheKey(word, language, false), result);
+      }
+    }
+    hook.newChunks?.forEach((chunk) => {
+      translatedKeys.add(canonicalVocabKey(chunk.phrase));
+      store.setVocabTranslation(chunk.phrase, chunk.translation);
+    });
+
+    const dialogueTranslationTargets = collectDialogueTranslationTargets(
+      dialogue,
+      hook.newChunks,
+    ).filter((target) => !translatedKeys.has(canonicalVocabKey(target)));
+    const tTrans = performance.now();
+    void (async () => {
+      const batch = await translateWordsBatch(
+        dialogueTranslationTargets,
+        language,
+        dialogue,
+      );
+      if (batch?.length) {
+        for (const item of batch) {
+          if (!item.translation) continue;
+          store.setVocabTranslation(item.word, item.translation);
+          store.cacheWordTooltip(tooltipCacheKey(item.word, language, false), {
+            translation: item.translation,
+            explanation: '',
+            example: '',
+          });
+        }
+        devLog(
+          `[Timing] Traduções sincronizadas: ${(performance.now() - tTrans).toFixed(0)}ms (${batch.length} itens, 1 chamada Gemini)`,
+        );
+        return;
+      }
+
+      // Preserve the old resilient fallback for the two lesson vocabulary items.
+      for (const word of words) {
+        if (translatedKeys.has(canonicalVocabKey(word))) continue;
+        const result = await translateWord(word, dialogue, language);
         if (result?.translation) {
           store.setVocabTranslation(word, result.translation);
           store.cacheWordTooltip(tooltipCacheKey(word, language, false), result);
         }
-      });
-      devLog(`[Timing] Traduções do vocabulário: vindas do hook (0ms)`);
-    } else {
-      const tTrans = performance.now();
-      void (async () => {
-        const batch = await translateWordsBatch(words, language);
-        if (batch?.length) {
-          for (const item of batch) {
-            if (!item.translation) continue;
-            store.setVocabTranslation(item.word, item.translation);
-            store.cacheWordTooltip(tooltipCacheKey(item.word, language, false), {
-              translation: item.translation,
-              explanation: '',
-              example: '',
-            });
-          }
-          devLog(
-            `[Timing] Traduções do vocabulário (batch): ${(performance.now() - tTrans).toFixed(0)}ms (${batch.length} palavras, 1 chamada Gemini)`,
-          );
-          return;
-        }
-
-        for (const word of words) {
-          const t = performance.now();
-          const result = await translateWord(word, dialogue, language);
-          if (result?.translation) {
-            store.setVocabTranslation(word, result.translation);
-            store.cacheWordTooltip(tooltipCacheKey(word, language, false), result);
-          }
-          devLog(`[Timing] Tradução '${word}' (fallback): ${(performance.now() - t).toFixed(0)}ms`);
-        }
-      })();
-      devLog(`[Timing] Traduções iniciadas (${words.length} palavras, batch): ${(performance.now() - tTrans).toFixed(0)}ms`);
-    }
+      }
+    })();
+    devLog(
+      `[Timing] Traduções sincronizadas iniciadas (${dialogueTranslationTargets.length} itens)`,
+    );
 
     const tImages = performance.now();
     if (!vocabImagesFiredRef.current) {
@@ -549,8 +566,16 @@ export function useLessonBootstrap({
     const nextLesson = getLessonById(nextLessonId);
     if (!nextLesson) return;
 
+    // The words taught in THIS lesson only reach Firestore when it is completed,
+    // so they must be appended by hand or the next lesson can present them again.
+    const learnedThisLesson = [
+      ...(store.hook?.newVocabulary ?? []),
+      ...(store.hook?.newChunks?.map((chunk) => chunk.phrase) ?? []),
+    ].map(canonicalVocabKey);
+    const knownVocabulary = [...new Set([...store.knownVocabulary, ...learnedThisLesson])];
+
     devLog(`[Timing] 🔮 Pregen próxima lição disparado (background): ${nextLessonId}`);
-    pregenerateNextLesson(user.uid, nextLesson, profile.interests ?? [], store.knownVocabulary, store.masteredVocabulary).catch(console.error);
+    pregenerateNextLesson(user.uid, nextLesson, profile.interests ?? [], knownVocabulary, store.masteredVocabulary).catch(console.error);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [store.phase]);
 

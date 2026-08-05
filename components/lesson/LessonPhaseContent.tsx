@@ -13,6 +13,8 @@ import { CheckpointDebriefScreen } from '@/components/lesson/CheckpointDebriefSc
 import { HOOK_LISTEN_FIRST } from '@/lib/practiceExercises/constants';
 import { useLessonStore } from '@/store/lessonStore';
 import { useAuthStore } from '@/store/authStore';
+import type { DialogueSpeakerVoice } from '@/lib/dialogueVoiceAvatars';
+import type { NarratedTextRange } from '@/lib/dialogueNarration';
 import type { Exercise, LessonTag } from '@/types';
 import type { WordClickPayload } from '@/components/lesson/ClickableWord';
 
@@ -27,6 +29,8 @@ type LessonPhaseContentProps = {
   isPlaying: boolean;
   isLoadingAudio: boolean;
   playingLineIdx: number;
+  narratedRange: NarratedTextRange | null;
+  speakerVoices: DialogueSpeakerVoice[];
   onAudioButton: () => void;
   onWordClick: (payload: WordClickPayload) => void;
   onAnswer: (correct: boolean) => void;
@@ -49,6 +53,8 @@ export function LessonPhaseContent({
   isPlaying,
   isLoadingAudio,
   playingLineIdx,
+  narratedRange,
+  speakerVoices,
   onAudioButton,
   onWordClick,
   onAnswer,
@@ -81,11 +87,15 @@ export function LessonPhaseContent({
         <LessonHookScreen
           dialogue={store.hook.dialogue}
           newVocabulary={[...store.hook.newVocabulary]}
+          newChunks={store.hook.newChunks}
           newVerbs={[...store.discoveredVerbs]}
+          vocabTranslations={store.vocabTranslations}
           dialogueTranslations={store.hook.dialogueTranslations}
           isPlaying={isPlaying}
           isLoadingAudio={isLoadingAudio}
           playingLineIdx={playingLineIdx}
+          narratedRange={narratedRange}
+          speakerVoices={speakerVoices}
           onAudioButton={onAudioButton}
           onWordClick={onWordClick}
           listenFirstEnabled={HOOK_LISTEN_FIRST}

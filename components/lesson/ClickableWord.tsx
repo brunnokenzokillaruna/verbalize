@@ -14,6 +14,7 @@ interface ClickableWordProps {
   isNewVocabulary?: boolean;
   isNewVerb?: boolean;
   isPunctuation?: boolean;
+  isNarrating?: boolean;
   onWordClick?: (payload: WordClickPayload) => void;
 }
 
@@ -22,6 +23,7 @@ export function ClickableWord({
   isNewVocabulary = false,
   isNewVerb = false,
   isPunctuation = false,
+  isNarrating = false,
   onWordClick,
 }: ClickableWordProps) {
   const [ripple, setRipple] = useState(false);
@@ -55,11 +57,20 @@ export function ClickableWord({
         className="relative inline-block cursor-pointer select-none rounded-[4px] px-0.5 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-primary"
         style={{
           color: mainColor,
-          borderBottom: `2px solid ${ripple ? mainColor : rippleBorderColor}`,
+          borderBottom: `2px solid ${ripple || isNarrating ? mainColor : rippleBorderColor}`,
           fontWeight: 700,
-          backgroundColor: ripple ? bgColor : 'transparent',
+          backgroundColor: isNarrating
+            ? 'var(--color-primary-light)'
+            : ripple
+              ? bgColor
+              : 'transparent',
+          boxShadow: isNarrating
+            ? '0 0 0 2px var(--color-primary-light)'
+            : undefined,
+          transform: isNarrating ? 'translateY(-1px)' : undefined,
         }}
         aria-label={`Traduzir: ${word}`}
+        aria-current={isNarrating ? 'true' : undefined}
       >
         {ripple && (
           <span
@@ -84,9 +95,20 @@ export function ClickableWord({
       role="button"
       tabIndex={0}
       onKeyDown={(e) => e.key === 'Enter' && handleClick(e as never)}
-      className="inline-block cursor-pointer select-none rounded px-0.5 transition-colors duration-100 hover:bg-[var(--color-surface-raised)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-primary"
-      style={{ color: 'var(--color-text-primary)' }}
+      className="inline-block cursor-pointer select-none rounded px-0.5 transition-all duration-150 hover:bg-[var(--color-surface-raised)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-primary"
+      style={{
+        color: 'var(--color-text-primary)',
+        backgroundColor: isNarrating
+          ? 'var(--color-primary-light)'
+          : 'transparent',
+        boxShadow: isNarrating
+          ? '0 0 0 2px var(--color-primary-light)'
+          : undefined,
+        transform: isNarrating ? 'translateY(-1px)' : undefined,
+        fontWeight: isNarrating ? 700 : undefined,
+      }}
       aria-label={`Traduzir: ${word}`}
+      aria-current={isNarrating ? 'true' : undefined}
     >
       {word}
     </span>

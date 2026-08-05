@@ -194,6 +194,14 @@ export function OralProductionShell({
             <p className="text-sm font-semibold text-[var(--color-text-primary)] italic">
               &ldquo;{transcript}&rdquo;
             </p>
+            {evalFeedback && (
+              <p className="mt-2 text-sm text-[var(--color-text-secondary)]">{evalFeedback}</p>
+            )}
+            {evalCorrected && (
+              <p className="mt-2 text-sm font-semibold text-[var(--color-text-primary)]">
+                Como ficaria melhor: {evalCorrected}
+              </p>
+            )}
           </div>
         </div>
       )}

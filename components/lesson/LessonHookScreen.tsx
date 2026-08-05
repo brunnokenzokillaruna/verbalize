@@ -1,20 +1,35 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import { Loader2, Volume2, VolumeX, MessageSquare, Eye } from 'lucide-react';
 import { ClickableSentence } from './ClickableSentence';
+import { HighlightedTranslation } from './HighlightedTranslation';
 import { LessonSceneBanner } from './LessonSceneBanner';
+import {
+  getDialogueVoiceAvatarPath,
+  type DialogueSpeakerVoice,
+} from '@/lib/dialogueVoiceAvatars';
+import {
+  findTranslationHighlightRange,
+  resolveNarrationTarget,
+  type NarratedTextRange,
+} from '@/lib/dialogueNarration';
 import type { WordClickPayload } from './ClickableWord';
-import type { VocabImageResult } from '@/types';
+import type { HookResult, VocabImageResult } from '@/types';
 
 interface LessonHookScreenProps {
   dialogue: string;
   newVocabulary: string[];
+  newChunks?: HookResult['newChunks'];
   newVerbs?: string[];
+  vocabTranslations?: Record<string, string>;
   dialogueTranslations?: string[];
   isPlaying: boolean;
   isLoadingAudio: boolean;
   playingLineIdx: number;
+  narratedRange?: NarratedTextRange | null;
+  speakerVoices?: DialogueSpeakerVoice[];
   onAudioButton: () => void;
   onWordClick: (payload: WordClickPayload) => void;
   listenFirstEnabled?: boolean;
@@ -26,6 +41,59 @@ const SPEAKER_COLORS = {
   second: '#ec4899',
 } as const;
 
+type SpeakerAvatarProps = {
+  speakerName: string;
+  speakerInitials: string;
+  voiceName?: string;
+  speakerColor: string;
+  isActive: boolean;
+};
+
+function SpeakerAvatar({
+  speakerName,
+  speakerInitials,
+  voiceName,
+  speakerColor,
+  isActive,
+}: SpeakerAvatarProps) {
+  const [imageFailed, setImageFailed] = useState(false);
+  const imagePath = getDialogueVoiceAvatarPath(voiceName);
+  const showImage = imagePath && !imageFailed;
+
+  return (
+    <div
+      className="relative mt-0.5 flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-b-[3px] bg-surface-raised text-xs font-bold shadow-sm transition-all duration-300"
+      style={{
+        borderColor: isActive ? speakerColor : 'var(--color-border)',
+        boxShadow: isActive ? `0 5px 18px ${speakerColor}35` : undefined,
+        color: 'var(--color-text-muted)',
+        transform: isActive ? 'translateY(-2px) scale(1.04)' : undefined,
+      }}
+      title={voiceName ? `${speakerName} · voz ${voiceName}` : speakerName}
+    >
+      {showImage ? (
+        <Image
+          src={imagePath}
+          alt={`Retrato de ${speakerName || 'interlocutor'}`}
+          fill
+          sizes="48px"
+          className="object-cover"
+          onError={() => setImageFailed(true)}
+        />
+      ) : (
+        speakerInitials
+      )}
+      {isActive && showImage ? (
+        <span
+          className="pointer-events-none absolute inset-0 ring-2 ring-inset"
+          style={{ color: speakerColor }}
+          aria-hidden
+        />
+      ) : null}
+    </div>
+  );
+}
+
 function stripSpeakerPrefix(translation: string, speakerName: string): string {
   if (!speakerName) return translation;
   return translation.replace(new RegExp(`^${speakerName}\\s*:\\s*`, 'i'), '').trim();
@@ -34,11 +102,15 @@ function stripSpeakerPrefix(translation: string, speakerName: string): string {
 export function LessonHookScreen({
   dialogue,
   newVocabulary,
+  newChunks = [],
   newVerbs,
+  vocabTranslations = {},
   dialogueTranslations,
   isPlaying,
   isLoadingAudio,
   playingLineIdx,
+  narratedRange = null,
+  speakerVoices = [],
   onAudioButton,
   onWordClick,
   listenFirstEnabled = false,
@@ -77,6 +149,9 @@ export function LessonHookScreen({
   }, [playingLineIdx]);
 
   const lines = dialogue.split('\n').filter((l) => l.trim());
+  const voiceBySpeaker = new Map(
+    speakerVoices.map(({ speaker, voiceName }) => [speaker, voiceName]),
+  );
 
   return (
     <div className="flex flex-col gap-6 sm:gap-8 animate-slide-up-spring">
@@ -169,10 +244,30 @@ export function LessonHookScreen({
             const isActive = playingLineIdx === i;
             const speakerInitials = speakerName.substring(0, 1).toUpperCase();
             const speakerColor = isSecondSpeaker ? SPEAKER_COLORS.second : SPEAKER_COLORS.first;
+            const speakerKey = speakerName || (i % 2 === 0 ? 'Speaker1' : 'Speaker2');
+            const voiceName = voiceBySpeaker.get(speakerKey);
             const rawTranslation = dialogueTranslations?.[i]?.trim();
             const translation = rawTranslation
               ? stripSpeakerPrefix(rawTranslation, speakerName)
               : '';
+            const activeNarrationTarget = isActive
+              ? resolveNarrationTarget(
+                  text,
+                  narratedRange,
+                  vocabTranslations,
+                  newChunks,
+                )
+              : null;
+            const highlightedRange = activeNarrationTarget ?? (
+              isActive ? narratedRange : null
+            );
+            const translationRange =
+              activeNarrationTarget && translation
+                ? findTranslationHighlightRange(
+                    translation,
+                    activeNarrationTarget.translation,
+                  )
+                : null;
 
             return (
               <div
@@ -189,16 +284,13 @@ export function LessonHookScreen({
                     isSecondSpeaker ? 'flex-row-reverse ml-auto' : 'mr-auto'
                   }`}
                 >
-                  <div
-                    className="mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold"
-                    style={{
-                      backgroundColor: isActive ? speakerColor : 'var(--color-surface-raised)',
-                      color: isActive ? '#fff' : 'var(--color-text-muted)',
-                      border: isActive ? 'none' : '1px solid var(--color-border)',
-                    }}
-                  >
-                    {speakerInitials}
-                  </div>
+                  <SpeakerAvatar
+                    speakerName={speakerName}
+                    speakerInitials={speakerInitials}
+                    voiceName={voiceName}
+                    speakerColor={speakerColor}
+                    isActive={isActive}
+                  />
 
                   <div
                     className={[
@@ -251,6 +343,7 @@ export function LessonHookScreen({
                       newVocabulary={[...new Set(newVocabulary)]}
                       newVerbs={newVerbs ? [...new Set(newVerbs)] : []}
                       onWordClick={onWordClick}
+                      narratedRange={highlightedRange}
                       className={`dialogue-french text-left leading-[1.65] ${isActive ? 'font-bold' : ''}`}
                     />
 
@@ -261,7 +354,11 @@ export function LessonHookScreen({
                           style={{ backgroundColor: 'var(--color-border)' }}
                           aria-hidden
                         />
-                        <p className="dialogue-translation text-left">{translation}</p>
+                        <HighlightedTranslation
+                          text={translation}
+                          range={translationRange}
+                          className="dialogue-translation text-left"
+                        />
                       </>
                     )}
                   </div>

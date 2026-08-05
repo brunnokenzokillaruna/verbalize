@@ -48,6 +48,11 @@ export function FreeWrittenProductionField({
         ? 'var(--color-error)'
         : 'var(--color-border)';
 
+  const wasAccepted = phase === 'correct';
+  // 'answered' with feedback means the learner moved on after a failed attempt —
+  // the correction still belongs on screen.
+  const isSettled = phase === 'correct' || phase === 'answered';
+
   return (
     <div className="flex flex-col gap-4">
       <div className="relative flex items-center justify-center my-1">
@@ -142,17 +147,34 @@ export function FreeWrittenProductionField({
         </div>
       )}
 
-      {phase === 'correct' && (feedback || suggested) && (
-        <div className="flex items-start gap-3 rounded-2xl p-4 border-2 border-[var(--color-success)]/30 bg-[var(--color-success)]/5">
-          <CheckCircle2 size={20} className="text-[var(--color-success)] shrink-0 mt-0.5" />
+      {isSettled && (feedback || suggested) && (
+        <div
+          className={[
+            'flex items-start gap-3 rounded-2xl p-4 border-2',
+            wasAccepted
+              ? 'border-[var(--color-success)]/30 bg-[var(--color-success)]/5'
+              : 'border-[var(--color-border)] bg-[var(--color-surface-raised)]',
+          ].join(' ')}
+        >
+          {wasAccepted ? (
+            <CheckCircle2 size={20} className="text-[var(--color-success)] shrink-0 mt-0.5" />
+          ) : (
+            <XCircle size={20} className="text-[var(--color-text-muted)] shrink-0 mt-0.5" />
+          )}
           <div>
             {feedback && (
               <p className="text-sm text-[var(--color-text-secondary)]">{feedback}</p>
             )}
             {suggested &&
               suggested.trim().toLowerCase() !== input.trim().toLowerCase() && (
-                <p className="text-sm font-semibold text-[var(--color-success)] mt-2">
-                  Sua frase corrigida: {suggested}
+                <p
+                  className={`text-sm font-semibold mt-2 ${
+                    wasAccepted
+                      ? 'text-[var(--color-success)]'
+                      : 'text-[var(--color-text-primary)]'
+                  }`}
+                >
+                  {wasAccepted ? 'Sua frase corrigida' : 'Como ficaria melhor'}: {suggested}
                 </p>
               )}
           </div>

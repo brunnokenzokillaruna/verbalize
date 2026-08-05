@@ -1,6 +1,7 @@
 'use server';
 
 import { evaluateReverseTranslationGemini } from '@/lib/reverseTranslationGemini';
+import type { TranslationCorrection } from '@/lib/reverseTranslationCorrections';
 import { validateReverseTranslationLocal } from '@/lib/reverseTranslationValidate';
 import type { ReverseTranslationVerdict } from '@/lib/reverseTranslationValidate';
 
@@ -9,6 +10,8 @@ export interface ValidationResult {
   verdict: ReverseTranslationVerdict;
   note?: string;
   correctedSentence?: string;
+  /** One entry per difference between the answer and the correction. */
+  corrections?: TranslationCorrection[];
 }
 
 /**
@@ -40,6 +43,7 @@ export async function validateReverseTranslation(
         verdict: ai.verdict,
         note: ai.note,
         correctedSentence: ai.correctedSentence,
+        corrections: ai.corrections,
       };
     }
 

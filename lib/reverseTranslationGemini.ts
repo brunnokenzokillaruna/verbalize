@@ -1,4 +1,9 @@
 import { callGeminiJSON } from '@/services/gemini';
+import {
+  buildTranslationCorrections,
+  type RawModelCorrection,
+  type TranslationCorrection,
+} from '@/lib/reverseTranslationCorrections';
 import type { ReverseTranslationVerdict } from '@/lib/reverseTranslationValidate';
 
 export interface ReverseTranslationAiResult {
@@ -6,11 +11,13 @@ export interface ReverseTranslationAiResult {
   verdict: ReverseTranslationVerdict;
   note?: string;
   correctedSentence?: string;
+  corrections?: TranslationCorrection[];
 }
 
 interface GeminiPayload {
   verdict: ReverseTranslationVerdict;
   feedback: string;
+  corrections?: RawModelCorrection[];
   correctedSentence?: string;
 }
 
@@ -20,6 +27,7 @@ Return ONLY valid JSON:
 {
   "verdict": "exact" | "acceptable" | "soft" | "wrong",
   "feedback": "1-2 short sentences in Brazilian Portuguese",
+  "corrections": [{ "learner": "exact text the learner wrote", "correct": "what it should be", "why": "≤14 words in PT-BR" }],
   "correctedSentence": "optional — the LEARNER's sentence with fixes applied"
 }
 
@@ -29,15 +37,20 @@ Verdict rules:
 - soft: meaning is preserved but there are form issues (accents, apostrophes/elision, articles de/du/des, minor spelling, minor word order). Count as SUCCESS.
 - wrong: meaning changed, key word wrong, wrong tense that changes meaning, incomplete, wrong language, or unrelated. Count as FAIL.
 
-SOFT feedback rules (critical):
-- feedback MUST list the concrete mistakes by quoting learner form → correct form.
-  Example: "Corrija: mange → mangé; q'un → qu'un; du pain → de pain; je etais → j'étais; fatigue → fatigué."
-- Do NOT give only a vague "versão mais natural" or paste a model answer without naming the errors.
-- correctedSentence MUST be the LEARNER's own sentence with ONLY those fixes applied — keep their structure and word choice. NEVER replace it with a different model translation from the reference when the learner's structure already works.
-- Prefer "soft" (not "acceptable") whenever accents, apostrophes, articles, or spelling need fixing.
+corrections rules (apply to BOTH soft and wrong — critical):
+- One entry for EVERY difference between the learner's sentence and correctedSentence that a learner should understand. Do not stop at the first or the most interesting one.
+- Order by severity: the difference that breaks the meaning comes first.
+- "learner" MUST be copied verbatim from the learner's answer, as one contiguous stretch, so it can be located in their text. For something they omitted entirely, use an empty string.
+- When the learner's wording means something different, say what it actually means in "why". Example: learner wrote "à côté du projet" → "why": "isso quer dizer 'ao lado do projeto', não 'por fora'".
+- NEVER leave a wrong preposition, contraction or article unmentioned just because a bigger error exists.
 
-WRONG feedback:
-- Explain the main meaning error; correctedSentence may be the best reference translation.
+feedback rules:
+- Comment only on what the learner actually wrote. Details belong in corrections, so keep feedback to the overall picture.
+- Do NOT paste a model answer as the whole explanation.
+
+correctedSentence:
+- soft: the LEARNER's own sentence with ONLY those fixes applied — keep their structure and word choice.
+- wrong: the closest correct sentence that still preserves the Portuguese meaning.
 
 Meaning traps (ALWAYS wrong, never soft):
 - Intensity: "trop" (too) ≠ "très"/"muito" (very); "peu" ≠ "un peu" when sense changes.
@@ -71,7 +84,7 @@ Learner answer: "${params.userAnswer.trim()}"
 Grade the learner answer.`;
 
   try {
-    const raw = await callGeminiJSON<GeminiPayload>(prompt, SYSTEM_PROMPT, 320, 0, 'lightweight');
+    const raw = await callGeminiJSON<GeminiPayload>(prompt, SYSTEM_PROMPT, 640, 0, 'lightweight');
     if (!raw || typeof raw.verdict !== 'string' || typeof raw.feedback !== 'string') {
       return null;
     }
@@ -80,11 +93,25 @@ Grade the learner answer.`;
     if (!verdict) return null;
 
     const accepted = verdict === 'exact' || verdict === 'acceptable' || verdict === 'soft';
+    const feedback = raw.feedback.trim();
+    const correctedSentence = raw.correctedSentence?.trim() || undefined;
+
+    const corrections =
+      verdict === 'soft' || verdict === 'wrong'
+        ? buildTranslationCorrections({
+            learnerAnswer: params.userAnswer,
+            correctedSentence: correctedSentence || params.expectedAnswer,
+            feedback,
+            modelCorrections: raw.corrections,
+          })
+        : [];
+
     return {
       accepted,
       verdict,
-      note: raw.feedback.trim() || undefined,
-      correctedSentence: raw.correctedSentence?.trim() || undefined,
+      note: feedback || undefined,
+      correctedSentence,
+      corrections: corrections.length > 0 ? corrections : undefined,
     };
   } catch (err) {
     console.warn('[evaluateReverseTranslationGemini] failed:', err);

@@ -1,5 +1,5 @@
 import { sanitizeVocabularyToken } from '@/lib/hookSanitize';
-import { canonicalVocabKey } from '@/lib/vocabCanonical';
+import { buildKnownVocabularyMatcher, canonicalVocabKey } from '@/lib/vocabCanonical';
 
 /**
  * Character names used in dialogue generation (pickHookNames / pickNames).
@@ -39,6 +39,26 @@ const DIALOGUE_STOP_WORDS = [
   'week', 'weekend', 'matin',
   'the', 'this', 'that', 'with', 'from', 'have', 'were', 'your',
   'voce', 'você',
+  // FR greetings, fillers and high-frequency function words
+  'salut', 'bonjour', 'bonsoir', 'merci', 'oui', 'non', 'alors', 'donc', 'aussi',
+  'bien', 'beaucoup', 'aujourd', 'hui', 'maintenant', 'bientot', 'bientôt',
+  'ensuite', 'apres', 'après', 'avant', 'encore', 'toujours', 'jamais', 'quand',
+  'comment', 'pourquoi', 'parce', 'quelque', 'quelques', 'chose', 'tout', 'tous',
+  'toute', 'toutes', 'juste', 'vraiment', 'super', 'genial', 'génial', 'dommage',
+  'accord', 'souci', 'grave', 'allez', 'voila', 'voilà', 'elle', 'elles', 'nous',
+  'vous', 'mon', 'ton', 'son', 'notre', 'votre', 'leur', 'leurs', 'cela', 'celui',
+  'celle', 'quoi', 'dont', 'sont', 'etait', 'était', 'etaient', 'étaient', 'avez',
+  'avons', 'avais', 'avait', 'plus', 'moins', 'sans', 'sous', 'chez', 'entre',
+  'vers', 'jusqu', 'deja', 'déjà', 'autre', 'autres', 'meme', 'même', 'seulement',
+  'peut', 'peux', 'veux', 'veut', 'faut', 'suis', 'etre', 'être', 'ici',
+  // EN greetings, fillers and high-frequency function words
+  'hello', 'hi', 'thanks', 'thank', 'yes', 'well', 'okay', 'right', 'sure',
+  'really', 'maybe', 'about', 'there', 'here', 'they', 'them', 'their', 'these',
+  'those', 'what', 'when', 'where', 'which', 'because', 'something', 'anything',
+  'everything', 'always', 'never', 'again', 'still', 'just', 'very', 'much',
+  'many', 'more', 'less', 'than', 'then', 'also', 'into', 'over', 'after',
+  'before', 'going', 'gonna', 'want', 'need', 'know', 'think', 'could', 'would',
+  'should', 'today', 'tomorrow', 'tonight',
   // Common MISS local-role labels (PT / FR / EN)
   'recepcionista', 'garcom', 'garçom', 'atendente', 'caixa', 'medico', 'médico',
   'serveur', 'serveuse', 'caissier', 'caissiere', 'caissière', 'medecin', 'médecin',
@@ -95,25 +115,33 @@ export function filterKnownFromNewVocabulary(
   knownVocabulary: string[],
   extraExcluded: string[] = [],
 ): string[] {
-  const knownSet = new Set(knownVocabulary.map(canonicalVocabKey));
+  const isKnown = buildKnownVocabularyMatcher(knownVocabulary);
   const dynamicExcluded = buildDynamicExcludedSet(dialogue, extraExcluded);
 
-  const filtered = newVocabulary
+  const sanitized = newVocabulary
     .map(sanitizeVocabularyToken)
-    .filter(
-      (word) =>
-        word.length > 0 &&
-        !knownSet.has(canonicalVocabKey(word)) &&
-        !isExcludedVocabularyWord(word, dynamicExcluded),
-    );
+    .filter((word) => word.length > 0);
 
-  const unique = [...new Set(filtered)];
+  const alreadyLearned = sanitized.filter(isKnown);
+  if (alreadyLearned.length > 0) {
+    console.warn(
+      `[filterKnownFromNewVocabulary] Model returned already-learned words: ${alreadyLearned.join(', ')}`,
+    );
+  }
+
+  const unique = [
+    ...new Set(
+      sanitized.filter(
+        (word) => !isKnown(word) && !isExcludedVocabularyWord(word, dynamicExcluded),
+      ),
+    ),
+  ];
   if (unique.length >= 2) return unique.slice(0, 2);
 
   const needed = 2 - unique.length;
   const extras = extractFreshWordsFromDialogue(
     dialogue,
-    knownSet,
+    isKnown,
     needed,
     unique,
     dynamicExcluded,
@@ -133,7 +161,7 @@ export function filterKnownFromNewVocabulary(
 
 function extractFreshWordsFromDialogue(
   dialogue: string,
-  knownSet: Set<string>,
+  isKnown: (word: string) => boolean,
   need: number,
   exclude: string[],
   dynamicExcluded: Set<string>,
@@ -142,35 +170,54 @@ function extractFreshWordsFromDialogue(
 
   const excludeSet = new Set(exclude.map(canonicalVocabKey));
   const tokens = dialogue
-    .split(/[\s,.!?;:«»"'()[\]-]+/)
+    .split(/[\s,.!?;:«»"“”'’‘()[\]\-—–…]+/)
     .map(sanitizeVocabularyToken)
     .filter(
       (word) =>
         word.length >= 4 &&
-        !knownSet.has(canonicalVocabKey(word)) &&
+        !isKnown(word) &&
         !excludeSet.has(canonicalVocabKey(word)) &&
         !isExcludedVocabularyWord(word, dynamicExcluded),
     );
 
-  const result: string[] = [];
-  for (const token of tokens) {
-    if (result.includes(token)) continue;
-    result.push(token);
-    if (result.length >= need) break;
-  }
-  return result;
+  // Longer tokens are far more likely to be content words than leftover
+  // function words, so they make better replacements.
+  const unique = [...new Set(tokens)];
+  return unique
+    .map((word, index) => ({ word, index }))
+    .sort((a, b) => b.word.length - a.word.length || a.index - b.index)
+    .slice(0, need)
+    .map((entry) => entry.word);
+}
+
+/** Drops multi-word entries the learner already has stored under the same phrase. */
+export function filterKnownFromNewChunks<T extends { phrase: string }>(
+  chunks: T[],
+  knownVocabulary: string[],
+): T[] {
+  const isKnown = buildKnownVocabularyMatcher(knownVocabulary);
+  return chunks.filter((chunk) => !isKnown(chunk.phrase));
 }
 
 export function filterHookVocabularyForKnownWords<
-  T extends { newVocabulary: string[]; dialogue: string },
+  T extends {
+    newVocabulary: string[];
+    dialogue: string;
+    newChunks?: Array<{ phrase: string }>;
+  },
 >(hook: T, knownVocabulary: string[], extraExcluded: string[] = []): T {
+  const newVocabulary = filterKnownFromNewVocabulary(
+    hook.newVocabulary,
+    hook.dialogue,
+    knownVocabulary,
+    extraExcluded,
+  );
+
+  if (!hook.newChunks?.length) return { ...hook, newVocabulary };
+
   return {
     ...hook,
-    newVocabulary: filterKnownFromNewVocabulary(
-      hook.newVocabulary,
-      hook.dialogue,
-      knownVocabulary,
-      extraExcluded,
-    ),
+    newVocabulary,
+    newChunks: filterKnownFromNewChunks(hook.newChunks, knownVocabulary),
   };
 }

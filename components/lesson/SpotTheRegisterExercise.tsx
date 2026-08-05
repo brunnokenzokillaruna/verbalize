@@ -163,17 +163,16 @@ export function SpotTheRegisterExercise({
           <div className="flex items-center gap-2 mb-2">
             <Lightbulb size={15} className="text-[#7c3aed]" />
             <span className="text-[10px] font-black uppercase tracking-wider text-[var(--color-text-muted)]">
-              Por que funciona
+              Uma correção modelo
             </span>
           </div>
-          <p className="text-sm font-medium leading-relaxed text-[var(--color-text-secondary)] mb-3">
-            {data.explanationPt}
-          </p>
-          <p className="text-xs text-[var(--color-text-muted)] uppercase tracking-wider font-bold mb-1">
-            Fala corrigida
-          </p>
+          {/* Sentence before explanation: the text below comments on this line,
+              not on what the learner wrote. */}
           <p className="text-sm font-semibold italic text-[var(--color-text-primary)]">
             {data.correctedLine}
+          </p>
+          <p className="mt-2 text-sm font-medium leading-relaxed text-[var(--color-text-secondary)]">
+            {data.explanationPt}
           </p>
         </div>
       )}

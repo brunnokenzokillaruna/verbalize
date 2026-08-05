@@ -3,6 +3,8 @@ import { Loader2, Languages, Lightbulb, XCircle, Link2 } from 'lucide-react';
 import type { TranslationWithConstraintData } from '@/types';
 import { isAccentOnlyDiff } from '@/utils/accent';
 import { validateReverseTranslation } from '@/app/actions/validateAnswer';
+import { TranslationCorrectionList } from './TranslationCorrectionList';
+import type { TranslationCorrection } from '@/lib/reverseTranslationCorrections';
 import { formatTranslationCorrectionHint, answersDifferOnlyByForm } from '@/lib/elaborationHints';
 import { incrementProductionStats } from '@/services/firestore';
 import { useAuthStore } from '@/store/authStore';
@@ -46,6 +48,7 @@ export function TranslationWithConstraintExercise({
   const [chunkMissing, setChunkMissing] = useState(false);
   const [aiNote, setAiNote] = useState<string | undefined>();
   const [correctedSentence, setCorrectedSentence] = useState<string | undefined>();
+  const [corrections, setCorrections] = useState<TranslationCorrection[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const frenchAccents = ['é', 'à', 'è', 'ù', 'ç', 'œ', 'ê', 'â', 'ô', 'î', 'ë', 'ï'];
@@ -120,12 +123,14 @@ export function TranslationWithConstraintExercise({
       setLastProductionPolishHint(polish);
       setAiNote(result.note);
       setCorrectedSentence(result.correctedSentence);
+      setCorrections(result.corrections ?? []);
       setAnswerStatus(isSoft ? 'soft' : 'correct');
       reportProduction(true);
     } else {
       setAnswerStatus('wrong');
       setAiNote(result.note);
       setCorrectedSentence(result.correctedSentence || data.target_translation);
+      setCorrections(result.corrections ?? []);
       reportProduction(false);
     }
   }
@@ -258,6 +263,11 @@ export function TranslationWithConstraintExercise({
                 {aiNote}
               </p>
             )}
+            {corrections.length > 0 && (
+              <div className="mb-3">
+                <TranslationCorrectionList corrections={corrections} />
+              </div>
+            )}
             <p className="text-[10px] font-black uppercase tracking-wider text-amber-600/80 mb-1">
               Sua frase corrigida
             </p>
@@ -290,7 +300,7 @@ export function TranslationWithConstraintExercise({
             </p>
           </div>
 
-          {aiNote && (
+          {(aiNote || corrections.length > 0) && (
             <div
               className="rounded-xl p-4.5 border-l-4 border-amber-500/40"
               style={{ backgroundColor: 'var(--color-surface-raised)' }}
@@ -301,9 +311,16 @@ export function TranslationWithConstraintExercise({
                   Análise gramatical
                 </span>
               </div>
-              <p className="text-sm font-medium leading-relaxed text-[var(--color-text-secondary)]">
-                {aiNote}
-              </p>
+              {aiNote && (
+                <p className="text-sm font-medium leading-relaxed text-[var(--color-text-secondary)]">
+                  {aiNote}
+                </p>
+              )}
+              {corrections.length > 0 && (
+                <div className={aiNote ? 'mt-3 border-t border-[var(--color-border)] pt-3' : ''}>
+                  <TranslationCorrectionList corrections={corrections} />
+                </div>
+              )}
             </div>
           )}
         </div>

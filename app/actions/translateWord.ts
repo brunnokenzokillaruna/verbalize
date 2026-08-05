@@ -1,5 +1,6 @@
 'use server';
 
+import { NATURAL_PT_BR_RULE, normalizeToEverydayPtBr } from '@/lib/naturalPtBr';
 import { callGeminiJSON } from '@/services/gemini';
 import type { SupportedLanguage, TranslateWordResult } from '@/types';
 import { unstable_cacheLife as cacheLife } from 'next/cache';
@@ -39,9 +40,15 @@ ${verbInstruction}
 Respond with ONLY this JSON (no markdown):
 {"translation":"PT-BR translation","explanation":"one PT-BR sentence, max 20 words","example":"new sentence in ${LANG_LABEL[language]} using the same word","partOfSpeech":${isNewVerb ? '"Verbo"' : 'null'},"infinitive":${isNewVerb ? '"infinitive lowercase"' : 'null'}}
 
-Rules: example must be ${LANG_LABEL[language]} only; beginner vocabulary.`;
+Rules: example must be ${LANG_LABEL[language]} only; beginner vocabulary.
+${NATURAL_PT_BR_RULE}`;
 
-    return await callGeminiJSON<TranslateWordResult>(prompt, systemPrompt, 256, 0, 'lightweight');
+    const result = await callGeminiJSON<TranslateWordResult>(prompt, systemPrompt, 256, 0, 'lightweight');
+    return {
+      ...result,
+      translation: normalizeToEverydayPtBr(result.translation ?? ''),
+      explanation: normalizeToEverydayPtBr(result.explanation ?? ''),
+    };
   } catch (err) {
     console.error('[translateWord] Error:', err);
     return null;
@@ -55,6 +62,7 @@ Rules: example must be ${LANG_LABEL[language]} only; beginner vocabulary.`;
 export async function translateWordsBatch(
   words: string[],
   language: SupportedLanguage,
+  context?: string,
 ): Promise<{ word: string; translation: string }[] | null> {
   'use cache';
   cacheLife('weeks');
@@ -62,8 +70,12 @@ export async function translateWordsBatch(
   try {
     const systemPrompt = `You are a language assistant for Brazilian Portuguese speakers learning ${LANG_LABEL[language]}. Respond with ONLY a valid JSON array of objects, with no markdown formatting, no explanations.`;
 
-    const prompt = `Translate the following list of ${LANG_LABEL[language]} words into Brazilian Portuguese:
+    const contextBlock = context?.trim()
+      ? `\nDialogue context (use it to resolve the meaning of each item):\n${context.trim().slice(0, 2000)}\n`
+      : '';
+    const prompt = `Translate the following list of ${LANG_LABEL[language]} words or expressions into Brazilian Portuguese:
 ${JSON.stringify(words)}
+${contextBlock}
 
 Output a JSON array of objects in exactly this format:
 [
@@ -75,9 +87,16 @@ Output a JSON array of objects in exactly this format:
 
 Rules:
 - Keep translations brief, accurate, and natural.
-- Respond ONLY with the JSON array, no markdown fences, no extra text.`;
+- Preserve each original item exactly in the "word" field.
+- Translate the meaning used in the dialogue, not every possible dictionary meaning.
+- Respond ONLY with the JSON array, no markdown fences, no extra text.
+${NATURAL_PT_BR_RULE}`;
 
-    return await callGeminiJSON<{ word: string; translation: string }[]>(prompt, systemPrompt, 1500, 0, 'lightweight');
+    const items = await callGeminiJSON<{ word: string; translation: string }[]>(prompt, systemPrompt, 4096, 0, 'lightweight');
+    return items.map((item) => ({
+      ...item,
+      translation: normalizeToEverydayPtBr(item.translation ?? ''),
+    }));
   } catch (err) {
     console.error('[translateWordsBatch] Error:', err);
     return null;
