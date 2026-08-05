@@ -21,8 +21,8 @@ export function ChatTranscript({
     return (
       <div className="flex flex-1 items-center justify-center px-6 py-10 text-center">
         <p className="text-sm text-text-muted max-w-xs">
-          Quando a sessão começar, a conversa aparece aqui com correções de gramática em tempo
-          quase real.
+          Quando a sessão começar, a conversa aparece aqui com tradução e correções das suas
+          falas.
         </p>
       </div>
     );

@@ -1,12 +1,39 @@
 import type { ProficiencyLevel, SupportedLanguage } from '@/types';
 
-export type RoleplayScenarioId =
-  | 'cafe'
-  | 'hotel'
-  | 'job-interview'
-  | 'doctor'
-  | 'friend-catchup'
-  | 'travel-help';
+/** Preset scenarios are unique per CEFR level — never reused across levels. */
+export type PresetScenarioId =
+  | 'a1-cafe'
+  | 'a1-apresentacao'
+  | 'a1-passagem'
+  | 'a1-feira'
+  | 'a2-hotel'
+  | 'a2-consulta'
+  | 'a2-combinar'
+  | 'a2-troca'
+  | 'b1-voo-cancelado'
+  | 'b1-atraso'
+  | 'b1-triagem'
+  | 'b1-reclamacao'
+  | 'b2-salario'
+  | 'b2-conflito'
+  | 'b2-turismo'
+  | 'b2-cliente'
+  | 'c1-projeto'
+  | 'c1-feedback'
+  | 'c1-entrevista-tecnica'
+  | 'c1-mediacao'
+  | 'c2-crise'
+  | 'c2-etica'
+  | 'c2-diplomacia'
+  | 'c2-ironia';
+
+export type RoleplayScenarioId = PresetScenarioId | 'custom';
+
+/** How demanding the character is inside the learner's own level. */
+export type RoleplayIntensity = 'gentle' | 'normal' | 'challenging';
+
+/** When grammar feedback is surfaced. */
+export type CorrectionMode = 'fluency' | 'study';
 
 export interface RoleplayScenario {
   id: RoleplayScenarioId;
@@ -14,10 +41,48 @@ export interface RoleplayScenario {
   descriptionPt: string;
   characterName: string;
   characterRolePt: string;
+  /** Learner's role in the scene (PT-BR). */
+  userRolePt: string;
+  /** Short conversation goal for the learner (PT-BR). */
+  objectivePt: string;
+  /** Checkable micro-goals (PT-BR) used for steering and for the debrief. */
+  goalsPt: string[];
   settingPt: string;
   /** Suggested opening vibe for the AI (target language context). */
   openingHint: string;
-  levels: ProficiencyLevel[];
+  /** Exactly one CEFR level per scenario. */
+  level: ProficiencyLevel;
+}
+
+/** Resolved config passed into Live + debrief. */
+export interface RoleplaySessionConfig {
+  scenario: RoleplayScenario;
+  userRolePt: string;
+  objectivePt: string;
+  intensity: RoleplayIntensity;
+  correctionMode: CorrectionMode;
+}
+
+export interface RoleplayRolePair {
+  aiRolePt: string;
+  userRolesPt: string[];
+}
+
+export interface SuggestRoleplayRolesResult {
+  pairs: RoleplayRolePair[];
+  /** True when local keyword fallback was used. */
+  usedFallback?: boolean;
+  error?: string;
+}
+
+export interface RoleplayDebriefResult {
+  whatWorkedPt: string;
+  recurringIssuePt: string;
+  phraseToPractice: string;
+  phraseToPracticePt: string;
+  /** Indexes of `goalsPt` the learner actually completed. */
+  completedGoalIndexes: number[];
+  error?: string;
 }
 
 export type ChatRole = 'user' | 'assistant' | 'system';
@@ -52,11 +117,42 @@ export type LiveSessionStatus =
   | 'error'
   | 'ended';
 
-export interface LiveTokenRequest {
-  language: SupportedLanguage;
-  scenarioId: RoleplayScenarioId;
-  level: ProficiencyLevel;
+/** In-character nudges the learner can request without breaking immersion. */
+export type CoachNoteKind = 'repeat' | 'simplify' | 'suggest';
+
+export interface LiveTokenCustomScenario {
+  titlePt: string;
+  descriptionPt: string;
+  settingPt: string;
+  characterName: string;
+  characterRolePt: string;
+  userRolePt: string;
+  objectivePt: string;
 }
+
+/**
+ * Exactly one path: preset scenarioId (never `custom`) or a customScenario payload.
+ * Optional opposite keys are typed as `never` so callers stay practical with object literals.
+ */
+export type LiveTokenRequest =
+  | {
+      language: SupportedLanguage;
+      level: ProficiencyLevel;
+      intensity: RoleplayIntensity;
+      scenarioId: PresetScenarioId;
+      userRolePt?: string;
+      objectivePt?: string;
+      customScenario?: never;
+    }
+  | {
+      language: SupportedLanguage;
+      level: ProficiencyLevel;
+      intensity: RoleplayIntensity;
+      scenarioId?: never;
+      userRolePt?: never;
+      objectivePt?: never;
+      customScenario: LiveTokenCustomScenario;
+    };
 
 export interface LiveTokenResponse {
   token: string;

@@ -1,30 +1,34 @@
 'use client';
 
-import { ROLEPLAY_SCENARIOS } from '@/features/roleplay-chat/scenarios';
-import type { RoleplayScenarioId } from '@/features/roleplay-chat/types';
+import { Check, Sparkles } from 'lucide-react';
+import { getScenariosForLevel } from '@/features/roleplay-chat/scenarios';
+import type { PresetScenarioId, RoleplayScenarioId } from '@/features/roleplay-chat/types';
 import type { ProficiencyLevel } from '@/types';
 
 export function ScenarioPicker({
   level,
   selectedId,
   onSelect,
+  onCreateCustom,
 }: {
   level: ProficiencyLevel;
   selectedId: RoleplayScenarioId | null;
-  onSelect: (id: RoleplayScenarioId) => void;
+  onSelect: (id: PresetScenarioId) => void;
+  onCreateCustom: () => void;
 }) {
-  const scenarios = ROLEPLAY_SCENARIOS.filter((s) => s.levels.includes(level));
+  const scenarios = getScenariosForLevel(level);
 
   return (
-    <div className="grid gap-2.5 sm:grid-cols-2">
+    <div className="grid gap-2 sm:grid-cols-2">
       {scenarios.map((scenario) => {
         const active = selectedId === scenario.id;
         return (
           <button
             key={scenario.id}
             type="button"
-            onClick={() => onSelect(scenario.id)}
-            className="rounded-2xl px-3.5 py-3 text-left transition-all active:scale-[0.98] cursor-pointer"
+            aria-pressed={active}
+            onClick={() => onSelect(scenario.id as PresetScenarioId)}
+            className="relative rounded-2xl px-3.5 py-3 text-left transition-all active:scale-[0.98] cursor-pointer"
             style={{
               backgroundColor: active ? 'var(--color-primary-light)' : 'var(--color-surface)',
               border: active
@@ -33,16 +37,59 @@ export function ScenarioPicker({
               boxShadow: active ? 'none' : '0 2px 0 var(--color-border)',
             }}
           >
-            <p className="text-sm font-bold text-text-primary">{scenario.titlePt}</p>
+            <div className="flex items-start justify-between gap-2">
+              <p className="text-sm font-bold text-text-primary leading-snug">
+                {scenario.titlePt}
+              </p>
+              {active && (
+                <span
+                  className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full"
+                  style={{ backgroundColor: 'var(--color-primary)', color: '#fff' }}
+                >
+                  <Check size={13} />
+                </span>
+              )}
+            </div>
             <p className="mt-0.5 text-xs text-text-secondary leading-snug">
               {scenario.descriptionPt}
             </p>
-            <p className="mt-1.5 text-[10px] font-semibold uppercase tracking-wide text-text-muted">
-              {scenario.characterName} · {scenario.characterRolePt}
+            <p className="mt-2 text-[10px] font-semibold uppercase tracking-wide text-text-muted">
+              Você: {scenario.userRolePt} · IA: {scenario.characterRolePt}
             </p>
           </button>
         );
       })}
+
+      <button
+        type="button"
+        aria-pressed={selectedId === 'custom'}
+        onClick={onCreateCustom}
+        className="flex items-center gap-2.5 rounded-2xl px-3.5 py-3 text-left transition-all active:scale-[0.98] cursor-pointer sm:col-span-2"
+        style={{
+          backgroundColor:
+            selectedId === 'custom' ? 'var(--color-primary-light)' : 'transparent',
+          border:
+            selectedId === 'custom'
+              ? '2px solid var(--color-primary)'
+              : '1.5px dashed var(--color-border)',
+        }}
+      >
+        <span
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl"
+          style={{
+            backgroundColor: 'var(--color-primary-light)',
+            color: 'var(--color-primary)',
+          }}
+        >
+          <Sparkles size={16} />
+        </span>
+        <span className="min-w-0">
+          <span className="block text-sm font-bold text-text-primary">Criar o meu cenário</span>
+          <span className="block text-xs text-text-secondary leading-snug">
+            Descreva a situação e escolha os papéis.
+          </span>
+        </span>
+      </button>
     </div>
   );
 }

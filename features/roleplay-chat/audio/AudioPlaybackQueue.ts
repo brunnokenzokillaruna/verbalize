@@ -70,6 +70,16 @@ export class AudioPlaybackQueue {
     }
   }
 
+  /** Wait until all audio currently queued has finished playing. */
+  async waitUntilIdle(): Promise<void> {
+    if (!this.ctx || this.sources.length === 0) return;
+
+    const remainingMs = Math.max(0, (this.nextStart - this.ctx.currentTime) * 1000);
+    await new Promise<void>((resolve) => {
+      window.setTimeout(resolve, remainingMs + 80);
+    });
+  }
+
   async close(): Promise<void> {
     this.clear();
     if (this.ctx) {

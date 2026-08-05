@@ -10,17 +10,48 @@ import {
   connectBrowserLiveSession,
   type BrowserLiveSession,
 } from '@/features/roleplay-chat/live/connectBrowserLiveSession';
+import {
+  boundOneLine,
+  createCustomScenario,
+  CUSTOM_SCENARIO_LIMITS,
+} from '@/features/roleplay-chat/buildCustomScenario';
+import { buildCoachNote } from '@/features/roleplay-chat/coachNotes';
 import { LIVE_INPUT_SAMPLE_RATE } from '@/features/roleplay-chat/constants';
 import type {
+  CoachNoteKind,
+  CorrectionMode,
   LiveSessionStatus,
+  LiveTokenRequest,
   LiveTokenResponse,
   RoleplayChatMessage,
+  RoleplayIntensity,
   RoleplayScenario,
 } from '@/features/roleplay-chat/types';
 import type { ProficiencyLevel, SupportedLanguage } from '@/types';
 
 function makeId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+}
+
+function isFarewell(text: string, hasConversationHistory: boolean): boolean {
+  const normalized = text
+    .normalize('NFKC')
+    .toLocaleLowerCase()
+    .replace(/[’']/g, "'")
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  return [
+    /\b(goodbye|bye(?: bye)?|see you(?: soon| later| tomorrow)?|talk to you later)\b/,
+    /\b(have a (?:good|nice) (?:day|evening|night)|that's all for today)\b/,
+    /\b(i have to go|i need to go|gotta go|i should get going)\b/,
+    /\b(au revoir|à bientôt|a bientôt|à plus tard|a plus tard|à la prochaine)\b/,
+    /\b(bonne journée|bonne journee|bonne soirée|bonne soiree|bonne nuit)\b/,
+    /\b(je dois y aller|il faut que j'y aille|je vais y aller)\b/,
+    /\b(tchau|adeus|até logo|ate logo|até mais|ate mais|até a próxima|ate a proxima)\b/,
+    /\b(preciso ir|tenho que ir|vou indo)\b/,
+  ].some((pattern) => pattern.test(normalized)) ||
+    (hasConversationHistory && /^(salut|ciao)[!. ]*$/.test(normalized));
 }
 
 /** Support both camelCase (SDK) and snake_case (raw wire) transcription fields. */
@@ -31,22 +62,35 @@ function readTranscription(content: Record<string, unknown>, kind: 'input' | 'ou
   return typeof block?.text === 'string' ? block.text : '';
 }
 
+/** Cap on deferred corrections so fluency mode stays inside free-tier quotas. */
+const MAX_DEFERRED_CORRECTIONS = 8;
+
 interface UseLiveRoleplaySessionParams {
   language: SupportedLanguage;
   level: ProficiencyLevel;
   scenario: RoleplayScenario | null;
+  userRolePt?: string;
+  objectivePt?: string;
+  intensity?: RoleplayIntensity;
+  /** `fluency` defers grammar feedback until the conversation ends. */
+  correctionMode?: CorrectionMode;
 }
 
 export function useLiveRoleplaySession({
   language,
   level,
   scenario,
+  userRolePt,
+  objectivePt,
+  intensity = 'normal',
+  correctionMode = 'study',
 }: UseLiveRoleplaySessionParams) {
   const [status, setStatus] = useState<LiveSessionStatus>('idle');
   const [error, setError] = useState<string | null>(null);
   const [messages, setMessages] = useState<RoleplayChatMessage[]>([]);
   const [micEnabled, setMicEnabled] = useState(false);
   const [isAssistantSpeaking, setIsAssistantSpeaking] = useState(false);
+  const [reviewingCorrections, setReviewingCorrections] = useState(false);
 
   const sessionRef = useRef<BrowserLiveSession | null>(null);
   const playbackRef = useRef(new AudioPlaybackQueue());
@@ -60,10 +104,15 @@ export function useLiveRoleplaySession({
   const scenarioRef = useRef(scenario);
   const languageRef = useRef(language);
   const levelRef = useRef(level);
+  const correctionModeRef = useRef(correctionMode);
+  const reviewInFlightRef = useRef(false);
   const micEnabledRef = useRef(false);
   const intentionalCloseRef = useRef(false);
   const greetingDoneRef = useRef(false);
   const startMicAfterGreetingRef = useRef<(() => void) | null>(null);
+  const farewellPendingRef = useRef(false);
+  const farewellFallbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const finishSessionRef = useRef<(() => Promise<void>) | null>(null);
 
   useEffect(() => {
     messagesRef.current = messages;
@@ -73,7 +122,8 @@ export function useLiveRoleplaySession({
     scenarioRef.current = scenario;
     languageRef.current = language;
     levelRef.current = level;
-  }, [scenario, language, level]);
+    correctionModeRef.current = correctionMode;
+  }, [scenario, language, level, correctionMode]);
 
   useEffect(() => {
     micEnabledRef.current = micEnabled;
@@ -152,6 +202,94 @@ export function useLiveRoleplaySession({
     });
   }, []);
 
+  const runGrammarCheck = useCallback(async (id: string, text: string) => {
+    const currentScenario = scenarioRef.current;
+    if (!currentScenario || !text || grammarInFlightRef.current.has(id)) return;
+
+    grammarInFlightRef.current.add(id);
+    setMessages((prev) => prev.map((m) => (m.id === id ? { ...m, grammarLoading: true } : m)));
+
+    const recentContext = messagesRef.current
+      .filter((m) => m.role !== 'system' && !m.streaming)
+      .slice(-8)
+      .map((m) => `${m.role === 'user' ? 'Learner' : currentScenario.characterName}: ${m.text}`);
+
+    try {
+      const result = await correctRoleplayGrammar({
+        transcript: text,
+        language: languageRef.current,
+        level: levelRef.current,
+        scenarioTitle: currentScenario.titlePt,
+        recentContext,
+      });
+
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === id
+            ? {
+                ...m,
+                grammarLoading: false,
+                grammar: {
+                  hasIssues: result.hasIssues,
+                  correctedSentence: result.correctedSentence,
+                  feedbackPt: result.feedbackPt,
+                  issueTags: result.issueTags,
+                },
+              }
+            : m,
+        ),
+      );
+    } catch {
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === id
+            ? {
+                ...m,
+                grammarLoading: false,
+                grammar: {
+                  hasIssues: false,
+                  feedbackPt: 'Correção temporariamente indisponível.',
+                },
+              }
+            : m,
+        ),
+      );
+    } finally {
+      grammarInFlightRef.current.delete(id);
+    }
+  }, []);
+
+  /** Fluency mode holds feedback back — this fills it in once the scene is over. */
+  const reviewCorrections = useCallback(async () => {
+    if (reviewInFlightRef.current) return;
+
+    const pending = messagesRef.current
+      .filter(
+        (m) =>
+          m.role === 'user' &&
+          !m.streaming &&
+          !m.grammar &&
+          !m.grammarLoading &&
+          m.text &&
+          !m.text.startsWith('('),
+      )
+      .slice(-MAX_DEFERRED_CORRECTIONS);
+
+    if (pending.length === 0) return;
+
+    reviewInFlightRef.current = true;
+    setReviewingCorrections(true);
+    try {
+      // Sequential on purpose: keeps the free-tier request rate predictable.
+      for (const message of pending) {
+        await runGrammarCheck(message.id, message.text);
+      }
+    } finally {
+      reviewInFlightRef.current = false;
+      setReviewingCorrections(false);
+    }
+  }, [runGrammarCheck]);
+
   const finalizeTurn = useCallback(
     async (
       role: 'user' | 'assistant',
@@ -189,6 +327,31 @@ export function useLiveRoleplaySession({
       });
 
       const shouldTranslate = Boolean(text) && !finalText.startsWith('(');
+
+      if (
+        role === 'user' &&
+        isFarewell(text, messagesRef.current.filter((message) => !message.streaming).length >= 2)
+      ) {
+        farewellPendingRef.current = true;
+        micEnabledRef.current = false;
+        setMicEnabled(false);
+        try {
+          sessionRef.current?.sendRealtimeInput({ audioStreamEnd: true });
+        } catch {
+          // The model may already be producing its farewell response.
+        }
+        void micRef.current.stop();
+        if (!farewellFallbackTimerRef.current) {
+          farewellFallbackTimerRef.current = setTimeout(() => {
+            farewellFallbackTimerRef.current = null;
+            farewellPendingRef.current = false;
+            void playbackRef.current
+              .waitUntilIdle()
+              .then(() => finishSessionRef.current?.());
+          }, 12_000);
+        }
+      }
+
       if (shouldTranslate) {
         void translateRoleplayLine({
           text: finalText,
@@ -209,65 +372,12 @@ export function useLiveRoleplaySession({
       }
 
       if (role !== 'user' || !text) return;
+      // Fluency mode keeps the scene uninterrupted; feedback lands after the goodbye.
+      if (correctionModeRef.current === 'fluency') return;
 
-      const currentScenario = scenarioRef.current;
-      if (!currentScenario || grammarInFlightRef.current.has(id)) return;
-
-      grammarInFlightRef.current.add(id);
-      setMessages((prev) =>
-        prev.map((m) => (m.id === id ? { ...m, grammarLoading: true } : m)),
-      );
-
-      const recentContext = messagesRef.current
-        .filter((m) => m.role !== 'system' && !m.streaming)
-        .slice(-8)
-        .map((m) => `${m.role === 'user' ? 'Learner' : currentScenario.characterName}: ${m.text}`);
-
-      try {
-        const result = await correctRoleplayGrammar({
-          transcript: text,
-          language: languageRef.current,
-          level: levelRef.current,
-          scenarioTitle: currentScenario.titlePt,
-          recentContext,
-        });
-
-        setMessages((prev) =>
-          prev.map((m) =>
-            m.id === id
-              ? {
-                  ...m,
-                  grammarLoading: false,
-                  grammar: {
-                    hasIssues: result.hasIssues,
-                    correctedSentence: result.correctedSentence,
-                    feedbackPt: result.feedbackPt,
-                    issueTags: result.issueTags,
-                  },
-                }
-              : m,
-          ),
-        );
-      } catch {
-        setMessages((prev) =>
-          prev.map((m) =>
-            m.id === id
-              ? {
-                  ...m,
-                  grammarLoading: false,
-                  grammar: {
-                    hasIssues: false,
-                    feedbackPt: 'Correção temporariamente indisponível.',
-                  },
-                }
-              : m,
-          ),
-        );
-      } finally {
-        grammarInFlightRef.current.delete(id);
-      }
+      await runGrammarCheck(id, text);
     },
-    [],
+    [runGrammarCheck],
   );
 
   const handleServerMessage = useCallback(
@@ -319,6 +429,8 @@ export function useLiveRoleplaySession({
         if (userAccumRef.current.trim() && userDraftIdRef.current) {
           void finalizeTurn('user', userDraftIdRef, userAccumRef);
         }
+        const shouldAutoFinish =
+          farewellPendingRef.current && Boolean(assistantDraftIdRef.current);
         if (assistantDraftIdRef.current) {
           void finalizeTurn('assistant', assistantDraftIdRef, assistantAccumRef);
         }
@@ -328,6 +440,17 @@ export function useLiveRoleplaySession({
           greetingDoneRef.current = true;
           startMicAfterGreetingRef.current?.();
           startMicAfterGreetingRef.current = null;
+        }
+
+        if (shouldAutoFinish) {
+          farewellPendingRef.current = false;
+          if (farewellFallbackTimerRef.current) {
+            clearTimeout(farewellFallbackTimerRef.current);
+            farewellFallbackTimerRef.current = null;
+          }
+          void playbackRef.current
+            .waitUntilIdle()
+            .then(() => finishSessionRef.current?.());
         }
       }
     },
@@ -378,11 +501,18 @@ export function useLiveRoleplaySession({
     userAccumRef.current = '';
     assistantAccumRef.current = '';
     greetingDoneRef.current = false;
+    farewellPendingRef.current = false;
+    if (farewellFallbackTimerRef.current) {
+      clearTimeout(farewellFallbackTimerRef.current);
+      farewellFallbackTimerRef.current = null;
+    }
     setIsAssistantSpeaking(false);
     setMicEnabled(false);
     micEnabledRef.current = false;
     setStatus((s) => (s === 'error' ? 'error' : 'ended'));
   }, []);
+
+  finishSessionRef.current = stop;
 
   const reset = useCallback(async () => {
     await stop();
@@ -391,14 +521,22 @@ export function useLiveRoleplaySession({
     setStatus('idle');
   }, [stop]);
 
-  const start = useCallback(async () => {
+  /** `overrides` lets callers replay a scene with a different intensity immediately. */
+  const start = useCallback(async (overrides?: { intensity?: RoleplayIntensity }) => {
     if (!scenario) {
       setError('Escolha um cenário para começar.');
       return;
     }
 
+    const effectiveIntensity = overrides?.intensity ?? intensity;
+
     intentionalCloseRef.current = false;
     greetingDoneRef.current = false;
+    farewellPendingRef.current = false;
+    if (farewellFallbackTimerRef.current) {
+      clearTimeout(farewellFallbackTimerRef.current);
+      farewellFallbackTimerRef.current = null;
+    }
     setError(null);
     setMessages([]);
     setStatus('connecting');
@@ -408,14 +546,61 @@ export function useLiveRoleplaySession({
     try {
       await playbackRef.current.ensureContext();
 
+      const resolvedUserRole = boundOneLine(
+        userRolePt,
+        CUSTOM_SCENARIO_LIMITS.userRolePt,
+        boundOneLine(scenario.userRolePt, CUSTOM_SCENARIO_LIMITS.userRolePt, 'aprendiz'),
+      );
+      const resolvedObjective = boundOneLine(
+        objectivePt,
+        CUSTOM_SCENARIO_LIMITS.objectivePt,
+        boundOneLine(
+          scenario.objectivePt,
+          CUSTOM_SCENARIO_LIMITS.objectivePt,
+          'Manter uma conversa natural',
+        ),
+      );
+      let tokenBody: LiveTokenRequest;
+      if (scenario.id === 'custom') {
+        const customScenario = createCustomScenario({
+          titlePt: scenario.titlePt,
+          descriptionPt: scenario.descriptionPt,
+          settingPt: scenario.settingPt,
+          characterName: scenario.characterName,
+          characterRolePt: scenario.characterRolePt,
+          userRolePt: resolvedUserRole,
+          objectivePt: resolvedObjective,
+          level,
+        });
+        tokenBody = {
+          language,
+          level,
+          intensity: effectiveIntensity,
+          customScenario: {
+            titlePt: customScenario.titlePt,
+            descriptionPt: customScenario.descriptionPt,
+            settingPt: customScenario.settingPt,
+            characterName: customScenario.characterName,
+            characterRolePt: customScenario.characterRolePt,
+            userRolePt: customScenario.userRolePt,
+            objectivePt: customScenario.objectivePt,
+          },
+        };
+      } else {
+        tokenBody = {
+          language,
+          level,
+          intensity: effectiveIntensity,
+          scenarioId: scenario.id,
+          userRolePt: resolvedUserRole,
+          objectivePt: resolvedObjective,
+        };
+      }
+
       const tokenRes = await fetch('/api/live-token', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          language,
-          scenarioId: scenario.id,
-          level,
-        }),
+        body: JSON.stringify(tokenBody),
       });
 
       const tokenJson = (await tokenRes.json()) as LiveTokenResponse & { error?: string };
@@ -473,7 +658,20 @@ export function useLiveRoleplaySession({
       setError(message);
       setStatus('error');
     }
-  }, [language, level, openMic, scenario]);
+  }, [intensity, language, level, openMic, objectivePt, scenario, userRolePt]);
+
+  const sendCoachNote = useCallback(
+    (kind: CoachNoteKind) => {
+      if (status !== 'live' || !sessionRef.current) return false;
+      try {
+        sessionRef.current.sendRealtimeInput({ text: buildCoachNote(kind) });
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    [status],
+  );
 
   const toggleMic = useCallback(async () => {
     if (status !== 'live' || !sessionRef.current) return;
@@ -494,9 +692,10 @@ export function useLiveRoleplaySession({
   }, [openMic, status]);
 
   useEffect(() => {
+    const playback = playbackRef.current;
     return () => {
       void stop();
-      void playbackRef.current.close();
+      void playback.close();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- unmount cleanup only
   }, []);
@@ -507,9 +706,12 @@ export function useLiveRoleplaySession({
     messages,
     micEnabled,
     isAssistantSpeaking,
+    reviewingCorrections,
     start,
     stop,
     reset,
     toggleMic,
+    sendCoachNote,
+    reviewCorrections,
   };
 }
