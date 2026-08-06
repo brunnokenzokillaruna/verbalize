@@ -6,26 +6,32 @@ export type PresetScenarioId =
   | 'a1-apresentacao'
   | 'a1-passagem'
   | 'a1-feira'
+  | 'a1-farmacia'
   | 'a2-hotel'
   | 'a2-consulta'
   | 'a2-combinar'
   | 'a2-troca'
+  | 'a2-entrega'
   | 'b1-voo-cancelado'
   | 'b1-atraso'
   | 'b1-triagem'
   | 'b1-reclamacao'
+  | 'b1-vizinho'
   | 'b2-salario'
   | 'b2-conflito'
   | 'b2-turismo'
   | 'b2-cliente'
+  | 'b2-aluguel'
   | 'c1-projeto'
   | 'c1-feedback'
   | 'c1-entrevista-tecnica'
   | 'c1-mediacao'
+  | 'c1-reuniao'
   | 'c2-crise'
   | 'c2-etica'
   | 'c2-diplomacia'
-  | 'c2-ironia';
+  | 'c2-ironia'
+  | 'c2-painel';
 
 export type RoleplayScenarioId = PresetScenarioId | 'custom';
 

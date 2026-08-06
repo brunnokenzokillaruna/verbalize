@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useTransition, type CSSProperties } from 'react';
+import { ArrowLeft } from 'lucide-react';
 import { suggestRoleplayRoles } from '@/app/actions/suggestRoleplayRoles';
 import { buildCustomScenario } from '@/features/roleplay-chat/buildCustomScenario';
 import { userRolesForAiRole } from '@/features/roleplay-chat/roleSuggestions';
@@ -68,18 +69,31 @@ export function CustomScenarioSetup({
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between gap-2">
-        <h2 className="text-xs font-bold uppercase tracking-wide text-text-muted">
-          Criar cenário
-        </h2>
+    <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-3">
         <button
           type="button"
           onClick={onCancel}
-          className="text-xs font-semibold text-text-secondary cursor-pointer"
+          className="inline-flex w-full items-center justify-center gap-2 rounded-2xl py-3 text-sm font-bold cursor-pointer"
+          style={{
+            backgroundColor: 'var(--color-surface)',
+            border: '1.5px solid var(--color-border)',
+            color: 'var(--color-text-primary)',
+            boxShadow: '0 3px 0 var(--color-border)',
+          }}
         >
+          <ArrowLeft size={16} style={{ color: 'var(--color-primary)' }} />
           Voltar aos prontos
         </button>
+
+        <div>
+          <h2 className="font-display text-lg font-bold text-text-primary">
+            Criar o meu cenário
+          </h2>
+          <p className="mt-0.5 text-xs text-text-secondary">
+            Descreva a situação; depois escolha os papéis.
+          </p>
+        </div>
       </div>
 
       <label className="flex flex-col gap-1.5">

@@ -229,7 +229,7 @@ export function RoleplayChatPage() {
 
       {showSetup ? (
         <>
-          <div className="flex flex-1 flex-col gap-4 px-4 py-4">
+          <div className="flex flex-1 flex-col gap-6 px-4 py-5 pb-6">
             <LevelSelector
               level={level}
               fromProfile={!levelTouchedRef.current && profileLevel === level}
@@ -244,14 +244,12 @@ export function RoleplayChatPage() {
               />
             ) : (
               <>
-                <section className="flex flex-col gap-2">
+                <section className="flex flex-col gap-3">
                   <div className="flex items-baseline justify-between gap-2">
                     <h2 className="text-xs font-bold uppercase tracking-wide text-text-muted">
                       Escolha a cena
                     </h2>
-                    <span className="text-[11px] text-text-muted">
-                      cenas exclusivas do {level}
-                    </span>
+                    <span className="text-[11px] text-text-muted">{level}</span>
                   </div>
                   <ScenarioPicker
                     level={level}
@@ -261,72 +259,16 @@ export function RoleplayChatPage() {
                   />
                 </section>
 
-                {scenario && <ScenarioBrief scenario={scenario} />}
-
-                <section
-                  className="rounded-2xl"
-                  style={{
-                    backgroundColor: 'var(--color-surface)',
-                    border: '1.5px solid var(--color-border)',
-                  }}
-                >
-                  <button
-                    type="button"
-                    onClick={() => setShowSettings((v) => !v)}
-                    aria-expanded={showSettings}
-                    className="flex w-full items-center gap-2.5 px-3.5 py-3 text-left cursor-pointer"
+                {scenario && (
+                  <section
+                    className="pt-1"
+                    style={{ borderTop: '1px solid var(--color-border)' }}
                   >
-                    <SlidersHorizontal
-                      size={15}
-                      style={{ color: 'var(--color-text-secondary)' }}
-                    />
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-bold text-text-primary">
-                        Como você quer praticar
-                      </span>
-                      <span className="block text-[11px] text-text-muted">
-                        {correctionMode === 'fluency' ? 'Fluência' : 'Estudo'} ·{' '}
-                        {INTENSITY_OPTIONS.find((o) => o.value === intensity)?.labelPt}
-                      </span>
-                    </span>
-                    <ChevronDown
-                      size={17}
-                      className="shrink-0 transition-transform"
-                      style={{
-                        color: 'var(--color-text-muted)',
-                        transform: showSettings ? 'rotate(180deg)' : 'none',
-                      }}
-                    />
-                  </button>
-
-                  {showSettings && (
-                    <div
-                      className="flex flex-col gap-4 px-3.5 pb-3.5 animate-fade-in"
-                      style={{ borderTop: '1px solid var(--color-border)', paddingTop: '0.875rem' }}
-                    >
-                      <SegmentedControl
-                        label="Correções"
-                        hint={CORRECTION_HINT[correctionMode]}
-                        options={CORRECTION_OPTIONS}
-                        value={correctionMode}
-                        onChange={setCorrectionMode}
-                      />
-                      <SegmentedControl
-                        label="Intensidade"
-                        hint={INTENSITY_HINT[intensity]}
-                        options={INTENSITY_OPTIONS}
-                        value={intensity}
-                        onChange={setIntensity}
-                      />
+                    <div className="pt-4">
+                      <ScenarioBrief scenario={scenario} />
                     </div>
-                  )}
-                </section>
-
-                <p className="flex items-start gap-2 px-1 text-[11px] leading-relaxed text-text-muted">
-                  <Headphones size={14} className="mt-px shrink-0" />
-                  Use fones para evitar eco. Quando quiser terminar, basta se despedir — a
-                  conversa fecha sozinha.
-                </p>
+                  </section>
+                )}
               </>
             )}
 
@@ -347,13 +289,75 @@ export function RoleplayChatPage() {
 
           {setupMode === 'presets' && (
             <div
-              className="sticky bottom-0 px-4 pt-3"
+              className="sticky bottom-0 flex flex-col gap-2.5 px-4 pt-3"
               style={{
                 backgroundColor: 'var(--color-bg)',
                 borderTop: '1px solid var(--color-border)',
                 paddingBottom: 'max(1rem, env(safe-area-inset-bottom))',
               }}
             >
+              <section
+                className="rounded-2xl"
+                style={{
+                  backgroundColor: 'var(--color-surface)',
+                  border: '1.5px solid var(--color-border)',
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => setShowSettings((v) => !v)}
+                  aria-expanded={showSettings}
+                  className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left cursor-pointer"
+                >
+                  <SlidersHorizontal
+                    size={15}
+                    style={{ color: 'var(--color-text-secondary)' }}
+                  />
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-bold text-text-primary">
+                      Como você quer praticar
+                    </span>
+                    <span className="block text-[11px] text-text-muted">
+                      {correctionMode === 'fluency' ? 'Fluência' : 'Estudo'} ·{' '}
+                      {INTENSITY_OPTIONS.find((o) => o.value === intensity)?.labelPt}
+                    </span>
+                  </span>
+                  <ChevronDown
+                    size={17}
+                    className="shrink-0 transition-transform"
+                    style={{
+                      color: 'var(--color-text-muted)',
+                      transform: showSettings ? 'rotate(180deg)' : 'none',
+                    }}
+                  />
+                </button>
+
+                {showSettings && (
+                  <div
+                    className="flex flex-col gap-4 px-3.5 pb-3.5 animate-fade-in"
+                    style={{
+                      borderTop: '1px solid var(--color-border)',
+                      paddingTop: '0.875rem',
+                    }}
+                  >
+                    <SegmentedControl
+                      label="Correções"
+                      hint={CORRECTION_HINT[correctionMode]}
+                      options={CORRECTION_OPTIONS}
+                      value={correctionMode}
+                      onChange={setCorrectionMode}
+                    />
+                    <SegmentedControl
+                      label="Intensidade"
+                      hint={INTENSITY_HINT[intensity]}
+                      options={INTENSITY_OPTIONS}
+                      value={intensity}
+                      onChange={setIntensity}
+                    />
+                  </div>
+                )}
+              </section>
+
               <button
                 type="button"
                 disabled={!scenario}

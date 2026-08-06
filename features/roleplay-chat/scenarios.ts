@@ -2,7 +2,7 @@ import type { ProficiencyLevel } from '@/types';
 import type { PresetScenarioId, RoleplayScenario } from './types';
 
 /**
- * Every preset belongs to exactly one CEFR level — four scenarios per level,
+ * Every preset belongs to exactly one CEFR level — five scenarios per level,
  * so a learner never sees the same scene twice as they progress.
  */
 export const ROLEPLAY_SCENARIOS: RoleplayScenario[] = [
@@ -57,6 +57,23 @@ export const ROLEPLAY_SCENARIOS: RoleplayScenario[] = [
     goalsPt: ['Perguntar o preço', 'Pedir uma quantidade', 'Agradecer e se despedir'],
     settingPt: 'uma feira de rua no sábado de manhã',
     openingHint: "Call the customer over and offer today's fresh fruit.",
+    level: 'A1',
+  },
+  {
+    id: 'a1-farmacia',
+    titlePt: 'Na farmácia',
+    descriptionPt: 'Peça um remédio e confirme o horário.',
+    characterName: 'Paul',
+    characterRolePt: 'farmacêutico(a)',
+    userRolePt: 'cliente',
+    objectivePt: 'Pedir um remédio e entender as instruções',
+    goalsPt: [
+      'Dizer o que você precisa',
+      'Perguntar a dose ou o horário',
+      'Confirmar o preço',
+    ],
+    settingPt: 'uma farmácia de bairro no fim da tarde',
+    openingHint: 'Greet the customer and ask how you can help.',
     level: 'A1',
   },
 
@@ -125,6 +142,23 @@ export const ROLEPLAY_SCENARIOS: RoleplayScenario[] = [
     openingHint: 'Ask how you can help them at the returns desk.',
     level: 'A2',
   },
+  {
+    id: 'a2-entrega',
+    titlePt: 'Receber uma entrega',
+    descriptionPt: 'Confirme o endereço e assine a entrega.',
+    characterName: 'Léa',
+    characterRolePt: 'entregador(a)',
+    userRolePt: 'morador(a)',
+    objectivePt: 'Confirmar o pedido e receber a entrega',
+    goalsPt: [
+      'Confirmar seu nome e endereço',
+      'Perguntar se precisa assinar',
+      'Agradecer e se despedir',
+    ],
+    settingPt: 'a porta do seu apartamento',
+    openingHint: 'Ring the doorbell and say you have a delivery for them.',
+    level: 'A2',
+  },
 
   // ─── B1 · resolver problemas ────────────────────────────────────────────────
   {
@@ -191,6 +225,23 @@ export const ROLEPLAY_SCENARIOS: RoleplayScenario[] = [
     openingHint: 'Notice the customer wants to talk and ask if everything was alright.',
     level: 'B1',
   },
+  {
+    id: 'b1-vizinho',
+    titlePt: 'Vizinho barulhento',
+    descriptionPt: 'Peça silêncio com educação e combine um horário.',
+    characterName: 'Olivier',
+    characterRolePt: 'vizinho barulhento',
+    userRolePt: 'vizinho(a)',
+    objectivePt: 'Pedir silêncio com educação e combinar um horário',
+    goalsPt: [
+      'Explicar o problema sem acusar',
+      'Propor um horário mais calmo',
+      'Fechar um acordo amigável',
+    ],
+    settingPt: 'o corredor do prédio à noite',
+    openingHint: 'Open the door a bit surprised and ask what is going on.',
+    level: 'B1',
+  },
 
   // ─── B2 · negociar e argumentar ─────────────────────────────────────────────
   {
@@ -255,6 +306,23 @@ export const ROLEPLAY_SCENARIOS: RoleplayScenario[] = [
     ],
     settingPt: 'uma reunião online de quinze minutos',
     openingHint: 'Say the proposal looks expensive and ask why it is worth your time.',
+    level: 'B2',
+  },
+  {
+    id: 'b2-aluguel',
+    titlePt: 'Negociar o aluguel',
+    descriptionPt: 'Peça desconto e defenda sua proposta.',
+    characterName: 'Camille',
+    characterRolePt: 'proprietário(a)',
+    userRolePt: 'futuro(a) inquilino(a)',
+    objectivePt: 'Negociar o valor do aluguel e as condições',
+    goalsPt: [
+      'Justificar um valor mais baixo',
+      'Responder a uma objeção',
+      'Propor uma condição de troca',
+    ],
+    settingPt: 'a visita a um apartamento anunciado',
+    openingHint: 'Ask what they think of the flat and mention the listed rent.',
     level: 'B2',
   },
 
@@ -327,6 +395,23 @@ export const ROLEPLAY_SCENARIOS: RoleplayScenario[] = [
     openingHint: 'Vent about the other team and expect them to take your side.',
     level: 'C1',
   },
+  {
+    id: 'c1-reuniao',
+    titlePt: 'Conduzir uma reunião',
+    descriptionPt: 'Mantenha a pauta e feche os próximos passos.',
+    characterName: 'Victor',
+    characterRolePt: 'colega que foge do assunto',
+    userRolePt: 'facilitador(a)',
+    objectivePt: 'Conduzir a reunião e fechar os próximos passos',
+    goalsPt: [
+      'Trazer a conversa de volta à pauta',
+      'Resumir o que foi decidido',
+      'Definir um responsável e um prazo',
+    ],
+    settingPt: 'uma reunião de equipe online',
+    openingHint: 'Start talking about something off-topic and expect them to follow.',
+    level: 'C1',
+  },
 
   // ─── C2 · ambiguidade e persuasão ───────────────────────────────────────────
   {
@@ -391,6 +476,23 @@ export const ROLEPLAY_SCENARIOS: RoleplayScenario[] = [
     goalsPt: ['Perceber uma ironia', 'Responder com humor', 'Puxar o assunto de volta'],
     settingPt: 'um bar no fim da noite',
     openingHint: 'Tease them playfully with irony and understatement.',
+    level: 'C2',
+  },
+  {
+    id: 'c2-painel',
+    titlePt: 'Painel ao vivo',
+    descriptionPt: 'Responda a uma pergunta difícil da plateia.',
+    characterName: 'Helena',
+    characterRolePt: 'moderadora do painel',
+    userRolePt: 'palestrante',
+    objectivePt: 'Responder com nuance a uma pergunta difícil',
+    goalsPt: [
+      'Reformular a pergunta a seu favor',
+      'Dar uma resposta com nuance',
+      'Encerrar com uma frase memorável',
+    ],
+    settingPt: 'um painel público com plateia',
+    openingHint: 'Relay a hostile audience question and press for a clear answer.',
     level: 'C2',
   },
 ];
