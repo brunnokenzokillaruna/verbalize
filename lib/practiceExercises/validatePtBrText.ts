@@ -178,5 +178,6 @@ export function isListeningComprehensionPtBrPure(
 
 export function buildPtBrVocabRule(language: SupportedLanguage): string {
   const langLabel = language === 'fr' ? 'French' : 'English';
-  return `- PT-BR LEARNER TEXT (listening-comprehension, bridge-choice scenario/question/explanation, checkpoint comprehension): write ONLY Brazilian Portuguese. NEVER insert ${langLabel} lesson vocabulary in options or explanations (write "torre de igreja", NOT "clocher"; write "gramado", NOT "gazon"). ${langLabel} may appear ONLY inside quotes when citing a dialogue line verbatim.`;
+  return `- PT-BR LEARNER TEXT (listening-comprehension, bridge-choice scenario/question/explanation, checkpoint comprehension, reverse-translation portuguese_sentence, word-bank-translation portuguese_sentence, translation-with-constraint portuguese_sentence, fill-gap/context-choice "translation" fields): write ONLY Brazilian Portuguese. NEVER insert ${langLabel} lesson vocabulary into Portuguese prompts (write "golpe" / "furada", NOT "arnaque"; write "torre de igreja", NOT "clocher"). ${langLabel} may appear ONLY inside quotes when citing a dialogue line verbatim, or in separate fields meant for the target language (required_chunk, blankWord, target_translation).
+- TRANSLATION-WITH-CONSTRAINT: portuguese_sentence must be 100% PT-BR and must NOT contain required_chunk. Express the meaning with a Portuguese equivalent; the learner sees required_chunk only in the mandatory-chunk box.`;
 }

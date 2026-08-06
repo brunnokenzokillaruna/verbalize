@@ -5,7 +5,8 @@ export function buildTypeDescriptions(langLabel: string): Record<ExerciseTypeId,
     'context-choice': `type "context-choice":
    - Write an ORIGINAL sentence with a blank (___) for a key vocabulary word or grammar item.
    - "blankWord" is correct answer. "options" has 4 items: the correct word plus 3 highly plausible distractors of the same grammatical category, similar spelling/tense, or common learner mistakes. Do NOT use obviously different or unrelated words. The options must make the student think.
-   - "translation" in PT-BR.`,
+   - "translation" in PT-BR.
+   - French directional verbs: PT "trazer" → apporter/amener; PT "levar" → emporter/emmener. blankWord MUST match the PT cue (ignore parenthetical glosses like "(trazer para lá)").`,
     'error-correction': `type "error-correction":
    - Write an ORIGINAL sentence with ONE deliberate error.
    - "sentence_with_error", "error_word", "correct_word", "corrected_sentence", "translation" (PT-BR: translation of corrected_sentence), "explanation" (PT-BR).
@@ -19,6 +20,7 @@ export function buildTypeDescriptions(langLabel: string): Record<ExerciseTypeId,
    - "acceptable_answers" is an array of other valid corrected sentences or replacement words, or empty.`,
     'reverse-translation': `type "reverse-translation":
    - "portuguese_sentence" (PT-BR) → "target_translation" (${langLabel}).
+   - portuguese_sentence MUST be entirely Brazilian Portuguese — NEVER mix ${langLabel} lesson words into the PT prompt (express the meaning in Portuguese; the ${langLabel} word belongs only in target_translation / variants).
    - "acceptable_variants" (2-4 alternative phrasings).
    - "hint" (optional grammar tip in PT-BR).
    - PT-BR ADVERB CLARITY: when the target uses an adverb (-ment / vite / -ly), write portuguese_sentence with explicit "-mente" (or "logo"/"depressa") — NOT colloquial "rápido/direto/forte" after a noun (e.g. avoid "organizar o mercado rápido"; prefer "organizar o mercado rapidamente").
@@ -151,13 +153,14 @@ export function buildTypeDescriptions(langLabel: string): Record<ExerciseTypeId,
    - "sentence" (${langLabel} sentence with exactly one "___" blank for a key word).
    - "blankWord" (correct word to type — NOT multiple choice).
    - "translation" (PT-BR translation of the full sentence).
-   - "acceptable_variants" (0-2 acceptable alternate spellings or forms).`,
+   - "acceptable_variants" (0-2 acceptable alternate spellings or forms).
+   - French directional verbs: PT "trazer" → apporter/amener; PT "levar" → emporter/emmener. blankWord MUST match the PT cue (e.g. "Eu vou levar (trazer para lá)…" → blankWord "emporter", NEVER "apporter").`,
     'translation-with-constraint': `type "translation-with-constraint":
-   - "portuguese_sentence" (PT-BR sentence to translate).
-   - "required_chunk" (${langLabel}): a word or short phrase FROM THIS LESSON's key vocabulary or dialogue — the learner MUST include it in their translation.
+   - "portuguese_sentence" (PT-BR sentence to translate) — MUST be entirely Brazilian Portuguese. FORBIDDEN: inserting the target-language required_chunk into this sentence (e.g. NEVER "Eu sei que o preço é uma arnaque total"; write "Eu sei que o preço é um golpe total" / "uma furada total").
+   - "required_chunk" (${langLabel}): a word or short phrase FROM THIS LESSON's key vocabulary or dialogue — the learner MUST include it in their translation. This is the ONLY place the chunk appears before the model answer.
    - "target_translation" (${langLabel}): model answer that naturally includes required_chunk.
    - "acceptable_variants" (2-4 valid alternatives that also include required_chunk).
-   - "constraint_explanation" (PT-BR): why this chunk is required/natural here.`,
+   - "constraint_explanation" (PT-BR): why this chunk is required/natural here (may mention the ${langLabel} word in quotes).`,
     'voicemail-dictation': `type "voicemail-dictation":
    - A longer voicemail message (2-4 sentences in ${langLabel}) the learner listens to.
    - "audioText" (${langLabel}): the full voicemail (natural spoken register, 25-60 words).

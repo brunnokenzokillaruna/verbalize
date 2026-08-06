@@ -21,7 +21,7 @@ export function DashboardTopBar({
 }: DashboardTopBarProps) {
   return (
     <header
-      className="sticky top-0 z-20 flex items-center justify-between px-4 py-3"
+      className="sticky top-0 z-[60] flex items-center justify-between px-4 py-3"
       style={{
         backgroundColor: 'var(--color-bg)',
         borderBottom: '2px solid var(--color-border)',

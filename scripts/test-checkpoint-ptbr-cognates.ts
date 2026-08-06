@@ -100,6 +100,22 @@ const leak = findLeakedTargetWord(
 );
 assert('clocher detected as leak', leak === 'clocher', `got ${leak}`);
 
+assert(
+  'arnaque leak in PT translation prompt flagged',
+  findLeakedTargetWord(
+    'Eu sei que o preço é uma arnaque total, mas vou lá.',
+    ['arnaque'],
+  ) === 'arnaque',
+);
+
+assert(
+  'pure PT prompt with golpe allowed',
+  findLeakedTargetWord(
+    'Eu sei que o preço é um golpe total, mas vou lá.',
+    ['arnaque'],
+  ) === null,
+);
+
 if (failed > 0) {
   console.error(`\n${failed} assertion(s) failed`);
   process.exit(1);

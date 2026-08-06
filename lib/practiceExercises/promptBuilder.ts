@@ -12,6 +12,7 @@ import { buildTypeDescriptions } from './exerciseTypeDescriptions';
 import { buildTagGuidance } from './tagGuidance';
 import { buildGrammarFocusExerciseGuidance } from './grammarFocusExerciseGuidance';
 import { REVERSE_TRANSLATION_PT_ADVERB_PROMPT_RULE } from '@/lib/reverseTranslationPtAdverb';
+import { FILL_GAP_DIRECTIONAL_PROMPT_RULE } from '@/lib/fillGapDirectionalSanitize';
 import { buildChainPromptBlock } from './chainExercises';
 import { pickInterleavingWords, buildInterleavingPromptBlock } from './interleaving';
 import { resolveRequiredProductionType } from './productionTypes';
@@ -125,7 +126,7 @@ export function buildPracticeExercisePrompt(params: GeneratePracticeParams): {
   const chainBlock = buildChainPromptBlock(hasChainTypes);
   const dialogueAnchorBlock = buildDialogueAnchorBlock();
   const constraintBlock = allowedSet.has('translation-with-constraint')
-    ? `\nTRANSLATION-WITH-CONSTRAINT RULE: "required_chunk" MUST come from this lesson's key vocabulary or dialogue — the learner must use that chunk in their written translation. All acceptable_variants must also contain required_chunk.`
+    ? `\nTRANSLATION-WITH-CONSTRAINT RULE: "required_chunk" MUST come from this lesson's key vocabulary or dialogue — the learner must use that chunk in their written translation. All acceptable_variants must also contain required_chunk. CRITICAL: "portuguese_sentence" must be pure PT-BR and must NOT contain required_chunk (use a Portuguese equivalent in the prompt; show the ${LANG_LABEL[language]} chunk only via required_chunk).`
     : '';
 
   const curatedAnchorBlock = theme
@@ -139,6 +140,11 @@ export function buildPracticeExercisePrompt(params: GeneratePracticeParams): {
   const reverseTranslationAdverbRule = allowedSet.has('reverse-translation')
     ? REVERSE_TRANSLATION_PT_ADVERB_PROMPT_RULE
     : '';
+  const directionalVerbRule =
+    language === 'fr' &&
+    (allowedSet.has('fill-gap-production') || allowedSet.has('context-choice'))
+      ? FILL_GAP_DIRECTIONAL_PROMPT_RULE
+      : '';
 
   const grammarAccuracyBlock = `
 --- CRITICAL LINGUISTIC ACCURACY & GENDER AGREEMENT RULES ---
@@ -176,7 +182,7 @@ ${tagGuidance}${grammarFocusGuidance}${productionRuleBlock}${interleavingBlock}$
 CRITICAL RULE: Do NOT copy or reuse any sentence from the dialogue above. Every exercise sentence must be ORIGINAL — newly created by you. The sentences should be related to the lesson's theme and grammar focus, but must be completely different from the dialogue lines.
 
 LEVEL CONSTRAINTS — all sentences you write must follow these rules: ${levelDesc}
-${vocabConstraint}${reverseTranslationHintRule}${reverseTranslationAdverbRule}
+${vocabConstraint}${reverseTranslationHintRule}${reverseTranslationAdverbRule}${directionalVerbRule}
 ${grammarAccuracyBlock}
 
 Generate exactly ${PRACTICE_EXERCISE_COUNT} exercises as a JSON array. Choose varied types from the following pool for a balanced practice session. You MUST use ONLY the types listed below — any other type is forbidden.

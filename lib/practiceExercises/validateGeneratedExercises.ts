@@ -3,12 +3,13 @@ import type { ConjugationSpeedData, ErrorCorrectionData, Exercise, SupportedLang
 import type { ExerciseTypeId } from './constants';
 import { fixConjugationSpeedExercise } from './fixConjugationSpeed';
 import { sanitizeReverseTranslationExercise } from '@/lib/reverseTranslationPtAdverb';
+import { sanitizeFillGapDirectional } from '@/lib/fillGapDirectionalSanitize';
 import { sanitizeListenAndRespondFields } from '@/lib/listenAndRespondAudio';
 import {
   isListenAndSelectConsistent,
   isMcqAnswerConsistent,
 } from './validateChoiceConsistency';
-import { isListeningComprehensionPtBrPure } from './validatePtBrText';
+import { isListeningComprehensionPtBrPure, findLeakedTargetWord } from './validatePtBrText';
 
 export interface ValidateExercisesOptions {
   lessonVocabulary?: string[];
@@ -74,6 +75,15 @@ export async function validateAndSanitizeExercises(
         console.warn('[generatePracticeExercises] Dropped reverse-translation with empty acceptable_variants');
         return false;
       }
+      const leak = findLeakedTargetWord(d.portuguese_sentence, [
+        ...lessonVocabulary,
+      ]);
+      if (leak) {
+        console.warn(
+          `[generatePracticeExercises] Dropped reverse-translation — PT prompt leaks target word "${leak}"`,
+        );
+        return false;
+      }
       return true;
     }
     if (ex.type === 'sentence-builder') {
@@ -97,9 +107,29 @@ export async function validateAndSanitizeExercises(
       return true;
     }
     if (ex.type === 'context-choice') {
-      const { sentence, blankWord, options } = ex.data as { sentence: string; blankWord: string; options: string[] };
+      let { sentence, blankWord, options } = ex.data as {
+        sentence: string;
+        blankWord: string;
+        options: string[];
+        translation?: string;
+      };
       if (!sentence || !blankWord || !Array.isArray(options) || options.length < 2) {
         console.warn('[generatePracticeExercises] Dropped malformed context-choice');
+        return false;
+      }
+      if (language === 'fr') {
+        Object.assign(
+          ex.data,
+          sanitizeFillGapDirectional(
+            ex.data as { blankWord: string; translation: string; options?: string[] },
+          ),
+        );
+        blankWord = (ex.data as { blankWord: string }).blankWord;
+        options = (ex.data as { options: string[] }).options;
+      }
+      const blankNorm = blankWord.toLowerCase().trim();
+      if (!options.some((o) => o.toLowerCase().trim() === blankNorm)) {
+        console.warn('[generatePracticeExercises] Dropped context-choice — blankWord missing from options');
         return false;
       }
       return true;
@@ -365,6 +395,7 @@ export async function validateAndSanitizeExercises(
         sentence?: string;
         blankWord?: string;
         translation?: string;
+        acceptable_variants?: string[];
       };
       if (
         !d.sentence?.includes('___') ||
@@ -373,6 +404,13 @@ export async function validateAndSanitizeExercises(
       ) {
         console.warn('[generatePracticeExercises] Dropped malformed fill-gap-production');
         return false;
+      }
+      if (language === 'fr') {
+        Object.assign(d, sanitizeFillGapDirectional({
+          blankWord: d.blankWord,
+          translation: d.translation,
+          acceptable_variants: d.acceptable_variants,
+        }));
       }
       return true;
     }
@@ -401,6 +439,16 @@ export async function validateAndSanitizeExercises(
       );
       if (!inTarget || !inVariants) {
         console.warn('[generatePracticeExercises] Dropped translation-with-constraint — required_chunk missing from model answers');
+        return false;
+      }
+      const leak = findLeakedTargetWord(d.portuguese_sentence, [
+        chunk,
+        ...lessonVocabulary,
+      ]);
+      if (leak) {
+        console.warn(
+          `[generatePracticeExercises] Dropped translation-with-constraint — PT prompt leaks target word "${leak}" (required_chunk must stay out of portuguese_sentence)`,
+        );
         return false;
       }
       return true;

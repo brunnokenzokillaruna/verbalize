@@ -4,6 +4,7 @@ import { callGeminiJSON } from '@/services/gemini';
 import { getCheckpointWindow, formatCheckpointRange } from '@/lib/curriculum/checkpointWindow';
 import { checkpointSessionSchema } from '@/lib/schemas/checkpoint';
 import { validateAndSanitizeExercises } from '@/lib/practiceExercises/validateGeneratedExercises';
+import { gateExerciseAnswerKeys } from '@/lib/practiceExercises/verifyAnswerKeys';
 import { isCheckpointComprehensionConsistent } from '@/lib/practiceExercises/validateChoiceConsistency';
 import { getAllowedExerciseTypes } from '@/lib/practiceExercises/constants';
 import type {
@@ -170,6 +171,8 @@ Rules:
       allowedSet,
       params.language,
     );
+
+    productionExercises = await gateExerciseAnswerKeys(productionExercises, params.language);
 
     if (!productionExercises.some((ex) => ex.type === 'listen-and-respond')) {
       productionExercises = [

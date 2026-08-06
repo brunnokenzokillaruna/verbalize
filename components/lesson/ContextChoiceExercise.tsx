@@ -1,6 +1,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import type { ContextChoiceData } from '@/types';
 import { Languages } from 'lucide-react';
+import { sanitizeFillGapDirectional } from '@/lib/fillGapDirectionalSanitize';
 
 interface ContextChoiceExerciseProps {
   data: ContextChoiceData;
@@ -15,6 +16,18 @@ interface ContextChoiceExerciseProps {
 export function ContextChoiceExercise({ data, onAnswer, answered, setIsExerciseReady, submitTrigger }: ContextChoiceExerciseProps) {
   const [choice, setChoice] = useState<string | null>(null);
 
+  const sanitized = useMemo(
+    () =>
+      sanitizeFillGapDirectional({
+        blankWord: data.blankWord,
+        translation: data.translation,
+        options: data.options,
+      }),
+    [data],
+  );
+  const blankWord = sanitized.blankWord;
+  const options = sanitized.options ?? data.options;
+
   // Notify parent of readiness
   useEffect(() => {
     if (!answered) {
@@ -27,28 +40,29 @@ export function ContextChoiceExercise({ data, onAnswer, answered, setIsExerciseR
   // Listen for global submit
   useEffect(() => {
     if (submitTrigger > 0 && !answered && choice) {
-      onAnswer(choice === data.blankWord);
+      onAnswer(choice === blankWord);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [submitTrigger]);
 
   // Shuffle options once on mount so the correct answer isn't always top-left
   const shuffledOptions = useMemo(() => {
-    const opts = [...data.options];
+    const opts = [...options];
     for (let i = opts.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [opts[i], opts[j]] = [opts[j], opts[i]];
     }
     return opts;
-  }, [data.options]);
+  }, [options]);
 
   function handleSelect(option: string) {
     if (answered || choice !== null) return;
     setChoice(option);
-    onAnswer(option === data.blankWord);
+    onAnswer(option === blankWord);
   }
 
   const parts = data.sentence.split('___');
-  const isCorrect = choice === data.blankWord;
+  const isCorrect = choice === blankWord;
 
   return (
     <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -107,7 +121,7 @@ export function ContextChoiceExercise({ data, onAnswer, answered, setIsExerciseR
       <div className="grid grid-cols-2 gap-3 mt-2">
         {shuffledOptions.map((option) => {
           const isChosen = choice === option;
-          const isCorrectOption = option === data.blankWord;
+          const isCorrectOption = option === blankWord;
 
           let stateStyles = "border border-white/5 bg-white/5 hover:bg-white/10 hover:border-white/10 text-[var(--color-text-primary)] hover:scale-[1.005] active:scale-[0.995]";
           

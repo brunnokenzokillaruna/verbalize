@@ -11,6 +11,7 @@ import {
   type DialogueSpeakerVoice,
 } from '@/lib/dialogueVoiceAvatars';
 import {
+  alignNarratedRangeToText,
   findTranslationHighlightRange,
   resolveNarrationTarget,
   type NarratedTextRange,
@@ -250,17 +251,19 @@ export function LessonHookScreen({
             const translation = rawTranslation
               ? stripSpeakerPrefix(rawTranslation, speakerName)
               : '';
-            const activeNarrationTarget = isActive
+            const lineNarration =
+              isActive && narratedRange?.lineIndex === i
+                ? alignNarratedRangeToText(text, narratedRange)
+                : null;
+            const activeNarrationTarget = lineNarration
               ? resolveNarrationTarget(
                   text,
-                  narratedRange,
+                  lineNarration,
                   vocabTranslations,
                   newChunks,
                 )
               : null;
-            const highlightedRange = activeNarrationTarget ?? (
-              isActive ? narratedRange : null
-            );
+            const highlightedRange = activeNarrationTarget ?? lineNarration;
             const translationRange =
               activeNarrationTarget && translation
                 ? findTranslationHighlightRange(

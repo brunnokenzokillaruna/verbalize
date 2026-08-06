@@ -27,7 +27,7 @@ export function DashboardBanner({
   onOpenSkipModal,
 }: DashboardBannerProps) {
   return (
-    <div className="sticky top-[61px] z-20 px-0 sm:px-4 pt-2 pb-4 animate-fade-in" style={{ backgroundColor: 'var(--color-bg)' }}>
+    <div className="sticky top-[61px] z-[60] px-0 sm:px-4 pt-2 pb-4 animate-fade-in" style={{ backgroundColor: 'var(--color-bg)' }}>
       <div
         className="rounded-2xl p-4.5 shadow-xl transition-all duration-500"
         style={{

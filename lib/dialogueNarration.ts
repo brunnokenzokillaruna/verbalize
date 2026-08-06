@@ -63,6 +63,69 @@ export function findNarratedRangeFromAlignment(
   return token ? { lineIndex, ...token } : null;
 }
 
+/**
+ * Remap a narrated range onto the displayed line text.
+ * ElevenLabs alignment offsets can drift from punctuation/spacing in the UI string;
+ * matching by spoken token keeps karaoke on the visible word.
+ */
+export function alignNarratedRangeToText(
+  displayText: string,
+  narrated: NarratedTextRange | null,
+): NarratedTextRange | null {
+  if (!narrated) return null;
+
+  const slice = displayText.slice(narrated.start, narrated.end);
+  if (
+    narrated.end <= displayText.length &&
+    canonicalVocabKey(slice) === canonicalVocabKey(narrated.text)
+  ) {
+    return narrated;
+  }
+
+  const targetKey = canonicalVocabKey(narrated.text);
+  if (!targetKey) return narrated;
+
+  const tokens = tokenizeNarratedText(displayText);
+  const exact = tokens.find((token) => canonicalVocabKey(token.text) === targetKey);
+  if (exact) {
+    return {
+      lineIndex: narrated.lineIndex,
+      start: exact.start,
+      end: exact.end,
+      text: exact.text,
+    };
+  }
+
+  // Prefer the token nearest the original offset when several stems match.
+  let best: (typeof tokens)[number] | null = null;
+  let bestDistance = Number.POSITIVE_INFINITY;
+  for (const token of tokens) {
+    const key = canonicalVocabKey(token.text);
+    let prefix = 0;
+    while (
+      prefix < targetKey.length &&
+      prefix < key.length &&
+      targetKey[prefix] === key[prefix]
+    ) {
+      prefix += 1;
+    }
+    if (prefix < 3 || prefix / Math.min(targetKey.length, key.length) < 0.7) continue;
+    const distance = Math.abs(token.start - narrated.start);
+    if (distance < bestDistance) {
+      best = token;
+      bestDistance = distance;
+    }
+  }
+
+  if (!best) return narrated;
+  return {
+    lineIndex: narrated.lineIndex,
+    start: best.start,
+    end: best.end,
+    text: best.text,
+  };
+}
+
 export function buildEstimatedNarrationTimeline(
   dialogueLines: string[],
   durationSeconds: number,

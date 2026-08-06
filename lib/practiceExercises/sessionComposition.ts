@@ -15,9 +15,10 @@ import {
 import { resolveRequiredProductionType, sessionHasProduction } from './productionTypes';
 import type { GeneratePracticeParams } from './types';
 import { validateAndSanitizeExercises } from './validateGeneratedExercises';
+import { gateExerciseAnswerKeys } from './verifyAnswerKeys';
 
 /**
- * Post-processes Gemini output: validate → adaptive tier → variety → production → chains → order.
+ * Post-processes Gemini output: validate → adaptive tier → variety → production → chains → order → answer-key QA.
  */
 export async function composePracticeSession(
   exercises: Exercise[],
@@ -66,6 +67,9 @@ export async function composePracticeSession(
   if (requiredProduction) {
     result = pinProductionOrder(result, requiredProduction);
   }
+
+  // Final pedagogical gate: drop exercises whose marked correct answer is wrong.
+  result = await gateExerciseAnswerKeys(result, params.language);
 
   if (!sessionHasProduction(result)) {
     console.warn(

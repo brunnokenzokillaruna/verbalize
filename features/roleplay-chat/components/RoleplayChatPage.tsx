@@ -89,6 +89,8 @@ export function RoleplayChatPage() {
     messages,
     micEnabled,
     isAssistantSpeaking,
+    speakingMessageId,
+    narratedRange,
     reviewingCorrections,
     start,
     stop,
@@ -396,6 +398,8 @@ export function RoleplayChatPage() {
           <ChatTranscript
             messages={messages}
             characterName={scenario?.characterName ?? 'Parceiro'}
+            speakingMessageId={speakingMessageId}
+            narratedRange={narratedRange}
           />
 
           {reviewingCorrections && (

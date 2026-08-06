@@ -27,6 +27,12 @@ import type {
   RoleplayIntensity,
   RoleplayScenario,
 } from '@/features/roleplay-chat/types';
+import {
+  alignNarratedRangeToText,
+  buildEstimatedNarrationTimeline,
+  findEstimatedNarratedRange,
+  type NarratedTextRange,
+} from '@/lib/dialogueNarration';
 import type { ProficiencyLevel, SupportedLanguage } from '@/types';
 
 function makeId(): string {
@@ -90,6 +96,8 @@ export function useLiveRoleplaySession({
   const [messages, setMessages] = useState<RoleplayChatMessage[]>([]);
   const [micEnabled, setMicEnabled] = useState(false);
   const [isAssistantSpeaking, setIsAssistantSpeaking] = useState(false);
+  const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(null);
+  const [narratedRange, setNarratedRange] = useState<NarratedTextRange | null>(null);
   const [reviewingCorrections, setReviewingCorrections] = useState(false);
 
   const sessionRef = useRef<BrowserLiveSession | null>(null);
@@ -113,6 +121,9 @@ export function useLiveRoleplaySession({
   const farewellPendingRef = useRef(false);
   const farewellFallbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const finishSessionRef = useRef<(() => Promise<void>) | null>(null);
+  const speakingMessageIdRef = useRef<string | null>(null);
+  const narrationFrameRef = useRef<number | null>(null);
+  const utteranceGenerationRef = useRef(0);
 
   useEffect(() => {
     messagesRef.current = messages;
@@ -128,6 +139,99 @@ export function useLiveRoleplaySession({
   useEffect(() => {
     micEnabledRef.current = micEnabled;
   }, [micEnabled]);
+
+  useEffect(() => {
+    speakingMessageIdRef.current = speakingMessageId;
+  }, [speakingMessageId]);
+
+  const clearNarration = useCallback(() => {
+    if (narrationFrameRef.current !== null) {
+      cancelAnimationFrame(narrationFrameRef.current);
+      narrationFrameRef.current = null;
+    }
+    setNarratedRange(null);
+  }, []);
+
+  const markAssistantSpeaking = useCallback((messageId: string | null) => {
+    if (messageId) {
+      speakingMessageIdRef.current = messageId;
+      setSpeakingMessageId(messageId);
+      setIsAssistantSpeaking(true);
+    }
+  }, []);
+
+  const endAssistantUtterance = useCallback(
+    (generation: number) => {
+      void playbackRef.current.waitUntilIdle().then(() => {
+        if (utteranceGenerationRef.current !== generation) return;
+        setIsAssistantSpeaking(false);
+        speakingMessageIdRef.current = null;
+        setSpeakingMessageId(null);
+        clearNarration();
+      });
+    },
+    [clearNarration],
+  );
+
+  // Karaoke cursor: map PCM playback clock → word range on the speaking bubble.
+  useEffect(() => {
+    if (!speakingMessageId) {
+      clearNarration();
+      return;
+    }
+
+    let active = true;
+
+    const tick = () => {
+      if (!active) return;
+
+      const message = messagesRef.current.find((m) => m.id === speakingMessageId);
+      const text = message?.text?.trim() ?? '';
+      const elapsed = playbackRef.current.getUtteranceElapsed();
+      const duration = playbackRef.current.getUtteranceDuration();
+
+      if (
+        text &&
+        text !== '…' &&
+        elapsed !== null &&
+        duration !== null &&
+        duration > 0
+      ) {
+        const timeline = buildEstimatedNarrationTimeline(
+          [text],
+          Math.max(duration, elapsed + 0.05),
+        );
+        const estimated = findEstimatedNarratedRange(timeline, elapsed);
+        const aligned = alignNarratedRangeToText(text, estimated);
+        setNarratedRange((current) => {
+          if (
+            current?.start === aligned?.start &&
+            current?.end === aligned?.end &&
+            current?.text === aligned?.text
+          ) {
+            return current;
+          }
+          return aligned;
+        });
+      }
+
+      if (!playbackRef.current.isActivelyPlaying() && elapsed !== null && duration !== null && elapsed >= duration - 0.05) {
+        clearNarration();
+        return;
+      }
+
+      narrationFrameRef.current = requestAnimationFrame(tick);
+    };
+
+    narrationFrameRef.current = requestAnimationFrame(tick);
+    return () => {
+      active = false;
+      if (narrationFrameRef.current !== null) {
+        cancelAnimationFrame(narrationFrameRef.current);
+        narrationFrameRef.current = null;
+      }
+    };
+  }, [speakingMessageId, clearNarration]);
 
   const upsertStreaming = useCallback(
     (role: 'user' | 'assistant', text: string, draftIdRef: MutableRefObject<string | null>) => {
@@ -386,8 +490,12 @@ export function useLiveRoleplaySession({
       if (!content) return;
 
       if (content.interrupted) {
+        utteranceGenerationRef.current += 1;
         playbackRef.current.clear();
         setIsAssistantSpeaking(false);
+        speakingMessageIdRef.current = null;
+        setSpeakingMessageId(null);
+        clearNarration();
       }
 
       const inputText = readTranscription(content, 'input');
@@ -404,7 +512,7 @@ export function useLiveRoleplaySession({
         // Grow the bubble as transcript chunks arrive so the learner can follow audio.
         assistantAccumRef.current += outputText;
         upsertStreaming('assistant', assistantAccumRef.current, assistantDraftIdRef);
-        setIsAssistantSpeaking(true);
+        markAssistantSpeaking(assistantDraftIdRef.current);
       }
 
       const modelTurn = content.modelTurn as
@@ -415,12 +523,13 @@ export function useLiveRoleplaySession({
           if (part.text?.trim()) {
             assistantAccumRef.current += part.text;
             upsertStreaming('assistant', assistantAccumRef.current, assistantDraftIdRef);
+            markAssistantSpeaking(assistantDraftIdRef.current);
           }
           const data = part.inlineData?.data;
           if (data) {
             ensureAssistantPlaceholder();
             void playbackRef.current.enqueueBase64Pcm(data);
-            setIsAssistantSpeaking(true);
+            markAssistantSpeaking(assistantDraftIdRef.current);
           }
         }
       }
@@ -431,10 +540,16 @@ export function useLiveRoleplaySession({
         }
         const shouldAutoFinish =
           farewellPendingRef.current && Boolean(assistantDraftIdRef.current);
-        if (assistantDraftIdRef.current) {
+        const speakingId = assistantDraftIdRef.current;
+        if (speakingId) {
+          markAssistantSpeaking(speakingId);
           void finalizeTurn('assistant', assistantDraftIdRef, assistantAccumRef);
+          const generation = ++utteranceGenerationRef.current;
+          endAssistantUtterance(generation);
+        } else {
+          setIsAssistantSpeaking(false);
+          clearNarration();
         }
-        setIsAssistantSpeaking(false);
 
         if (!greetingDoneRef.current) {
           greetingDoneRef.current = true;
@@ -454,7 +569,14 @@ export function useLiveRoleplaySession({
         }
       }
     },
-    [ensureAssistantPlaceholder, finalizeTurn, upsertStreaming],
+    [
+      clearNarration,
+      endAssistantUtterance,
+      ensureAssistantPlaceholder,
+      finalizeTurn,
+      markAssistantSpeaking,
+      upsertStreaming,
+    ],
   );
 
   const handleServerMessageRef = useRef(handleServerMessage);
@@ -507,10 +629,13 @@ export function useLiveRoleplaySession({
       farewellFallbackTimerRef.current = null;
     }
     setIsAssistantSpeaking(false);
+    speakingMessageIdRef.current = null;
+    setSpeakingMessageId(null);
+    clearNarration();
     setMicEnabled(false);
     micEnabledRef.current = false;
     setStatus((s) => (s === 'error' ? 'error' : 'ended'));
-  }, []);
+  }, [clearNarration]);
 
   finishSessionRef.current = stop;
 
@@ -706,6 +831,8 @@ export function useLiveRoleplaySession({
     messages,
     micEnabled,
     isAssistantSpeaking,
+    speakingMessageId,
+    narratedRange,
     reviewingCorrections,
     start,
     stop,

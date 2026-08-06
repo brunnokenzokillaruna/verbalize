@@ -1,18 +1,31 @@
 'use client';
 
+import { ClickableSentence } from '@/components/lesson/ClickableSentence';
 import { GrammarHint } from './GrammarHint';
 import type { RoleplayChatMessage } from '@/features/roleplay-chat/types';
 
 export function MessageBubble({
   message,
   characterName,
+  narratedRange = null,
 }: {
   message: RoleplayChatMessage;
   characterName: string;
+  narratedRange?: { start: number; end: number } | null;
 }) {
   const isUser = message.role === 'user';
+  const isAssistant = message.role === 'assistant';
   const showTranslation =
     Boolean(message.translationPt) || Boolean(message.translationLoading);
+
+  const translationStyle = {
+    borderColor: isUser
+      ? 'color-mix(in srgb, #fff 28%, transparent)'
+      : 'var(--color-border)',
+    color: isUser
+      ? 'color-mix(in srgb, #fff 88%, transparent)'
+      : 'var(--color-text-secondary)',
+  } as const;
 
   return (
     <div className={`flex gap-2.5 ${isUser ? 'flex-row' : 'flex-row-reverse'}`}>
@@ -52,8 +65,12 @@ export function MessageBubble({
               : {
                   backgroundColor: 'var(--color-surface)',
                   color: 'var(--color-text-primary)',
-                  border: '1.5px solid var(--color-border)',
-                  boxShadow: '0 2px 0 var(--color-border)',
+                  border: narratedRange
+                    ? '1.5px solid color-mix(in srgb, var(--color-primary) 45%, var(--color-border))'
+                    : '1.5px solid var(--color-border)',
+                  boxShadow: narratedRange
+                    ? '0 2px 0 color-mix(in srgb, var(--color-primary) 25%, var(--color-border))'
+                    : '0 2px 0 var(--color-border)',
                 }
           }
         >
@@ -68,12 +85,18 @@ export function MessageBubble({
             {isUser ? 'Você' : characterName}
             {message.streaming ? ' …' : ''}
           </p>
-          <p
-            className="text-sm leading-relaxed"
-            style={{ color: isUser ? '#fff' : 'var(--color-text-primary)' }}
-          >
-            {message.text}
-          </p>
+
+          {isAssistant ? (
+            <ClickableSentence
+              text={message.text}
+              narratedRange={narratedRange}
+              className={`text-sm leading-relaxed text-left ${narratedRange ? 'font-semibold' : ''}`}
+            />
+          ) : (
+            <p className="text-sm leading-relaxed" style={{ color: '#fff' }}>
+              {message.text}
+            </p>
+          )}
 
           {showTranslation && (
             <p
@@ -81,16 +104,9 @@ export function MessageBubble({
                 'mt-2 pt-2 text-xs leading-relaxed border-t',
                 message.translationLoading ? 'animate-pulse' : '',
               ].join(' ')}
-              style={{
-                borderColor: isUser
-                  ? 'color-mix(in srgb, #fff 28%, transparent)'
-                  : 'var(--color-border)',
-                color: isUser
-                  ? 'color-mix(in srgb, #fff 88%, transparent)'
-                  : 'var(--color-text-secondary)',
-              }}
+              style={translationStyle}
             >
-              {message.translationLoading
+              {message.translationLoading || !message.translationPt
                 ? 'Traduzindo…'
                 : message.translationPt}
             </p>
@@ -98,8 +114,11 @@ export function MessageBubble({
         </div>
 
         {isUser && (
-          <div className="mt-1 w-full">
-            <GrammarHint grammar={message.grammar} loading={message.grammarLoading} />
+          <div className="mt-1.5 w-full">
+            <GrammarHint
+              grammar={message.grammar}
+              loading={Boolean(message.grammarLoading)}
+            />
           </div>
         )}
       </div>

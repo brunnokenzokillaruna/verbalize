@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Lightbulb, XCircle, PenLine } from 'lucide-react';
 import type { FillGapProductionData } from '@/types';
 import { isAccentOnlyDiff } from '@/utils/accent';
 import { validateReverseTranslationLocal } from '@/lib/reverseTranslationValidate';
+import { sanitizeFillGapDirectional } from '@/lib/fillGapDirectionalSanitize';
 import { incrementProductionStats } from '@/services/firestore';
 import { useAuthStore } from '@/store/authStore';
 
@@ -38,7 +39,19 @@ export function FillGapProductionExercise({
   const [answerStatus, setAnswerStatus] = useState<AnswerStatus>('idle');
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const variants = data.acceptable_variants ?? [];
+  const sanitized = useMemo(
+    () =>
+      language === 'fr'
+        ? sanitizeFillGapDirectional({
+            blankWord: data.blankWord,
+            translation: data.translation,
+            acceptable_variants: data.acceptable_variants,
+          })
+        : data,
+    [data, language],
+  );
+  const blankWord = sanitized.blankWord;
+  const variants = sanitized.acceptable_variants ?? [];
   const frenchAccents = ['é', 'à', 'è', 'ù', 'ç', 'œ', 'ê', 'â', 'ô', 'î', 'ë', 'ï'];
 
   useEffect(() => {
@@ -62,7 +75,7 @@ export function FillGapProductionExercise({
 
     const userNorm = normalize(input);
     const isExact =
-      userNorm === normalize(data.blankWord) ||
+      userNorm === normalize(blankWord) ||
       variants.some((v) => userNorm === normalize(v));
 
     if (isExact) {
@@ -72,7 +85,7 @@ export function FillGapProductionExercise({
     }
 
     const accentOnly =
-      isAccentOnlyDiff(input, data.blankWord) ||
+      isAccentOnlyDiff(input, blankWord) ||
       variants.some((v) => isAccentOnlyDiff(input, v));
 
     if (accentOnly) {
@@ -81,7 +94,7 @@ export function FillGapProductionExercise({
       return;
     }
 
-    const result = validateReverseTranslationLocal(input, data.blankWord, variants);
+    const result = validateReverseTranslationLocal(input, blankWord, variants);
     if (result.accepted) {
       setAnswerStatus('correct');
       reportProduction(true);
@@ -134,7 +147,7 @@ export function FillGapProductionExercise({
               borderStyle: isAnswered ? 'solid' : 'dashed',
             }}
           >
-            {isAnswered ? input || data.blankWord : '___'}
+            {isAnswered ? input || blankWord : '___'}
           </span>
           {parts[1] ?? ''}
         </p>
@@ -186,7 +199,7 @@ export function FillGapProductionExercise({
               Resposta correta:
             </span>
           </div>
-          <p className="text-base font-semibold italic">{data.blankWord}</p>
+          <p className="text-base font-semibold italic">{blankWord}</p>
           <div className="flex items-center gap-2 mt-3">
             <Lightbulb size={14} className="text-amber-500" />
             <p className="text-sm text-[var(--color-text-secondary)]">
