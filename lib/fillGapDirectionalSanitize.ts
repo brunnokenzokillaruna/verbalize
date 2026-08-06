@@ -71,7 +71,7 @@ export function swapFrenchDirectionalVerb(word: string, to: Direction): string {
           [/emmen(?=[a-zàâçéèêëîïôùûü]|$)/gi, 'amen'],
         ];
 
-  let result = word;
+  const result = word;
   for (const [pattern, replacement] of replacements) {
     const next = result.replace(pattern, replacement);
     if (next !== result) return next;

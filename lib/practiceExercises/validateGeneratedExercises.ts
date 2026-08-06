@@ -107,12 +107,15 @@ export async function validateAndSanitizeExercises(
       return true;
     }
     if (ex.type === 'context-choice') {
-      let { sentence, blankWord, options } = ex.data as {
+      const data = ex.data as {
         sentence: string;
         blankWord: string;
         options: string[];
         translation?: string;
       };
+      const { sentence } = data;
+      let blankWord = data.blankWord;
+      let options = data.options;
       if (!sentence || !blankWord || !Array.isArray(options) || options.length < 2) {
         console.warn('[generatePracticeExercises] Dropped malformed context-choice');
         return false;
