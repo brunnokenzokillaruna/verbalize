@@ -86,6 +86,7 @@ export function useVocabReview(
     setAnswered(false);
     setLastCorrect(null);
     setResults([]);
+    setSavingResults(false);
   }, []);
 
   const reshuffleSession = useCallback(() => {
@@ -112,18 +113,29 @@ export function useVocabReview(
     async (reviewResults: ReviewResult[], exercises?: VocabReviewItem[]) => {
       if (!user) return;
       setSavingResults(true);
-      await Promise.all(
-        reviewResults.map(async (r) => {
-          await updateVocabSrsAfterReview(user.uid, r.word, language, r.correct);
-          if (!r.correct || !exercises) return;
-          const item = exercises.find((e) => e.word === r.word);
-          if (item && isProductionExerciseType(item.exercise.type)) {
-            await markVocabularyProduced(user.uid, r.word, language);
-          }
-        }),
-      );
-      await loadVocabulary();
-      setSavingResults(false);
+      try {
+        // Persist SRS updates one failure shouldn't block the rest
+        await Promise.all(
+          reviewResults.map(async (r) => {
+            try {
+              await updateVocabSrsAfterReview(user.uid, r.word, language, r.correct);
+              if (!r.correct || !exercises) return;
+              const item = exercises.find((e) => e.word === r.word);
+              if (item && isProductionExerciseType(item.exercise.type)) {
+                await markVocabularyProduced(user.uid, r.word, language);
+              }
+            } catch (err) {
+              console.error(`[saveResults] Failed for word "${r.word}":`, err);
+            }
+          }),
+        );
+        // Silent refresh — must NOT flip page `loading` or the review overlay unmounts mid-save
+        await loadVocabulary();
+      } catch (err) {
+        console.error('[saveResults] Failed:', err);
+      } finally {
+        setSavingResults(false);
+      }
     },
     [user, language, loadVocabulary],
   );
@@ -190,8 +202,12 @@ export function useVocabReview(
 
   const finishAndClose = useCallback(
     async (reviewResults: ReviewResult[], exercises?: VocabReviewItem[]) => {
-      await saveResults(reviewResults, exercises);
-      closeAllReview();
+      try {
+        await saveResults(reviewResults, exercises);
+      } finally {
+        // Always leave the review overlay, even if save/refresh failed
+        closeAllReview();
+      }
     },
     [saveResults, closeAllReview],
   );

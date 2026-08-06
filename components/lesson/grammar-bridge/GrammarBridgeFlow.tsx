@@ -125,7 +125,11 @@ export function GrammarBridgeFlow({
       onTouchEnd={onTouchEnd}
     >
       <div className="flex flex-col p-4 sm:p-5 gap-4 sm:gap-5">
-        <GrammarStepProgress step={currentStep} allSteps={steps} />
+        <GrammarStepProgress
+          step={currentStep}
+          allSteps={steps}
+          currentIndex={currentIndex}
+        />
 
         <div
           key={currentStep.id}

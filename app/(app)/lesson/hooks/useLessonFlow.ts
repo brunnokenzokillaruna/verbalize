@@ -224,9 +224,15 @@ export function useLessonFlow({
       );
       devLog(`[Timing] Grammar bridge (${fromCache ? 'do cache' : 'gerado agora'}): ${(performance.now() - tBridge).toFixed(0)}ms`);
       grammarBridgePrefetchRef.current = null;
-      if (bridge) store.setGrammarBridge(bridge);
-      else store.setIsLoading(false);
-      store.setPhase('grammar');
+      if (bridge) {
+        store.setGrammarBridge(bridge);
+        store.setPhase('grammar');
+      } else {
+        // Accuracy gate exhausted / generation failed — skip grammar rather than teach nothing or wrong.
+        console.warn('[useLessonFlow] Grammar bridge unavailable — skipping to practice');
+        store.setIsLoading(false);
+        advanceFromGrammar();
+      }
     } else if (next === 'phonetics') {
       if (store.hook.phoneticsTip) {
         store.setPhase('phonetics');

@@ -2,6 +2,8 @@
  * Heuristics to avoid redundant pedagogical content across grammar bridge steps.
  */
 
+import type { GrammarBridgeResult } from '@/types';
+
 function normalizeText(text: string): string {
   return text
     .toLowerCase()
@@ -52,6 +54,49 @@ export function filterUniqueExplanation(
     .map((s) => s.trim())
     .filter(Boolean)
     .filter((item) => textOverlap(item, base) < OVERLAP_THRESHOLD);
+}
+
+/**
+ * Drop survivalTip when it mostly restates insight / difference / trap explanation.
+ * Uses per-field Jaccard so a short mnemonic is not false-dropped against a long base.
+ */
+export function filterUniqueSurvivalTip(
+  tip: string | undefined,
+  bridge: Pick<GrammarBridgeResult, 'insight' | 'bridge' | 'brazilianTrap' | 'explanation'>,
+): string | undefined {
+  const trimmed = tip?.trim();
+  if (!trimmed) return undefined;
+
+  const trapExplanation =
+    typeof bridge.brazilianTrap === 'object' ? bridge.brazilianTrap?.explanation : undefined;
+  const explanationItems = Array.isArray(bridge.explanation)
+    ? bridge.explanation
+    : bridge.explanation
+      ? [bridge.explanation]
+      : [];
+
+  const references = [
+    bridge.insight,
+    bridge.bridge?.difference,
+    trapExplanation,
+    ...explanationItems,
+  ].filter((s): s is string => Boolean(s?.trim()));
+
+  for (const ref of references) {
+    if (textOverlap(trimmed, ref) >= OVERLAP_THRESHOLD) return undefined;
+  }
+
+  return trimmed;
+}
+
+/**
+ * Whether the âncora step adds a memorable tip (not a restatement of earlier steps).
+ */
+export function shouldIncludeSynthesis(bridge: GrammarBridgeResult): boolean {
+  const tip = filterUniqueSurvivalTip(bridge.survivalTip, bridge);
+  if (tip) return true;
+  // Formula-only anchor is ok when tip was dropped or missing
+  return Boolean(bridge.structureFormulas?.[0]?.formula || bridge.structureFormula);
 }
 
 /** Extract significant words from target phrases for transfer dedup. */

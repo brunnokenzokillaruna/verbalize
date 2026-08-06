@@ -49,6 +49,7 @@ const retentionCheckSchema = z.object({
 export const grammarBridgeSchema = z
   .object({
     insight: z.string().optional(),
+    analogy: wordLimit(20).optional(),
     explanation: z.union([z.string(), z.array(z.string())]).optional(),
     survivalTip: wordLimit(12).optional(),
     culturalNote: wordLimit(15).optional(),
@@ -64,7 +65,7 @@ export const grammarBridgeSchema = z
       .optional(),
     additionalExamples: z
       .array(z.object({ target: z.string(), portuguese: z.string() }))
-      .max(1)
+      .max(2)
       .optional(),
     items: z
       .array(
@@ -86,7 +87,7 @@ export const grammarBridgeSchema = z
           portuguese: z.string(),
         }),
       )
-      .max(2)
+      .max(3)
       .optional(),
     verbSpotlight: z
       .object({
@@ -190,6 +191,7 @@ export function normalizeGrammarBridgeResult(
 
   const normalized: GrammarBridgeResult = stripUndefinedDeep({
     insight: data.insight,
+    analogy: data.analogy,
     explanation: toExplanationArray(data.explanation) ?? undefined,
     survivalTip: data.survivalTip,
     culturalNote: data.culturalNote,
@@ -198,7 +200,7 @@ export function normalizeGrammarBridgeResult(
     formulaExample: data.formulaExample,
     bridge: data.bridge,
     dialogueExample: data.dialogueExample,
-    additionalExamples: (data.additionalExamples ?? []).slice(0, 1),
+    additionalExamples: (data.additionalExamples ?? []).slice(0, 2),
     items: data.items?.slice(0, 3)?.map((item) =>
       stripUndefinedDeep({
         target: item.target,
@@ -208,7 +210,7 @@ export function normalizeGrammarBridgeResult(
     ),
     brazilianTrap: normalizeTrap(data.brazilianTrap) ?? undefined,
     usageContext: data.usageContext,
-    patterns: data.patterns?.slice(0, 2),
+    patterns: data.patterns?.slice(0, 3),
     verbSpotlight: data.verbSpotlight,
     retentionCheck: safeRetention,
   }) as GrammarBridgeResult;

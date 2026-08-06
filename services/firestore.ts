@@ -14,7 +14,7 @@ import {
   type DocumentData,
   Timestamp,
 } from 'firebase/firestore';
-import { getDb } from './firebase';
+import { getDb, getAuthInstance } from './firebase';
 import { normalizeHookPtBr } from '@/lib/naturalPtBr';
 import { getPregenGeneratingTimeoutMs } from '@/lib/pregenTiming';
 import {
@@ -243,6 +243,23 @@ export async function deleteUserData(uid: string): Promise<void> {
 }
 
 // ─── Vocabulary ───────────────────────────────────────────────────────────────
+
+/** Force-refresh the Firebase Auth ID token so long awaits don't hit expired credentials. */
+async function ensureFirestoreAuth(expectedUid: string): Promise<boolean> {
+  try {
+    const auth = await getAuthInstance();
+    const current = auth.currentUser;
+    if (!current || current.uid !== expectedUid) {
+      console.warn('[ensureFirestoreAuth] No matching signed-in user for vocabulary write');
+      return false;
+    }
+    await current.getIdToken(true);
+    return true;
+  } catch (err) {
+    console.error('[ensureFirestoreAuth] Token refresh failed:', err);
+    return false;
+  }
+}
 
 async function resolveVocabularyDocRef(
   uid: string,
@@ -828,12 +845,39 @@ export async function updateVocabTranslation(
   word: string,
   language: SupportedLanguage,
   translation: string,
+  docId?: string,
 ): Promise<void> {
-  const docRef = await resolveVocabularyDocRef(uid, language, word);
-  const snap = await getDoc(docRef);
-  if (snap.exists()) {
-    await updateDoc(docRef, { translation, wordKey: canonicalVocabKey(word) });
+  if (!(await ensureFirestoreAuth(uid))) {
+    throw new Error('Sessão expirada. Faça login novamente para completar o vocabulário.');
   }
+
+  const db = await getDb();
+  let docRef = docId
+    ? doc(db, 'user_vocabulary', docId)
+    : await resolveVocabularyDocRef(uid, language, word);
+
+  let snap = await getDoc(docRef);
+  if (!snap.exists()) {
+    docRef = await resolveVocabularyDocRef(uid, language, word);
+    snap = await getDoc(docRef);
+  }
+
+  const payload = stripUndefinedDeep({
+    translation,
+    wordKey: canonicalVocabKey(word),
+    uid,
+    language,
+    word: cleanWordToken(word),
+  });
+
+  if (snap.exists()) {
+    await updateDoc(docRef, payload);
+    return;
+  }
+
+  // Canonical id may not exist yet (legacy-only row) — merge-create so enrich still saves.
+  const canonicalRef = doc(db, 'user_vocabulary', buildVocabDocId(uid, language, word));
+  await setDoc(canonicalRef, payload, { merge: true });
 }
 
 /**
@@ -845,12 +889,38 @@ export async function updateVocabImage(
   word: string,
   language: SupportedLanguage,
   imageUrl: string,
+  docId?: string,
 ): Promise<void> {
-  const docRef = await resolveVocabularyDocRef(uid, language, word);
-  const snap = await getDoc(docRef);
-  if (snap.exists()) {
-    await updateDoc(docRef, { imageUrl, wordKey: canonicalVocabKey(word) });
+  if (!(await ensureFirestoreAuth(uid))) {
+    throw new Error('Sessão expirada. Faça login novamente para completar o vocabulário.');
   }
+
+  const db = await getDb();
+  let docRef = docId
+    ? doc(db, 'user_vocabulary', docId)
+    : await resolveVocabularyDocRef(uid, language, word);
+
+  let snap = await getDoc(docRef);
+  if (!snap.exists()) {
+    docRef = await resolveVocabularyDocRef(uid, language, word);
+    snap = await getDoc(docRef);
+  }
+
+  const payload = stripUndefinedDeep({
+    imageUrl,
+    wordKey: canonicalVocabKey(word),
+    uid,
+    language,
+    word: cleanWordToken(word),
+  });
+
+  if (snap.exists()) {
+    await updateDoc(docRef, payload);
+    return;
+  }
+
+  const canonicalRef = doc(db, 'user_vocabulary', buildVocabDocId(uid, language, word));
+  await setDoc(canonicalRef, payload, { merge: true });
 }
 
 

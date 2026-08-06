@@ -39,6 +39,7 @@ export interface RegraStep extends GrammarStepBase {
   type: 'regra';
   data: {
     insight: string;
+    analogy?: string;
     usageContext?: string;
     culturalNote?: string;
     bridge?: NonNullable<GrammarBridgeResult['bridge']>;
@@ -131,11 +132,13 @@ export interface CulturaStep extends GrammarStepBase {
 export interface SynthesisStep extends GrammarStepBase {
   type: 'synthesis';
   data: {
+    /** @deprecated synthesis is mnemonic-only; kept for cached bridges */
     insight?: string;
     survivalTip?: string;
     /** @deprecated use formulas — kept for backward compat with cached bridges */
     formula?: string;
     formulas?: Array<{ label?: string; formula: string; hint?: string }>;
+    /** @deprecated trap belongs in cuidado step — kept for cached bridges */
     trap?: {
       wrong: string;
       right: string;

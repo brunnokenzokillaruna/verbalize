@@ -285,6 +285,7 @@ export interface RolePlayConsequence {
 export interface GrammarBridgeResult {
   // ── Novo formato estruturado (Portuguese Bridge Method) ───────────────────
   insight?: string;           // 1 frase "aha!" em PT-BR — o gancho imediato
+  analogy?: string;           // 1 frase "pensa assim…" — analogia do dia a dia (opcional)
   explanation?: string | string[]; // 2-4 frases em PT-BR explicando a regra com profundidade. Pode ser um array para múltiplos tópicos.
   survivalTip?: string;       // Dica de sobrevivência ultra curta, ≤12 palavras
   culturalNote?: string;      // Detalhe ou curiosidade cultural de uso, ≤15 palavras
@@ -305,7 +306,7 @@ export interface GrammarBridgeResult {
     target: string;           // Frase real do diálogo atual
     portuguese: string;       // Equivalente PT-BR
   };
-  additionalExamples?: Array<{ target: string; portuguese: string }>; // 2 exemplos extras
+  additionalExamples?: Array<{ target: string; portuguese: string }>; // até 2 exemplos extras
   items?: Array<{ target: string; portuguese: string; logic?: string }>; // OPCIONAL: Usado para lições com múltiplos itens (ex: interrogativas, expressões)
   brazilianTrap?: {
     wrong: string;

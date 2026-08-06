@@ -38,6 +38,7 @@ export function pushRegraStep(
     phase: 'compreender',
     data: {
       insight: bridge.insight ?? '',
+      analogy: bridge.analogy,
       usageContext: bridge.usageContext,
       culturalNote: sacadaHasCulture ? bridge.culturalNote : undefined,
       bridge: hasBridge ? bridge.bridge : undefined,
@@ -46,6 +47,7 @@ export function pushRegraStep(
   });
 }
 
+/** Radar de erro — only after the learner understands the rule. */
 export function pushCuidadoStep(drafts: StepDraft[], bridge: GrammarBridgeResult): void {
   const trap = getTrap(bridge);
 
@@ -55,18 +57,7 @@ export function pushCuidadoStep(drafts: StepDraft[], bridge: GrammarBridgeResult
       type: 'cuidado',
       label: 'Radar de erro',
       phase: 'evitar_erro',
-      data: { trap, survivalTip: bridge.survivalTip },
-    });
-  } else if (bridge.survivalTip) {
-    drafts.push({
-      id: 'cuidado',
-      type: 'cuidado',
-      label: 'Dica de sobrevivência',
-      phase: 'evitar_erro',
-      data: {
-        trap: { wrong: '', right: '', explanation: bridge.survivalTip },
-        survivalTip: undefined,
-      },
+      data: { trap },
     });
   }
 }
@@ -89,7 +80,7 @@ export function pushFormulaStep(
 }
 
 export function pushPatternSteps(drafts: StepDraft[], bridge: GrammarBridgeResult): void {
-  const patterns = bridge.patterns?.slice(0, 2) ?? [];
+  const patterns = bridge.patterns?.slice(0, 3) ?? [];
 
   if (patterns.length >= 2 && canComparePatterns(patterns)) {
     drafts.push({
@@ -103,6 +94,16 @@ export function pushPatternSteps(drafts: StepDraft[], bridge: GrammarBridgeResul
         changeHint: inferChangeHint(patterns[0], patterns[1]),
       },
     });
+    // Third pattern (if any) as standalone after the compare pair
+    if (patterns[2]) {
+      drafts.push({
+        id: 'pattern-2',
+        type: 'pattern',
+        label: patterns[2].label || 'Padrão de uso',
+        phase: 'aplicar',
+        data: patterns[2],
+      });
+    }
     return;
   }
 
@@ -126,14 +127,7 @@ export function pushApplyBlocks(
   const isVerb = tag === 'VERB';
 
   if (isVerb && bridge.verbSpotlight?.infinitive) {
-    drafts.push({
-      id: 'verb-intro',
-      type: 'verb-intro',
-      label: 'Verbo em destaque',
-      phase: 'aplicar',
-      data: bridge.verbSpotlight,
-    });
-
+    // verb-intro is pushed in buildGrammarSteps (compreender); conjugations + idioms here
     const preview = bridge.verbSpotlight.conjugationPreview
       ? normalizeConjugationPreview(bridge.verbSpotlight.conjugationPreview, language)
       : [];
@@ -189,42 +183,48 @@ export function pushApplyBlocks(
     });
   }
 
-  const transfer = bridge.additionalExamples?.[0];
-  if (transfer) {
-    const patternTargets = (bridge.patterns ?? []).map((p) => p.target);
-    if (shouldIncludeTransfer(transfer, patternTargets, bridge.dialogueExample?.target)) {
-      drafts.push({
-        id: 'transfer',
-        type: 'transfer',
-        label: 'Generalize',
-        phase: 'aplicar',
-        data: transfer,
-      });
-    }
-  }
+  const transfers = bridge.additionalExamples?.slice(0, 2) ?? [];
+  const patternTargets = (bridge.patterns ?? []).map((p) => p.target);
+  const usedTargets = new Set<string>();
+
+  transfers.forEach((transfer, i) => {
+    if (!shouldIncludeTransfer(transfer, patternTargets, bridge.dialogueExample?.target)) return;
+    const key = transfer.target.trim().toLowerCase();
+    if (usedTargets.has(key)) return;
+    usedTargets.add(key);
+    drafts.push({
+      id: `transfer-${i}`,
+      type: 'transfer',
+      label: 'Generalize',
+      phase: 'aplicar',
+      data: transfer,
+    });
+  });
 }
 
 export function pushFixarSteps(
   drafts: StepDraft[],
   bridge: GrammarBridgeResult,
   sacadaHasCulture: boolean,
+  includeSynthesis = true,
 ): void {
-  const synthesisData = buildSynthesisData(bridge);
-  const hasSynthesis =
-    synthesisData.insight ||
-    synthesisData.survivalTip ||
-    synthesisData.formulas?.length ||
-    synthesisData.formula ||
-    synthesisData.trap;
+  if (includeSynthesis) {
+    const synthesisData = buildSynthesisData(bridge);
+    const hasSynthesis = Boolean(
+      synthesisData.survivalTip ||
+        synthesisData.formulas?.length ||
+        synthesisData.formula,
+    );
 
-  if (hasSynthesis) {
-    drafts.push({
-      id: 'synthesis',
-      type: 'synthesis',
-      label: 'Síntese',
-      phase: 'fixar',
-      data: synthesisData,
-    });
+    if (hasSynthesis) {
+      drafts.push({
+        id: 'synthesis',
+        type: 'synthesis',
+        label: 'Âncora',
+        phase: 'fixar',
+        data: synthesisData,
+      });
+    }
   }
 
   if (bridge.retentionCheck) {

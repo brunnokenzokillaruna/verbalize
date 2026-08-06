@@ -37,7 +37,7 @@ export function useVocabEnrich(
           const match = results?.find((r) => r.word.toLowerCase() === word.toLowerCase());
           if (match?.translation && match.translation !== word) {
             translation = match.translation;
-            await updateVocabTranslation(user.uid, word, language, translation);
+            await updateVocabTranslation(user.uid, word, language, translation, item.id);
           }
         }
 
@@ -48,7 +48,7 @@ export function useVocabEnrich(
           });
           if (imgResult?.imageUrl) {
             imageUrl = imgResult.imageUrl;
-            await updateVocabImage(user.uid, word, language, imageUrl);
+            await updateVocabImage(user.uid, word, language, imageUrl, item.id);
           }
         }
 

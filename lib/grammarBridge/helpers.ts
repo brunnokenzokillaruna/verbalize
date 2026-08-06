@@ -1,4 +1,5 @@
 import type { GrammarBridgeResult, SupportedLanguage } from '@/types';
+import { filterUniqueSurvivalTip } from '@/lib/grammarBridgeDedup';
 import type {
   ConjugationStep,
   FormulaExample,
@@ -72,34 +73,40 @@ export function getTrap(bridge: GrammarBridgeResult) {
   return null;
 }
 
+/**
+ * Âncora de fixação: só mnemônico (survivalTip) + no máximo 1 fórmula-chave.
+ * Não reexibe insight nem trap — o aluno já viu isso nas fases anteriores.
+ */
 export function buildSynthesisData(bridge: GrammarBridgeResult): SynthesisStep['data'] {
-  const trap = getTrap(bridge);
-
-  const formulas = bridge.structureFormulas?.length
-    ? bridge.structureFormulas.map((f) => ({
-        label: f.label,
-        formula: f.formula,
-        hint: f.hint,
-      }))
-    : bridge.structureFormula
-      ? [{ formula: bridge.structureFormula }]
+  const tip = filterUniqueSurvivalTip(bridge.survivalTip, bridge);
+  const keyFormula = bridge.structureFormulas?.[0]
+    ? {
+        label: bridge.structureFormulas[0].label,
+        formula: bridge.structureFormulas[0].formula,
+        hint: bridge.structureFormulas[0].hint,
+      }
+    : bridge.structureFormula?.trim()
+      ? { formula: bridge.structureFormula.trim() }
       : undefined;
 
-  return {
-    insight: bridge.insight,
-    survivalTip: bridge.survivalTip,
-    formula: formulas?.[0]?.formula,
-    formulas,
-    trap:
-      trap?.wrong && trap?.right
-        ? {
-            wrong: trap.wrong,
-            right: trap.right,
-            wrongPortuguese: trap.wrongPortuguese,
-            rightPortuguese: trap.rightPortuguese,
-          }
-        : undefined,
-  };
+  // Prefer tip-only anchor; add one formula line only when tip exists (mnemonic + shape).
+  if (tip) {
+    return {
+      survivalTip: tip,
+      formulas: keyFormula ? [keyFormula] : undefined,
+      formula: keyFormula?.formula,
+    };
+  }
+
+  // Fallback: formula alone if tip missing (still better than repeating insight/trap).
+  if (keyFormula) {
+    return {
+      formulas: [keyFormula],
+      formula: keyFormula.formula,
+    };
+  }
+
+  return {};
 }
 
 export function inferChangeHint(

@@ -72,13 +72,24 @@ export default function VocabularyPage() {
   const language = (profile?.currentTargetLanguage ?? 'fr') as SupportedLanguage;
   const lang = LANG_LABEL[language];
 
-  const loadVocabulary = useCallback(async () => {
+  const loadVocabulary = useCallback(async (opts?: { silent?: boolean }) => {
     if (!user) return;
-    setLoading(true);
-    const vocab = await getUserVocabulary(user.uid, language);
-    setItems(vocab);
-    setLoading(false);
+    const silent = opts?.silent === true;
+    if (!silent) setLoading(true);
+    try {
+      const vocab = await getUserVocabulary(user.uid, language);
+      setItems(vocab);
+    } catch (err) {
+      console.error('[VocabularyPage] loadVocabulary failed:', err);
+    } finally {
+      if (!silent) setLoading(false);
+    }
   }, [user, language]);
+
+  const refreshVocabulary = useCallback(
+    () => loadVocabulary({ silent: true }),
+    [loadVocabulary],
+  );
 
   const handleImageLoaded = useCallback((word: string, imageUrl: string) => {
     setItems((prev) => prev.map((item) => (wordsMatchCanonically(item.word, word) ? { ...item, imageUrl } : item)));
@@ -120,10 +131,10 @@ export default function VocabularyPage() {
     handleContextAnswer,
     handleContextContinue,
     finishContextReview,
-  } = useVocabReview(user, profile, items, language, loadVocabulary);
+  } = useVocabReview(user, profile, items, language, refreshVocabulary);
 
   useEffect(() => {
-    loadVocabulary();
+    void loadVocabulary();
   }, [loadVocabulary]);
 
   useEffect(() => {

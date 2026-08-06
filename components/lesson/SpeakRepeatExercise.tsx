@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Mic, Square, Loader2, CheckCircle, XCircle, SkipForward, RefreshCw, Send } from 'lucide-react';
+import { Mic, Square, Loader2, CheckCircle, XCircle, SkipForward, RefreshCw } from 'lucide-react';
 import { AudioPlayerButton } from './AudioPlayerButton';
 import { useVoiceRecorder } from '@/hooks/useVoiceRecorder';
 import { transcribeSpeech } from '@/app/actions/transcribeSpeech';
@@ -133,6 +133,9 @@ export function SpeakRepeatExercise({
   }
 
   function submit(correct: boolean, skipped = false) {
+    if (phase === 'recording') {
+      void recorder.stop();
+    }
     setPhase('answered');
     if (user) {
       incrementProductionStats(user.uid, 'oral', correct).catch(console.error);
@@ -140,6 +143,8 @@ export function SpeakRepeatExercise({
     }
     onAnswer(correct);
   }
+
+  const canRetry = Boolean(transcript) && phase === 'review';
 
   return (
     <div className="flex flex-col gap-8">
@@ -223,10 +228,9 @@ export function SpeakRepeatExercise({
         </div>
       )}
 
-      {/* Review phase: transcript + action buttons */}
+      {/* Transcript preview after recording — verify via footer "Verificar" */}
       {phase === 'review' && (
         <div className="flex flex-col gap-5 animate-in slide-in-from-bottom-2 duration-500">
-          {/* Transcript Feedback */}
           <div
             className="flex items-start gap-4 rounded-xl p-5 bg-[var(--color-surface-raised)]/50 border border-[var(--color-border)]"
           >
@@ -245,59 +249,26 @@ export function SpeakRepeatExercise({
               )}
             </div>
           </div>
-
-          {/* Action Row */}
-          <div className="flex flex-col gap-2.5">
-            {/* Primary action — full width, no wrap */}
-            <button
-              type="button"
-              onClick={() => submit(isCorrect ?? true, false)}
-              className="flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl py-3.5 text-sm font-bold tracking-wide transition-all duration-200 ease-out bg-[var(--color-primary)] text-white shadow-lg shadow-[var(--color-primary)]/30 hover:brightness-110 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-[var(--color-primary)]/40 active:scale-[0.98] active:translate-y-0"
-            >
-              <Send size={16} />
-              Enviar Resposta
-            </button>
-
-            {/* Secondary actions — equal weight, not muted */}
-            <div className="grid grid-cols-2 gap-2.5">
-              <button
-                type="button"
-                onClick={startRecording}
-                className="flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-xs font-bold uppercase tracking-widest transition-all duration-200 ease-out bg-[var(--color-surface-raised)] text-[var(--color-text-primary)] border border-[var(--color-border)] hover:bg-[var(--color-bg)] hover:border-[var(--color-primary)]/40 hover:-translate-y-0.5 active:scale-[0.98] active:translate-y-0"
-              >
-                <RefreshCw size={14} />
-                Refazer
-              </button>
-
-              <button
-                type="button"
-                onClick={() => submit(isCorrect ?? true, true)}
-                className="flex items-center justify-center gap-1.5 rounded-xl px-4 py-3 text-xs font-bold uppercase tracking-widest transition-all duration-200 ease-out bg-[var(--color-surface-raised)] text-[var(--color-text-primary)] border border-[var(--color-border)] hover:bg-[var(--color-bg)] hover:border-[var(--color-primary)]/40 hover:-translate-y-0.5 active:scale-[0.98] active:translate-y-0"
-              >
-                Pular
-                <SkipForward size={14} />
-              </button>
-            </div>
-          </div>
         </div>
       )}
 
-      {/* No Speech API or after error fallback */}
-      {phase === 'idle' && (!hasSpeechAPI || !!recordError) && (
-        <div className="flex flex-col gap-2.5">
+      {/* Refazer + Pular always visible until answered */}
+      {phase !== 'answered' && (
+        <div className="grid grid-cols-2 gap-2.5">
           <button
             type="button"
-            onClick={() => submit(true, true)}
-            className="flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl py-3.5 text-sm font-bold tracking-wide transition-all duration-200 ease-out bg-[var(--color-primary)] text-white shadow-lg shadow-[var(--color-primary)]/30 hover:brightness-110 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-[var(--color-primary)]/40 active:scale-[0.98] active:translate-y-0"
+            onClick={startRecording}
+            disabled={!canRetry}
+            className="flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-xs font-bold uppercase tracking-widest transition-all duration-200 ease-out bg-[var(--color-surface-raised)] text-[var(--color-text-primary)] border border-[var(--color-border)] hover:bg-[var(--color-bg)] hover:border-[var(--color-primary)]/40 hover:-translate-y-0.5 active:scale-[0.98] active:translate-y-0 disabled:opacity-40 disabled:pointer-events-none disabled:hover:translate-y-0 disabled:hover:border-[var(--color-border)]"
           >
-            <Send size={16} />
-            Continuar sem áudio
+            <RefreshCw size={14} />
+            Refazer
           </button>
 
           <button
             type="button"
-            onClick={() => submit(true, true)}
-            className="flex w-full items-center justify-center gap-1.5 rounded-xl px-4 py-3 text-xs font-bold uppercase tracking-widest transition-all duration-200 ease-out bg-[var(--color-surface-raised)] text-[var(--color-text-primary)] border border-[var(--color-border)] hover:bg-[var(--color-bg)] hover:border-[var(--color-primary)]/40 hover:-translate-y-0.5 active:scale-[0.98] active:translate-y-0"
+            onClick={() => submit(isCorrect ?? true, true)}
+            className="flex items-center justify-center gap-1.5 rounded-xl px-4 py-3 text-xs font-bold uppercase tracking-widest transition-all duration-200 ease-out bg-[var(--color-surface-raised)] text-[var(--color-text-primary)] border border-[var(--color-border)] hover:bg-[var(--color-bg)] hover:border-[var(--color-primary)]/40 hover:-translate-y-0.5 active:scale-[0.98] active:translate-y-0"
           >
             Pular
             <SkipForward size={14} />

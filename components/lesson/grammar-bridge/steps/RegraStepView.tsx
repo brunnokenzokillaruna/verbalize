@@ -22,7 +22,7 @@ export function RegraStepView({
   newVerbs = [],
   onWordClick,
 }: RegraStepViewProps) {
-  const { insight, usageContext, culturalNote, bridge, explanationItems } = step.data;
+  const { insight, analogy, usageContext, culturalNote, bridge, explanationItems } = step.data;
 
   return (
     <div className="flex flex-col gap-4 sm:gap-5 px-1 w-full max-w-lg mx-auto">
@@ -40,6 +40,11 @@ export function RegraStepView({
                 {insight}
               </p>
             </div>
+          )}
+          {analogy && (
+            <p className="text-sm text-text-muted italic leading-relaxed max-w-md">
+              {analogy}
+            </p>
           )}
         </div>
       )}

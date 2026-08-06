@@ -167,7 +167,8 @@ export function mergeVocabularyGroup(group: UserVocabularyDocument[]): UserVocab
 
   return {
     ...best,
-    id: buildVocabDocId(uid, language, displayWord),
+    // Prefer a real Firestore id that already exists; fall back to canonical.
+    id: group.find((i) => i.id === buildVocabDocId(uid, language, displayWord))?.id ?? best.id,
     uid,
     language,
     word: displayWord,
