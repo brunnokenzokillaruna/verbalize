@@ -7,12 +7,17 @@ import {
   createCustomScenario,
   CUSTOM_SCENARIO_LIMITS,
 } from '@/features/roleplay-chat/buildCustomScenario';
-import { buildRoleplaySystemInstruction } from '@/features/roleplay-chat/prompts';
+import { buildMissionLiveSystemInstruction } from '@/features/mission-live/buildMissionLiveSystemInstruction';
+import { boundGoals, buildRoleplaySystemInstruction } from '@/features/roleplay-chat/prompts';
 import {
   getScenarioById,
   isPresetScenarioId,
 } from '@/features/roleplay-chat/scenarios';
-import type { LiveTokenResponse, RoleplayScenario } from '@/features/roleplay-chat/types';
+import type {
+  LiveMissionConstraintsPayload,
+  LiveTokenResponse,
+  RoleplayScenario,
+} from '@/features/roleplay-chat/types';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -31,6 +36,16 @@ const CustomScenarioSchema = z
     characterRolePt: z.string().min(1).max(CUSTOM_SCENARIO_LIMITS.characterRolePt),
     userRolePt: z.string().min(1).max(CUSTOM_SCENARIO_LIMITS.userRolePt),
     objectivePt: z.string().min(1).max(CUSTOM_SCENARIO_LIMITS.objectivePt),
+    goalsPt: z.array(z.string().max(120)).max(4).optional(),
+    missionConstraints: z
+      .object({
+        keyPhrases: z.array(z.string().max(80)).max(8),
+        stakes: z.string().max(160).optional(),
+        timePressure: z.string().max(60).optional(),
+        dialogueSkeleton: z.array(z.string().max(160)).max(10),
+      })
+      .strict()
+      .optional(),
   })
   .strict();
 
@@ -74,8 +89,16 @@ export async function POST(request: Request) {
       parsed.data;
 
     let scenario: RoleplayScenario;
+    let missionConstraints: LiveMissionConstraintsPayload | undefined;
+
     if (customScenario) {
-      scenario = createCustomScenario({ ...customScenario, level });
+      const { goalsPt: customGoalsPt, missionConstraints: constraints, ...scenarioFields } =
+        customScenario;
+      missionConstraints = constraints;
+      scenario = createCustomScenario({ ...scenarioFields, level });
+      if (customGoalsPt?.length) {
+        scenario = { ...scenario, goalsPt: boundGoals(customGoalsPt) };
+      }
     } else {
       const found = getScenarioById(scenarioId!);
       if (!found) {
@@ -84,15 +107,25 @@ export async function POST(request: Request) {
       scenario = found;
     }
 
-    const systemInstruction = buildRoleplaySystemInstruction({
-      language,
-      // Presets own their CEFR level; only custom scenes follow the client's pick.
-      level: customScenario ? level : scenario.level,
-      scenario,
-      userRolePt: customScenario ? scenario.userRolePt : userRolePt,
-      objectivePt: customScenario ? scenario.objectivePt : objectivePt,
-      intensity,
-    });
+    const systemInstruction = missionConstraints
+      ? buildMissionLiveSystemInstruction({
+          language,
+          level: customScenario ? level : scenario.level,
+          scenario,
+          userRolePt: customScenario ? scenario.userRolePt : userRolePt,
+          objectivePt: customScenario ? scenario.objectivePt : objectivePt,
+          intensity,
+          constraints: missionConstraints,
+        })
+      : buildRoleplaySystemInstruction({
+          language,
+          // Presets own their CEFR level; only custom scenes follow the client's pick.
+          level: customScenario ? level : scenario.level,
+          scenario,
+          userRolePt: customScenario ? scenario.userRolePt : userRolePt,
+          objectivePt: customScenario ? scenario.objectivePt : objectivePt,
+          intensity,
+        });
 
     const apiKey = getGeminiKey();
     const client = new GoogleGenAI({

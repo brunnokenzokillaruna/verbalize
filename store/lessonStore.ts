@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import type { RoleplayDebriefResult } from '@/features/roleplay-chat/types';
 import type {
   LessonDefinition,
   HookResult,
@@ -67,6 +68,9 @@ interface LessonState {
   rolePlayLinesSpoken: number;
   rolePlayTotalSpeakable: number;
   rolePlayComplete: boolean;
+  rolePlayMode: 'live' | 'scripted' | null;
+  rolePlayCompletedGoalIndexes: number[];
+  rolePlayLiveDebrief: RoleplayDebriefResult | null;
 
   // Loading state
   isLoading: boolean;
@@ -110,6 +114,12 @@ interface LessonState {
   mergeHook: (partial: Partial<HookResult>) => void;
   setMissionBriefing: (briefing: MissionBriefingResult) => void;
   completeRolePlay: (spoken: number, totalSpeakable: number) => void;
+  completeLiveRolePlay: (payload: {
+    spoken: number;
+    totalSpeakable: number;
+    completedGoalIndexes: number[];
+    debrief: RoleplayDebriefResult | null;
+  }) => void;
   setGrammarBridge: (bridge: GrammarBridgeResult) => void;
   setVocabImage: (word: string, image: VocabImageResult | null) => void;
   setSceneImage: (image: VocabImageResult | null) => void;
@@ -173,6 +183,9 @@ export const useLessonStore = create<LessonState>((set, get) => ({
   rolePlayLinesSpoken: 0,
   rolePlayTotalSpeakable: 0,
   rolePlayComplete: false,
+  rolePlayMode: null,
+  rolePlayCompletedGoalIndexes: [],
+  rolePlayLiveDebrief: null,
   isLoading: false,
   bridgeQuizPassed: false,
   checkpointSession: null,
@@ -212,6 +225,9 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       rolePlayLinesSpoken: 0,
       rolePlayTotalSpeakable: 0,
       rolePlayComplete: false,
+      rolePlayMode: null,
+      rolePlayCompletedGoalIndexes: [],
+      rolePlayLiveDebrief: null,
       isLoading: true,
       bridgeQuizPassed: false,
       checkpointSession: null,
@@ -247,6 +263,19 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       rolePlayLinesSpoken: spoken,
       rolePlayTotalSpeakable: totalSpeakable,
       rolePlayComplete: true,
+      rolePlayMode: 'scripted',
+      rolePlayCompletedGoalIndexes: [],
+      rolePlayLiveDebrief: null,
+    }),
+
+  completeLiveRolePlay: ({ spoken, totalSpeakable, completedGoalIndexes, debrief }) =>
+    set({
+      rolePlayLinesSpoken: spoken,
+      rolePlayTotalSpeakable: totalSpeakable,
+      rolePlayComplete: true,
+      rolePlayMode: 'live',
+      rolePlayCompletedGoalIndexes: completedGoalIndexes,
+      rolePlayLiveDebrief: debrief,
     }),
 
   setDiscoveredVerbs: (verbs: string[]) => set({ discoveredVerbs: verbs }),
@@ -357,6 +386,9 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       rolePlayLinesSpoken: 0,
       rolePlayTotalSpeakable: 0,
       rolePlayComplete: false,
+      rolePlayMode: null,
+      rolePlayCompletedGoalIndexes: [],
+      rolePlayLiveDebrief: null,
       isLoading: false,
       bridgeQuizPassed: false,
       checkpointSession: null,

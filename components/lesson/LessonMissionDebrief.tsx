@@ -1,6 +1,6 @@
 'use client';
 
-import { CheckCircle2, MapPin, Mic, Target, Sparkles } from 'lucide-react';
+import { CheckCircle2, Circle, MapPin, Mic, Target, Sparkles } from 'lucide-react';
 import { AudioPlayerButton } from '@/components/lesson/AudioPlayerButton';
 import { MissionStepGuide } from '@/components/lesson/mission-roleplay/MissionStepGuide';
 import { ProductionWeekStat } from '@/components/lesson/ProductionWeekStat';
@@ -16,6 +16,14 @@ interface LessonMissionDebriefProps {
   linesSpoken?: number;
   totalSpeakable?: number;
   weeklyProduction?: WeeklyProductionBreakdown;
+  /** null/undefined = scripted path: assume all objectives achieved */
+  completedGoalIndexes?: number[] | null;
+  liveHighlights?: {
+    whatWorkedPt?: string;
+    recurringIssuePt?: string;
+    phraseToPractice?: string;
+    phraseToPracticePt?: string;
+  } | null;
   onExit: () => void;
 }
 
@@ -28,6 +36,8 @@ export function LessonMissionDebrief({
   linesSpoken = 0,
   totalSpeakable = 0,
   weeklyProduction,
+  completedGoalIndexes,
+  liveHighlights,
   onExit,
 }: LessonMissionDebriefProps) {
   const pct = totalExercises > 0
@@ -35,6 +45,27 @@ export function LessonMissionDebrief({
     : 100;
   const isPerfect = pct === 100;
   const allSpoken = totalSpeakable > 0 && linesSpoken >= totalSpeakable;
+
+  const isLiveGoals = Array.isArray(completedGoalIndexes);
+  const completedCount = isLiveGoals
+    ? briefing.objectives.filter((_, i) => completedGoalIndexes.includes(i)).length
+    : briefing.objectives.length;
+  const allGoalsComplete = !isLiveGoals || completedCount >= briefing.objectives.length;
+  const partialLive = isLiveGoals && completedCount < briefing.objectives.length;
+  const objectivesHeader =
+    isLiveGoals && completedCount < briefing.objectives.length
+      ? 'Objetivos da missão'
+      : 'Objetivos alcançados';
+  const keyPhrasesHeader = isLiveGoals
+    ? 'Frases-chave da missão'
+    : 'Frases que você dominou';
+
+  const hasHighlights = Boolean(
+    liveHighlights &&
+      (liveHighlights.whatWorkedPt ||
+        liveHighlights.recurringIssuePt ||
+        liveHighlights.phraseToPractice),
+  );
 
   return (
     <div
@@ -57,13 +88,21 @@ export function LessonMissionDebrief({
             </span>
           </div>
           <div className="text-center">
-            <p className="text-xs font-bold uppercase tracking-widest text-success">
-              Missão cumprida
+            <p
+              className={`text-xs font-bold uppercase tracking-widest ${
+                partialLive ? 'text-text-muted' : 'text-success'
+              }`}
+            >
+              {partialLive ? 'Missão encerrada' : 'Missão cumprida'}
             </p>
             <h1 className="mt-1 font-display text-2xl sm:text-3xl font-black text-text-primary">
-              Você sobreviveu!
+              {partialLive
+                ? completedCount === 0
+                  ? 'Você praticou a missão'
+                  : `${completedCount} de ${briefing.objectives.length} objetivos`
+                : 'Você sobreviveu!'}
             </h1>
-            {isPerfect && (
+            {isPerfect && allGoalsComplete && (
               <p className="mt-1.5 text-sm font-semibold text-vocab flex items-center justify-center gap-1">
                 <Sparkles size={14} />
                 Execução perfeita na prática
@@ -83,21 +122,83 @@ export function LessonMissionDebrief({
 
         <div className="rounded-2xl p-4 border border-border bg-surface">
           <p className="text-xs font-bold uppercase tracking-wide text-text-muted mb-3">
-            Objetivos alcançados
+            {objectivesHeader}
           </p>
           <div className="flex flex-col gap-2.5">
-            {briefing.objectives.map((obj, i) => (
-              <div key={i} className="flex items-start gap-3">
-                <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-success text-white">
-                  <CheckCircle2 size={13} strokeWidth={3} />
+            {briefing.objectives.map((obj, i) => {
+              const done = isLiveGoals
+                ? completedGoalIndexes.includes(i)
+                : true;
+
+              if (done) {
+                return (
+                  <div key={i} className="flex items-start gap-3">
+                    <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-success text-white">
+                      <CheckCircle2 size={13} strokeWidth={3} />
+                    </div>
+                    <p className="grammar-secondary text-text-secondary line-through decoration-success/60 decoration-2">
+                      {obj}
+                    </p>
+                  </div>
+                );
+              }
+
+              return (
+                <div key={i} className="flex items-start gap-3 opacity-60">
+                  <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-border bg-surface text-text-muted">
+                    <Circle size={13} strokeWidth={2} />
+                  </div>
+                  <p className="grammar-secondary text-text-muted">
+                    {obj}
+                  </p>
                 </div>
-                <p className="grammar-secondary text-text-secondary line-through decoration-success/60 decoration-2">
-                  {obj}
-                </p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
+
+        {hasHighlights && liveHighlights && (
+          <div className="flex flex-col gap-2.5">
+            <p className="text-xs font-bold uppercase tracking-wide text-text-muted">
+              Feedback da conversa
+            </p>
+            {liveHighlights.whatWorkedPt && (
+              <div className="rounded-2xl px-3.5 py-3 border border-border bg-surface">
+                <p className="text-[10px] font-bold uppercase tracking-wide text-text-muted">
+                  O que funcionou
+                </p>
+                <p className="mt-1 text-sm text-text-primary leading-snug">
+                  {liveHighlights.whatWorkedPt}
+                </p>
+              </div>
+            )}
+            {liveHighlights.recurringIssuePt && (
+              <div className="rounded-2xl px-3.5 py-3 border border-border bg-surface">
+                <p className="text-[10px] font-bold uppercase tracking-wide text-text-muted">
+                  Para melhorar
+                </p>
+                <p className="mt-1 text-sm text-text-primary leading-snug">
+                  {liveHighlights.recurringIssuePt}
+                </p>
+              </div>
+            )}
+            {liveHighlights.phraseToPractice && (
+              <div className="rounded-2xl px-3.5 py-3 border border-border bg-primary/5">
+                <p className="text-[10px] font-bold uppercase tracking-wide text-text-muted">
+                  Frase para repetir
+                </p>
+                <p className="mt-1 text-sm font-bold text-text-primary leading-snug">
+                  {liveHighlights.phraseToPractice}
+                </p>
+                {liveHighlights.phraseToPracticePt && (
+                  <p className="mt-1 text-xs text-text-secondary">
+                    {liveHighlights.phraseToPracticePt}
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {totalSpeakable > 0 && (
@@ -142,14 +243,18 @@ export function LessonMissionDebrief({
         {briefing.keyPhrases.length > 0 && (
           <div className="flex flex-col gap-2.5">
             <p className="text-xs font-bold uppercase tracking-wide text-text-muted">
-              Frases que você dominou
+              {keyPhrasesHeader}
             </p>
             {briefing.keyPhrases.map((phrase, i) => (
               <div
                 key={i}
-                className="flex items-center gap-3 rounded-2xl p-3.5 border border-success/30 bg-surface"
+                className={`flex items-center gap-3 rounded-2xl p-3.5 border bg-surface ${
+                  isLiveGoals ? 'border-border' : 'border-success/30'
+                }`}
               >
-                <CheckCircle2 size={16} className="shrink-0 text-success" />
+                {!isLiveGoals && (
+                  <CheckCircle2 size={16} className="shrink-0 text-success" />
+                )}
                 <p className="flex-1 grammar-body font-semibold text-text-primary min-w-0">
                   {phrase}
                 </p>

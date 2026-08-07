@@ -20,6 +20,7 @@ import { LIVE_INPUT_SAMPLE_RATE } from '@/features/roleplay-chat/constants';
 import type {
   CoachNoteKind,
   CorrectionMode,
+  LiveMissionConstraintsPayload,
   LiveSessionStatus,
   LiveTokenRequest,
   LiveTokenResponse,
@@ -80,6 +81,9 @@ interface UseLiveRoleplaySessionParams {
   intensity?: RoleplayIntensity;
   /** `fluency` defers grammar feedback until the conversation ends. */
   correctionMode?: CorrectionMode;
+  /** Present only for MISS Live sessions — forwarded on custom token requests. */
+  missionConstraints?: LiveMissionConstraintsPayload;
+  goalsPtOverride?: string[];
 }
 
 export function useLiveRoleplaySession({
@@ -90,6 +94,8 @@ export function useLiveRoleplaySession({
   objectivePt,
   intensity = 'normal',
   correctionMode = 'study',
+  missionConstraints,
+  goalsPtOverride,
 }: UseLiveRoleplaySessionParams) {
   const [status, setStatus] = useState<LiveSessionStatus>('idle');
   const [error, setError] = useState<string | null>(null);
@@ -709,6 +715,8 @@ export function useLiveRoleplaySession({
             characterRolePt: customScenario.characterRolePt,
             userRolePt: customScenario.userRolePt,
             objectivePt: customScenario.objectivePt,
+            ...(goalsPtOverride?.length ? { goalsPt: goalsPtOverride } : {}),
+            ...(missionConstraints ? { missionConstraints } : {}),
           },
         };
       } else {
@@ -783,7 +791,17 @@ export function useLiveRoleplaySession({
       setError(message);
       setStatus('error');
     }
-  }, [intensity, language, level, openMic, objectivePt, scenario, userRolePt]);
+  }, [
+    goalsPtOverride,
+    intensity,
+    language,
+    level,
+    missionConstraints,
+    openMic,
+    objectivePt,
+    scenario,
+    userRolePt,
+  ]);
 
   const sendCoachNote = useCallback(
     (kind: CoachNoteKind) => {

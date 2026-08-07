@@ -126,6 +126,13 @@ export type LiveSessionStatus =
 /** In-character nudges the learner can request without breaking immersion. */
 export type CoachNoteKind = 'repeat' | 'simplify' | 'suggest';
 
+export interface LiveMissionConstraintsPayload {
+  keyPhrases: string[];
+  stakes?: string;
+  timePressure?: string;
+  dialogueSkeleton: string[];
+}
+
 export interface LiveTokenCustomScenario {
   titlePt: string;
   descriptionPt: string;
@@ -134,6 +141,9 @@ export interface LiveTokenCustomScenario {
   characterRolePt: string;
   userRolePt: string;
   objectivePt: string;
+  /** Present only for MISS Live sessions. */
+  goalsPt?: string[];
+  missionConstraints?: LiveMissionConstraintsPayload;
 }
 
 /**

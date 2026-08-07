@@ -9,14 +9,19 @@ export function SessionControls({
   isAssistantSpeaking,
   onToggleMic,
   onEnd,
+  endDisabled = false,
 }: {
   status: LiveSessionStatus;
   micEnabled: boolean;
   isAssistantSpeaking: boolean;
   onToggleMic: () => void;
   onEnd: () => void;
+  /** Extra End disable (e.g. connect-time error before scripted fallback). */
+  endDisabled?: boolean;
 }) {
   const live = status === 'live';
+  const endBlocked =
+    endDisabled || status === 'idle' || status === 'connecting';
 
   return (
     <div
@@ -65,7 +70,7 @@ export function SessionControls({
       <button
         type="button"
         onClick={onEnd}
-        disabled={status === 'idle' || status === 'connecting'}
+        disabled={endBlocked}
         aria-label="Encerrar conversa"
         className="flex h-14 w-14 items-center justify-center rounded-full transition-transform active:scale-95 disabled:opacity-40 cursor-pointer"
         style={{

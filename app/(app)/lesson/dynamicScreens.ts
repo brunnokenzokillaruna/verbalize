@@ -28,6 +28,10 @@ export const LessonMissionRolePlay = dynamic(() =>
   import('@/components/lesson/LessonMissionRolePlay').then((m) => m.LessonMissionRolePlay),
 );
 
+export const LessonMissionLiveRolePlay = dynamic(() =>
+  import('@/components/lesson/LessonMissionLiveRolePlay').then((m) => m.LessonMissionLiveRolePlay),
+);
+
 export const LessonPhoneticsScreen = dynamic(() =>
   import('@/components/lesson/LessonPhoneticsScreen').then((m) => m.LessonPhoneticsScreen),
 );

@@ -1,15 +1,20 @@
+'use client';
+
+import { useState } from 'react';
 import {
   LessonVocabularyScreen,
   LessonHookScreen,
   LessonGrammarScreen,
   LessonMissionScreen,
   LessonMissionRolePlay,
+  LessonMissionLiveRolePlay,
   LessonPhoneticsScreen,
   LessonPracticeScreen,
 } from '@/app/(app)/lesson/dynamicScreens';
 import { CheckpointBriefingScreen } from '@/components/lesson/CheckpointBriefingScreen';
 import { CheckpointListeningScreen } from '@/components/lesson/CheckpointListeningScreen';
 import { CheckpointDebriefScreen } from '@/components/lesson/CheckpointDebriefScreen';
+import { shouldUseLiveMissionRolePlay } from '@/features/mission-live';
 import { HOOK_LISTEN_FIRST } from '@/lib/practiceExercises/constants';
 import { useLessonStore } from '@/store/lessonStore';
 import { useAuthStore } from '@/store/authStore';
@@ -68,6 +73,12 @@ export function LessonPhaseContent({
   const store = useLessonStore();
   const { profile } = useAuthStore();
   const immersionMode = profile?.immersionMode ?? 'auto';
+  const [forceScripted, setForceScripted] = useState(false);
+  const useLive =
+    !!store.lesson &&
+    !!store.missionBriefing &&
+    shouldUseLiveMissionRolePlay(store.lesson.level) &&
+    !forceScripted;
 
   return (
     <>
@@ -178,7 +189,26 @@ export function LessonPhaseContent({
         />
       )}
 
-      {phase === 'role-play' && store.hook && store.lesson && (
+      {phase === 'role-play' && store.hook && store.lesson && store.missionBriefing && useLive && (
+        <LessonMissionLiveRolePlay
+          briefing={store.missionBriefing}
+          dialogue={store.hook.dialogue}
+          language={store.lesson.language}
+          level={store.lesson.level}
+          lessonTitlePt={store.lesson.uiTitle}
+          onFallbackToScripted={() => setForceScripted(true)}
+          onComplete={({ userTurns, debrief, completedGoalIndexes }) => {
+            store.completeLiveRolePlay({
+              spoken: userTurns,
+              totalSpeakable: Math.max(store.missionBriefing!.objectives.length, 1),
+              completedGoalIndexes,
+              debrief,
+            });
+          }}
+        />
+      )}
+
+      {phase === 'role-play' && store.hook && store.lesson && (!useLive || forceScripted) && (
         <LessonMissionRolePlay
           dialogue={store.hook.dialogue}
           dialogueTranslations={store.hook.dialogueTranslations}

@@ -44,6 +44,19 @@ export function LessonCompleteViews({ onExit }: LessonCompleteViewsProps) {
         linesSpoken={store.rolePlayLinesSpoken}
         totalSpeakable={store.rolePlayTotalSpeakable}
         weeklyProduction={weeklyProduction}
+        completedGoalIndexes={
+          store.rolePlayMode === 'live' ? store.rolePlayCompletedGoalIndexes : null
+        }
+        liveHighlights={
+          store.rolePlayMode === 'live' && store.rolePlayLiveDebrief
+            ? {
+                whatWorkedPt: store.rolePlayLiveDebrief.whatWorkedPt,
+                recurringIssuePt: store.rolePlayLiveDebrief.recurringIssuePt,
+                phraseToPractice: store.rolePlayLiveDebrief.phraseToPractice,
+                phraseToPracticePt: store.rolePlayLiveDebrief.phraseToPracticePt,
+              }
+            : null
+        }
         onExit={onExit}
       />
     );
