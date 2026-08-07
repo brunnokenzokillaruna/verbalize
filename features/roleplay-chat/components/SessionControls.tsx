@@ -20,11 +20,10 @@ export function SessionControls({
 
   return (
     <div
-      className="flex items-center justify-center gap-4 px-4 py-4"
+      className="sticky z-20 flex items-center justify-center gap-4 px-4 py-4 bottom-[calc(4rem+env(safe-area-inset-bottom,0px))] md:bottom-0"
       style={{
         borderTop: '2px solid var(--color-border)',
         backgroundColor: 'var(--color-bg)',
-        paddingBottom: 'max(1rem, env(safe-area-inset-bottom))',
       }}
     >
       <button

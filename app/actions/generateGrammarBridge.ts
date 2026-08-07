@@ -6,6 +6,7 @@ import {
   buildDurationGrammarFocusGuidance,
   buildPtBrLocalizationPromptBlock,
 } from '@/lib/grammarBridge/ptBrLocalization';
+import { buildFocusCompletenessPromptBlock } from '@/lib/grammarBridge/focusCompleteness';
 import {
   formatIssuesForRegen,
   gateGrammarBridge,
@@ -18,12 +19,12 @@ const MAX_REGEN_ATTEMPTS = 2;
 function buildTagBridgeGuidance(tag: LessonTag | undefined): string {
   switch (tag) {
     case 'GRAM':
-      return 'PRIORIDADE: bridge + structureFormulas (quando houver 2+ usos) + patterns (2-3) + additionalExamples (até 2) + brazilianTrap. Garanta COMPLETUDE: todo uso ensinado em structureFormulas deve aparecer em insight e explanation.';
+      return 'PRIORIDADE: bridge + structureFormulas (quando houver 2+ usos/termos) + patterns (2-3) + additionalExamples (até 2) + brazilianTrap. Garanta COMPLETUDE: todo termo/uso do grammarFocus deve aparecer em insight, explanation e structureFormulas/patterns.';
     case 'VERB':
       return 'PRIORIDADE: verbSpotlight completo + patterns (1-2 exemplos de uso do verbo) + brazilianTrap. NÃO omita patterns.';
     case 'EXPR':
     case 'VOC':
-      return 'PRIORIDADE: items (lista de expressões) + dialogueExample + additionalExamples. bridge/patterns podem ser null.';
+      return 'PRIORIDADE: items (UM item por termo do tema — se o foco for "Amener e Emmener", items DEVE ter os dois) + dialogueExample + additionalExamples. Se o tema for par de confusão/lista, NÃO ensine só o primeiro termo. bridge/patterns podem ser null.';
     case 'DIAL':
     case 'CULT':
       return 'PRIORIDADE: usageContext + culturalNote + additionalExamples + dialogueExample.';
@@ -159,6 +160,7 @@ function buildUserPrompt(params: {
   const tagGuidance = buildTagBridgeGuidance(tag);
   const focusGuidance = buildGrammarFocusGuidance(grammarFocus, language);
   const durationGuidance = buildDurationGrammarFocusGuidance(grammarFocus, language);
+  const completenessGuidance = buildFocusCompletenessPromptBlock(grammarFocus);
   const ptBrLocalizationBlock = buildPtBrLocalizationPromptBlock();
   const isGram = tag === 'GRAM' || !tag;
 
@@ -170,6 +172,7 @@ Contexto do diálogo:
 ORIENTAÇÃO POR TIPO DE LIÇÃO (tag: ${tag ?? 'GRAM'}):
 ${tagGuidance}
 ${focusGuidance}
+${completenessGuidance}
 ${durationGuidance}
 ${ptBrLocalizationBlock}
 ${correctionBlock ?? ''}
@@ -214,11 +217,14 @@ Você DEVE:
 - Incluir equivalências explícitas: para cada conceito, mostrar COMO se diz em português e COMO se diz na língua-alvo.
 Mas NUNCA escreva como um livro acadêmico. Escreva como um amigo paciente explicando.
 
-⚠️ PRECISÃO LINGUÍSTICA — CRÍTICO (não ensine errado) ⚠️
+⚠️ PRECISÃO LINGUÍSTICA — CRÍTICO (não ensine errado; ensinar errado é pior do que não ensinar) ⚠️
 - Toda frase na língua-alvo (bridge.target, patterns.target, formula examples, brazilianTrap.right, opção correta do quiz, conjugações) DEVE ser gramaticalmente correta e natural.
+- Toda tradução PT-BR (*.portuguese) DEVE ser FIEL ao sentido da frase-alvo correspondente: mesmo sujeito, verbo, negação e complementos. NÃO acrescente conectores inventados ("por sua vez", "já", "então", "por outro lado") se a frase-alvo não tiver equivalente.
+- Exemplo proibido: target "Lui, il ne veut pas venir." → portuguese "Ele, por sua vez, não quer vir." Correto: "Ele não quer vir."
 - brazilianTrap.wrong é o ÚNICO lugar permitido para frase errada — e deve ser o erro clássico do brasileiro, NÃO um "certo" disfarçado.
 - insight/explanation NÃO podem afirmar regra falsa (gênero, contração, ordem, conjugação inventada).
-- ANTES DE FECHAR O JSON: checklist mental — "cada campo marcado como certo está certo de verdade?"
+- additionalExamples devem ilustrar "${grammarFocus}" — não frases de outra regra gramatical.
+- ANTES DE FECHAR O JSON: checklist mental — "cada campo marcado como certo está certo de verdade? cada portuguese diz a mesma coisa que o target?"
 
 ⚠️ LINGUAGEM ACESSÍVEL — REGRA CRÍTICA ⚠️
 O público inclui brasileiros com baixa escolaridade. Escreva como se estivesse explicando para um amigo que nunca estudou gramática, não como livro didático.
@@ -326,7 +332,7 @@ Regras Cruciais:
 5b2. formulaExample: quando usar structureFormula única, inclua 1 frase real + tradução PT-BR.
 5c. retentionCheck: prefira "Como você diria X?". correctIndex aponta para a opção certa de verdade.
 6. dialogueExample.target: DEVE ser uma linha real do diálogo acima.
-7. additionalExamples: até 2 exemplos com vocabulário diferente dos patterns.
+7. additionalExamples: até 2 exemplos com vocabulário diferente dos patterns, SEMPRE ilustrando o mesmo grammarFocus; portuguese fiel ao target (sem inventar "por sua vez").
 8. Todo texto em PT-BR exceto as frases na língua-alvo.
 9. ANTES DE RESPONDER: releia insight, explanation, brazilianTrap.explanation e bridge.difference. Se usou palavra proibida OU um brasileiro com ensino fundamental teria dificuldade, REESCREVA mais simples.
 10. IDIOMA 100% PURO NA LÍNGUA-ALVO: zero português em campos target.
@@ -338,7 +344,7 @@ Regras Cruciais:
     - brazilianTrap.explanation: só o motivo do erro
     - survivalTip: só mnemônico (não repete insight)
 12. ESTRUTURA E COMPLETUDE EM FRANCÊS: preposições + artigos → cobrir au / à la / aux / à l' quando aplicável.
-13. COMPLETUDE EM REGRAS COM MÚLTIPLOS USOS: structureFormulas com TODAS (máx. 3); insight resume TODOS os usos; explanation 1 item por uso principal.`;
+13. COMPLETUDE EM REGRAS COM MÚLTIPLOS USOS/TERMOS: se o grammarFocus nomeia 2+ itens (ex: "Amener e Emmener", "X VS Y"), ensine TODOS — structureFormulas/items/patterns + insight. Omitir um termo = conteúdo inválido.`;
 }
 
 function finalizeBridge(

@@ -124,7 +124,12 @@ export async function validateAndSanitizeExercises(
         Object.assign(
           ex.data,
           sanitizeFillGapDirectional(
-            ex.data as { blankWord: string; translation: string; options?: string[] },
+            ex.data as {
+              blankWord: string;
+              translation: string;
+              sentence?: string;
+              options?: string[];
+            },
           ),
         );
         blankWord = (ex.data as { blankWord: string }).blankWord;
@@ -412,6 +417,7 @@ export async function validateAndSanitizeExercises(
         Object.assign(d, sanitizeFillGapDirectional({
           blankWord: d.blankWord,
           translation: d.translation,
+          sentence: d.sentence,
           acceptable_variants: d.acceptable_variants,
         }));
       }

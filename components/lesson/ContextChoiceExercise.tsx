@@ -21,6 +21,7 @@ export function ContextChoiceExercise({ data, onAnswer, answered, setIsExerciseR
       sanitizeFillGapDirectional({
         blankWord: data.blankWord,
         translation: data.translation,
+        sentence: data.sentence,
         options: data.options,
       }),
     [data],

@@ -19,6 +19,7 @@ import type {
 } from '@/types';
 import { LANG_LABEL } from './constants';
 import { findLeakedTargetWord } from './validatePtBrText';
+import { isDirectionalBlankMismatched } from '@/lib/fillGapDirectionalSanitize';
 
 export type AnswerClaim = {
   index: number;
@@ -138,6 +139,15 @@ export function failsLocalAnswerKeyGuard(ex: Exercise): string | null {
     if (!d.sentence.includes('___')) {
       return 'context-choice sentence missing blank';
     }
+    if (
+      isDirectionalBlankMismatched({
+        blankWord: d.blankWord,
+        translation: d.translation,
+        sentence: d.sentence,
+      })
+    ) {
+      return 'directional verb blankWord mismatches PT cue (trazer/levar or person/thing)';
+    }
   }
 
   if (ex.type === 'fill-gap-production') {
@@ -147,6 +157,15 @@ export function failsLocalAnswerKeyGuard(ex: Exercise): string | null {
     }
     if (!d.blankWord.trim()) {
       return 'empty blankWord';
+    }
+    if (
+      isDirectionalBlankMismatched({
+        blankWord: d.blankWord,
+        translation: d.translation,
+        sentence: d.sentence,
+      })
+    ) {
+      return 'directional verb blankWord mismatches PT cue (trazer/levar or person/thing)';
     }
   }
 
@@ -206,11 +225,12 @@ Respond with ONLY a JSON array. No markdown.`;
   const prompt = `Review these ${claims.length} exercises. For each, set ok=true ONLY if the marked correct answer is linguistically correct given the Portuguese cue and the target-language sentence/options.
 
 Mark ok=false when ANY of these apply:
-1. blankWord / correctForm / target_translation contradicts the Portuguese meaning (classic: PT "levar" marked as French "apporter" — should be "emporter"; "trazer"↔"apporter").
-2. The marked correct option is ungrammatical (wrong gender/number/conjugation/agreement).
-3. isCorrect / correctIndex points to the wrong option (the real correct option is another one, or none are correct).
-4. reverse-translation / sentence-builder target does not mean what the Portuguese prompt says.
-5. error-correction "corrected" sentence is still wrong, or correct_word does not fix the error.
+1. blankWord / correctForm / target_translation contradicts the Portuguese meaning (classic: PT "levar" marked as French "apporter" — should be "emporter" for things or "emmener" for people; "trazer"↔"apporter"/"amener").
+2. French person vs thing mix-up: amener/emmener are ONLY for people/animals; apporter/emporter are ONLY for things. Marking "apporter" correct for "primo/ami/cousin" is ALWAYS wrong.
+3. The marked correct option is ungrammatical (wrong gender/number/conjugation/agreement).
+4. isCorrect / correctIndex points to the wrong option (the real correct option is another one, or none are correct).
+5. reverse-translation / sentence-builder target does not mean what the Portuguese prompt says.
+6. error-correction "corrected" sentence is still wrong, or correct_word does not fix the error.
 
 Be conservative: if you are unsure, set ok=true (do not false-drop). If clearly wrong, set ok=false.
 

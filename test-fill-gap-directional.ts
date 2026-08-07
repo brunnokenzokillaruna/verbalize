@@ -1,9 +1,11 @@
 /**
- * Smoke tests for French directional verb sanitization (apporter/emporter).
+ * Smoke tests for French directional verb sanitization (apporter/emporter/amener/emmener).
  * Run: npx tsx test-fill-gap-directional.ts
  */
 import {
+  isDirectionalBlankMismatched,
   sanitizeFillGapDirectional,
+  swapFrenchAnimacyVerb,
   swapFrenchDirectionalVerb,
 } from './lib/fillGapDirectionalSanitize';
 
@@ -90,6 +92,68 @@ const ambiguous = sanitizeFillGapDirectional({
 assert(
   ambiguous.blankWord === 'apporter',
   'does not guess when primary PT text has both levar and trazer',
+);
+
+// Person vs thing — "levar meu primo" must never be apporter
+const cousinCase = sanitizeFillGapDirectional({
+  blankWord: 'apporter',
+  translation:
+    'Meu amigo está sozinho em casa, eu acho que deveria levar meu primo para brincar com ele.',
+  sentence: 'Mon ami est seul chez lui, je pense que je devrais ___ mon cousin pour jouer avec lui.',
+  options: ['apporter', 'emporter', 'amener', 'emmener'],
+});
+assert(
+  cousinCase.blankWord === 'emmener',
+  'fixes apporter → emmener for levar + person (primo/cousin)',
+);
+assert(
+  cousinCase.options?.includes('emmener') === true,
+  'person/thing fix keeps emmener in options',
+);
+
+const emporterPerson = sanitizeFillGapDirectional({
+  blankWord: 'emporter',
+  translation: 'Eu vou levar meu amigo ao cinema.',
+});
+assert(
+  emporterPerson.blankWord === 'emmener',
+  'fixes emporter → emmener when object is a person',
+);
+
+const amenerThing = sanitizeFillGapDirectional({
+  blankWord: 'amener',
+  translation: 'Eu vou trazer o bolo para a festa.',
+});
+assert(
+  amenerThing.blankWord === 'apporter',
+  'fixes amener → apporter when object is a thing',
+);
+
+assert(
+  swapFrenchAnimacyVerb('emporter', 'person') === 'emmener',
+  'animacy swap emporter → emmener',
+);
+
+const userScreenshotOk = sanitizeFillGapDirectional({
+  blankWord: 'emmener',
+  translation:
+    'Meu amigo está sozinho em casa, eu acho que deveria levar meu primo para brincar com ele.',
+  options: ['emmener', 'emporter', 'amener', 'apporter'],
+});
+assert(
+  userScreenshotOk.blankWord === 'emmener',
+  'keeps emmener for levar + primo (correct key)',
+);
+assert(
+  !isDirectionalBlankMismatched(userScreenshotOk),
+  'emmener + levar + person is not a mismatch',
+);
+assert(
+  isDirectionalBlankMismatched({
+    blankWord: 'apporter',
+    translation: 'Eu vou levar meu primo.',
+  }),
+  'flags apporter + levar + person as mismatch',
 );
 
 console.log('\nAll fill-gap directional tests passed.');

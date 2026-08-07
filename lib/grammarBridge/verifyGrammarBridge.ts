@@ -11,6 +11,7 @@ import {
   looksLikeMetaExplanation,
   looksLikePortugueseInTargetField,
 } from '@/lib/grammarBridgeValidation';
+import { findMissingFocusTerms } from '@/lib/grammarBridge/focusCompleteness';
 
 export type BridgeIssueSeverity = 'core' | 'secondary';
 
@@ -77,13 +78,27 @@ function targetFieldIssues(
 }
 
 /**
- * Deterministic structural / format guards. Does not judge linguistic correctness.
+ * Deterministic structural / format guards. Does not judge linguistic correctness
+ * beyond required focus-term completeness.
  */
 export function collectLocalBridgeIssues(
   bridge: GrammarBridgeResult,
   language: SupportedLanguage,
+  grammarFocus = '',
 ): BridgeIssue[] {
   const issues: BridgeIssue[] = [];
+
+  if (grammarFocus) {
+    const missing = findMissingFocusTerms(bridge, grammarFocus);
+    if (missing) {
+      issues.push({
+        field: missing.field,
+        severity: 'core',
+        problem: missing.problem,
+        fixHint: missing.fixHint,
+      });
+    }
+  }
 
   if (bridge.bridge?.target) {
     issues.push(...targetFieldIssues('bridge.target', bridge.bridge.target, language, 'core'));
@@ -268,6 +283,7 @@ export function stripSecondaryIssues(
 export function extractBridgeClaims(
   bridge: GrammarBridgeResult,
   language: SupportedLanguage,
+  grammarFocus = '',
 ): Claim[] {
   const lang = LANG_LABEL[language];
   const claims: Claim[] = [];
@@ -277,7 +293,7 @@ export function extractBridgeClaims(
       id: 'bridge.target',
       field: 'bridge.target',
       severity: 'core',
-      claim: `RIGHT ${lang} example (must be grammatical): "${stripHighlights(bridge.bridge.target)}" (PT parallel: "${stripHighlights(bridge.bridge.portuguese)}")`,
+      claim: `PAIR must match in meaning: ${lang}="${stripHighlights(bridge.bridge.target)}" ↔ PT-BR="${stripHighlights(bridge.bridge.portuguese ?? '')}". ${lang} must be grammatical; PT must be a faithful translation (no invented connectors/emphasis).`,
     });
   }
 
@@ -305,7 +321,7 @@ export function extractBridgeClaims(
       id: 'formulaExample',
       field: 'formulaExample.target',
       severity: 'core',
-      claim: `RIGHT ${lang} formula example: "${bridge.formulaExample.target}"`,
+      claim: `PAIR formula example: ${lang}="${stripHighlights(bridge.formulaExample.target)}" ↔ PT-BR="${stripHighlights(bridge.formulaExample.portuguese)}"`,
     });
   }
 
@@ -315,7 +331,7 @@ export function extractBridgeClaims(
         id: `structureFormulas[${i}]`,
         field: `structureFormulas[${i}].example.target`,
         severity: 'core',
-        claim: `RIGHT ${lang} for formula "${f.label}": "${f.example.target}"`,
+        claim: `PAIR for formula "${f.label}": ${lang}="${stripHighlights(f.example.target)}" ↔ PT-BR="${stripHighlights(f.example.portuguese)}"`,
       });
     }
   });
@@ -325,16 +341,19 @@ export function extractBridgeClaims(
       id: `patterns[${i}]`,
       field: `patterns[${i}].target`,
       severity: 'secondary',
-      claim: `RIGHT ${lang} pattern "${p.label}": "${p.target}"`,
+      claim: `PAIR "${p.label}": ${lang}="${stripHighlights(p.target)}" ↔ PT-BR="${stripHighlights(p.portuguese)}". Both must be correct and mean the same.`,
     });
   });
 
   bridge.additionalExamples?.forEach((ex, i) => {
+    const focusHint = grammarFocus
+      ? ` Must illustrate grammar focus "${grammarFocus}".`
+      : '';
     claims.push({
       id: `additionalExamples[${i}]`,
       field: `additionalExamples[${i}].target`,
       severity: 'secondary',
-      claim: `RIGHT ${lang} extra example: "${ex.target}"`,
+      claim: `PAIR extra example: ${lang}="${stripHighlights(ex.target)}" ↔ PT-BR="${stripHighlights(ex.portuguese)}". PT must faithfully translate ${lang} (no invented "por sua vez"/connectors).${focusHint}`,
     });
   });
 
@@ -377,13 +396,16 @@ Language: ${lang}
 Review each claim. Set ok=true ONLY if the marked RIGHT / correct content is actually correct ${lang} (or a true teaching statement).
 
 Mark ok=false when ANY of these apply:
-1. A "RIGHT" target sentence is ungrammatical (gender, agreement, conjugation, word order, wrong preposition).
-2. brazilianTrap.right is wrong OR brazilianTrap.wrong is actually correct.
-3. Quiz correctIndex points to a wrong option, or the marked option teaches bad ${lang}.
-4. Conjugation forms are incorrect for present tense.
-5. insight asserts a false rule about ${lang}.
+1. A "RIGHT" / target sentence is ungrammatical (gender, agreement, conjugation, word order, wrong preposition).
+2. PT-BR translation invents meaning absent from the target (e.g. adding "por sua vez", "já", "então" when the target has no equivalent) OR mismatches subject/verb/negation/complements.
+3. brazilianTrap.right is wrong OR brazilianTrap.wrong is actually correct.
+4. Quiz correctIndex points to a wrong option, or the marked option teaches bad ${lang}.
+5. Conjugation forms are incorrect for present tense.
+6. insight asserts a false rule about ${lang}.
+7. An additionalExamples pair is clearly about a different grammar topic than the stated focus (when focus is provided).
+8. Focus completeness: when grammarFocus names multiple terms (e.g. "Amener e Emmener", "X VS Y"), teaching content that only covers a subset is FAIL — all named terms must appear.
 
-Be conservative on soft pedagogy wording: if unsure about insight style, ok=true. If clearly wrong grammar, ok=false.
+Be conservative on soft pedagogy wording: if unsure about insight style, ok=true. If clearly wrong grammar OR clearly unfaithful PT translation OR missing a required focus term, ok=false.
 
 Input:
 ${JSON.stringify(
@@ -406,7 +428,7 @@ export async function verifyBridgeClaimsWithGemini(
   language: SupportedLanguage,
   grammarFocus: string,
 ): Promise<BridgeIssue[] | null> {
-  const claims = extractBridgeClaims(bridge, language);
+  const claims = extractBridgeClaims(bridge, language, grammarFocus);
   if (claims.length === 0) return [];
 
   try {
@@ -461,7 +483,7 @@ export async function gateGrammarBridge(
   language: SupportedLanguage,
   grammarFocus: string,
 ): Promise<BridgeVerificationResult> {
-  const localIssues = collectLocalBridgeIssues(bridge, language);
+  const localIssues = collectLocalBridgeIssues(bridge, language, grammarFocus);
   const geminiIssues = await verifyBridgeClaimsWithGemini(bridge, language, grammarFocus);
 
   if (geminiIssues === null) {

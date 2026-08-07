@@ -48,6 +48,35 @@ assert(failsLocalAnswerKeyGuard(goodBlank) === null, 'keeps context-choice when 
 const claim = extractAnswerClaim(goodBlank, 0);
 assert(claim !== null && claim.claim.includes('emporter'), 'extracts claim including blankWord');
 
+// Person/thing: apporter marked correct for a person must fail local guard
+const personThingWrong: Exercise = {
+  type: 'context-choice',
+  data: {
+    sentence: 'Je pense que je devrais ___ mon cousin.',
+    blankWord: 'apporter',
+    options: ['apporter', 'emporter', 'amener', 'emmener'],
+    translation: 'Eu acho que deveria levar meu primo.',
+  },
+};
+assert(
+  failsLocalAnswerKeyGuard(personThingWrong)?.includes('person/thing') === true,
+  'drops context-choice when apporter is marked correct for a person',
+);
+
+const personThingOk: Exercise = {
+  type: 'context-choice',
+  data: {
+    sentence: 'Je pense que je devrais ___ mon cousin.',
+    blankWord: 'emmener',
+    options: ['emmener', 'emporter', 'amener', 'apporter'],
+    translation: 'Eu acho que deveria levar meu primo.',
+  },
+};
+assert(
+  failsLocalAnswerKeyGuard(personThingOk) === null,
+  'keeps emmener as correct for levar + person',
+);
+
 // Screenshot pedagogy case: local directional sanitize + guard
 const flipped = sanitizeFillGapDirectional({
   blankWord: 'apporter',
@@ -58,6 +87,16 @@ assert(flipped.blankWord === 'emporter', 'directional sanitize fixes wrong key b
 assert(
   flipped.options?.includes('emporter') === true,
   'directional sanitize puts corrected blank into options',
+);
+
+const cousinFlipped = sanitizeFillGapDirectional({
+  blankWord: 'apporter',
+  translation: 'Eu acho que deveria levar meu primo para brincar com ele.',
+  options: ['apporter', 'emporter', 'amener', 'emmener'],
+});
+assert(
+  cousinFlipped.blankWord === 'emmener',
+  'sanitize fixes apporter → emmener for person before QA',
 );
 
 const grammarTrapBad: Exercise = {

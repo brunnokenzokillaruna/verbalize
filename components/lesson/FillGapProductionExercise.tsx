@@ -45,6 +45,7 @@ export function FillGapProductionExercise({
         ? sanitizeFillGapDirectional({
             blankWord: data.blankWord,
             translation: data.translation,
+            sentence: data.sentence,
             acceptable_variants: data.acceptable_variants,
           })
         : data,

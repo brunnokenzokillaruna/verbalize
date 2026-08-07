@@ -199,8 +199,16 @@ export function RoleplayChatPage() {
     await reset();
   }
 
+  // Mobile BottomNav is fixed (~4rem + safe-area). Keep CTAs and session controls above it.
+  const mobileNavClearance =
+    'pb-[calc(4rem+env(safe-area-inset-bottom,0px))] md:pb-4';
+  const stickyAboveNav =
+    'bottom-[calc(4rem+env(safe-area-inset-bottom,0px))] md:bottom-0';
+
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-[600px] flex-col">
+    <div
+      className={`mx-auto flex min-h-dvh w-full max-w-[600px] flex-col ${mobileNavClearance}`}
+    >
       <header
         className="sticky top-0 z-10 px-4 py-3"
         style={{
@@ -291,13 +299,27 @@ export function RoleplayChatPage() {
 
           {setupMode === 'presets' && (
             <div
-              className="sticky bottom-0 flex flex-col gap-2.5 px-4 pt-3"
+              className={`sticky z-20 flex flex-col gap-2.5 px-4 pt-3 pb-3 ${stickyAboveNav}`}
               style={{
                 backgroundColor: 'var(--color-bg)',
                 borderTop: '1px solid var(--color-border)',
-                paddingBottom: 'max(1rem, env(safe-area-inset-bottom))',
               }}
             >
+              {/* Primary CTA first so it stays visible above BottomNav on short viewports */}
+              <button
+                type="button"
+                disabled={!scenario}
+                onClick={() => void start()}
+                className="flex w-full items-center justify-center gap-2 rounded-2xl py-3.5 text-sm font-extrabold text-white transition-transform active:translate-y-[2px] disabled:opacity-40 cursor-pointer"
+                style={{
+                  backgroundColor: 'var(--color-primary)',
+                  boxShadow: '0 4px 0 color-mix(in srgb, var(--color-primary) 70%, black)',
+                }}
+              >
+                <Mic size={17} />
+                Iniciar conversa
+              </button>
+
               <section
                 className="rounded-2xl"
                 style={{
@@ -359,20 +381,6 @@ export function RoleplayChatPage() {
                   </div>
                 )}
               </section>
-
-              <button
-                type="button"
-                disabled={!scenario}
-                onClick={() => void start()}
-                className="flex w-full items-center justify-center gap-2 rounded-2xl py-3.5 text-sm font-extrabold text-white transition-transform active:translate-y-[2px] disabled:opacity-40 cursor-pointer"
-                style={{
-                  backgroundColor: 'var(--color-primary)',
-                  boxShadow: '0 4px 0 color-mix(in srgb, var(--color-primary) 70%, black)',
-                }}
-              >
-                <Mic size={17} />
-                Iniciar conversa
-              </button>
             </div>
           )}
         </>

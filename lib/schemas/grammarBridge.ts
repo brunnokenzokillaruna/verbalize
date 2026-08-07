@@ -216,7 +216,7 @@ export function normalizeGrammarBridgeResult(
   }) as GrammarBridgeResult;
 
   normalized.bridge = sanitizeBridgeExample(normalized, language);
-  return grammarFocus
-    ? applyPtBrLocalizationFixes(normalized, grammarFocus, language)
-    : normalized;
+  // Always run PT-BR fidelity fixes (e.g. strip invented "por sua vez") so cached
+  // bridges are corrected at display time; duration guidance still needs grammarFocus.
+  return applyPtBrLocalizationFixes(normalized, grammarFocus ?? '', language);
 }

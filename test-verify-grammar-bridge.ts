@@ -15,6 +15,11 @@ import {
   shouldIncludeSynthesis,
   textOverlap,
 } from './lib/grammarBridgeDedup';
+import {
+  applyPtBrLocalizationFixes,
+  stripInventedPorSuaVez,
+} from './lib/grammarBridge/ptBrLocalization';
+import { normalizeGrammarBridgeResult } from './lib/schemas/grammarBridge';
 
 function assert(condition: boolean, message: string) {
   if (!condition) {
@@ -86,6 +91,10 @@ const claims = extractBridgeClaims(goodBridge, 'fr');
 assert(claims.some((c) => c.id === 'bridge.target'), 'extracts bridge.target claim');
 assert(claims.some((c) => c.id === 'brazilianTrap'), 'extracts brazilianTrap claim');
 assert(claims.some((c) => c.id === 'retentionCheck'), 'extracts retentionCheck claim');
+assert(
+  claims.some((c) => c.claim.includes('PAIR') && c.claim.includes('PT-BR')),
+  'claims require PT↔target fidelity',
+);
 assert(
   claims.filter((c) => c.severity === 'core').length >= 3,
   'has multiple core claims',
@@ -195,5 +204,56 @@ const uniqueTip = filterUniqueSurvivalTip('Geral? Il faut. Pessoal? devoir.', go
 assert(uniqueTip !== undefined, 'keeps distinctive survivalTip');
 
 assert(shouldIncludeSynthesis(goodBridge) === true, 'includes synthesis when tip is unique');
+
+// PT fidelity: invented "por sua vez" on left-dislocation
+assert(
+  stripInventedPorSuaVez(
+    'Ele, por sua vez, não quer vir.',
+    'Lui, il ne veut pas venir.',
+  ) === 'Ele não quer vir.',
+  'strips invented por sua vez from Lui-dislocation',
+);
+assert(
+  stripInventedPorSuaVez(
+    'Por sua vez, ele não quer vir.',
+    'Pour sa part, il ne veut pas venir.',
+  ) === 'Por sua vez, ele não quer vir.',
+  'keeps por sua vez when FR has pour sa part',
+);
+
+const badTranslationBridge: GrammarBridgeResult = {
+  ...goodBridge,
+  additionalExamples: [
+    {
+      target: 'Lui, il ne veut pas venir.',
+      portuguese: 'Ele, por sua vez, não quer vir.',
+    },
+  ],
+};
+const fidelityFixed = applyPtBrLocalizationFixes(
+  badTranslationBridge,
+  'Vocabulário: Amener e Emmener',
+  'fr',
+);
+assert(
+  fidelityFixed.additionalExamples?.[0]?.portuguese === 'Ele não quer vir.',
+  'localization strips invented por sua vez on display',
+);
+
+const normalizedCached = normalizeGrammarBridgeResult(badTranslationBridge, 'fr');
+assert(
+  normalizedCached?.additionalExamples?.[0]?.portuguese === 'Ele não quer vir.',
+  'normalize fixes cached bridges without grammarFocus',
+);
+
+const transferSteps = buildGrammarSteps(badTranslationBridge, 'fr', 'VOC');
+const transfer = transferSteps.find((s) => s.type === 'transfer');
+assert(transfer?.type === 'transfer', 'builds transfer/generalize step');
+if (transfer?.type === 'transfer') {
+  assert(
+    transfer.data.portuguese === 'Ele não quer vir.',
+    'Generalize step shows faithful PT for Lui-dislocation',
+  );
+}
 
 console.log('\nAll verify-grammar-bridge local tests passed.');
