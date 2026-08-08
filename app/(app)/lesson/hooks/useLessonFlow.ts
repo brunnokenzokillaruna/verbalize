@@ -17,6 +17,7 @@ import {
   LESSON_VISUAL_EXERCISE_COUNT,
   mergeLessonImagesIntoPool,
 } from '@/utils/imageMatchBuilder';
+import { trackExercisesPrefetch } from '@/lib/practiceExercises/trackExercisesPrefetch';
 import type { GrammarBridgeResult, Exercise, LessonTag } from '@/types';
 import type { LessonPhase } from '@/store/lessonStore';
 
@@ -100,10 +101,41 @@ export function useLessonFlow({
     store.setIsLoading(true);
 
     const tEx = performance.now();
-    const fromCache = !!exercisesPrefetchRef.current;
-    const aiExercises = await (exercisesPrefetchRef.current ?? fetchAiExercises());
-    exercisesPrefetchRef.current = null;
-    devLog(`[Timing] Exercícios (${fromCache ? 'do cache' : 'gerados agora'}): ${(performance.now() - tEx).toFixed(0)}ms (${aiExercises?.length ?? 0} exercícios)`);
+    const statusBefore = store.exercisesPrefetchStatus;
+    const prefetchPromise = exercisesPrefetchRef.current;
+    const source = prefetchPromise
+      ? statusBefore === 'ready'
+        ? 'prefetch-ready'
+        : statusBefore === 'pending'
+          ? 'prefetch-pending'
+          : `prefetch-${statusBefore}`
+      : 'on-demand';
+
+    let aiExercises: Exercise[] | null;
+    if (prefetchPromise) {
+      aiExercises = await prefetchPromise;
+      exercisesPrefetchRef.current = null;
+    } else {
+      aiExercises = await trackExercisesPrefetch(fetchAiExercises());
+    }
+
+    const waitMs = performance.now() - tEx;
+    devLog(
+      `[Timing] Exercícios advance: source=${source}, statusBefore=${statusBefore}, wait=${waitMs.toFixed(0)}ms, count=${aiExercises?.length ?? 0}`,
+    );
+    if (waitMs > 300 && source === 'prefetch-pending') {
+      devLog(
+        `[Timing] ⚠️ Usuário chegou à prática antes do prefetch terminar (esperou ${waitMs.toFixed(0)}ms)`,
+      );
+    } else if (source === 'on-demand') {
+      console.warn(
+        `[Timing] Prefetch ausente na transição grammar→practice (status=${statusBefore}) — gerou sob demanda (${waitMs.toFixed(0)}ms)`,
+      );
+    } else if (statusBefore === 'empty' || statusBefore === 'error') {
+      console.warn(
+        `[Timing] Prefetch falhou/vazio antes da prática (status=${statusBefore}) — resultado: ${aiExercises?.length ?? 0} exercícios`,
+      );
+    }
 
     let merged = assemblePracticeSession(
       aiExercises ?? [],

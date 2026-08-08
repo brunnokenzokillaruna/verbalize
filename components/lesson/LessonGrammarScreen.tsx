@@ -1,5 +1,7 @@
-import React from 'react';
+'use client';
+
 import { GrammarBridgeFlow } from './grammar-bridge/GrammarBridgeFlow';
+import { useLessonStore } from '@/store/lessonStore';
 import type { GrammarBridgeResult, LessonTag, SupportedLanguage } from '@/types';
 import type { WordClickPayload } from './ClickableWord';
 
@@ -28,6 +30,11 @@ export function LessonGrammarScreen({
   onAdvanceToPractice,
   onQuizCorrect,
 }: LessonGrammarScreenProps) {
+  const isLoading = useLessonStore((s) => s.isLoading);
+  const exercisesPrefetchStatus = useLessonStore((s) => s.exercisesPrefetchStatus);
+  const isPreparingPractice = exercisesPrefetchStatus === 'pending';
+  const exercisesReady = exercisesPrefetchStatus === 'ready';
+
   return (
     <div className="flex flex-col gap-5 sm:gap-6 animate-slide-up-spring">
       <div className="flex flex-col gap-1.5">
@@ -55,6 +62,9 @@ export function LessonGrammarScreen({
         onComplete={onComplete}
         onAdvanceToPractice={onAdvanceToPractice}
         onQuizCorrect={onQuizCorrect}
+        isPreparingPractice={isPreparingPractice}
+        isAdvancingToPractice={isLoading}
+        exercisesReady={exercisesReady}
       />
     </div>
   );

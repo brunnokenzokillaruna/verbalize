@@ -1,12 +1,13 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { buildGrammarSteps } from '@/lib/grammarBridgeSteps';
 import { GrammarStepProgress } from './GrammarStepProgress';
 import { GrammarStepRenderer } from './GrammarStepRenderer';
 import { useGrammarSwipe } from './useGrammarSwipe';
 import { useSoundEffects } from '@/hooks/useSoundEffects';
+import { devLog } from '@/lib/devLog';
 import type { GrammarBridgeResult, LessonTag, SupportedLanguage } from '@/types';
 import type { WordClickPayload } from '../ClickableWord';
 
@@ -21,6 +22,12 @@ interface GrammarBridgeFlowProps {
   onAdvanceToPractice?: () => void;
   onQuizCorrect?: (correct: boolean) => void;
   previewMode?: boolean;
+  /** True while practice exercises are still generating in the background. */
+  isPreparingPractice?: boolean;
+  /** True when the user already tapped advance and we're awaiting the session. */
+  isAdvancingToPractice?: boolean;
+  /** True when prefetch settled with a usable exercise set. */
+  exercisesReady?: boolean;
 }
 
 export function GrammarBridgeFlow({
@@ -34,6 +41,9 @@ export function GrammarBridgeFlow({
   onAdvanceToPractice,
   onQuizCorrect,
   previewMode = false,
+  isPreparingPractice = false,
+  isAdvancingToPractice = false,
+  exercisesReady = false,
 }: GrammarBridgeFlowProps) {
   const { play } = useSoundEffects();
 
@@ -52,6 +62,10 @@ export function GrammarBridgeFlow({
   const isQuizStep = currentStep?.type === 'quiz';
   const canContinue = previewMode || !isQuizStep || quizAnswered;
   const readyForPractice = isLastStep && canContinue;
+  const showPreparingCta =
+    readyForPractice && (isPreparingPractice || isAdvancingToPractice) && !previewMode;
+  const practiceCtaDisabled =
+    isAdvancingToPractice || (isPreparingPractice && !exercisesReady);
 
   useEffect(() => {
     if (steps.length === 0) {
@@ -66,6 +80,23 @@ export function GrammarBridgeFlow({
   useEffect(() => {
     setQuizAnswered(false);
   }, [currentIndex]);
+
+  useEffect(() => {
+    if (!readyForPractice || previewMode) return;
+    if (isPreparingPractice || isAdvancingToPractice) {
+      devLog(
+        `[GrammarBridge] Último passo — exercícios preparando (ready=${exercisesReady}, advancing=${isAdvancingToPractice})`,
+      );
+    } else if (exercisesReady) {
+      devLog('[GrammarBridge] Último passo — exercícios prontos (prefetch ready)');
+    }
+  }, [
+    readyForPractice,
+    isPreparingPractice,
+    isAdvancingToPractice,
+    exercisesReady,
+    previewMode,
+  ]);
 
   const goNext = useCallback(() => {
     if (!canContinue || isLastStep) return;
@@ -171,9 +202,23 @@ export function GrammarBridgeFlow({
             <button
               type="button"
               onClick={handleAdvanceToPractice}
-              className="flex items-center gap-1 rounded-xl px-4 sm:px-5 py-2.5 sm:py-3 text-xs sm:text-sm font-black bg-primary text-white border border-b-[3px] border-primary-dark active:translate-y-[1px] active:border-b-[1px] transition-all min-h-[44px]"
+              disabled={practiceCtaDisabled}
+              aria-busy={showPreparingCta}
+              className={[
+                'flex items-center gap-1.5 rounded-xl px-4 sm:px-5 py-2.5 sm:py-3 text-xs sm:text-sm font-black transition-all min-h-[44px]',
+                practiceCtaDisabled
+                  ? 'bg-surface-raised text-text-secondary border border-border cursor-wait'
+                  : 'bg-primary text-white border border-b-[3px] border-primary-dark active:translate-y-[1px] active:border-b-[1px]',
+              ].join(' ')}
             >
-              Praticar agora 💪
+              {showPreparingCta ? (
+                <>
+                  <Loader2 size={16} className="animate-spin shrink-0" />
+                  Preparando exercícios…
+                </>
+              ) : (
+                <>Praticar agora 💪</>
+              )}
             </button>
           ) : !isLastStep ? (
             <button

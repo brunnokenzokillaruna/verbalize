@@ -30,6 +30,9 @@ export type LessonPhase =
   | 'production'
   | 'debrief';
 
+/** Background generation of practice exercises (prefetch during intro→grammar). */
+export type ExercisesPrefetchStatus = 'idle' | 'pending' | 'ready' | 'empty' | 'error';
+
 interface LessonState {
   // Context
   phase: LessonPhase;
@@ -82,6 +85,9 @@ interface LessonState {
 
   // Loading state
   isLoading: boolean;
+
+  /** Live status of practice-exercise prefetch (for grammar→practice UX). */
+  exercisesPrefetchStatus: ExercisesPrefetchStatus;
 
   /** True when the grammar bridge retention quiz was answered correctly. */
   bridgeQuizPassed: boolean;
@@ -144,6 +150,7 @@ interface LessonState {
   cacheWordTooltip: (key: string, result: TranslateWordResult) => void;
   setExercises: (exercises: Exercise[]) => void;
   setIsLoading: (loading: boolean) => void;
+  setExercisesPrefetchStatus: (status: ExercisesPrefetchStatus) => void;
   setBridgeQuizPassed: (passed: boolean) => void;
   setDiscoveredVerbs: (verbs: string[]) => void;
   markSpontaneousProductionAccepted: () => void;
@@ -205,6 +212,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
   rolePlayCompletedGoalIndexes: [],
   rolePlayLiveDebrief: null,
   isLoading: false,
+  exercisesPrefetchStatus: 'idle',
   bridgeQuizPassed: false,
   checkpointSession: null,
   comprehensionIndex: 0,
@@ -248,6 +256,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       rolePlayCompletedGoalIndexes: [],
       rolePlayLiveDebrief: null,
       isLoading: true,
+      exercisesPrefetchStatus: 'idle',
       bridgeQuizPassed: false,
       checkpointSession: null,
       comprehensionIndex: 0,
@@ -261,6 +270,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
 
   setPhase: (phase) => set({ phase }),
   setIsLoading: (isLoading) => set({ isLoading }),
+  setExercisesPrefetchStatus: (exercisesPrefetchStatus) => set({ exercisesPrefetchStatus }),
   setBridgeQuizPassed: (bridgeQuizPassed) => set({ bridgeQuizPassed }),
   setKnownVocabulary: (knownVocabulary) => set({ knownVocabulary }),
   setMasteredVocabulary: (masteredVocabulary) => set({ masteredVocabulary }),
@@ -411,6 +421,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       rolePlayCompletedGoalIndexes: [],
       rolePlayLiveDebrief: null,
       isLoading: false,
+      exercisesPrefetchStatus: 'idle',
       bridgeQuizPassed: false,
       checkpointSession: null,
       comprehensionIndex: 0,

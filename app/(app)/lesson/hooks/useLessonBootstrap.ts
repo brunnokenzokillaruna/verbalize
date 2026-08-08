@@ -12,6 +12,10 @@ import { generateMissionBriefing } from '@/app/actions/generateMissionBriefing';
 import { generatePracticeExercises } from '@/app/actions/generatePracticeExercises';
 import { generateCheckpointSession } from '@/app/actions/generateCheckpointSession';
 import { isPregenSchemaCurrent, PREGEN_SCHEMA_VERSION } from '@/lib/practiceExercises/constants';
+import {
+  markExercisesPrefetchReady,
+  trackExercisesPrefetch,
+} from '@/lib/practiceExercises/trackExercisesPrefetch';
 import { pregenerateNextLesson } from '@/app/actions/pregenerateNextLesson';
 import { isAggressivePregenEnabled } from '@/lib/geminiDevGuard';
 import { translateWord, translateWordsBatch } from '@/app/actions/translateWord';
@@ -121,6 +125,7 @@ function applyPregenCache(
   }
   if (schemaOk && pregenDoc.exercises && pregenDoc.exercises.length > 0) {
     exercisesPrefetchRef.current = Promise.resolve(pregenDoc.exercises);
+    markExercisesPrefetchReady(pregenDoc.exercises);
   } else if (!schemaOk && pregenDoc.exercises?.length) {
     devLog(
       `[Timing] Cache pregen exercises STALE (schema ${pregenDoc.schemaVersion ?? 'none'} < ${PREGEN_SCHEMA_VERSION}) — regenerating exercises`,
@@ -486,15 +491,46 @@ export function useLessonBootstrap({
 
       // Exercises prefetch chained after Grammar Bridge to avoid concurrency 429
       if (exercisesPrefetchRef.current) {
-        devLog(`[Timing] Exercícios: já vindo do pregen cache (0ms)`);
+        devLog(`[Timing] Exercícios: já no prefetch ref (status=${store.exercisesPrefetchStatus})`);
       } else {
         devLog(`[Timing] 🚀 Prefetch exercícios encadeado após o Grammar Bridge`);
-        exercisesPrefetchRef.current = grammarBridgePrefetchRef.current!.then(async (bridge) => {
-          // Wait 500ms cooling period to avoid rapid subsequent requests
-          await new Promise((resolve) => setTimeout(resolve, 500));
-          const tEx = performance.now();
-          devLog(`[Timing] 🚀 Prefetch exercícios iniciado`);
-          const result = await generatePracticeExercises({
+        exercisesPrefetchRef.current = trackExercisesPrefetch(
+          grammarBridgePrefetchRef.current!.then(async (bridge) => {
+            // Wait 500ms cooling period to avoid rapid subsequent requests
+            await new Promise((resolve) => setTimeout(resolve, 500));
+            const tEx = performance.now();
+            devLog(`[Timing] 🚀 Prefetch exercícios Gemini iniciado`);
+            const result = await generatePracticeExercises({
+              dialogue,
+              newVocabulary: words,
+              verbWord: hook.verbWord ?? '',
+              grammarFocus: lesson.grammarFocus,
+              theme: lesson.theme,
+              uiTitle: lesson.uiTitle,
+              tag: lesson.tag,
+              language,
+              level: lesson.level,
+              knownVocabulary: store.knownVocabulary,
+              masteredVocabulary: store.masteredVocabulary,
+              previousTopics: getPreviousTopics(language, lesson.id),
+              grammarBridge: bridge ?? hook.grammarBridge ?? null,
+            });
+            devLog(
+              `[Timing] ✅ Prefetch exercícios Gemini terminou: ${(performance.now() - tEx).toFixed(0)}ms (${result?.length ?? 0} exercícios)`,
+            );
+            return result;
+          }),
+        );
+      }
+    } else {
+      // No grammar bridge, run exercises prefetch immediately
+      if (exercisesPrefetchRef.current) {
+        devLog(`[Timing] Exercícios: já no prefetch ref (status=${store.exercisesPrefetchStatus})`);
+      } else {
+        const tEx = performance.now();
+        devLog(`[Timing] 🚀 Prefetch exercícios Gemini iniciado`);
+        exercisesPrefetchRef.current = trackExercisesPrefetch(
+          generatePracticeExercises({
             dialogue,
             newVocabulary: words,
             verbWord: hook.verbWord ?? '',
@@ -507,44 +543,13 @@ export function useLessonBootstrap({
             knownVocabulary: store.knownVocabulary,
             masteredVocabulary: store.masteredVocabulary,
             previousTopics: getPreviousTopics(language, lesson.id),
-            grammarBridge: bridge ?? hook.grammarBridge ?? null,
-          });
-          devLog(`[Timing] ✅ Prefetch exercícios terminou: ${(performance.now() - tEx).toFixed(0)}ms (${result?.length ?? 0} exercícios)`);
-          return result;
-        }).catch((err) => {
-          console.error('[Prefetch] exercises error:', err);
-          return null;
-        });
-      }
-    } else {
-      // No grammar bridge, run exercises prefetch immediately
-      if (exercisesPrefetchRef.current) {
-        devLog(`[Timing] Exercícios: já vindo do pregen cache (0ms)`);
-      } else {
-        const tEx = performance.now();
-        devLog(`[Timing] 🚀 Prefetch exercícios iniciado`);
-        exercisesPrefetchRef.current = generatePracticeExercises({
-          dialogue,
-          newVocabulary: words,
-          verbWord: hook.verbWord ?? '',
-          grammarFocus: lesson.grammarFocus,
-          theme: lesson.theme,
-          uiTitle: lesson.uiTitle,
-          tag: lesson.tag,
-          language,
-          level: lesson.level,
-          knownVocabulary: store.knownVocabulary,
-          masteredVocabulary: store.masteredVocabulary,
-          previousTopics: getPreviousTopics(language, lesson.id),
-        })
-          .then((result) => {
-            devLog(`[Timing] ✅ Prefetch exercícios terminou: ${(performance.now() - tEx).toFixed(0)}ms (${result?.length ?? 0} exercícios)`);
+          }).then((result) => {
+            devLog(
+              `[Timing] ✅ Prefetch exercícios Gemini terminou: ${(performance.now() - tEx).toFixed(0)}ms (${result?.length ?? 0} exercícios)`,
+            );
             return result;
-          })
-          .catch((err) => {
-            console.error('[Prefetch] exercises error:', err);
-            return null;
-          });
+          }),
+        );
       }
     }
 
