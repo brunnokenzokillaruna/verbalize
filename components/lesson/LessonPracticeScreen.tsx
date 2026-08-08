@@ -115,7 +115,13 @@ export function LessonPracticeScreen({
       case 'error-correction':
         return <ErrorCorrectionExercise data={currentExercise.data} {...common} />;
       case 'image-match':
-        return <ImageMatchExercise data={currentExercise.data} {...common} />;
+        return (
+          <ImageMatchExercise
+            data={currentExercise.data}
+            variant="gallery"
+            {...common}
+          />
+        );
       case 'word-bank-translation':
         return <WordBankTranslation data={currentExercise.data} {...common} />;
       case 'bridge-choice':

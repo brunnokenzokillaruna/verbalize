@@ -48,6 +48,14 @@ interface LessonState {
   wordTooltips: Record<string, TranslateWordResult>;
   knownVocabulary: string[]; // words the user already learned (from Firestore)
   masteredVocabulary: string[]; // words with SRS level ≥4
+  /** Imaged vocab for lesson visual (image-match) review drills. */
+  vocabImagePool: Array<{
+    word: string;
+    translation: string;
+    imageUrl?: string;
+    srsLevel?: number;
+    nextReviewMs?: number;
+  }>;
 
   // Practice exercises
   exercises: Exercise[];
@@ -110,6 +118,15 @@ interface LessonState {
   setPhase: (phase: LessonPhase) => void;
   setKnownVocabulary: (words: string[]) => void;
   setMasteredVocabulary: (words: string[]) => void;
+  setVocabImagePool: (
+    pool: Array<{
+      word: string;
+      translation: string;
+      imageUrl?: string;
+      srsLevel?: number;
+      nextReviewMs?: number;
+    }>,
+  ) => void;
   setHook: (hook: HookResult) => void;
   mergeHook: (partial: Partial<HookResult>) => void;
   setMissionBriefing: (briefing: MissionBriefingResult) => void;
@@ -171,6 +188,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
   wordTooltips: {},
   knownVocabulary: [],
   masteredVocabulary: [],
+  vocabImagePool: [],
   discoveredVerbs: [],
   exercises: [],
   exerciseIndex: 0,
@@ -213,6 +231,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       wordTooltips: {},
       knownVocabulary: [],
       masteredVocabulary: [],
+      vocabImagePool: [],
       discoveredVerbs: [],
       exercises: [],
       exerciseIndex: 0,
@@ -245,6 +264,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
   setBridgeQuizPassed: (bridgeQuizPassed) => set({ bridgeQuizPassed }),
   setKnownVocabulary: (knownVocabulary) => set({ knownVocabulary }),
   setMasteredVocabulary: (masteredVocabulary) => set({ masteredVocabulary }),
+  setVocabImagePool: (vocabImagePool) => set({ vocabImagePool }),
 
   setHook: (hook) => set({
     hook: { ...hook, newVocabulary: [...new Set(hook.newVocabulary)] },
@@ -374,6 +394,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       wordTooltips: {},
       knownVocabulary: [],
       masteredVocabulary: [],
+      vocabImagePool: [],
       discoveredVerbs: [],
       exercises: [],
       exerciseIndex: 0,

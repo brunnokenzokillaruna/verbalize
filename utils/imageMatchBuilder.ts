@@ -256,3 +256,90 @@ export function buildImageMatchFromReviewWords(
 
   return { type: 'image-match', data };
 }
+
+/** How many visual (image-match) drills to append after AI lesson practice. */
+export const LESSON_VISUAL_EXERCISE_COUNT = 5;
+
+export type VocabImagePoolItem = {
+  word: string;
+  translation: string;
+  imageUrl?: string;
+  srsLevel?: number;
+  /** Epoch ms — used to prefer due review words. */
+  nextReviewMs?: number;
+};
+
+/**
+ * Merge lesson-fetched images into the user's imaged vocabulary pool
+ * so new words from this lesson can be visual targets/distractors.
+ */
+export function mergeLessonImagesIntoPool(
+  pool: VocabImagePoolItem[],
+  words: string[],
+  vocabImages: Record<string, VocabImageResult | null>,
+  vocabTranslations: Record<string, string>,
+): VocabImagePoolItem[] {
+  const byWord = new Map<string, VocabImagePoolItem>();
+  for (const item of pool) {
+    byWord.set(normalizeWord(item.word), item);
+  }
+
+  for (const word of words) {
+    const image = vocabImages[word];
+    if (!image?.imageUrl) continue;
+    const key = normalizeWord(word);
+    const existing = byWord.get(key);
+    byWord.set(key, {
+      word: existing?.word ?? word,
+      translation: vocabTranslations[word] ?? existing?.translation ?? word,
+      imageUrl: image.imageUrl,
+      srsLevel: existing?.srsLevel ?? 0,
+      nextReviewMs: existing?.nextReviewMs,
+    });
+  }
+
+  return [...byWord.values()];
+}
+
+/**
+ * Build up to `count` image-match exercises for lesson practice (vocab review).
+ * Prefers lesson words and due / weaker SRS items. Needs ≥4 distinct images in the pool.
+ */
+export function buildLessonVisualExercises(params: {
+  imagePool: VocabImagePoolItem[];
+  preferWords?: string[];
+  count?: number;
+  nowMs?: number;
+}): Exercise[] {
+  const count = params.count ?? LESSON_VISUAL_EXERCISE_COUNT;
+  const now = params.nowMs ?? Date.now();
+  const pool = params.imagePool.filter((item) => item.imageUrl);
+  if (pool.length < MIN_VISUAL_REVIEW_ITEMS || count <= 0) return [];
+
+  const preferSet = new Set((params.preferWords ?? []).map(normalizeWord));
+
+  const ranked = pool
+    .map((item) => {
+      const due = item.nextReviewMs != null && item.nextReviewMs <= now ? 1 : 0;
+      const preferred = preferSet.has(normalizeWord(item.word)) ? 1 : 0;
+      const srs = item.srsLevel ?? 0;
+      const score = preferred * 100 + due * 40 - srs + Math.random();
+      return { item, score };
+    })
+    .sort((a, b) => b.score - a.score);
+
+  const exercises: Exercise[] = [];
+  const usedTargets = new Set<string>();
+
+  for (const { item } of ranked) {
+    if (exercises.length >= count) break;
+    const key = normalizeWord(item.word);
+    if (usedTargets.has(key)) continue;
+    const exercise = buildImageMatchFromReviewWords(item.word, pool);
+    if (!exercise) continue;
+    usedTargets.add(key);
+    exercises.push(exercise);
+  }
+
+  return exercises;
+}

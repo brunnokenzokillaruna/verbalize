@@ -18,14 +18,91 @@ import { translateWord, translateWordsBatch } from '@/app/actions/translateWord'
 import { prefetchVocabImages } from '@/lib/vocabImagePrefetch';
 import { getLessonSceneImage } from '@/app/actions/getLessonSceneImage';
 import { fetchPregeneratedLessonWithWait } from '@/lib/waitForPregeneratedLesson';
-import { deletePregeneratedLesson, getUserVocabulary, upsertVocabularyItem, tryStartPregeneratingLesson, abortPregeneratedLesson } from '@/services/firestore';
-import { canonicalVocabKey } from '@/lib/vocabCanonical';
-import { filterHookVocabularyForKnownWords, filterKnownFromNewChunks } from '@/lib/hookVocabulary';
-import { collectDialogueTranslationTargets } from '@/lib/dialogueNarration';
-import { tooltipCacheKey } from '@/lib/wordTooltipUtils';
-import type { GrammarBridgeResult, Exercise, LessonTag, HookResult, PregeneratedLessonDocument } from '@/types';
+import { deletePregeneratedLesson, getUserVocabulary, upsertVocabularyItem, tryStartPregeneratingLesson, abortPregeneratedLesson, getCachedImage } from '@/services/firestore';
+import { sanitizeVocabularyToken } from '@/lib/hookSanitize';
+import { MIN_VISUAL_REVIEW_ITEMS } from '@/utils/imageMatchBuilder';
+import type {
+  GrammarBridgeResult,
+  Exercise,
+  LessonTag,
+  HookResult,
+  PregeneratedLessonDocument,
+  UserVocabularyDocument,
+  SupportedLanguage,
+} from '@/types';
 
 const TAGS_WITH_GRAMMAR_PHASE: ReadonlySet<LessonTag> = new Set(['GRAM', 'VERB', 'CULT', 'VOC', 'DIAL', 'EXPR']);
+
+type VocabImagePoolItem = {
+  word: string;
+  translation: string;
+  imageUrl?: string;
+  srsLevel?: number;
+  nextReviewMs?: number;
+};
+
+function nextReviewMsFromDoc(item: UserVocabularyDocument): number | undefined {
+  const nextReview = item.nextReview as { toMillis?: () => number; toDate?: () => Date } | undefined;
+  if (nextReview && typeof nextReview.toMillis === 'function') return nextReview.toMillis();
+  if (nextReview && typeof nextReview.toDate === 'function') return nextReview.toDate().getTime();
+  return undefined;
+}
+
+function poolItemFromVocabDoc(
+  item: UserVocabularyDocument,
+  imageUrl?: string,
+): VocabImagePoolItem {
+  return {
+    word: item.word,
+    translation: item.translation,
+    imageUrl: imageUrl ?? item.imageUrl,
+    srsLevel: item.srsLevel,
+    nextReviewMs: nextReviewMsFromDoc(item),
+  };
+}
+
+/**
+ * Build the imaged-vocab pool for lesson visual drills.
+ * Prefer imageUrl on the vocab doc; if the pool is thin, hydrate from image_cache.
+ */
+async function buildVocabImagePool(
+  vocabDocs: UserVocabularyDocument[],
+  language: SupportedLanguage,
+): Promise<VocabImagePoolItem[]> {
+  const byWord = new Map<string, VocabImagePoolItem>();
+
+  for (const item of vocabDocs) {
+    if (!item.imageUrl) continue;
+    byWord.set(canonicalVocabKey(item.word), poolItemFromVocabDoc(item));
+  }
+
+  if (byWord.size >= MIN_VISUAL_REVIEW_ITEMS) {
+    return [...byWord.values()];
+  }
+
+  // Newest-first candidates without a saved imageUrl (list is oldest-first).
+  const missing = [...vocabDocs]
+    .reverse()
+    .filter((item) => !item.imageUrl)
+    .slice(0, 40);
+
+  const hydrated = await Promise.all(
+    missing.map(async (item) => {
+      const cacheKey = `${sanitizeVocabularyToken(item.word)}_${language}`;
+      const cached = await getCachedImage(cacheKey).catch(() => null);
+      if (!cached?.imageUrl) return null;
+      return poolItemFromVocabDoc(item, cached.imageUrl);
+    }),
+  );
+
+  for (const item of hydrated) {
+    if (!item?.imageUrl) continue;
+    const key = canonicalVocabKey(item.word);
+    if (!byWord.has(key)) byWord.set(key, item);
+  }
+
+  return [...byWord.values()];
+}
 
 function applyPregenCache(
   pregenDoc: PregeneratedLessonDocument,
@@ -148,7 +225,11 @@ export function useLessonBootstrap({
           .map((v) => canonicalVocabKey(v.word));
         store.setKnownVocabulary(knownVocabulary);
         store.setMasteredVocabulary(masteredVocabulary);
-        devLog(`[Timing] Vocabulário do usuário: ${(performance.now() - tVocab).toFixed(0)}ms (${knownVocabulary.length} palavras conhecidas, ${masteredVocabulary.length} dominadas)`);
+        const imagePool = await buildVocabImagePool(vocabDocs, lesson.language);
+        store.setVocabImagePool(imagePool);
+        devLog(
+          `[Timing] Vocabulário do usuário: ${(performance.now() - tVocab).toFixed(0)}ms (${knownVocabulary.length} conhecidas, ${masteredVocabulary.length} dominadas, ${imagePool.length} com imagem p/ visual)`,
+        );
 
         if (lesson.tag === 'REVIEW') {
           let checkpoint = useLessonStore.getState().checkpointSession;

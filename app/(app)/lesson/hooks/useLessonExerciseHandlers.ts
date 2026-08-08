@@ -4,6 +4,7 @@ import {
   saveLessonMistake,
   getOldestMistake,
   deleteLessonMistake,
+  updateVocabSrsAfterReview,
 } from '@/services/firestore';
 import { useLessonStore } from '@/store/lessonStore';
 import { buildMistakeContext } from '@/app/(app)/lesson/utils';
@@ -149,6 +150,21 @@ export function useLessonExerciseHandlers(
           [...(store.hook?.newVocabulary ?? []), ...(store.hook?.newChunks?.map((c) => c.phrase) ?? [])],
           true,
         );
+      }
+
+      // Visual drills also count as vocab review for SRS.
+      if (
+        phase === 'practice' &&
+        exercise?.type === 'image-match' &&
+        user?.uid &&
+        store.lesson
+      ) {
+        void updateVocabSrsAfterReview(
+          user.uid,
+          exercise.data.targetWord,
+          store.lesson.language,
+          correct,
+        ).catch((err) => console.warn('[lesson] visual SRS update failed:', err));
       }
 
       if (phase === 'production') {

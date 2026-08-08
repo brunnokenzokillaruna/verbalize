@@ -11,8 +11,12 @@ import { logLesson, updateLessonStats, upsertVocabularyItem, saveLessonMistake, 
 import { canonicalVocabKey } from '@/lib/vocabCanonical';
 import { sessionHasProduction } from '@/lib/practiceExercises/productionTypes';
 import { applyAdaptiveTier } from '@/lib/practiceExercises/adaptiveTier';
-import { assemblePracticeSession, injectImageMatchIntoPool } from '@/utils/assemblePracticeExercises';
-import { buildImageMatchFromLessonVocab } from '@/utils/imageMatchBuilder';
+import { assemblePracticeSession } from '@/utils/assemblePracticeExercises';
+import {
+  buildLessonVisualExercises,
+  LESSON_VISUAL_EXERCISE_COUNT,
+  mergeLessonImagesIntoPool,
+} from '@/utils/imageMatchBuilder';
 import type { GrammarBridgeResult, Exercise, LessonTag } from '@/types';
 import type { LessonPhase } from '@/store/lessonStore';
 
@@ -72,15 +76,24 @@ export function useLessonFlow({
     });
   }, [store]);
 
-  const buildClientExercises = useCallback((): Exercise[] => {
+  const buildVisualExercises = useCallback((): Exercise[] => {
     if (!store.hook) return [];
-    const imageMatch = buildImageMatchFromLessonVocab({
-      hook: store.hook,
-      vocabImages: store.vocabImages,
-      vocabTranslations: store.vocabTranslations,
+    const preferWords = [
+      ...store.hook.newVocabulary,
+      ...(store.hook.newChunks?.map((c) => c.phrase) ?? []),
+    ];
+    const pool = mergeLessonImagesIntoPool(
+      store.vocabImagePool,
+      store.hook.newVocabulary,
+      store.vocabImages,
+      store.vocabTranslations,
+    );
+    return buildLessonVisualExercises({
+      imagePool: pool,
+      preferWords,
+      count: LESSON_VISUAL_EXERCISE_COUNT,
     });
-    return imageMatch ? [imageMatch] : [];
-  }, [store.hook, store.vocabImages, store.vocabTranslations]);
+  }, [store.hook, store.vocabImagePool, store.vocabImages, store.vocabTranslations]);
 
   const advanceFromGrammar = useCallback(async () => {
     if (!store.lesson || !store.hook || store.isLoading) return;
@@ -92,26 +105,23 @@ export function useLessonFlow({
     exercisesPrefetchRef.current = null;
     devLog(`[Timing] Exercícios (${fromCache ? 'do cache' : 'gerados agora'}): ${(performance.now() - tEx).toFixed(0)}ms (${aiExercises?.length ?? 0} exercícios)`);
 
-    const clientExercises = buildClientExercises();
-    const imageMatchForPool = clientExercises[0] ?? buildImageMatchFromLessonVocab({
-      hook: store.hook,
-      vocabImages: store.vocabImages,
-      vocabTranslations: store.vocabTranslations,
-    });
-
     let merged = assemblePracticeSession(
       aiExercises ?? [],
-      clientExercises,
+      [],
       store.lesson.tag,
       store.bridgeQuizPassed,
       store.lesson.level,
     );
 
-    if (store.lesson.tag !== 'VOC' || !clientExercises.length) {
-      merged = injectImageMatchIntoPool(merged, imageMatchForPool);
-    }
-
+    // Drop any AI/cache image-match — visual review is appended as a dedicated block.
+    merged = merged.filter((ex) => ex.type !== 'image-match');
     merged = applyAdaptiveTier(merged, store.masteredVocabulary);
+
+    const visualExercises = buildVisualExercises();
+    if (visualExercises.length > 0) {
+      merged = [...merged, ...visualExercises];
+      devLog(`[useLessonFlow] Appended ${visualExercises.length} visual vocab exercises`);
+    }
 
     if (merged.length === 0) {
       console.error('[useLessonFlow] Empty practice session — staying on grammar phase');
@@ -125,7 +135,7 @@ export function useLessonFlow({
 
     store.setExercises(merged);
     store.setPhase('practice');
-  }, [store, exercisesPrefetchRef, fetchAiExercises, buildClientExercises]);
+  }, [store, exercisesPrefetchRef, fetchAiExercises, buildVisualExercises]);
 
   const advanceFromBriefing = useCallback(() => {
     if (!store.lesson) return;
@@ -378,7 +388,7 @@ export function useLessonFlow({
 
   return {
     fetchAiExercises,
-    buildClientExercises,
+    buildVisualExercises,
     advanceFromIntro,
     advanceFromMission,
     advanceFromVocabulary,
