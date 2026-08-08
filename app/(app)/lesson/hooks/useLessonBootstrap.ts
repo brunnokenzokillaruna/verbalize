@@ -21,6 +21,10 @@ import { fetchPregeneratedLessonWithWait } from '@/lib/waitForPregeneratedLesson
 import { deletePregeneratedLesson, getUserVocabulary, upsertVocabularyItem, tryStartPregeneratingLesson, abortPregeneratedLesson, getCachedImage } from '@/services/firestore';
 import { sanitizeVocabularyToken } from '@/lib/hookSanitize';
 import { MIN_VISUAL_REVIEW_ITEMS } from '@/utils/imageMatchBuilder';
+import { canonicalVocabKey } from '@/lib/vocabCanonical';
+import { filterHookVocabularyForKnownWords, filterKnownFromNewChunks } from '@/lib/hookVocabulary';
+import { collectDialogueTranslationTargets } from '@/lib/dialogueNarration';
+import { tooltipCacheKey } from '@/lib/wordTooltipUtils';
 import type {
   GrammarBridgeResult,
   Exercise,
