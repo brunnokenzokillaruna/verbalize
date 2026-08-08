@@ -192,9 +192,6 @@ export function VisualReviewSession({
             <p className="font-display text-[clamp(1.5rem,6vw,1.875rem)] font-bold text-text-primary break-words">
               {exercise.data.targetWord}
             </p>
-            <p className="text-sm text-text-secondary italic mt-1">
-              {exercise.data.translation}
-            </p>
             <div className="flex justify-center mt-3">
               <AudioPlayerButton text={exercise.data.targetWord} language={language} size="md" />
             </div>
