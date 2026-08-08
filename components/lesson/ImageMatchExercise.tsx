@@ -99,7 +99,7 @@ export function ImageMatchExercise({
 
           return (
             <button
-              key={option.imageUrl}
+              key={`${option.word}-${option.imageUrl}`}
               type="button"
               disabled={answered}
               onClick={() => handlePick(option.word)}

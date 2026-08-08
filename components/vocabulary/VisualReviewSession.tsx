@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Frame, Eye } from 'lucide-react';
 import { ImageMatchExercise } from '@/components/lesson/ImageMatchExercise';
 import { AudioPlayerButton } from '@/components/lesson/AudioPlayerButton';
@@ -63,10 +63,13 @@ export function VisualReviewSession({
     setSubmitTrigger(0);
   }, [currentIdx]);
 
-  const exercise =
-    state === 'running' && currentItem
-      ? buildImageMatchFromReviewWords(currentItem.word, imagePool)
-      : null;
+  // Build once per card. Rebuilding on every ready/selection re-render reshuffles options.
+  const exercise = useMemo(() => {
+    if (state !== 'running' || !currentItem) return null;
+    return buildImageMatchFromReviewWords(currentItem.word, imagePool);
+    // imagePool is captured when the card opens; do not reshuffle on parent re-renders.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- stabilize options for currentIdx
+  }, [state, currentIdx, currentItem?.word]);
 
   useEffect(() => {
     if (state !== 'running' || exercise || !currentItem) return;
