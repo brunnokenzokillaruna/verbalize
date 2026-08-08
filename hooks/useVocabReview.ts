@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
 import { generateVocabReview } from '@/app/actions/generateVocabReview';
 import type { VocabReviewItem } from '@/app/actions/generateVocabReview';
 import { updateVocabSrsAfterReview, markVocabularyProduced } from '@/services/firestore';
@@ -39,7 +39,8 @@ export function useVocabReview(
   const [lastCorrect, setLastCorrect] = useState<boolean | null>(null);
   const [results, setResults] = useState<ReviewResult[]>([]);
   const [savingResults, setSavingResults] = useState(false);
-  const { playAnswer } = useReviewSoundFeedback();
+  const { playAnswer, playCombo } = useReviewSoundFeedback();
+  const streakRef = useRef(0);
 
   const rawDueToday = useMemo(
     () => items.filter((item) => isDueForReview(item)),
@@ -100,6 +101,7 @@ export function useVocabReview(
     setCardIdx(0);
     setAnswered(false);
     setLastCorrect(null);
+    streakRef.current = 0;
     return session;
   }, [rawDueToday]);
 
@@ -268,9 +270,17 @@ export function useVocabReview(
       if (answered) return;
       setAnswered(true);
       setLastCorrect(correct);
-      playAnswer(correct);
+      if (correct) {
+        const nextStreak = streakRef.current + 1;
+        streakRef.current = nextStreak;
+        playAnswer(true);
+        if (nextStreak >= 2) playCombo(nextStreak);
+      } else {
+        streakRef.current = 0;
+        playAnswer(false);
+      }
     },
-    [answered, playAnswer],
+    [answered, playAnswer, playCombo],
   );
 
   const handleVisualContinue = useCallback(() => {
@@ -335,9 +345,17 @@ export function useVocabReview(
       if (answered) return;
       setAnswered(true);
       setLastCorrect(correct);
-      playAnswer(correct);
+      if (correct) {
+        const nextStreak = streakRef.current + 1;
+        streakRef.current = nextStreak;
+        playAnswer(true);
+        if (nextStreak >= 2) playCombo(nextStreak);
+      } else {
+        streakRef.current = 0;
+        playAnswer(false);
+      }
     },
-    [answered, playAnswer],
+    [answered, playAnswer, playCombo],
   );
 
   const handleContextContinue = useCallback(() => {

@@ -9,12 +9,13 @@ import { formatTranslationCorrectionHint, answersDifferOnlyByForm } from '@/lib/
 import { incrementProductionStats } from '@/services/firestore';
 import { useAuthStore } from '@/store/authStore';
 import { useLessonStore } from '@/store/lessonStore';
+import type { OnExerciseAnswer, ExerciseAnswerMeta } from '@/hooks/useSoundEffects';
 
 interface ReverseTranslationInputProps {
   data: ReverseTranslationData;
   language: string;
   level?: ProficiencyLevel;
-  onAnswer: (correct: boolean) => void;
+  onAnswer: OnExerciseAnswer;
   answered: boolean;
   setIsExerciseReady: (ready: boolean) => void;
   submitTrigger: number;
@@ -46,9 +47,9 @@ export function ReverseTranslationInput({
     !!level &&
     !(['A2', 'B1', 'B2', 'C1', 'C2'] as ProficiencyLevel[]).includes(level);
 
-  function reportProduction(correct: boolean) {
+  function reportProduction(correct: boolean, meta?: ExerciseAnswerMeta) {
     if (user) incrementProductionStats(user.uid, 'freeWrite', correct).catch(console.error);
-    onAnswer(correct);
+    onAnswer(correct, meta);
   }
   const [input, setInput] = useState('');
   const [hintOpen, setHintOpen] = useState(false);
@@ -99,7 +100,7 @@ export function ReverseTranslationInput({
     if (isAccentWarning) {
       setLastProductionPolishHint(`Atenção aos acentos na sua frase: ${data.target_translation}`);
       setAnswerStatus('accent-warning');
-      reportProduction(true);
+      reportProduction(true, { accentOnly: true });
       return;
     }
 

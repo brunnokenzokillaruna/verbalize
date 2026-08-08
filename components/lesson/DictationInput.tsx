@@ -5,11 +5,12 @@ import { ChevronDown } from 'lucide-react';
 import { AudioPlayerButton } from './AudioPlayerButton';
 import type { DictationData, SupportedLanguage } from '@/types';
 import { isAccentOnlyDiff } from '@/utils/accent';
+import type { OnExerciseAnswer } from '@/hooks/useSoundEffects';
 
 interface DictationInputProps {
   data: DictationData;
   language: SupportedLanguage;
-  onAnswer: (correct: boolean) => void;
+  onAnswer: OnExerciseAnswer;
   answered: boolean;
   setIsExerciseReady: (ready: boolean) => void;
   submitTrigger: number;
@@ -60,7 +61,9 @@ export function DictationInput({
     if (input.trim() === '' || answered) return;
     const status: AnswerStatus = isCorrect ? 'correct' : isAccentWarning ? 'accent-warning' : 'wrong';
     setAnswerStatus(status);
-    onAnswer(status === 'correct' || status === 'accent-warning');
+    onAnswer(status === 'correct' || status === 'accent-warning', {
+      accentOnly: status === 'accent-warning',
+    });
   }
 
   return (

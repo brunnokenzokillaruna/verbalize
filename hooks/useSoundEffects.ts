@@ -19,6 +19,14 @@ export type PlaySoundOptions = {
   soft?: boolean;
 };
 
+/** Optional metadata when reporting an exercise answer (SFX routing). */
+export type ExerciseAnswerMeta = {
+  /** Accepted answer that only differs by accents/diacritics. */
+  accentOnly?: boolean;
+};
+
+export type OnExerciseAnswer = (correct: boolean, meta?: ExerciseAnswerMeta) => void;
+
 const AMBIENT_SOUND_TYPES = new Set<SoundType>(['complete', 'perfect', 'combo', 'session-end']);
 
 function prefersReducedMotion(): boolean {

@@ -11,6 +11,7 @@ import { generateMistakeReview } from '@/app/actions/generateMistakeReview';
 import { CheckButton } from '@/components/lesson/CheckButton';
 import { LessonPracticeScreen } from '@/components/lesson/LessonPracticeScreen';
 import { useSoundEffects } from '@/hooks/useSoundEffects';
+import type { ExerciseAnswerMeta } from '@/hooks/useSoundEffects';
 import { MistakeReviewShell } from '@/components/mistakes/MistakeReviewShell';
 import { MistakeReviewIntro } from '@/components/mistakes/MistakeReviewIntro';
 import { MistakeReviewComplete } from '@/components/mistakes/MistakeReviewComplete';
@@ -91,10 +92,13 @@ function ReviewContent() {
     };
   }, [mistakeId, router, user]);
 
-  function handleAnswer(correct: boolean) {
+  function handleAnswer(correct: boolean, meta?: ExerciseAnswerMeta) {
     if (exerciseAnswer !== null) return;
     setExerciseAnswer(correct);
-    if (correct) {
+    if (meta?.accentOnly) {
+      setCorrectCount((n) => n + 1);
+      playSound('accent-warning');
+    } else if (correct) {
       setCorrectCount((n) => n + 1);
       playSound('correct');
     } else {

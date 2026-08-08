@@ -22,6 +22,7 @@ import type { DialogueSpeakerVoice } from '@/lib/dialogueVoiceAvatars';
 import type { NarratedTextRange } from '@/lib/dialogueNarration';
 import type { Exercise, LessonTag } from '@/types';
 import type { WordClickPayload } from '@/components/lesson/ClickableWord';
+import type { OnExerciseAnswer } from '@/hooks/useSoundEffects';
 
 type LessonPhaseContentProps = {
   phase: string;
@@ -38,8 +39,8 @@ type LessonPhaseContentProps = {
   speakerVoices: DialogueSpeakerVoice[];
   onAudioButton: () => void;
   onWordClick: (payload: WordClickPayload) => void;
-  onAnswer: (correct: boolean) => void;
-  onReviewAnswer: (correct: boolean) => void;
+  onAnswer: OnExerciseAnswer;
+  onReviewAnswer: OnExerciseAnswer;
   onAdvanceFromGrammar: () => void;
   comprehensionAnswered?: boolean;
   comprehensionLastCorrect?: boolean | null;

@@ -6,11 +6,12 @@ import { validateReverseTranslationLocal } from '@/lib/reverseTranslationValidat
 import { sanitizeFillGapDirectional } from '@/lib/fillGapDirectionalSanitize';
 import { incrementProductionStats } from '@/services/firestore';
 import { useAuthStore } from '@/store/authStore';
+import type { OnExerciseAnswer, ExerciseAnswerMeta } from '@/hooks/useSoundEffects';
 
 interface FillGapProductionExerciseProps {
   data: FillGapProductionData;
   language: string;
-  onAnswer: (correct: boolean) => void;
+  onAnswer: OnExerciseAnswer;
   answered: boolean;
   setIsExerciseReady: (ready: boolean) => void;
   submitTrigger: number;
@@ -66,9 +67,9 @@ export function FillGapProductionExercise({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [submitTrigger]);
 
-  function reportProduction(correct: boolean) {
+  function reportProduction(correct: boolean, meta?: ExerciseAnswerMeta) {
     if (user) incrementProductionStats(user.uid, 'freeWrite', correct).catch(console.error);
-    onAnswer(correct);
+    onAnswer(correct, meta);
   }
 
   function handleSubmit() {
@@ -91,7 +92,7 @@ export function FillGapProductionExercise({
 
     if (accentOnly) {
       setAnswerStatus('accent-warning');
-      reportProduction(true);
+      reportProduction(true, { accentOnly: true });
       return;
     }
 

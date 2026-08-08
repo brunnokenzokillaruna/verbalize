@@ -1,5 +1,6 @@
 import { Loader2 } from 'lucide-react';
 import { TAGS_WITH_GRAMMAR_PHASE } from '@/app/(app)/lesson/constants';
+import { useSoundEffects } from '@/hooks/useSoundEffects';
 import type { LessonPhase } from '@/store/lessonStore';
 import type { LessonTag } from '@/types';
 
@@ -41,17 +42,24 @@ export function LessonContinueButton({
   comprehensionAnswered,
   onAdvance,
 }: LessonContinueButtonProps) {
+  const { play } = useSoundEffects();
   const disabled =
     isLoading ||
     (phase === 'role-play' && !rolePlayComplete) ||
     (phase === 'comprehension' && !comprehensionAnswered);
+
+  function handleClick() {
+    if (disabled) return;
+    play('tap');
+    onAdvance();
+  }
 
   return (
     <div className="mt-10 animate-slide-up delay-300">
       <button
         type="button"
         disabled={disabled}
-        onClick={onAdvance}
+        onClick={handleClick}
         className={[
           'cta-shimmer relative flex w-full max-w-sm mx-auto items-center justify-center gap-2.5 overflow-hidden rounded-2xl px-6 py-4 text-base font-bold',
           'transition-all duration-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-primary',

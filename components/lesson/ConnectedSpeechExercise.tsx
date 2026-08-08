@@ -7,11 +7,12 @@ import type { ConnectedSpeechData, SupportedLanguage } from '@/types';
 import { isAccentOnlyDiff } from '@/utils/accent';
 import { incrementProductionStats } from '@/services/firestore';
 import { useAuthStore } from '@/store/authStore';
+import type { OnExerciseAnswer, ExerciseAnswerMeta } from '@/hooks/useSoundEffects';
 
 interface ConnectedSpeechExerciseProps {
   data: ConnectedSpeechData;
   language: SupportedLanguage;
-  onAnswer: (correct: boolean) => void;
+  onAnswer: OnExerciseAnswer;
   answered: boolean;
   setIsExerciseReady: (ready: boolean) => void;
   submitTrigger: number;
@@ -40,9 +41,9 @@ export function ConnectedSpeechExercise({
   const [hintOpen, setHintOpen] = useState(false);
   const [answerStatus, setAnswerStatus] = useState<AnswerStatus>('idle');
 
-  function reportProduction(correct: boolean) {
+  function reportProduction(correct: boolean, meta?: ExerciseAnswerMeta) {
     if (user) incrementProductionStats(user.uid, 'freeWrite', correct).catch(console.error);
-    onAnswer(correct);
+    onAnswer(correct, meta);
   }
 
   useEffect(() => {
@@ -69,7 +70,9 @@ export function ConnectedSpeechExercise({
     if (input.trim() === '' || answered) return;
     const status: AnswerStatus = isCorrect ? 'correct' : isAccentWarning ? 'accent-warning' : 'wrong';
     setAnswerStatus(status);
-    reportProduction(status === 'correct' || status === 'accent-warning');
+    reportProduction(status === 'correct' || status === 'accent-warning', {
+      accentOnly: status === 'accent-warning',
+    });
   }
 
   const isAnswered = answered || answerStatus !== 'idle';

@@ -9,11 +9,12 @@ import { formatTranslationCorrectionHint, answersDifferOnlyByForm } from '@/lib/
 import { incrementProductionStats } from '@/services/firestore';
 import { useAuthStore } from '@/store/authStore';
 import { useLessonStore } from '@/store/lessonStore';
+import type { OnExerciseAnswer, ExerciseAnswerMeta } from '@/hooks/useSoundEffects';
 
 interface TranslationWithConstraintExerciseProps {
   data: TranslationWithConstraintData;
   language: string;
-  onAnswer: (correct: boolean) => void;
+  onAnswer: OnExerciseAnswer;
   answered: boolean;
   setIsExerciseReady: (ready: boolean) => void;
   submitTrigger: number;
@@ -53,9 +54,9 @@ export function TranslationWithConstraintExercise({
 
   const frenchAccents = ['é', 'à', 'è', 'ù', 'ç', 'œ', 'ê', 'â', 'ô', 'î', 'ë', 'ï'];
 
-  function reportProduction(correct: boolean) {
+  function reportProduction(correct: boolean, meta?: ExerciseAnswerMeta) {
     if (user) incrementProductionStats(user.uid, 'freeWrite', correct).catch(console.error);
-    onAnswer(correct);
+    onAnswer(correct, meta);
   }
 
   useEffect(() => {
@@ -99,7 +100,7 @@ export function TranslationWithConstraintExercise({
 
     if (isAccentWarning) {
       setAnswerStatus('accent-warning');
-      reportProduction(true);
+      reportProduction(true, { accentOnly: true });
       return;
     }
 

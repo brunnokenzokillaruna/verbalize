@@ -13,6 +13,7 @@ import { SessionControls } from '@/features/roleplay-chat/components/SessionCont
 import { SupportButtons } from '@/features/roleplay-chat/components/SupportButtons';
 import type { RoleplayChatMessage, RoleplayDebriefResult } from '@/features/roleplay-chat/types';
 import { useLiveRoleplaySession } from '@/hooks/useLiveRoleplaySession';
+import { useSoundEffects } from '@/hooks/useSoundEffects';
 import { markSpontaneousProductionAccepted } from '@/lib/sessionProductionTracking';
 import { incrementProductionStats } from '@/services/firestore';
 import { useAuthStore } from '@/store/authStore';
@@ -53,6 +54,7 @@ export function LessonMissionLiveRolePlay({
   onFallbackToScripted,
 }: Props) {
   const { user } = useAuthStore();
+  const { play } = useSoundEffects();
   const startedRef = useRef(false);
   const finishedRef = useRef(false);
   const fallbackRef = useRef(false);
@@ -141,10 +143,20 @@ export function LessonMissionLiveRolePlay({
 
     const finish = (debrief: RoleplayDebriefResult | null) => {
       if (!isMountedRef.current) return;
+      const completedGoalIndexes = debrief?.completedGoalIndexes ?? [];
+      const goalTotal = config.scenario.goalsPt.length;
+      const goalDone = completedGoalIndexes.length;
+      if (goalTotal > 0 && goalDone >= goalTotal) {
+        play('perfect');
+      } else if (goalDone > 0 || userTurns > 0) {
+        play('complete');
+      } else {
+        play('session-end');
+      }
       onComplete({
         userTurns,
         debrief,
-        completedGoalIndexes: debrief?.completedGoalIndexes ?? [],
+        completedGoalIndexes,
       });
     };
 

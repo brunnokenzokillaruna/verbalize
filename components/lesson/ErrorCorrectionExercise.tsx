@@ -13,10 +13,11 @@ import {
   resolveErrorHighlightIndex,
   shouldHighlightErrorSpan,
 } from '@/utils/errorCorrection';
+import type { OnExerciseAnswer } from '@/hooks/useSoundEffects';
 
 interface ErrorCorrectionExerciseProps {
   data: ErrorCorrectionData;
-  onAnswer: (correct: boolean) => void;
+  onAnswer: OnExerciseAnswer;
   answered: boolean;
   setIsExerciseReady: (ready: boolean) => void;
   submitTrigger: number;
@@ -83,7 +84,9 @@ export function ErrorCorrectionExercise({
     if (answered || input.trim() === '') return;
     const status: AnswerStatus = isCorrect ? 'correct' : isAccentWarning ? 'accent-warning' : 'wrong';
     setAnswerStatus(status);
-    onAnswer(status === 'correct');
+    onAnswer(status === 'correct' || status === 'accent-warning', {
+      accentOnly: status === 'accent-warning',
+    });
   }
 
   const highlightIdx = resolveErrorHighlightIndex(exercise);

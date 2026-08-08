@@ -16,10 +16,26 @@ import {
   supportsDesirableDifficulty,
 } from '@/lib/practiceExercises/desirableDifficulty';
 import { markExerciseProductionVocabulary } from '@/lib/vocabProductionTracking';
+import type { ExerciseAnswerMeta } from '@/hooks/useSoundEffects';
 import type { Exercise } from '@/types';
 import type { User } from 'firebase/auth';
 
-type PlaySoundFn = (name: 'correct' | 'incorrect', options?: { soft?: boolean }) => void;
+type PlaySoundFn = (
+  name: 'correct' | 'incorrect' | 'accent-warning',
+  options?: { soft?: boolean },
+) => void;
+
+function playAnswerFeedback(
+  playSound: PlaySoundFn,
+  correct: boolean,
+  meta?: ExerciseAnswerMeta,
+) {
+  if (meta?.accentOnly) {
+    playSound('accent-warning');
+    return;
+  }
+  playSound(correct ? 'correct' : 'incorrect');
+}
 
 function getCorrectAnswerForBanner(
   exercise: Exercise | undefined,
@@ -131,7 +147,7 @@ export function useLessonExerciseHandlers(
   }, [store]);
 
   const finalizeAnswer = useCallback(
-    (correct: boolean) => {
+    (correct: boolean, meta?: ExerciseAnswerMeta) => {
       setExerciseAnswer(correct);
       setRetryNotice(null);
 
@@ -169,23 +185,23 @@ export function useLessonExerciseHandlers(
 
       if (phase === 'production') {
         store.recordCheckpointProduction(correct);
-        playSound(correct ? 'correct' : 'incorrect');
+        playAnswerFeedback(playSound, correct, meta);
         return;
       }
       if (correct) {
         store.recordCorrect();
-        playSound('correct');
+        playAnswerFeedback(playSound, correct, meta);
       } else if (store.lesson) {
         const exercise = store.exercises[store.exerciseIndex];
         if (exercise) store.recordMistake(exercise);
-        playSound('incorrect');
+        playAnswerFeedback(playSound, correct, meta);
       }
     },
     [phase, store, playSound, user?.uid],
   );
 
   const handleAnswer = useCallback(
-    (correct: boolean) => {
+    (correct: boolean, meta?: ExerciseAnswerMeta) => {
       if (exerciseAnswer !== null) return;
 
       const exercise =
@@ -208,7 +224,7 @@ export function useLessonExerciseHandlers(
         return;
       }
 
-      finalizeAnswer(correct);
+      finalizeAnswer(correct, meta);
     },
     [exerciseAnswer, phase, store, wrongAttempts, finalizeAnswer, playSound],
   );
@@ -218,7 +234,7 @@ export function useLessonExerciseHandlers(
   }, []);
 
   const handleReviewAnswer = useCallback(
-    (correct: boolean) => {
+    (correct: boolean, meta?: ExerciseAnswerMeta) => {
       if (exerciseAnswer !== null) return;
 
       const exercise = store.reviewExercises[store.reviewIndex];
@@ -239,9 +255,9 @@ export function useLessonExerciseHandlers(
       setRetryNotice(null);
       if (correct) {
         store.recordReviewCorrect();
-        playSound('correct');
+        playAnswerFeedback(playSound, correct, meta);
       } else {
-        playSound('incorrect');
+        playAnswerFeedback(playSound, correct, meta);
       }
     },
     [exerciseAnswer, store, wrongAttempts, playSound],

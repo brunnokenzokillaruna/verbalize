@@ -37,6 +37,7 @@ import {
 } from './ExerciseTypeShell';
 import type { Exercise, LessonTag, ProficiencyLevel, SupportedLanguage } from '@/types';
 import type { ImmersionMode } from '@/lib/immersion';
+import type { OnExerciseAnswer } from '@/hooks/useSoundEffects';
 
 interface LessonPracticeScreenProps {
   exercises: Exercise[];
@@ -50,7 +51,7 @@ interface LessonPracticeScreenProps {
   exerciseRetryKey?: number;
   /** Hook dialogue from the lesson — keeps listen-and-respond from replaying it. */
   lessonDialogue?: string;
-  onAnswer: (correct: boolean) => void;
+  onAnswer: OnExerciseAnswer;
   setIsExerciseReady: (ready: boolean) => void;
   submitTrigger: number;
 }
@@ -59,7 +60,7 @@ const sharedProps = (
   exerciseAnswer: boolean | null,
   setIsExerciseReady: (ready: boolean) => void,
   submitTrigger: number,
-  onAnswer: (correct: boolean) => void,
+  onAnswer: OnExerciseAnswer,
 ) => ({
   onAnswer,
   answered: exerciseAnswer !== null,

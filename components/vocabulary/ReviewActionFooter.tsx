@@ -31,6 +31,7 @@ export function ReviewActionFooter({
 
   function handlePrimaryAction() {
     if (answered) {
+      playTap();
       onContinue();
       return;
     }
