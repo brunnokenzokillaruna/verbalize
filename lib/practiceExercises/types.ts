@@ -1,5 +1,6 @@
 import type {
   GrammarBridgeResult,
+  LessonRole,
   LessonTag,
   ProficiencyLevel,
   SupportedLanguage,
@@ -13,6 +14,7 @@ export interface GeneratePracticeParams {
   theme?: string;
   uiTitle?: string;
   tag: LessonTag;
+  lessonRole?: LessonRole;
   language: SupportedLanguage;
   level: ProficiencyLevel;
   knownVocabulary: string[];

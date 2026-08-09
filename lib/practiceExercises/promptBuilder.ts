@@ -18,6 +18,7 @@ import { pickInterleavingWords, buildInterleavingPromptBlock } from './interleav
 import { resolveRequiredProductionType } from './productionTypes';
 import type { GeneratePracticeParams } from './types';
 import { buildPtBrVocabRule } from './validatePtBrText';
+import { buildLessonRolePromptGuidance } from '@/lib/curriculum/lessonTopic';
 
 export function buildDialogueAnchorBlock(): string {
   return `
@@ -56,6 +57,7 @@ export function buildPracticeExercisePrompt(params: GeneratePracticeParams): {
     theme,
     uiTitle,
     tag,
+    lessonRole,
     language,
     level,
     knownVocabulary,
@@ -105,6 +107,7 @@ export function buildPracticeExercisePrompt(params: GeneratePracticeParams): {
 
   const poolSection = poolTypes.map((t, i) => `${i + 1}. ${typeDescriptions[t]}`).join('\n\n');
   const tagGuidance = buildTagGuidance(tag, allowedSet, level, knownVocabulary.length);
+  const roleGuidance = buildLessonRolePromptGuidance(lessonRole);
   const grammarFocusGuidance = buildGrammarFocusExerciseGuidance(grammarFocus, language);
 
   const vocabConstraint = isEarlyLearner
@@ -177,7 +180,7 @@ ${previousTopicsBlock}
 ${grammarBridgeBlock}
 
 TAG-SPECIFIC EXERCISE BALANCE (follow this strictly):
-${tagGuidance}${grammarFocusGuidance}${productionRuleBlock}${interleavingBlock}${chainBlock}${dialogueAnchorBlock}${constraintBlock}
+${tagGuidance}${roleGuidance ? `\nPEDAGOGICAL ROLE:\n${roleGuidance}\n` : ''}${grammarFocusGuidance}${productionRuleBlock}${interleavingBlock}${chainBlock}${dialogueAnchorBlock}${constraintBlock}
 
 CRITICAL RULE: Do NOT copy or reuse any sentence from the dialogue above. Every exercise sentence must be ORIGINAL — newly created by you. The sentences should be related to the lesson's theme and grammar focus, but must be completely different from the dialogue lines.
 

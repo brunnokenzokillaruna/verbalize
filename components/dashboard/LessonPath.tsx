@@ -7,12 +7,15 @@ import { LessonNodePopover } from '@/components/dashboard/LessonNodePopover';
 import { getLessonNodeColors, getPathOffset } from '@/components/dashboard/utils';
 import type { LessonModalState } from '@/components/dashboard/types';
 import type { LessonDefinition } from '@/types';
+import { getTopicStage } from '@/lib/curriculum/lessonTopic';
 
 type ThemeGroup = { title: string; lessons: LessonDefinition[] };
 
 type LessonPathProps = {
   themes: ThemeGroup[];
   allLessons: LessonDefinition[];
+  /** Lessons for the selected CEFR level (for topicKey stage labels). */
+  levelLessons: LessonDefinition[];
   frontierIndex: number;
   isMobile: boolean;
   langName: string;
@@ -28,6 +31,7 @@ type LessonPathProps = {
 export function LessonPath({
   themes,
   allLessons,
+  levelLessons,
   frontierIndex,
   isMobile,
   langName,
@@ -99,6 +103,7 @@ export function LessonPath({
                 const nodeIcon = getTagIcon(lesson.tag ?? 'GRAM', iconSize);
                 const finalNodeColors = getLessonNodeColors(isCompleted, isCurrent, isMission);
                 const tagLabel = TAG_LABELS[lesson.tag ?? ''] ?? 'Gramática';
+                const topicStage = getTopicStage(lesson, levelLessons);
                 const isPopoverOpen = modalState.isOpen && modalState.lesson?.id === lesson.id;
 
                 return (
@@ -180,6 +185,14 @@ export function LessonPath({
                       >
                         {tagLabel}
                       </span>
+                      {topicStage && (
+                        <span
+                          className="text-[9px] font-semibold tracking-wide mt-0.5 select-none"
+                          style={{ color: 'var(--color-text-muted)' }}
+                        >
+                          {topicStage.label}
+                        </span>
+                      )}
 
                       {isPopoverOpen && (
                         <LessonNodePopover
@@ -187,6 +200,7 @@ export function LessonPath({
                           isLocked={isLocked}
                           isCompleted={isCompleted}
                           isMission={isMission}
+                          levelLessons={levelLessons}
                           popoverRef={popoverRef}
                           onStart={() => {
                             if (!isLocked) {

@@ -69,6 +69,7 @@ export function useLessonFlow({
       theme: store.lesson.theme,
       uiTitle: store.lesson.uiTitle,
       tag: store.lesson.tag,
+      lessonRole: store.lesson.lessonRole,
       language: store.lesson.language,
       level: store.lesson.level,
       knownVocabulary: store.knownVocabulary,
@@ -267,6 +268,7 @@ export function useLessonFlow({
           grammarFocus: store.lesson.tag === 'VOC' ? store.lesson.grammarFocus : store.hook.grammarFocus,
           language: store.lesson.language,
           tag: store.lesson.tag,
+          lessonRole: store.lesson.lessonRole,
         })
       );
       devLog(`[Timing] Grammar bridge (${fromCache ? 'do cache' : 'gerado agora'}): ${(performance.now() - tBridge).toFixed(0)}ms`);

@@ -353,6 +353,9 @@ export interface VocabImageResult {
 
 export type LessonTag = 'GRAM' | 'VOC' | 'DIAL' | 'MISS' | 'PRON' | 'VERB' | 'EXPR' | 'CULT' | 'REVIEW';
 
+/** Pedagogical role within a shared topicKey family. */
+export type LessonRole = 'introduce' | 'contrast' | 'reinforce' | 'practice';
+
 export interface LessonDefinition {
   id: string;
   language: SupportedLanguage;
@@ -361,6 +364,10 @@ export interface LessonDefinition {
   uiTitle?: string;
   grammarFocus: string;
   theme: string;
+  /** Links VOC→Confusão pairs and spiral revisits of the same topic. */
+  topicKey?: string;
+  /** How this lesson treats topicKey (first teach, contrast, spiral reinforce…). */
+  lessonRole?: LessonRole;
   arcCharacters?: { learner?: string; local?: string };
   arcSummary?: string;
 }

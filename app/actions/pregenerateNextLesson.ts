@@ -87,6 +87,7 @@ async function runPregenerateNextLesson(
       grammarFocus: lesson.tag === 'VOC' ? lesson.grammarFocus : hook.grammarFocus,
       language: lesson.language,
       tag: lesson.tag,
+      lessonRole: lesson.lessonRole,
     }).catch((err) => {
       console.error('[pregenerateNextLesson] grammar bridge error:', err);
       return null;
@@ -115,6 +116,7 @@ async function runPregenerateNextLesson(
     theme: lesson.theme,
     uiTitle: lesson.uiTitle,
     tag: lesson.tag,
+    lessonRole: lesson.lessonRole,
     language: lesson.language,
     level: lesson.level,
     knownVocabulary,

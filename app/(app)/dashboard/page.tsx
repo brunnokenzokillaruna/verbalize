@@ -331,6 +331,7 @@ export default function DashboardPage() {
         <LessonPath
           themes={themes}
           allLessons={allLessons}
+          levelLessons={levelLessons}
           frontierIndex={frontierIndex}
           isMobile={isMobile}
           langName={lang.name}

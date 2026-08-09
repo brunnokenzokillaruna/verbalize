@@ -1,12 +1,15 @@
 import type { RefObject } from 'react';
 import type { LessonDefinition } from '@/types';
 import { getCheckpointPopoverCopy } from '@/lib/curriculum/checkpointPresentation';
+import { getTopicStage } from '@/lib/curriculum/lessonTopic';
 
 type LessonNodePopoverProps = {
   lesson: LessonDefinition;
   isLocked: boolean;
   isCompleted: boolean;
   isMission: boolean;
+  /** Same CEFR level lessons — used to compute Etapa N/M for topicKey families. */
+  levelLessons?: LessonDefinition[];
   popoverRef: RefObject<HTMLDivElement | null>;
   onStart: () => void;
 };
@@ -16,18 +19,23 @@ export function LessonNodePopover({
   isLocked,
   isCompleted,
   isMission,
+  levelLessons = [],
   popoverRef,
   onStart,
 }: LessonNodePopoverProps) {
   const isCheckpoint = lesson.tag === 'REVIEW';
   const checkpointCopy = isCheckpoint ? getCheckpointPopoverCopy(lesson) : null;
   const [mainTitle, subTitle] = lesson.grammarFocus.split(' — ');
+  const topicStage = !isCheckpoint ? getTopicStage(lesson, levelLessons) : null;
 
   const title = checkpointCopy?.title ?? lesson.uiTitle ?? mainTitle;
+  const baseSubtitle = checkpointCopy?.subtitle
+    ?? (lesson.uiTitle ? lesson.grammarFocus : subTitle || lesson.theme);
   const subtitle = isLocked
     ? 'Complete todos os níveis acima pra desbloquear esse aqui!'
-    : checkpointCopy?.subtitle
-      ?? (lesson.uiTitle ? lesson.grammarFocus : subTitle || lesson.theme);
+    : topicStage
+      ? `${topicStage.label} — ${baseSubtitle}`
+      : baseSubtitle;
 
   const startLabel = isLocked
     ? 'Bloqueado'

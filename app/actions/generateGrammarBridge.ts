@@ -12,7 +12,8 @@ import {
   gateGrammarBridge,
 } from '@/lib/grammarBridge/verifyGrammarBridge';
 import { filterUniqueSurvivalTip } from '@/lib/grammarBridgeDedup';
-import type { SupportedLanguage, GrammarBridgeResult, LessonTag } from '@/types';
+import type { SupportedLanguage, GrammarBridgeResult, LessonTag, LessonRole } from '@/types';
+import { buildLessonRolePromptGuidance } from '@/lib/curriculum/lessonTopic';
 
 const MAX_REGEN_ATTEMPTS = 2;
 
@@ -74,6 +75,7 @@ interface GenerateGrammarBridgeParams {
   grammarFocus: string;
   language: SupportedLanguage;
   tag?: LessonTag;
+  lessonRole?: LessonRole;
 }
 
 function buildSystemPrompt(language: SupportedLanguage): string {
@@ -143,6 +145,7 @@ function buildUserPrompt(params: {
   grammarFocus: string;
   language: SupportedLanguage;
   tag?: LessonTag;
+  lessonRole?: LessonRole;
   verbSpotlightBlock: string;
   verbRulesBlock: string;
   correctionBlock?: string;
@@ -152,12 +155,14 @@ function buildUserPrompt(params: {
     grammarFocus,
     language,
     tag,
+    lessonRole,
     verbSpotlightBlock,
     verbRulesBlock,
     correctionBlock,
   } = params;
 
   const tagGuidance = buildTagBridgeGuidance(tag);
+  const roleGuidance = buildLessonRolePromptGuidance(lessonRole);
   const focusGuidance = buildGrammarFocusGuidance(grammarFocus, language);
   const durationGuidance = buildDurationGrammarFocusGuidance(grammarFocus, language);
   const completenessGuidance = buildFocusCompletenessPromptBlock(grammarFocus);
@@ -171,6 +176,7 @@ Contexto do diálogo:
 
 ORIENTAÇÃO POR TIPO DE LIÇÃO (tag: ${tag ?? 'GRAM'}):
 ${tagGuidance}
+${roleGuidance ? `\nORIENTAÇÃO POR PAPEL PEDAGÓGICO:\n${roleGuidance}\n` : ''}
 ${focusGuidance}
 ${completenessGuidance}
 ${durationGuidance}
@@ -370,7 +376,7 @@ function finalizeBridge(
 export async function generateGrammarBridge(
   params: GenerateGrammarBridgeParams,
 ): Promise<GrammarBridgeResult | null> {
-  const { dialogue, grammarFocus, language, tag } = params;
+  const { dialogue, grammarFocus, language, tag, lessonRole } = params;
 
   try {
     const systemPrompt = buildSystemPrompt(language);
@@ -390,6 +396,7 @@ export async function generateGrammarBridge(
         grammarFocus,
         language,
         tag,
+        lessonRole,
         verbSpotlightBlock,
         verbRulesBlock,
         correctionBlock,

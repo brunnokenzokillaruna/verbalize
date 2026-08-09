@@ -483,6 +483,7 @@ export function useLessonBootstrap({
           grammarFocus: hook.grammarFocus,
           language,
           tag: lesson.tag,
+          lessonRole: lesson.lessonRole,
         })
           .then((result) => {
             devLog(`[Timing] ✅ Prefetch grammar bridge terminou: ${(performance.now() - tBridge).toFixed(0)}ms`);
@@ -513,6 +514,7 @@ export function useLessonBootstrap({
               theme: lesson.theme,
               uiTitle: lesson.uiTitle,
               tag: lesson.tag,
+              lessonRole: lesson.lessonRole,
               language,
               level: lesson.level,
               knownVocabulary: store.knownVocabulary,
@@ -543,6 +545,7 @@ export function useLessonBootstrap({
             theme: lesson.theme,
             uiTitle: lesson.uiTitle,
             tag: lesson.tag,
+            lessonRole: lesson.lessonRole,
             language,
             level: lesson.level,
             knownVocabulary: store.knownVocabulary,

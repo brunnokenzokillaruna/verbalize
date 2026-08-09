@@ -371,7 +371,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Pegando a Chave",
     "grammarFocus": "Vocabulário: Bon",
-    "theme": "Tema 3: Check-in e Apresentações"
+    "theme": "Tema 3: Check-in e Apresentações",
+    "topicKey": "bon-bien",
+    "lessonRole": "introduce"
   },
   {
     "id": "fr-a1-039",
@@ -407,7 +409,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Uma Manhã de Sol",
     "grammarFocus": "Par de Confusão: Bon VS Bien",
-    "theme": "Tema 4: O Primeiro Café da Manhã"
+    "theme": "Tema 4: O Primeiro Café da Manhã",
+    "topicKey": "bon-bien",
+    "lessonRole": "contrast"
   },
   {
     "id": "fr-a1-043",
@@ -416,7 +420,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Passeando pela Calçada",
     "grammarFocus": "Vocabulário: Muito (Très)",
-    "theme": "Tema 4: O Primeiro Café da Manhã"
+    "theme": "Tema 4: O Primeiro Café da Manhã",
+    "topicKey": "tres-trop",
+    "lessonRole": "introduce"
   },
   {
     "id": "fr-a1-044",
@@ -452,7 +458,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Sentando na Mesa",
     "grammarFocus": "Vocabulário: Excesso (Trop)",
-    "theme": "Tema 4: O Primeiro Café da Manhã"
+    "theme": "Tema 4: O Primeiro Café da Manhã",
+    "topicKey": "tres-trop",
+    "lessonRole": "introduce"
   },
   {
     "id": "fr-a1-048",
@@ -461,7 +469,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Entrando no Bistrôzinho",
     "grammarFocus": "Par de Confusão: Très VS Trop",
-    "theme": "Tema 4: O Primeiro Café da Manhã"
+    "theme": "Tema 4: O Primeiro Café da Manhã",
+    "topicKey": "tres-trop",
+    "lessonRole": "contrast"
   },
   {
     "id": "fr-a1-049",
@@ -488,7 +498,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "A Bebida Quente e o Suco",
     "grammarFocus": "Vocabulário: Cuisiner",
-    "theme": "Tema 4: O Primeiro Café da Manhã"
+    "theme": "Tema 4: O Primeiro Café da Manhã",
+    "topicKey": "manger-cuisiner",
+    "lessonRole": "introduce"
   },
   {
     "id": "fr-a1-052",
@@ -497,7 +509,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Começo Forte",
     "grammarFocus": "Conjugação: Manger",
-    "theme": "Tema 4: O Primeiro Café da Manhã"
+    "theme": "Tema 4: O Primeiro Café da Manhã",
+    "topicKey": "manger-cuisiner",
+    "lessonRole": "practice"
   },
   {
     "id": "fr-a1-053",
@@ -515,7 +529,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Elogiando a Qualidade",
     "grammarFocus": "Par de Confusão: Manger VS Cuisiner",
-    "theme": "Tema 4: O Primeiro Café da Manhã"
+    "theme": "Tema 4: O Primeiro Café da Manhã",
+    "topicKey": "manger-cuisiner",
+    "lessonRole": "contrast"
   },
   {
     "id": "fr-a1-055",
@@ -677,7 +693,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Analisando o Mapa da Cidade",
     "grammarFocus": "Par de Confusão: Près de VS Proche de",
-    "theme": "Tema 6: Passeando e Explorando"
+    "theme": "Tema 6: Passeando e Explorando",
+    "topicKey": "pres-de-vs-proche-de",
+    "lessonRole": "contrast"
   },
   {
     "id": "fr-a1-073",
@@ -704,7 +722,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Calculando a Distância",
     "grammarFocus": "Conjugação: Venir",
-    "theme": "Tema 6: Passeando e Explorando"
+    "theme": "Tema 6: Passeando e Explorando",
+    "topicKey": "conj-venir",
+    "lessonRole": "introduce"
   },
   {
     "id": "fr-a1-076",
@@ -713,7 +733,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Pelas Calçadas Antigas",
     "grammarFocus": "Par de Confusão: Dans VS En",
-    "theme": "Tema 6: Passeando e Explorando"
+    "theme": "Tema 6: Passeando e Explorando",
+    "topicKey": "dans-vs-en",
+    "lessonRole": "contrast"
   },
   {
     "id": "fr-a1-077",
@@ -866,7 +888,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "As Histórias dos Pais",
     "grammarFocus": "Par de Confusão: Tu VS Vous",
-    "theme": "Tema 7: Novas Amizades e A Família"
+    "theme": "Tema 7: Novas Amizades e A Família",
+    "topicKey": "tu-vs-vous",
+    "lessonRole": "contrast"
   },
   {
     "id": "fr-a1-094",
@@ -893,7 +917,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Perguntas Educadas",
     "grammarFocus": "Par de Confusão: On VS Nous",
-    "theme": "Tema 7: Novas Amizades e A Família"
+    "theme": "Tema 7: Novas Amizades e A Família",
+    "topicKey": "on-vs-nous",
+    "lessonRole": "contrast"
   },
   {
     "id": "fr-a1-097",
@@ -911,7 +937,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "O Tempo Passa Rápido",
     "grammarFocus": "Par de Confusão: Tard VS En retard",
-    "theme": "Tema 7: Novas Amizades e A Família"
+    "theme": "Tema 7: Novas Amizades e A Família",
+    "topicKey": "tard-vs-en-retard",
+    "lessonRole": "contrast"
   },
   {
     "id": "fr-a1-099",
@@ -1100,25 +1128,27 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Organizando as Coisas",
     "grammarFocus": "Par de Confusão: Devoir VS Falloir",
-    "theme": "Tema 9: Minha Casa, Minha Rotina"
+    "theme": "Tema 9: Minha Casa, Minha Rotina",
+    "topicKey": "devoir-vs-falloir",
+    "lessonRole": "contrast"
   },
   {
+    "id": "fr-a2-120",
+    "language": "fr",
     "level": "A2",
     "tag": "REVIEW",
     "uiTitle": "Checkpoint — lições 111–120",
     "grammarFocus": "Revisão: lições 111–120",
-    "theme": "Tema 9: Minha Casa, Minha Rotina",
-    "language": "fr",
-    "id": "fr-a2-120"
+    "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
+    "id": "fr-a2-121",
+    "language": "fr",
     "level": "A2",
     "tag": "PRON",
     "uiTitle": "O R Francês",
     "grammarFocus": "O Som Vibrante do R (Uvular e Liaison com R)",
-    "theme": "Tema 9: Minha Casa, Minha Rotina",
-    "language": "fr",
-    "id": "fr-a2-121"
+    "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
     "id": "fr-a2-122",
@@ -1179,9 +1209,11 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
-    "uiTitle": "Passos da Vida",
+    "uiTitle": "Responder no Presente",
     "grammarFocus": "Conjugação: Répondre",
-    "theme": "Tema 9: Minha Casa, Minha Rotina"
+    "theme": "Tema 9: Minha Casa, Minha Rotina",
+    "topicKey": "conj-repondre",
+    "lessonRole": "introduce"
   },
   {
     "id": "fr-a2-129",
@@ -1316,7 +1348,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Organização",
     "grammarFocus": "Par de Confusão: Vite VS Rapide",
-    "theme": "Tema 10: O Mercado e a Cozinha"
+    "theme": "Tema 10: O Mercado e a Cozinha",
+    "topicKey": "vite-vs-rapide",
+    "lessonRole": "contrast"
   },
   {
     "id": "fr-a2-144",
@@ -1343,7 +1377,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Sábado à Noite",
     "grammarFocus": "Par de Confusão: Passé Composé VS Passé Récent",
-    "theme": "Tema 11: Contando o Final de Semana"
+    "theme": "Tema 11: Contando o Final de Semana",
+    "topicKey": "passe-compose-vs-passe-recent",
+    "lessonRole": "contrast"
   },
   {
     "id": "fr-a2-147",
@@ -1387,7 +1423,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "level": "A2",
     "tag": "VOC",
     "uiTitle": "As Risadas Mútuas",
-    "grammarFocus": "Vocabulário de Tempo: Desde (Depuis)",
+    "grammarFocus": "Vocabulário de Tempo: Depuis",
     "theme": "Tema 11: Contando o Final de Semana"
   },
   {
@@ -1396,8 +1432,10 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "level": "A2",
     "tag": "GRAM",
     "uiTitle": "Reações do Amigo",
-    "grammarFocus": "Par de Confusão: Pendant VS Desde (Depuis)",
-    "theme": "Tema 11: Contando o Final de Semana"
+    "grammarFocus": "Par de Confusão: Pendant VS Depuis",
+    "theme": "Tema 11: Contando o Final de Semana",
+    "topicKey": "pendant-vs-depuis",
+    "lessonRole": "contrast"
   },
   {
     "id": "fr-a2-153",
@@ -1460,7 +1498,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "A Diferença é Clara",
     "grammarFocus": "Prática: Entrevista de Trajetória Pessoal",
-    "theme": "Tema 12: Expressando Opiniões e Comparações"
+    "theme": "Tema 12: Comparações e Pares de Confusão"
   },
   {
     "id": "fr-a2-160",
@@ -1469,7 +1507,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "REVIEW",
     "uiTitle": "Checkpoint — lições 151–160",
     "grammarFocus": "Revisão: lições 151–160",
-    "theme": "Tema 12: Expressando Opiniões e Comparações"
+    "theme": "Tema 12: Comparações e Pares de Confusão"
   },
   {
     "id": "fr-a2-161",
@@ -1478,7 +1516,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Não Tão Bom Assim",
     "grammarFocus": "Vocabulário: Connaître",
-    "theme": "Tema 12: Expressando Opiniões e Comparações"
+    "theme": "Tema 12: Comparações e Pares de Confusão",
+    "topicKey": "savoir-connaitre",
+    "lessonRole": "introduce"
   },
   {
     "id": "fr-a2-162",
@@ -1487,7 +1527,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Avaliando o Custo",
     "grammarFocus": "Par de Confusão: Savoir VS Connaître",
-    "theme": "Tema 12: Expressando Opiniões e Comparações"
+    "theme": "Tema 12: Comparações e Pares de Confusão",
+    "topicKey": "savoir-connaitre",
+    "lessonRole": "contrast"
   },
   {
     "id": "fr-a2-163",
@@ -1496,7 +1538,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "EXPR",
     "uiTitle": "O Critério Principal",
     "grammarFocus": "5 Expressões com o verbo Être",
-    "theme": "Tema 12: Expressando Opiniões e Comparações"
+    "theme": "Tema 12: Comparações e Pares de Confusão"
   },
   {
     "id": "fr-a2-164",
@@ -1505,7 +1547,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "O Crítico de Plantão",
     "grammarFocus": "Vocabulário: Apporter e Emporter",
-    "theme": "Tema 12: Expressando Opiniões e Comparações"
+    "theme": "Tema 12: Comparações e Pares de Confusão",
+    "topicKey": "apporter-emporter",
+    "lessonRole": "introduce"
   },
   {
     "id": "fr-a2-165",
@@ -1514,7 +1558,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "O Degrau Acima",
     "grammarFocus": "Par de Confusão: Apporter VS Emporter",
-    "theme": "Tema 12: Expressando Opiniões e Comparações"
+    "theme": "Tema 12: Comparações e Pares de Confusão",
+    "topicKey": "apporter-emporter",
+    "lessonRole": "contrast"
   },
   {
     "id": "fr-a2-166",
@@ -1523,7 +1569,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "EXPR",
     "uiTitle": "Veredito Pessoal",
     "grammarFocus": "5 Expressões com o verbo Avoir",
-    "theme": "Tema 12: Expressando Opiniões e Comparações"
+    "theme": "Tema 12: Comparações e Pares de Confusão"
   },
   {
     "id": "fr-a2-167",
@@ -1532,7 +1578,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "O Fim do Jogo",
     "grammarFocus": "Vocabulário: Amener e Emmener",
-    "theme": "Tema 12: Expressando Opiniões e Comparações"
+    "theme": "Tema 12: Comparações e Pares de Confusão",
+    "topicKey": "amener-emmener",
+    "lessonRole": "introduce"
   },
   {
     "id": "fr-a2-168",
@@ -1541,7 +1589,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Notas do Avaliador",
     "grammarFocus": "Par de Confusão: Amener VS Emmener",
-    "theme": "Tema 12: Expressando Opiniões e Comparações"
+    "theme": "Tema 12: Comparações e Pares de Confusão",
+    "topicKey": "amener-emmener",
+    "lessonRole": "contrast"
   },
   {
     "id": "fr-a2-169",
@@ -1550,7 +1600,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Perspectiva",
     "grammarFocus": "Vocabulário: Rentrer e Revenir",
-    "theme": "Tema 12: Expressando Opiniões e Comparações"
+    "theme": "Tema 12: Comparações e Pares de Confusão",
+    "topicKey": "rentrer-revenir-retourner",
+    "lessonRole": "introduce"
   },
   {
     "id": "fr-a2-170",
@@ -1559,16 +1611,18 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "REVIEW",
     "uiTitle": "Checkpoint — lições 161–170",
     "grammarFocus": "Revisão: lições 161–170",
-    "theme": "Tema 12: Expressando Opiniões e Comparações"
+    "theme": "Tema 12: Comparações e Pares de Confusão"
   },
   {
     "id": "fr-a2-171",
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
-    "uiTitle": "Bancando o Juíz",
+    "uiTitle": "Bancando o Juiz",
     "grammarFocus": "Par de Confusão: Rentrer VS Revenir VS Retourner",
-    "theme": "Tema 12: Expressando Opiniões e Comparações"
+    "theme": "Tema 12: Comparações e Pares de Confusão",
+    "topicKey": "rentrer-revenir-retourner",
+    "lessonRole": "contrast"
   },
   {
     "id": "fr-a2-172",
@@ -1577,7 +1631,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Fechamento",
     "grammarFocus": "Par de Confusão: Entendre VS Écouter",
-    "theme": "Tema 12: Expressando Opiniões e Comparações"
+    "theme": "Tema 12: Comparações e Pares de Confusão",
+    "topicKey": "entendre-vs-ecouter",
+    "lessonRole": "contrast"
   },
   {
     "id": "fr-a2-173",
@@ -1586,7 +1642,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Tudo Certo",
     "grammarFocus": "Par de Confusão: Voir VS Regarder",
-    "theme": "Tema 12: Expressando Opiniões e Comparações"
+    "theme": "Tema 12: Comparações e Pares de Confusão",
+    "topicKey": "voir-vs-regarder",
+    "lessonRole": "contrast"
   },
   {
     "id": "fr-a2-174",
@@ -1613,7 +1671,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Um Acorde Distante",
     "grammarFocus": "Par de Confusão: Avoir mal à VS Avoir du mal à",
-    "theme": "Tema 13: Clima, Natureza e Passeios"
+    "theme": "Tema 13: Clima, Natureza e Passeios",
+    "topicKey": "avoir-mal",
+    "lessonRole": "contrast"
   },
   {
     "id": "fr-a2-177",
@@ -1643,13 +1703,13 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
+    "id": "fr-a2-180",
+    "language": "fr",
     "level": "A2",
     "tag": "REVIEW",
     "uiTitle": "Checkpoint — lições 171–180",
     "grammarFocus": "Revisão: lições 171–180",
-    "theme": "Tema 13: Clima, Natureza e Passeios",
-    "language": "fr",
-    "id": "fr-a2-180"
+    "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
     "id": "fr-a2-181",
@@ -1661,13 +1721,13 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
+    "id": "fr-a2-182",
+    "language": "fr",
     "level": "A2",
     "tag": "MISS",
     "uiTitle": "Comprando o Bilhete",
     "grammarFocus": "Metro, RER e Navigo: Bilhetes e Correspondance",
-    "theme": "Tema 13: Clima, Natureza e Passeios",
-    "language": "fr",
-    "id": "fr-a2-182"
+    "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
     "id": "fr-a2-183",
@@ -1730,7 +1790,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Voltando",
     "grammarFocus": "Saúde e Corpo: Avoir mal à",
-    "theme": "Tema 13: Clima, Natureza e Passeios"
+    "theme": "Tema 13: Clima, Natureza e Passeios",
+    "topicKey": "avoir-mal",
+    "lessonRole": "reinforce"
   },
   {
     "id": "fr-a2-190",
@@ -1748,7 +1810,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "O Refúgio do Café",
     "grammarFocus": "Par de Confusão: Encore VS Toujours",
-    "theme": "Tema 14: Rotina do Escritório e da Cidade"
+    "theme": "Tema 14: Rotina do Escritório e da Cidade",
+    "topicKey": "encore-vs-toujours",
+    "lessonRole": "contrast"
   },
   {
     "id": "fr-a2-192",
@@ -1760,13 +1824,13 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 14: Rotina do Escritório e da Cidade"
   },
   {
+    "id": "fr-a2-193",
+    "language": "fr",
     "level": "A2",
     "tag": "PRON",
     "uiTitle": "Liaison Obrigatória",
     "grammarFocus": "Liaison Avançada: Obrigatória vs Proibida",
-    "theme": "Tema 14: Rotina do Escritório e da Cidade",
-    "language": "fr",
-    "id": "fr-a2-193"
+    "theme": "Tema 14: Rotina do Escritório e da Cidade"
   },
   {
     "id": "fr-a2-194",
@@ -1784,7 +1848,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Conversa no Corredor",
     "grammarFocus": "Par de Confusão: Déjà VS Jamais",
-    "theme": "Tema 14: Rotina do Escritório e da Cidade"
+    "theme": "Tema 14: Rotina do Escritório e da Cidade",
+    "topicKey": "deja-vs-jamais",
+    "lessonRole": "contrast"
   },
   {
     "id": "fr-a2-196",
@@ -1802,7 +1868,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "A Reunião do Projeto",
     "grammarFocus": "Par de Confusão: Tant pis VS Tant mieux",
-    "theme": "Tema 14: Rotina do Escritório e da Cidade"
+    "theme": "Tema 14: Rotina do Escritório e da Cidade",
+    "topicKey": "tant-pis-vs-tant-mieux",
+    "lessonRole": "contrast"
   },
   {
     "id": "fr-a2-198",
@@ -1811,7 +1879,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Responsabilidade Diária",
     "grammarFocus": "Par de Confusão: Visiter VS Rendre visite à",
-    "theme": "Tema 14: Rotina do Escritório e da Cidade"
+    "theme": "Tema 14: Rotina do Escritório e da Cidade",
+    "topicKey": "visiter-vs-rendre-visite-a",
+    "lessonRole": "contrast"
   },
   {
     "id": "fr-a2-199",
@@ -1820,7 +1890,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "O Ponto Final",
     "grammarFocus": "Par de Confusão: Leur VS Leurs",
-    "theme": "Tema 14: Rotina do Escritório e da Cidade"
+    "theme": "Tema 14: Rotina do Escritório e da Cidade",
+    "topicKey": "leur-vs-leurs",
+    "lessonRole": "contrast"
   },
   {
     "id": "fr-a2-200",
@@ -1838,25 +1910,27 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "A Dor Oculta",
     "grammarFocus": "Conjugação: Mettre",
-    "theme": "Tema 15: Saúde e Farmácia"
+    "theme": "Tema 15: Saúde e Farmácia",
+    "topicKey": "conj-mettre",
+    "lessonRole": "introduce"
   },
   {
+    "id": "fr-a2-202",
+    "language": "fr",
     "level": "A2",
     "tag": "DIAL",
     "uiTitle": "Na Consulta Médica",
     "grammarFocus": "5 Frases para Consultas: Rendez-vous, Symptômes e Ordonnance",
-    "theme": "Tema 15: Saúde e Farmácia",
-    "language": "fr",
-    "id": "fr-a2-202"
+    "theme": "Tema 15: Saúde e Farmácia"
   },
   {
+    "id": "fr-a2-203",
+    "language": "fr",
     "level": "A2",
     "tag": "VOC",
     "uiTitle": "Abrir uma Conta",
     "grammarFocus": "Vocabulário: Banque, Compte, RIB e Préfecture",
-    "theme": "Tema 15: Saúde e Farmácia",
-    "language": "fr",
-    "id": "fr-a2-203"
+    "theme": "Tema 15: Saúde e Farmácia"
   },
   {
     "id": "fr-a2-204",
@@ -1874,7 +1948,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "A Busca pelo Alívio",
     "grammarFocus": "Conjugação: Prendre",
-    "theme": "Tema 15: Saúde e Farmácia"
+    "theme": "Tema 15: Saúde e Farmácia",
+    "topicKey": "conj-prendre",
+    "lessonRole": "introduce"
   },
   {
     "id": "fr-a2-206",
@@ -1892,7 +1968,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "O Remédio Necessário",
     "grammarFocus": "Conjugação: Lire",
-    "theme": "Tema 15: Saúde e Farmácia"
+    "theme": "Tema 15: Saúde e Farmácia",
+    "topicKey": "conj-lire",
+    "lessonRole": "introduce"
   },
   {
     "id": "fr-a2-208",
@@ -1910,7 +1988,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "A Cura Gradual",
     "grammarFocus": "Conjugação: Écrire",
-    "theme": "Tema 15: Saúde e Farmácia"
+    "theme": "Tema 15: Saúde e Farmácia",
+    "topicKey": "conj-ecrire",
+    "lessonRole": "introduce"
   },
   {
     "id": "fr-a2-210",
@@ -1922,13 +2002,13 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 15: Saúde e Farmácia"
   },
   {
+    "id": "fr-a2-211",
+    "language": "fr",
     "level": "A2",
     "tag": "GRAM",
     "uiTitle": "Ação em Andamento",
     "grammarFocus": "Gérondif e Être en train de + Infinitif",
-    "theme": "Tema 15: Saúde e Farmácia",
-    "language": "fr",
-    "id": "fr-a2-211"
+    "theme": "Tema 15: Saúde e Farmácia"
   },
   {
     "id": "fr-a2-212",
@@ -1937,7 +2017,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Recuperação",
     "grammarFocus": "Conjugação: Croire",
-    "theme": "Tema 15: Saúde e Farmácia"
+    "theme": "Tema 15: Saúde e Farmácia",
+    "topicKey": "conj-croire",
+    "lessonRole": "introduce"
   },
   {
     "id": "fr-a2-213",
@@ -1958,13 +2040,13 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
+    "id": "fr-b1-215",
+    "language": "fr",
     "level": "B1",
     "tag": "PRON",
     "uiTitle": "Entonação e Ritmo",
     "grammarFocus": "Intonação em Perguntas, Negação e Ênfase",
-    "theme": "Tema 16: Relembrando a Infância",
-    "language": "fr",
-    "id": "fr-b1-215"
+    "theme": "Tema 16: Relembrando a Infância"
   },
   {
     "id": "fr-b1-216",
@@ -2063,7 +2145,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Lá e Cá",
     "grammarFocus": "Par de Confusão: Qui VS Que (Relativos)",
-    "theme": "Tema 16: Relembrando a Infância"
+    "theme": "Tema 16: Relembrando a Infância",
+    "topicKey": "qui-vs-que-relativos",
+    "lessonRole": "contrast"
   },
   {
     "id": "fr-b1-227",
@@ -2072,7 +2156,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Visão do Hoje",
     "grammarFocus": "Par de Confusão: Lequel, Laquelle, Lesquels, Lesquelles",
-    "theme": "Tema 16: Relembrando a Infância"
+    "theme": "Tema 16: Relembrando a Infância",
+    "topicKey": "lequel-laquelle-lesquels-lesquelles",
+    "lessonRole": "contrast"
   },
   {
     "id": "fr-b1-228",
@@ -2093,13 +2179,13 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
+    "id": "fr-b1-230",
+    "language": "fr",
     "level": "B1",
     "tag": "REVIEW",
     "uiTitle": "Checkpoint — lições 221–230",
     "grammarFocus": "Revisão: lições 221–230",
-    "theme": "Tema 17: Fofocas e Histórias Indiretas",
-    "language": "fr",
-    "id": "fr-b1-230"
+    "theme": "Tema 16: Relembrando a Infância"
   },
   {
     "id": "fr-b1-231",
@@ -2117,7 +2203,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "A Caixa de Fotografias",
     "grammarFocus": "Par de Confusão: Quand VS Lorsque",
-    "theme": "Tema 16: Relembrando a Infância"
+    "theme": "Tema 16: Relembrando a Infância",
+    "topicKey": "quand-vs-lorsque",
+    "lessonRole": "contrast"
   },
   {
     "id": "fr-b1-233",
@@ -2159,7 +2247,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "id": "fr-b1-237",
     "language": "fr",
     "level": "B1",
-    "tag": "VOC",
+    "tag": "GRAM",
     "uiTitle": "Trocando Recados no Portão",
     "grammarFocus": "Conjunções: Mais, ou, et, donc, or, ni, car",
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
@@ -2195,7 +2283,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "id": "fr-b1-241",
     "language": "fr",
     "level": "B1",
-    "tag": "VOC",
+    "tag": "GRAM",
     "uiTitle": "Lembrando do que Ouviu",
     "grammarFocus": "Conjunções: Parce que, quand, si, comme, puisque",
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
@@ -2225,7 +2313,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Concluindo a Fofoca",
     "grammarFocus": "Par de Confusão: Parce que VS Car",
-    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+    "theme": "Tema 17: Fofocas e Histórias Indiretas",
+    "topicKey": "parce-que-vs-car",
+    "lessonRole": "contrast"
   },
   {
     "id": "fr-b1-245",
@@ -2261,7 +2351,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Encerrando a Manhã",
     "grammarFocus": "Par de Confusão: Puisque VS Comme",
-    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+    "theme": "Tema 17: Fofocas e Histórias Indiretas",
+    "topicKey": "puisque-vs-comme",
+    "lessonRole": "contrast"
   },
   {
     "id": "fr-b1-249",
@@ -2270,7 +2362,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Voltando ao Tópico",
     "grammarFocus": "Par de Confusão: Penser à VS Penser de",
-    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+    "theme": "Tema 17: Fofocas e Histórias Indiretas",
+    "topicKey": "penser-a-vs-penser-de",
+    "lessonRole": "contrast"
   },
   {
     "id": "fr-b1-250",
@@ -2282,22 +2376,22 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
+    "id": "fr-b1-251",
+    "language": "fr",
     "level": "B1",
     "tag": "MISS",
     "uiTitle": "Jantar Reservado",
     "grammarFocus": "Au Restaurant: Réservation, Menu, Addition et Pourboire",
-    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro",
-    "language": "fr",
-    "id": "fr-b1-251"
+    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
+    "id": "fr-b1-252",
+    "language": "fr",
     "level": "B1",
     "tag": "CULT",
     "uiTitle": "Carte Vitale e Mutuelle",
     "grammarFocus": "Système de Santé Français: Carte Vitale et Mutuelle",
-    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro",
-    "language": "fr",
-    "id": "fr-b1-252"
+    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
     "id": "fr-b1-253",
@@ -2306,7 +2400,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Enfatizando Culpados",
     "grammarFocus": "Pronomes Enfáticos: Mesmo (Même)",
-    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
     "id": "fr-b1-254",
@@ -2315,7 +2409,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Palavras Indefinidas",
     "grammarFocus": "Adjetivos Indefinidos: Chaque, certain, plusieurs, quelque",
-    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
     "id": "fr-b1-255",
@@ -2324,7 +2418,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Antes ou Depois do Substantivo",
     "grammarFocus": "Adjetivos: Mudança de Sentido pela posição",
-    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
     "id": "fr-b1-256",
@@ -2396,7 +2490,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Possibilidades Várias",
     "grammarFocus": "Vocabulário: Sortir, Partir, Quitter e Laisser",
-    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
+    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro",
+    "topicKey": "sortir-partir-quitter-laisser",
+    "lessonRole": "introduce"
   },
   {
     "id": "fr-b1-264",
@@ -2405,7 +2501,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Deixando Voar",
     "grammarFocus": "Par de Confusão: Sortir VS Partir VS Quitter VS Laisser",
-    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
+    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro",
+    "topicKey": "sortir-partir-quitter-laisser",
+    "lessonRole": "contrast"
   },
   {
     "id": "fr-b1-265",
@@ -2432,7 +2530,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "O Resgate",
     "grammarFocus": "Vocabulário: Avoir mal à e Avoir du mal à",
-    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
+    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro",
+    "topicKey": "avoir-mal",
+    "lessonRole": "reinforce"
   },
   {
     "id": "fr-b1-268",
@@ -2495,7 +2595,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Revisando o Currículo",
     "grammarFocus": "Par de Confusão: Faire mal à VS Faire du mal",
-    "theme": "Tema 19: Vida Profissional e Entrevistas"
+    "theme": "Tema 19: Vida Profissional e Entrevistas",
+    "topicKey": "faire-mal-a-vs-faire-du-mal",
+    "lessonRole": "contrast"
   },
   {
     "id": "fr-b1-275",
@@ -2522,7 +2624,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Apresentando a Trajetória",
     "grammarFocus": "Par de Confusão: Souligner VS Surligner",
-    "theme": "Tema 19: Vida Profissional e Entrevistas"
+    "theme": "Tema 19: Vida Profissional e Entrevistas",
+    "topicKey": "souligner-vs-surligner",
+    "lessonRole": "contrast"
   },
   {
     "id": "fr-b1-278",
@@ -2540,7 +2644,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Escrevendo um E-mail de Follow-up",
     "grammarFocus": "Conjugação: Écrire",
-    "theme": "Tema 19: Vida Profissional e Entrevistas"
+    "theme": "Tema 19: Vida Profissional e Entrevistas",
+    "topicKey": "conj-ecrire",
+    "lessonRole": "reinforce"
   },
   {
     "id": "fr-b1-280",
@@ -2558,7 +2664,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "O Teste Técnico",
     "grammarFocus": "Conjugação: Lire",
-    "theme": "Tema 19: Vida Profissional e Entrevistas"
+    "theme": "Tema 19: Vida Profissional e Entrevistas",
+    "topicKey": "conj-lire",
+    "lessonRole": "reinforce"
   },
   {
     "id": "fr-b1-282",
@@ -2567,7 +2675,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "A Pergunta Difícil",
     "grammarFocus": "Par de Confusão: Rappeler VS Se rappeler VS Se souvenir",
-    "theme": "Tema 19: Vida Profissional e Entrevistas"
+    "theme": "Tema 19: Vida Profissional e Entrevistas",
+    "topicKey": "rappeler-vs-se-rappeler-vs-se-souvenir",
+    "lessonRole": "contrast"
   },
   {
     "id": "fr-b1-283",
@@ -2576,7 +2686,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "O Desafio Final",
     "grammarFocus": "Conjugação: Répondre",
-    "theme": "Tema 19: Vida Profissional e Entrevistas"
+    "theme": "Tema 19: Vida Profissional e Entrevistas",
+    "topicKey": "conj-repondre",
+    "lessonRole": "reinforce"
   },
   {
     "id": "fr-b1-284",
@@ -2594,7 +2706,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "A Segunda Rodada",
     "grammarFocus": "Conjugação: Prendre",
-    "theme": "Tema 19: Vida Profissional e Entrevistas"
+    "theme": "Tema 19: Vida Profissional e Entrevistas",
+    "topicKey": "conj-prendre",
+    "lessonRole": "reinforce"
   },
   {
     "id": "fr-b1-286",
@@ -2603,7 +2717,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "A Oferta Chega",
     "grammarFocus": "Conjugação: Mettre",
-    "theme": "Tema 19: Vida Profissional e Entrevistas"
+    "theme": "Tema 19: Vida Profissional e Entrevistas",
+    "topicKey": "conj-mettre",
+    "lessonRole": "reinforce"
   },
   {
     "id": "fr-b1-287",
@@ -2666,7 +2782,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "O Post Viral",
     "grammarFocus": "Par de Confusão: Tout à coup VS Tout d'un coup",
-    "theme": "Tema 20: Expressões e Redes Sociais"
+    "theme": "Tema 20: Expressões e Redes Sociais",
+    "topicKey": "tout-a-coup-vs-tout-d-un-coup",
+    "lessonRole": "contrast"
   },
   {
     "id": "fr-b1-294",
@@ -2684,7 +2802,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Comentários nas Stories",
     "grammarFocus": "Conjugação: Croire",
-    "theme": "Tema 20: Expressões e Redes Sociais"
+    "theme": "Tema 20: Expressões e Redes Sociais",
+    "topicKey": "conj-croire",
+    "lessonRole": "reinforce"
   },
   {
     "id": "fr-b1-296",
@@ -2693,7 +2813,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Tache ou Tâche?",
     "grammarFocus": "Par de Confusão: Une tâche VS Une tache",
-    "theme": "Tema 20: Expressões e Redes Sociais"
+    "theme": "Tema 20: Expressões e Redes Sociais",
+    "topicKey": "une-tache-vs-une-tache",
+    "lessonRole": "contrast"
   },
   {
     "id": "fr-b1-297",
@@ -2720,7 +2842,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "A Diferença é Fundamental",
     "grammarFocus": "Par de Confusão: En plus VS De plus",
-    "theme": "Tema 20: Expressões e Redes Sociais"
+    "theme": "Tema 20: Expressões e Redes Sociais",
+    "topicKey": "en-plus-vs-de-plus",
+    "lessonRole": "contrast"
   },
   {
     "id": "fr-b1-300",
@@ -2738,7 +2862,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "O Comentário Ambíguo",
     "grammarFocus": "Par de Confusão: Ailleurs VS D'ailleurs",
-    "theme": "Tema 20: Expressões e Redes Sociais"
+    "theme": "Tema 20: Expressões e Redes Sociais",
+    "topicKey": "ailleurs-vs-d-ailleurs",
+    "lessonRole": "contrast"
   },
   {
     "id": "fr-b1-302",
@@ -2774,7 +2900,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "De Onde Vem a Ideia",
     "grammarFocus": "Conjugação: Venir",
-    "theme": "Tema 20: Expressões e Redes Sociais"
+    "theme": "Tema 20: Expressões e Redes Sociais",
+    "topicKey": "conj-venir",
+    "lessonRole": "reinforce"
   },
   {
     "id": "fr-b1-306",
@@ -2978,7 +3106,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "id": "fr-b2-328",
     "language": "fr",
     "level": "B2",
-    "tag": "VOC",
+    "tag": "GRAM",
     "uiTitle": "Estruturando a Fala",
     "grammarFocus": "Marcadores Discursivos: Adição e Estruturação",
     "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
@@ -3008,7 +3136,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Enfatizando a Urgência",
     "grammarFocus": "Par de Confusão: Si VS Tellement VS Tant",
-    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+    "theme": "Tema 22: Liderança, Imperativos e Julgamentos",
+    "topicKey": "si-vs-tellement-vs-tant",
+    "lessonRole": "contrast"
   },
   {
     "id": "fr-b2-332",
@@ -3017,7 +3147,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Decidindo com Firmeza",
     "grammarFocus": "Par de Confusão: Décider de VS Se decidir à",
-    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+    "theme": "Tema 22: Liderança, Imperativos e Julgamentos",
+    "topicKey": "decider-de-vs-se-decidir-a",
+    "lessonRole": "contrast"
   },
   {
     "id": "fr-b2-333",
@@ -3026,7 +3158,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Mudança de Rumo",
     "grammarFocus": "Par de Confusão: Déménager VS Aménager",
-    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+    "theme": "Tema 22: Liderança, Imperativos e Julgamentos",
+    "topicKey": "demenager-vs-amenager",
+    "lessonRole": "contrast"
   },
   {
     "id": "fr-b2-334",
@@ -3035,7 +3169,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Fatos Reais vs Aparentes",
     "grammarFocus": "Par de Confusão: En fait VS Au fait (B2)",
-    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+    "theme": "Tema 22: Liderança, Imperativos e Julgamentos",
+    "topicKey": "en-fait-vs-au-fait-b2",
+    "lessonRole": "contrast"
   },
   {
     "id": "fr-b2-335",
@@ -3044,7 +3180,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Apontando com Precisão",
     "grammarFocus": "Par de Confusão: Y VS En (B2)",
-    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+    "theme": "Tema 22: Liderança, Imperativos e Julgamentos",
+    "topicKey": "y-vs-en-b2",
+    "lessonRole": "contrast"
   },
   {
     "id": "fr-b2-336",
@@ -3530,7 +3668,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Même ou Si",
     "grammarFocus": "Par de Confusão: Même VS Si",
-    "theme": "Tema 26: O Francês das Ruas e o Formal"
+    "theme": "Tema 26: O Francês das Ruas e o Formal",
+    "topicKey": "meme-vs-si",
+    "lessonRole": "contrast"
   },
   {
     "id": "fr-c1-390",
