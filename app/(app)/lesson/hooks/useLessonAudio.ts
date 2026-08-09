@@ -210,7 +210,7 @@ export function useLessonAudio(
       console.warn('[useLessonAudio] ElevenLabs failed, trying Gemini TTS:', err);
     }
 
-    // 2️⃣ Try Gemini Flash TTS (1 multi-speaker call — separate model quota)
+    // 2️⃣ Try Gemini Pro TTS (1 multi-speaker call — separate model quota)
     try {
       const geminiResult = await synthesizeDialogueGemini(lines, language);
       if (geminiResult && geminiResult.chunks.length > 0) {
@@ -218,7 +218,7 @@ export function useLessonAudio(
         monolithicAudioRef.current = geminiResult.monolithic;
         setSpeakerVoices(geminiResult.speakerVoices);
         devLog(
-          '%c🎙️ [Audio Provider] SUCCESS: Gemini Flash TTS dialogue generated (1 API call) ✓',
+          '%c🎙️ [Audio Provider] SUCCESS: Gemini Pro TTS dialogue generated (1 API call) ✓',
           'color: #059669; font-weight: bold; background-color: #ecfdf5; padding: 4px 8px; border-radius: 4px; border: 1px solid #a7f3d0;'
         );
         return { chunks: geminiResult.chunks, alignments: [] };
