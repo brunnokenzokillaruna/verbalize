@@ -15,6 +15,7 @@ import {
   resolveSpeakerGenders,
   stripSpeakerPrefix,
 } from '@/lib/speakerGender';
+import { applyLearnerAudioTag } from '@/lib/geminiTtsAudioTags';
 import { pickGeminiTtsVoice } from '@/lib/geminiTtsVoices';
 import type { DialogueSpeakerVoice } from '@/lib/dialogueVoiceAvatars';
 import type { SupportedLanguage } from '@/types';
@@ -34,8 +35,11 @@ const TTS_MODEL_CHAIN = [
 ] as const;
 
 const STYLE_PROMPT =
-  'Speak naturally at a slightly slower pace suitable for language learners. ' +
-  'Keep clear pronunciation and warm conversational tone.';
+  'Director notes for language learners: speak clearly at a slightly slower pace, ' +
+  'warm conversational tone, crisp pronunciation. ' +
+  'Honor English audio tags in square brackets (e.g. [curious], [sighs], [excited], [laughs]) — ' +
+  'they control delivery or add a brief non-speech sound; never read the brackets aloud. ' +
+  'Do not rush, shout, or whisper unless a tag asks for it.';
 
 export type GeminiDialogueResult = {
   chunks: string[];
@@ -48,8 +52,8 @@ export type GeminiDialogueResult = {
 const dialogueCache = new Map<string, GeminiDialogueResult>();
 
 function cacheKey(lines: string[], language: SupportedLanguage): string {
-  // v3: full 30-voice gender pools (invalidates older fixed-pool caches).
-  return `v3:${language}:${lines.map((l) => l.trim().toLowerCase()).join('|')}`;
+  // v4: learner-safe English audio tags in the TTS transcript.
+  return `v4:${language}:${lines.map((l) => l.trim().toLowerCase()).join('|')}`;
 }
 
 /** Gemini multi-speaker TTS supports at most 2 distinct speakers. */
@@ -81,15 +85,16 @@ function buildMultiSpeakerPrompt(lines: string[]): {
 
   const formattedLines = nonEmpty.map((line, i) => {
     const name = parseSpeakerName(line);
-    if (name) return line.trim();
-    const speaker = i % 2 === 0 ? speakerA : speakerB;
-    return `${speaker}: ${stripSpeakerPrefix(line)}`;
+    const speaker = name ?? (i % 2 === 0 ? speakerA : speakerB);
+    const spoken = applyLearnerAudioTag(stripSpeakerPrefix(line));
+    return `${speaker}: ${spoken}`;
   });
 
   // Prompt must lead with the multi-speaker instruction so voice mapping sticks.
   const input =
     `TTS the following conversation between ${speakerA} and ${speakerB}.\n` +
     `${STYLE_PROMPT}\n\n` +
+    `### TRANSCRIPT\n` +
     formattedLines.join('\n');
 
   return { input, speechConfig };
