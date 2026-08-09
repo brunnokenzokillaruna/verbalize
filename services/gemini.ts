@@ -13,10 +13,11 @@ import {
 export type { GeminiTier } from '@/lib/geminiQuota';
 
 const MODEL_CHAINS: Record<GeminiTier, readonly string[]> = {
-  // Lite is the runtime fallback when 3.5 is overloaded (503) or rate-limited.
+  // Hooks / critical content: prefer 3.5 quality; lite if overloaded or soft budget out.
   critical: ['gemini-3.5-flash', 'gemini-3.1-flash-lite'],
-  // Paid: prefer 3.5 for lesson content quality; lite remains the cheap fallback.
-  standard: ['gemini-3.5-flash', 'gemini-3.1-flash-lite', 'gemini-2.5-flash-lite'],
+  // Grammar, exercises, bridges: lite first — cheaper, faster JSON, fewer timeouts.
+  // (Putting 3.5 on standard burned ~CA$0.20+/lesson and raised practice failure rate.)
+  standard: ['gemini-3.1-flash-lite', 'gemini-2.5-flash-lite'],
   lightweight: ['gemini-3.1-flash-lite'],
 };
 
@@ -196,7 +197,7 @@ async function generateWithModel(
 /**
  * Calls the Gemini API using tier-specific model chains.
  * critical → 3.5-flash (degrades to lite when daily budget exhausted)
- * standard → 3.5-flash → 3.1-flash-lite → 2.5-flash-lite
+ * standard → 3.1-flash-lite → 2.5-flash-lite
  * lightweight → 3.1-flash-lite only
  */
 export async function callGemini(
