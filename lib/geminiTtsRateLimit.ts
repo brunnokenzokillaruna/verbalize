@@ -7,7 +7,7 @@
  * lesson prefetch while content generation may be active.
  */
 
-const MIN_GAP_MS = 5_000;
+const MIN_GAP_MS = 1_000;
 const DEFAULT_COOLDOWN_MS = 60_000;
 const MAX_COOLDOWN_MS = 5 * 60_000;
 

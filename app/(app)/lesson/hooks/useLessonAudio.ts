@@ -237,8 +237,12 @@ export function useLessonAudio(
     const googleResult = await synthesizeDialogueWithVoices(lines, language);
     if (googleResult.chunks.length === expectedLines) {
       setSpeakerVoices(googleResult.speakerVoices);
+      return { chunks: googleResult.chunks, alignments: [] };
     }
-    return { chunks: googleResult.chunks, alignments: [] };
+    console.warn(
+      `[useLessonAudio] Google Cloud TTS incomplete (${googleResult.chunks.length}/${expectedLines} lines)`,
+    );
+    return { chunks: [], alignments: [] };
   }
 
   function getDialogueLines(): string[] {

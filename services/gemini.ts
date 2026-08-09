@@ -15,7 +15,8 @@ export type { GeminiTier } from '@/lib/geminiQuota';
 const MODEL_CHAINS: Record<GeminiTier, readonly string[]> = {
   // Lite is the runtime fallback when 3.5 is overloaded (503) or rate-limited.
   critical: ['gemini-3.5-flash', 'gemini-3.1-flash-lite'],
-  standard: ['gemini-3.1-flash-lite', 'gemini-2.5-flash-lite'],
+  // Paid: prefer 3.5 for lesson content quality; lite remains the cheap fallback.
+  standard: ['gemini-3.5-flash', 'gemini-3.1-flash-lite', 'gemini-2.5-flash-lite'],
   lightweight: ['gemini-3.1-flash-lite'],
 };
 
@@ -138,11 +139,17 @@ function markModelCooldown(model: string, err: unknown): void {
 function getActiveModelChain(tier: GeminiTier): string[] {
   let chain = [...MODEL_CHAINS[tier]];
 
-  if (tier === 'critical' && (isFlash35BudgetExhausted() || !isQuotaAvailable(PRIMARY_GEMINI_MODEL))) {
+  const flash35Unavailable =
+    isFlash35BudgetExhausted() || !isQuotaAvailable(PRIMARY_GEMINI_MODEL);
+
+  if (flash35Unavailable && chain.includes(PRIMARY_GEMINI_MODEL)) {
     console.warn(
-      '[Gemini SDK] gemini-3.5-flash daily budget exhausted — degrading critical call to gemini-3.1-flash-lite',
+      `[Gemini SDK] gemini-3.5-flash daily budget exhausted — skipping 3.5 for tier=${tier}`,
     );
-    chain = [CRITICAL_FALLBACK_MODEL];
+    chain = chain.filter((model) => model !== PRIMARY_GEMINI_MODEL);
+    if (chain.length === 0) {
+      chain = [CRITICAL_FALLBACK_MODEL];
+    }
   }
 
   const available = chain.filter((model) => !isModelInCooldown(model));
@@ -188,8 +195,8 @@ async function generateWithModel(
 
 /**
  * Calls the Gemini API using tier-specific model chains.
- * critical → 3.5-flash only (degrades to lite when daily budget exhausted)
- * standard → 3.1-flash-lite → 2.5-flash-lite
+ * critical → 3.5-flash (degrades to lite when daily budget exhausted)
+ * standard → 3.5-flash → 3.1-flash-lite → 2.5-flash-lite
  * lightweight → 3.1-flash-lite only
  */
 export async function callGemini(
@@ -225,9 +232,13 @@ export async function callGemini(
         return text;
       } catch (err: unknown) {
         if (err instanceof GeminiQuotaExceededError) {
-          if (tier === 'critical' && model === PRIMARY_GEMINI_MODEL) {
-            console.warn('[Gemini SDK] Critical quota exceeded — retrying with lite model');
-            return callGemini(prompt, systemPrompt, maxOutputTokens, thinkingBudget ?? 0, 'standard');
+          if (model === PRIMARY_GEMINI_MODEL) {
+            console.warn('[Gemini SDK] 3.5 quota exceeded — continuing with lite models');
+            // Fall through to next model in chain (or degrade critical → standard).
+            if (modelChain[modelIndex + 1]) break;
+            if (tier === 'critical') {
+              return callGemini(prompt, systemPrompt, maxOutputTokens, thinkingBudget ?? 0, 'standard');
+            }
           }
           throw err;
         }

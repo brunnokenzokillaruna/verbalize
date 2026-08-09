@@ -244,24 +244,42 @@ async function synthesizeDialogueElevenLabsResult(
     const gender = genders.get(speaker) ?? (i % 2 === 0 ? 'female' : 'male');
     const voice = voiceForGender(pair, gender);
     voiceBySpeaker.set(speaker, voice.name);
-    const audio = await callElevenLabsWithTimestamps(
+    let audio = await callElevenLabsWithTimestamps(
       stripSpeakerPrefix(line),
       voice.id,
       language,
       apiKey,
     );
+    // One retry — male voice / transient 429s often recover on the next call.
+    if (!audio) {
+      console.warn(
+        `[ElevenLabs] Line ${i + 1}/${nonEmpty.length} failed (${voice.name}/${gender}) — retrying once`,
+      );
+      audio = await callElevenLabsWithTimestamps(
+        stripSpeakerPrefix(line),
+        voice.id,
+        language,
+        apiKey,
+      );
+    }
     results.push(audio);
   }
 
-  const successful = results.filter(
-    (
-      result,
-    ): result is { audioBase64: string; alignment: CharacterAlignment | null } =>
-      result !== null,
-  );
+  const failedIndexes = results
+    .map((result, index) => (result === null ? index : -1))
+    .filter((index) => index >= 0);
+
+  // Never return a partial line list — the player would skip speakers and desync highlights.
+  if (failedIndexes.length > 0) {
+    console.warn(
+      `[ElevenLabs] Incomplete dialogue (${nonEmpty.length - failedIndexes.length}/${nonEmpty.length} lines). Failed indexes: ${failedIndexes.join(', ')}`,
+    );
+    return { chunks: [], alignments: [], speakerVoices: [] };
+  }
+
   return {
-    chunks: successful.map((result) => result.audioBase64),
-    alignments: successful.map((result) => result.alignment),
+    chunks: results.map((result) => result!.audioBase64),
+    alignments: results.map((result) => result!.alignment),
     speakerVoices: [...voiceBySpeaker].map(([speaker, voiceName]) => ({ speaker, voiceName })),
   };
 }

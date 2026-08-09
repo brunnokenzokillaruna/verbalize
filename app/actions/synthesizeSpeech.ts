@@ -329,8 +329,16 @@ async function synthesizeDialogueResult(
     }),
   );
 
+  // Keep line↔audio alignment: partial success would drop speakers (often one gender).
+  if (results.some((r) => r === null)) {
+    console.warn(
+      `[Google TTS] Incomplete dialogue (${results.filter(Boolean).length}/${nonEmpty.length} lines) — returning empty for fallback`,
+    );
+    return { chunks: [], speakerVoices: [] };
+  }
+
   return {
-    chunks: results.filter((r): r is string => r !== null),
+    chunks: results as string[],
     speakerVoices: [...resolvedVoiceBySpeaker].map(([speaker, voiceName]) => ({
       speaker,
       voiceName,

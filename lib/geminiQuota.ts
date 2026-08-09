@@ -1,9 +1,10 @@
 /**
- * Soft daily budget tracker for Gemini free-tier models.
- * In-memory counters reset at UTC midnight; survives warm serverless instances.
+ * Soft daily budget tracker for Gemini models (in-memory, UTC midnight reset).
+ * Survives warm serverless instances; protects spend caps during spikes.
  *
- * Defaults (no env required): 8 RPD for 3.5-flash, 80 RPD for lite.
- * In dev mode the 3.5 cap is automatically reduced to 4.
+ * Defaults sized for paid Tier 1 (override with env if needed):
+ *   GEMINI_DAILY_BUDGET_35 / GEMINI_DAILY_BUDGET_LITE
+ * In dev mode the 3.5 cap is automatically reduced.
  */
 
 import { isGeminiDevMode } from '@/lib/geminiDevGuard';
@@ -32,10 +33,10 @@ function readBudget(envKey: string, fallback: number): number {
 
 function getBudgetLimit(bucket: QuotaBucket): number {
   if (bucket === 'flash35') {
-    const base = readBudget('GEMINI_DAILY_BUDGET_35', 8);
-    return isGeminiDevMode() ? Math.min(base, 4) : base;
+    const base = readBudget('GEMINI_DAILY_BUDGET_35', 120);
+    return isGeminiDevMode() ? Math.min(base, 30) : base;
   }
-  return readBudget('GEMINI_DAILY_BUDGET_LITE', 80);
+  return readBudget('GEMINI_DAILY_BUDGET_LITE', 2_000);
 }
 
 let dateKey = utcDateKey();

@@ -1,6 +1,7 @@
 /**
- * Serializes Gemini text API calls to stay within free-tier RPM limits.
- * Separate queues per tier — critical (3.5) is slower; lite allows faster cadence.
+ * Serializes Gemini text API calls to stay within project RPM limits.
+ * Gaps sized for paid Tier 1+ (override lower via code if returning to free).
+ * Separate queues per tier — critical (3.5) vs lite cadence.
  */
 
 import {
@@ -12,9 +13,9 @@ import {
 } from '@/lib/geminiQuota';
 
 const GAP_MS: Record<GeminiTier, number> = {
-  critical: 13_000, // 5 RPM on gemini-3.5-flash
-  standard: 4_500, // 15 RPM on gemini-3.1-flash-lite
-  lightweight: 4_500,
+  critical: 1_500, // ~40 RPM serialized for gemini-3.5-flash
+  standard: 400, // lite / mixed content
+  lightweight: 300, // translations, tooltips, grading
 };
 
 const lastCallAt: Record<GeminiTier, number> = {

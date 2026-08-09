@@ -99,9 +99,10 @@ function buildMultiSpeakerPrompt(lines: string[]): {
     return `${speaker}: ${stripSpeakerPrefix(line)}`;
   });
 
+  // Prompt must lead with the multi-speaker instruction so voice mapping sticks.
   const input =
+    `TTS the following conversation between ${speakerA} and ${speakerB}.\n` +
     `${STYLE_PROMPT}\n\n` +
-    `TTS the following conversation between ${speakerA} and ${speakerB}:\n` +
     formattedLines.join('\n');
 
   return { input, speechConfig };
@@ -128,10 +129,12 @@ async function callGeminiTts(
 
   for (const model of TTS_MODEL_CHAIN) {
     try {
+      // Interactions TTS API expects response_format + speech_config speaker/voice pairs.
+      // (response_modalities is generateContent-era and can ignore multi-speaker mapping.)
       const interaction = await client.interactions.create({
         model,
         input,
-        response_modalities: ['audio'],
+        response_format: { type: 'audio' },
         store: false,
         generation_config: {
           speech_config: speechConfig,
@@ -145,6 +148,12 @@ async function callGeminiTts(
         console.warn(`[Gemini TTS] ${model} returned no audio data`);
         continue;
       }
+
+      console.log(
+        `[Gemini TTS] ${model} multi-speaker ok — voices: ${speechConfig
+          .map((s) => `${s.speaker}=${s.voice}`)
+          .join(', ')}`,
+      );
 
       const pcm = Buffer.from(audioData, 'base64');
       return pcmToWavBase64(pcm);

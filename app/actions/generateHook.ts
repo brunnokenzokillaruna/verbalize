@@ -607,7 +607,7 @@ export async function generateMinimalHook(params: GenerateHookParams): Promise<H
   const { knownVocabulary } = params;
   try {
     const fetchHook = async (correction = ''): Promise<HookResult | null> => {
-      const raw = await callGeminiJSON<HookResult>(prompt + correction, systemPrompt, 2048, 0, 'standard');
+      const raw = await callGeminiJSON<HookResult>(prompt + correction, systemPrompt, 2048, 0, 'critical');
       if (!raw?.dialogue || raw?.newVocabulary?.length !== 2) {
         console.error('[generateMinimalHook] Invalid response');
         return null;
