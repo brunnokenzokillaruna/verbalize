@@ -10,6 +10,7 @@ import type {
   MissionBriefingResult,
   TranslateWordResult,
   CheckpointSessionResult,
+  CheckpointTopicResult,
 } from '@/types';
 
 export type LessonPhase =
@@ -99,6 +100,7 @@ interface LessonState {
   checkpointProductionIndex: number;
   checkpointProductionCorrect: number;
   checkpointPassed: boolean;
+  checkpointTopicResults: CheckpointTopicResult[];
 
   /** True when the learner accepted at least one spontaneous production attempt this session. */
   spontaneousProductionAccepted: boolean;
@@ -110,9 +112,9 @@ interface LessonState {
   lastProductionPolishHint: string | null;
 
   setCheckpointSession: (session: CheckpointSessionResult) => void;
-  recordComprehensionAnswer: (correct: boolean) => void;
+  recordComprehensionAnswer: (correct: boolean, topic?: string) => void;
   nextComprehensionQuestion: () => void;
-  recordCheckpointProduction: (correct: boolean) => void;
+  recordCheckpointProduction: (correct: boolean, topic?: string) => void;
   nextCheckpointProduction: () => void;
   setCheckpointPassed: (passed: boolean) => void;
 
@@ -220,6 +222,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
   checkpointProductionIndex: 0,
   checkpointProductionCorrect: 0,
   checkpointPassed: false,
+  checkpointTopicResults: [],
   spontaneousProductionAccepted: false,
   lastProductionPolishHint: null,
 
@@ -264,6 +267,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       checkpointProductionIndex: 0,
       checkpointProductionCorrect: 0,
       checkpointPassed: false,
+      checkpointTopicResults: [],
       spontaneousProductionAccepted: false,
       lastProductionPolishHint: null,
     }),
@@ -341,17 +345,29 @@ export const useLessonStore = create<LessonState>((set, get) => ({
 
   setCheckpointSession: (checkpointSession) => set({ checkpointSession, isLoading: false }),
 
-  recordComprehensionAnswer: (correct) =>
+  recordComprehensionAnswer: (correct, topic) =>
     set((state) => ({
       comprehensionCorrect: state.comprehensionCorrect + (correct ? 1 : 0),
+      checkpointTopicResults: topic
+        ? [
+            ...state.checkpointTopicResults,
+            { topic, skill: 'comprehension' as const, correct },
+          ]
+        : state.checkpointTopicResults,
     })),
 
   nextComprehensionQuestion: () =>
     set((state) => ({ comprehensionIndex: state.comprehensionIndex + 1 })),
 
-  recordCheckpointProduction: (correct) =>
+  recordCheckpointProduction: (correct, topic) =>
     set((state) => ({
       checkpointProductionCorrect: state.checkpointProductionCorrect + (correct ? 1 : 0),
+      checkpointTopicResults: topic
+        ? [
+            ...state.checkpointTopicResults,
+            { topic, skill: 'production' as const, correct },
+          ]
+        : state.checkpointTopicResults,
     })),
 
   nextCheckpointProduction: () =>
@@ -429,6 +445,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       checkpointProductionIndex: 0,
       checkpointProductionCorrect: 0,
       checkpointPassed: false,
+      checkpointTopicResults: [],
       spontaneousProductionAccepted: false,
       lastProductionPolishHint: null,
     }),

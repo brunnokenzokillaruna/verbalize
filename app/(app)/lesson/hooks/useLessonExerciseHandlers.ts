@@ -184,7 +184,9 @@ export function useLessonExerciseHandlers(
       }
 
       if (phase === 'production') {
-        store.recordCheckpointProduction(correct);
+        const topic =
+          store.checkpointSession?.productionTopics?.[store.checkpointProductionIndex];
+        store.recordCheckpointProduction(correct, topic);
         playAnswerFeedback(playSound, correct, meta);
         return;
       }

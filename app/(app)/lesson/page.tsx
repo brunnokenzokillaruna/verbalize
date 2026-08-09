@@ -213,7 +213,9 @@ export default function LessonPage() {
       if (comprehensionAnswered) return;
       setComprehensionAnswered(true);
       setComprehensionLastCorrect(correct);
-      store.recordComprehensionAnswer(correct);
+      const topic =
+        store.checkpointSession?.comprehensionQuestions[store.comprehensionIndex]?.topicFocus;
+      store.recordComprehensionAnswer(correct, topic);
       playSound(correct ? 'correct' : 'incorrect');
     },
     [comprehensionAnswered, store, playSound],

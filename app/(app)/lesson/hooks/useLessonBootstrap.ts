@@ -117,7 +117,7 @@ function applyPregenCache(
   store: ReturnType<typeof useLessonStore.getState>,
   grammarBridgePrefetchRef: React.MutableRefObject<Promise<GrammarBridgeResult | null> | null>,
   exercisesPrefetchRef: React.MutableRefObject<Promise<Exercise[] | null> | null>,
-): HookResult {
+): HookResult | null {
   const schemaOk = isPregenSchemaCurrent(pregenDoc.schemaVersion);
 
   if (pregenDoc.grammarBridge) {
@@ -134,11 +134,15 @@ function applyPregenCache(
   if (pregenDoc.missionBriefing) {
     store.setMissionBriefing(pregenDoc.missionBriefing);
   }
-  if (pregenDoc.checkpointSession) {
+  if (schemaOk && pregenDoc.checkpointSession) {
     store.setCheckpointSession(pregenDoc.checkpointSession);
+  } else if (!schemaOk && pregenDoc.checkpointSession) {
+    devLog(
+      `[Timing] Cache pregen checkpoint STALE (schema ${pregenDoc.schemaVersion ?? 'none'} < ${PREGEN_SCHEMA_VERSION}) — regenerating checkpoint`,
+    );
   }
 
-  return pregenDoc.hook!;
+  return pregenDoc.hook ?? null;
 }
 
 interface UseLessonBootstrapProps {
@@ -209,9 +213,10 @@ export function useLessonBootstrap({
             const tPregen = performance.now();
             const pregenDoc = await fetchPregeneratedLessonWithWait(user.uid, lesson.id);
 
-            if (pregenDoc?.hook) {
+            if (pregenDoc?.hook || pregenDoc?.checkpointSession) {
               hook = applyPregenCache(pregenDoc, store, grammarBridgePrefetchRef, exercisesPrefetchRef);
-              const parts: string[] = ['hook'];
+              const parts: string[] = [];
+              if (pregenDoc.hook) parts.push('hook');
               if (pregenDoc.grammarBridge) parts.push('grammarBridge');
               if (pregenDoc.exercises?.length) parts.push(`exercises(${pregenDoc.exercises.length})`);
               if (pregenDoc.missionBriefing) parts.push('missionBriefing');
@@ -281,10 +286,10 @@ export function useLessonBootstrap({
             if (!acquiredPregenLock) {
               devLog(`[Timing] Lock pregen indisponível — verificando cache uma vez...`);
               const pregenDoc = await fetchPregeneratedLessonWithWait(user.uid, lesson.id);
-              if (pregenDoc?.hook) {
+              if (pregenDoc?.hook || pregenDoc?.checkpointSession) {
                 hook = applyPregenCache(pregenDoc, store, grammarBridgePrefetchRef, exercisesPrefetchRef);
                 deletePregeneratedLesson(user.uid, lesson.id).catch(console.error);
-                devLog(`[Timing] Hook recebido do pregen após lock: ${(performance.now() - tHook).toFixed(0)}ms`);
+                devLog(`[Timing] Conteúdo recebido do pregen após lock: ${(performance.now() - tHook).toFixed(0)}ms`);
               }
             }
           }
@@ -637,11 +642,10 @@ export function useLessonBootstrap({
   }, [store.phase]);
 
   // Pre-generate the NEXT lesson's full payload (hook + bridge + exercises)
-  // as soon as the user enters the 'practice' phase. This gives the pregen
-  // ~60-180s of head start while the user works through the exercises, so
-  // by the time they click "next lesson" everything is cached and instant.
+  // Fire-and-forget pregen for the *next* lesson while the learner is busy in
+  // practice (normal lessons) or production (REVIEW checkpoints).
   useEffect(() => {
-    if (store.phase !== 'practice') return;
+    if (store.phase !== 'practice' && store.phase !== 'production') return;
     if (pregenFiredRef.current) return;
     if (!user || !store.lesson || !profile) return;
     if (!isAggressivePregenEnabled()) {

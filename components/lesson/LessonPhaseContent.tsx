@@ -15,6 +15,10 @@ import { CheckpointBriefingScreen } from '@/components/lesson/CheckpointBriefing
 import { CheckpointListeningScreen } from '@/components/lesson/CheckpointListeningScreen';
 import { CheckpointDebriefScreen } from '@/components/lesson/CheckpointDebriefScreen';
 import { shouldUseLiveMissionRolePlay } from '@/features/mission-live';
+import {
+  evaluateCheckpointPass,
+  summarizeTopicResults,
+} from '@/lib/curriculum/checkpointAssessment';
 import { HOOK_LISTEN_FIRST } from '@/lib/practiceExercises/constants';
 import { useLessonStore } from '@/store/lessonStore';
 import { useAuthStore } from '@/store/authStore';
@@ -81,6 +85,22 @@ export function LessonPhaseContent({
     shouldUseLiveMissionRolePlay(store.lesson.level) &&
     !forceScripted;
 
+  const checkpointDebrief =
+    phase === 'debrief' && store.checkpointSession && store.lesson
+      ? {
+          ...evaluateCheckpointPass({
+            level: store.lesson.level,
+            comprehensionCorrect: store.comprehensionCorrect,
+            comprehensionTotal: store.checkpointSession.comprehensionQuestions.length,
+            productionCorrect: store.checkpointProductionCorrect,
+            productionTotal: store.checkpointSession.productionExercises.length,
+          }),
+          ...summarizeTopicResults(store.checkpointTopicResults),
+          comprehensionTotal: store.checkpointSession.comprehensionQuestions.length,
+          productionTotal: store.checkpointSession.productionExercises.length,
+        }
+      : null;
+
   return (
     <>
       {phase === 'vocabulary' && store.hook && store.lesson && (
@@ -119,6 +139,7 @@ export function LessonPhaseContent({
         <CheckpointBriefingScreen
           briefing={store.checkpointSession.briefing}
           coveredTopics={store.checkpointSession.coveredTopics}
+          assessedTopics={store.checkpointSession.assessedTopics}
         />
       )}
 
@@ -155,13 +176,16 @@ export function LessonPhaseContent({
         />
       )}
 
-      {phase === 'debrief' && store.checkpointSession && (
+      {phase === 'debrief' && checkpointDebrief && (
         <CheckpointDebriefScreen
           comprehensionCorrect={store.comprehensionCorrect}
-          comprehensionTotal={store.checkpointSession.comprehensionQuestions.length}
+          comprehensionTotal={checkpointDebrief.comprehensionTotal}
           productionCorrect={store.checkpointProductionCorrect}
-          productionTotal={store.checkpointSession.productionExercises.length}
+          productionTotal={checkpointDebrief.productionTotal}
           passed={store.checkpointPassed}
+          overallPct={checkpointDebrief.overallPct}
+          strongTopics={checkpointDebrief.strong}
+          weakTopics={checkpointDebrief.weak}
           onReviewMistakes={onDebriefExit}
         />
       )}

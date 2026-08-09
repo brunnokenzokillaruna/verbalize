@@ -8,6 +8,9 @@ interface CheckpointDebriefScreenProps {
   productionCorrect: number;
   productionTotal: number;
   passed: boolean;
+  overallPct: number;
+  strongTopics?: string[];
+  weakTopics?: string[];
   onReviewMistakes?: () => void;
 }
 
@@ -17,6 +20,9 @@ export function CheckpointDebriefScreen({
   productionCorrect,
   productionTotal,
   passed,
+  overallPct,
+  strongTopics = [],
+  weakTopics = [],
   onReviewMistakes,
 }: CheckpointDebriefScreenProps) {
   const comprehensionPct =
@@ -36,12 +42,16 @@ export function CheckpointDebriefScreen({
 
       <div>
         <h2 className="font-display text-2xl font-black italic text-text-primary">
-          {passed ? 'Checkpoint concluído!' : 'Quase lá!'}
+          {passed ? 'Checkpoint concluído!' : 'Ainda não passou'}
         </h2>
         <p className="mt-2 text-sm text-text-muted">
           {passed
-            ? 'Você demonstrou compreensão e produção neste trecho do curso.'
-            : 'Revise os tópicos fracos antes de seguir — você pode continuar mesmo assim.'}
+            ? 'Você mostrou retenção sólida neste trecho — compreensão e produção no nível esperado.'
+            : 'O critério ficou mais exigente. Revise os pontos fracos; você ainda pode seguir o caminho.'}
+        </p>
+        <p className="mt-3 text-3xl font-black text-text-primary">{overallPct}%</p>
+        <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">
+          Resultado geral
         </p>
       </div>
 
@@ -61,6 +71,39 @@ export function CheckpointDebriefScreen({
           </p>
         </div>
       </div>
+
+      {(strongTopics.length > 0 || weakTopics.length > 0) && (
+        <div className="grid gap-3 text-left">
+          {strongTopics.length > 0 && (
+            <div className="rounded-xl border border-success/30 bg-success/5 p-4">
+              <p className="text-xs font-bold uppercase tracking-wide text-success mb-2">
+                Firmes
+              </p>
+              <ul className="flex flex-col gap-1">
+                {strongTopics.map((topic) => (
+                  <li key={topic} className="text-sm text-text-primary">
+                    • {topic}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {weakTopics.length > 0 && (
+            <div className="rounded-xl border border-warning/30 bg-warning/5 p-4">
+              <p className="text-xs font-bold uppercase tracking-wide text-warning mb-2">
+                Revisar
+              </p>
+              <ul className="flex flex-col gap-1">
+                {weakTopics.map((topic) => (
+                  <li key={topic} className="text-sm text-text-primary">
+                    • {topic}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
 
       {!passed && onReviewMistakes && (
         <button

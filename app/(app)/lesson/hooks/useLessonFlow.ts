@@ -18,6 +18,7 @@ import {
   mergeLessonImagesIntoPool,
 } from '@/utils/imageMatchBuilder';
 import { trackExercisesPrefetch } from '@/lib/practiceExercises/trackExercisesPrefetch';
+import { evaluateCheckpointPass } from '@/lib/curriculum/checkpointAssessment';
 import type { GrammarBridgeResult, Exercise, LessonTag } from '@/types';
 import type { LessonPhase } from '@/store/lessonStore';
 
@@ -195,9 +196,13 @@ export function useLessonFlow({
 
     const compTotal = store.checkpointSession.comprehensionQuestions.length;
     const prodTotal = store.checkpointSession.productionExercises.length;
-    const compPass = store.comprehensionCorrect >= Math.ceil(compTotal / 2);
-    const prodPass = store.checkpointProductionCorrect >= Math.ceil(prodTotal / 2);
-    const passed = compPass && prodPass;
+    const { passed, overallPct } = evaluateCheckpointPass({
+      level: store.lesson.level,
+      comprehensionCorrect: store.comprehensionCorrect,
+      comprehensionTotal: compTotal,
+      productionCorrect: store.checkpointProductionCorrect,
+      productionTotal: prodTotal,
+    });
     store.setCheckpointPassed(passed);
 
     if (!passed && user && store.lesson) {
@@ -205,7 +210,7 @@ export function useLessonFlow({
         user.uid,
         store.lesson.language,
         store.lesson.grammarFocus,
-        `Checkpoint reprovado: compreensão ${store.comprehensionCorrect}/${compTotal}, produção ${store.checkpointProductionCorrect}/${prodTotal}`,
+        `Checkpoint reprovado (${overallPct}%): compreensão ${store.comprehensionCorrect}/${compTotal}, produção ${store.checkpointProductionCorrect}/${prodTotal}`,
         store.lesson.id,
         store.lesson.level,
       ).catch(console.error);

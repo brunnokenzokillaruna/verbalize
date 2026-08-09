@@ -20,7 +20,7 @@ export function getCheckpointPopoverCopy(lesson: LessonDefinition): {
 
   const title = label || 'Checkpoint';
   const themePart = number !== undefined ? `Revisão do Tema ${number}` : 'Revisão do tema';
-  const subtitle = `${themePart} · ${range} — ouça, traduza livremente e repita em voz alta`;
+  const subtitle = `${themePart} · ${range} — avaliação densa: ouça, produza e fale`;
 
   return {
     title,

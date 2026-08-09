@@ -10,6 +10,10 @@ import type { PregeneratedLessonDocument } from '@/types';
 
 const POLL_INTERVAL_MS = 2000;
 
+function isPregenContentReady(doc: PregeneratedLessonDocument): boolean {
+  return Boolean(doc.hook || doc.checkpointSession);
+}
+
 async function clearStaleGeneratingLock(uid: string, lessonId: string, reason: string): Promise<void> {
   devLog(`[Timing] ${reason} — abortando lock pregen`);
   await abortPregeneratedLesson(uid, lessonId).catch(console.error);
@@ -18,6 +22,7 @@ async function clearStaleGeneratingLock(uid: string, lessonId: string, reason: s
 /**
  * Loads a pre-generated lesson, waiting briefly when another process is generating.
  * Orphan/stale `generating` locks are cleared so local generation can proceed.
+ * REVIEW lessons may be ready with only `checkpointSession` (no hook).
  */
 export async function fetchPregeneratedLessonWithWait(
   uid: string,
@@ -27,13 +32,13 @@ export async function fetchPregeneratedLessonWithWait(
   if (!doc) return null;
 
   if (doc.status === 'failed') return null;
-  if (doc.hook && doc.status === 'ready') return doc;
+  if (isPregenContentReady(doc) && doc.status === 'ready') return doc;
 
   if (doc.status !== 'generating') {
-    return doc.hook ? doc : null;
+    return isPregenContentReady(doc) ? doc : null;
   }
 
-  // Dev has no dashboard pregen — a generating doc without hook is always orphaned.
+  // Dev has no dashboard pregen — a generating doc without content is always orphaned.
   if (!isAggressivePregenEnabled()) {
     await clearStaleGeneratingLock(uid, lessonId, 'Pregen orphan lock em dev');
     return null;
@@ -52,7 +57,7 @@ export async function fetchPregeneratedLessonWithWait(
     doc = await getPregeneratedLesson(uid, lessonId);
 
     if (!doc || doc.status === 'failed') return null;
-    if (doc.hook) return doc;
+    if (isPregenContentReady(doc)) return doc;
     if (doc.status !== 'generating') return null;
 
     if (isPregenGeneratingStale(doc)) {

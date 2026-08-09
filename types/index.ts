@@ -370,6 +370,14 @@ export interface CheckpointComprehensionQuestion {
   options: string[];
   correctIndex: number;
   explanationPt: string;
+  /** Grammar focus this item samples from the prior lesson window. */
+  topicFocus?: string;
+}
+
+export interface CheckpointTopicResult {
+  topic: string;
+  skill: 'comprehension' | 'production';
+  correct: boolean;
 }
 
 export interface CheckpointSessionResult {
@@ -377,7 +385,12 @@ export interface CheckpointSessionResult {
   dialogueAudio: string;
   comprehensionQuestions: CheckpointComprehensionQuestion[];
   productionExercises: Exercise[];
+  /** Parallel to productionExercises — which window topic each item assesses. */
+  productionTopics?: string[];
+  /** Full prior window (retrieval cues). */
   coveredTopics: string[];
+  /** Subset actually sampled in dialogue / items. */
+  assessedTopics?: string[];
 }
 
 // ─── Exercise Data Types ──────────────────────────────────────────────────────

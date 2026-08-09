@@ -4,6 +4,7 @@ import { generateHook } from './generateHook';
 import { generateGrammarBridge } from './generateGrammarBridge';
 import { generateMissionBriefing } from './generateMissionBriefing';
 import { generatePracticeExercises } from './generatePracticeExercises';
+import { generateCheckpointSession } from './generateCheckpointSession';
 import {
   savePregeneratedLesson,
   tryStartPregeneratingLesson,
@@ -33,6 +34,31 @@ async function runPregenerateNextLesson(
   const acquired = await tryStartPregeneratingLesson(uid, lesson.id);
   if (!acquired) {
     console.info(`[pregenerateNextLesson] Skipped ${lesson.id} — already generating or cached.`);
+    return true;
+  }
+
+  // REVIEW: dense checkpoint only — no hook / grammar bridge / practice pool.
+  if (lesson.tag === 'REVIEW') {
+    const checkpointSession = await generateCheckpointSession({
+      language: lesson.language,
+      level: lesson.level,
+      lessonId: lesson.id,
+      grammarFocus: lesson.grammarFocus,
+      theme: lesson.theme,
+      uiTitle: lesson.uiTitle,
+      knownVocabulary,
+    }).catch((err) => {
+      console.error('[pregenerateNextLesson] checkpoint session error:', err);
+      return null;
+    });
+
+    if (!checkpointSession) {
+      await abortPregeneratedLesson(uid, lesson.id).catch(() => {});
+      console.error('[pregenerateNextLesson] Checkpoint generation failed — cache cleared.');
+      return false;
+    }
+
+    await savePregeneratedLesson(uid, lesson.id, { checkpointSession });
     return true;
   }
 
@@ -111,12 +137,9 @@ async function runPregenerateNextLesson(
 }
 
 /**
- * Generates the full content for `lesson` in the background (hook + grammar
- * bridge + exercises) and caches everything in Firestore so the next lesson
- * can start and transition instantly. Called fire-and-forget when the user
- * enters the 'practice' phase of the current lesson — that gives ~60-180s
- * of runway, enough for all three Gemini calls to finish before the user
- * clicks "next lesson".
+ * Generates the full content for `lesson` in the background and caches it in
+ * Firestore. REVIEW lessons cache a dense checkpoint session; other tags cache
+ * hook + optional grammar/mission/exercises.
  */
 export async function pregenerateNextLesson(
   uid: string,

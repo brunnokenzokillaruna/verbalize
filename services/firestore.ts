@@ -1153,24 +1153,26 @@ export async function tryStartPregeneratingLesson(uid: string, lessonId: string)
 }
 
 /**
- * Stores a pre-generated lesson payload (hook + optional grammar bridge and
- * exercises) in the `lesson_pregen` collection so the next lesson can start
- * instantly without any AI calls. Optional fields are only persisted when
- * provided — Firestore rejects `undefined` values.
+ * Stores a pre-generated lesson payload in `lesson_pregen`.
+ * REVIEW lessons may persist only `checkpointSession` (no hook).
+ * Optional fields are only written when provided — Firestore rejects `undefined`.
  */
 export async function savePregeneratedLesson(
   uid: string,
   lessonId: string,
   payload: Pick<PregeneratedLessonDocument, 'hook' | 'grammarBridge' | 'exercises' | 'missionBriefing' | 'checkpointSession'>,
 ): Promise<void> {
+  if (!payload.hook && !payload.checkpointSession) {
+    throw new Error('savePregeneratedLesson requires hook or checkpointSession');
+  }
   const id = pregeneratedDocId(uid, lessonId);
   const data = stripUndefinedDeep({
     uid,
     lessonId,
     status: 'ready' as const,
     schemaVersion: PREGEN_SCHEMA_VERSION,
-    hook: payload.hook,
     createdAt: serverTimestamp(),
+    ...(payload.hook ? { hook: payload.hook } : {}),
     ...(payload.grammarBridge ? { grammarBridge: payload.grammarBridge } : {}),
     ...(payload.exercises && payload.exercises.length > 0 ? { exercises: payload.exercises } : {}),
     ...(payload.missionBriefing ? { missionBriefing: payload.missionBriefing } : {}),
