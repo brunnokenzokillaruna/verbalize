@@ -25,7 +25,7 @@ type FetchedDialogueAudio = {
  *
  * Provider priority:
  *   1. ElevenLabs (if ELEVENLABS_API_KEY is set server-side)
- *   2. Gemini Flash TTS — multi-speaker, 1 API call (separate TTS quota)
+ *   2. Gemini Pro TTS — multi-speaker, 1 API call (separate TTS quota)
  *   3. Google Cloud TTS (last resort)
  *
  * Caching strategy (two layers — zero wasted credits on replay):

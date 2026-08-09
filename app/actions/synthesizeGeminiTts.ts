@@ -14,13 +14,13 @@ import {
   parseSpeakerName,
   resolveSpeakerGenders,
   stripSpeakerPrefix,
-  type SpeakerGender,
 } from '@/lib/speakerGender';
+import { pickGeminiTtsVoice } from '@/lib/geminiTtsVoices';
 import type { DialogueSpeakerVoice } from '@/lib/dialogueVoiceAvatars';
 import type { SupportedLanguage } from '@/types';
 
 /* ------------------------------------------------------------------ */
-/*  Gemini Flash TTS — multi-speaker dialogue in a single API call     */
+/*  Gemini Pro TTS — multi-speaker dialogue in a single API call       */
 /*                                                                     */
 /*  Uses the Interactions API with a dedicated TTS model so quotas     */
 /*  are separate from lesson content generation (gemini-3.5-flash).    */
@@ -28,15 +28,10 @@ import type { SupportedLanguage } from '@/types';
 /* ------------------------------------------------------------------ */
 
 const TTS_MODEL_CHAIN = [
+  'gemini-2.5-pro-preview-tts',
   'gemini-2.5-flash-preview-tts',
   'gemini-3.1-flash-tts-preview',
 ] as const;
-
-/** Prebuilt Gemini voices by gender (multilingual). */
-const GEMINI_VOICES = {
-  female: ['Aoede', 'Kore', 'Leda', 'Zephyr'] as const,
-  male: ['Puck', 'Charon', 'Fenrir', 'Orus'] as const,
-};
 
 const STYLE_PROMPT =
   'Speak naturally at a slightly slower pace suitable for language learners. ' +
@@ -53,8 +48,8 @@ export type GeminiDialogueResult = {
 const dialogueCache = new Map<string, GeminiDialogueResult>();
 
 function cacheKey(lines: string[], language: SupportedLanguage): string {
-  // v2: voice assignment is gender-aware (invalidates pre-fix caches).
-  return `v2:${language}:${lines.map((l) => l.trim().toLowerCase()).join('|')}`;
+  // v3: full 30-voice gender pools (invalidates older fixed-pool caches).
+  return `v3:${language}:${lines.map((l) => l.trim().toLowerCase()).join('|')}`;
 }
 
 /** Gemini multi-speaker TTS supports at most 2 distinct speakers. */
@@ -65,14 +60,6 @@ function countUniqueSpeakers(lines: string[]): number {
     if (name) speakers.add(name);
   }
   return speakers.size;
-}
-
-function pickGeminiVoice(gender: SpeakerGender, used: Set<string>): string {
-  const pool = GEMINI_VOICES[gender];
-  const available = pool.filter((v) => !used.has(v));
-  const voice = available[0] ?? pool[0]!;
-  used.add(voice);
-  return voice;
 }
 
 function buildMultiSpeakerPrompt(lines: string[]): {
@@ -89,7 +76,7 @@ function buildMultiSpeakerPrompt(lines: string[]): {
   const usedVoices = new Set<string>();
   const speechConfig = [speakerA, speakerB].map((speaker) => {
     const gender = genders.get(speaker) ?? (speaker === speakerA ? 'female' : 'male');
-    return { speaker, voice: pickGeminiVoice(gender, usedVoices) };
+    return { speaker, voice: pickGeminiTtsVoice(gender, usedVoices) };
   });
 
   const formattedLines = nonEmpty.map((line, i) => {
