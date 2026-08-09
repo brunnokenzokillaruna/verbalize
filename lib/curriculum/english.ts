@@ -371,7 +371,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Pegando a Chave",
     "grammarFocus": "Vocabulário: Good (Bom — usos básicos)",
-    "theme": "Tema 3: Check-in e Apresentações"
+    "theme": "Tema 3: Check-in e Apresentações",
+    "topicKey": "good-well",
+    "lessonRole": "introduce"
   },
   {
     "id": "en-a1-039",
@@ -407,7 +409,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Uma Manhã de Sol",
     "grammarFocus": "Par de Confusão: Good VS Well",
-    "theme": "Tema 4: O Primeiro Café da Manhã"
+    "theme": "Tema 4: O Primeiro Café da Manhã",
+    "topicKey": "good-well",
+    "lessonRole": "contrast"
   },
   {
     "id": "en-a1-043",
@@ -452,7 +456,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Sentando na Mesa",
     "grammarFocus": "Vocabulário: Too (Excesso)",
-    "theme": "Tema 4: O Primeiro Café da Manhã"
+    "theme": "Tema 4: O Primeiro Café da Manhã",
+    "topicKey": "very-too",
+    "lessonRole": "introduce"
   },
   {
     "id": "en-a1-048",
@@ -461,7 +467,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Entrando no Bistrôzinho",
     "grammarFocus": "Par de Confusão: Very VS Too",
-    "theme": "Tema 4: O Primeiro Café da Manhã"
+    "theme": "Tema 4: O Primeiro Café da Manhã",
+    "topicKey": "very-too",
+    "lessonRole": "contrast"
   },
   {
     "id": "en-a1-049",
@@ -488,7 +496,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "A Bebida Quente e o Suco",
     "grammarFocus": "Vocabulário: Cook (Cozinhar)",
-    "theme": "Tema 4: O Primeiro Café da Manhã"
+    "theme": "Tema 4: O Primeiro Café da Manhã",
+    "topicKey": "eat-cook",
+    "lessonRole": "introduce"
   },
   {
     "id": "en-a1-052",
@@ -515,7 +525,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Elogiando a Qualidade",
     "grammarFocus": "Par de Confusão: Eat VS Cook",
-    "theme": "Tema 4: O Primeiro Café da Manhã"
+    "theme": "Tema 4: O Primeiro Café da Manhã",
+    "topicKey": "eat-cook",
+    "lessonRole": "contrast"
   },
   {
     "id": "en-a1-055",
@@ -677,7 +689,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Analisando o Mapa da Cidade",
     "grammarFocus": "Par de Confusão: Near VS Close to",
-    "theme": "Tema 6: Passeando e Explorando"
+    "theme": "Tema 6: Passeando e Explorando",
+    "topicKey": "near-vs-close-to",
+    "lessonRole": "contrast"
   },
   {
     "id": "en-a1-073",
@@ -713,7 +727,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Pelas Calçadas Antigas",
     "grammarFocus": "Par de Confusão: In VS On (Tempo)",
-    "theme": "Tema 6: Passeando e Explorando"
+    "theme": "Tema 6: Passeando e Explorando",
+    "topicKey": "in-vs-on-tempo",
+    "lessonRole": "contrast"
   },
   {
     "id": "en-a1-077",
@@ -803,7 +819,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Próximo Ponto",
     "grammarFocus": "Par de Confusão: 'S vs Of (Quando usar cada um)",
-    "theme": "Tema 6: Passeando e Explorando"
+    "theme": "Tema 6: Passeando e Explorando",
+    "topicKey": "s-vs-of-quando-usar-cada-um",
+    "lessonRole": "contrast"
   },
   {
     "id": "en-a1-087",
@@ -1058,31 +1076,31 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
+    "id": "en-a2-115",
+    "language": "en",
     "level": "A2",
     "tag": "VERB",
     "uiTitle": "Check-in e Bagagem",
     "grammarFocus": "Phrasal Verbs: Check in, Pick up, Drop off",
-    "theme": "Tema 9: Minha Casa, Minha Rotina",
-    "language": "en",
-    "id": "en-a2-115"
+    "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
+    "id": "en-a2-116",
+    "language": "en",
     "level": "A2",
     "tag": "VERB",
     "uiTitle": "Descobertas Urbanas",
     "grammarFocus": "Phrasal Verbs: Run out of, Find out, Figure out",
-    "theme": "Tema 9: Minha Casa, Minha Rotina",
-    "language": "en",
-    "id": "en-a2-116"
+    "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
+    "id": "en-a2-117",
+    "language": "en",
     "level": "A2",
     "tag": "DIAL",
     "uiTitle": "Frases de Viagem",
     "grammarFocus": "5 Frases com Phrasal Verbs em Aeroportos e Hotéis",
-    "theme": "Tema 9: Minha Casa, Minha Rotina",
-    "language": "en",
-    "id": "en-a2-117"
+    "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
     "id": "en-a2-118",
@@ -1127,25 +1145,27 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Organizando as Coisas",
     "grammarFocus": "Par de Confusão: Have to VS Must",
-    "theme": "Tema 9: Minha Casa, Minha Rotina"
+    "theme": "Tema 9: Minha Casa, Minha Rotina",
+    "topicKey": "have-to-vs-must",
+    "lessonRole": "contrast"
   },
   {
+    "id": "en-a2-123",
+    "language": "en",
     "level": "A2",
     "tag": "PRON",
     "uiTitle": "The Schwa Sound",
     "grammarFocus": "The Schwa /ə/ in Unstressed Syllables",
-    "theme": "Tema 9: Minha Casa, Minha Rotina",
-    "language": "en",
-    "id": "en-a2-123"
+    "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
+    "id": "en-a2-124",
+    "language": "en",
     "level": "A2",
     "tag": "PRON",
     "uiTitle": "Silent Letters",
     "grammarFocus": "Silent Letters: K, B, W and GH in Common Words",
-    "theme": "Tema 9: Minha Casa, Minha Rotina",
-    "language": "en",
-    "id": "en-a2-124"
+    "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
     "id": "en-a2-125",
@@ -1206,7 +1226,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "language": "en",
     "level": "A2",
     "tag": "VERB",
-    "uiTitle": "Passos da Vida",
+    "uiTitle": "Negando no Passado",
     "grammarFocus": "Negação no Simple Past (Didn't)",
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
@@ -1316,43 +1336,45 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "A Volta Redonda",
     "grammarFocus": "Par de Confusão: Less VS Fewer",
-    "theme": "Tema 10: O Mercado e a Cozinha"
+    "theme": "Tema 10: O Mercado e a Cozinha",
+    "topicKey": "less-vs-fewer",
+    "lessonRole": "contrast"
   },
   {
+    "id": "en-a2-144",
+    "language": "en",
     "level": "A2",
     "tag": "VOC",
     "uiTitle": "Make ou Do?",
     "grammarFocus": "Collocations: Make vs Do (Make a mistake, Do homework)",
-    "theme": "Tema 10: O Mercado e a Cozinha",
-    "language": "en",
-    "id": "en-a2-144"
+    "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
+    "id": "en-a2-145",
+    "language": "en",
     "level": "A2",
     "tag": "VOC",
     "uiTitle": "Take ou Have?",
     "grammarFocus": "Collocations: Take vs Have (Take a shower, Have a break)",
-    "theme": "Tema 10: O Mercado e a Cozinha",
-    "language": "en",
-    "id": "en-a2-145"
+    "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
+    "id": "en-a2-146",
+    "language": "en",
     "level": "A2",
     "tag": "VOC",
     "uiTitle": "Adjetivos Fortes",
     "grammarFocus": "Collocations: Adjective + Noun (Heavy rain, Deep sleep)",
-    "theme": "Tema 10: O Mercado e a Cozinha",
-    "language": "en",
-    "id": "en-a2-146"
+    "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
+    "id": "en-a2-147",
+    "language": "en",
     "level": "A2",
     "tag": "MISS",
     "uiTitle": "Dia no Supermercado",
     "grammarFocus": "Prática: Collocations do Cotidiano em Lojas e Mercados",
-    "theme": "Tema 10: O Mercado e a Cozinha",
-    "language": "en",
-    "id": "en-a2-147"
+    "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
     "id": "en-a2-148",
@@ -1406,7 +1428,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Sábado à Noite",
     "grammarFocus": "Par de Confusão: Simple Past VS Past Continuous",
-    "theme": "Tema 11: Contando o Final de Semana"
+    "theme": "Tema 11: Contando o Final de Semana",
+    "topicKey": "simple-past-past-continuous",
+    "lessonRole": "introduce"
   },
   {
     "id": "en-a2-154",
@@ -1451,7 +1475,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Reações do Amigo",
     "grammarFocus": "Par de Confusão: Used to VS Be used to",
-    "theme": "Tema 11: Contando o Final de Semana"
+    "theme": "Tema 11: Contando o Final de Semana",
+    "topicKey": "used-to",
+    "lessonRole": "introduce"
   },
   {
     "id": "en-a2-159",
@@ -1523,7 +1549,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "A Diferença é Clara",
     "grammarFocus": "Prática: Entrevista de Trajetória Pessoal",
-    "theme": "Tema 12: Expressando Opiniões e Comparações"
+    "theme": "Tema 12: Comparações e Pares de Confusão"
   },
   {
     "id": "en-a2-167",
@@ -1532,7 +1558,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "O Meu Favorito",
     "grammarFocus": "Vocabulário: Know (Conhecer/Saber)",
-    "theme": "Tema 12: Expressando Opiniões e Comparações"
+    "theme": "Tema 12: Comparações e Pares de Confusão",
+    "topicKey": "know-meet",
+    "lessonRole": "introduce"
   },
   {
     "id": "en-a2-168",
@@ -1541,7 +1569,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Não Tão Bom Assim",
     "grammarFocus": "Vocabulário: Meet (Conhecer pela primeira vez)",
-    "theme": "Tema 12: Expressando Opiniões e Comparações"
+    "theme": "Tema 12: Comparações e Pares de Confusão",
+    "topicKey": "know-meet",
+    "lessonRole": "introduce"
   },
   {
     "id": "en-a2-169",
@@ -1550,7 +1580,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Avaliando o Custo",
     "grammarFocus": "Par de Confusão: Know VS Meet",
-    "theme": "Tema 12: Expressando Opiniões e Comparações"
+    "theme": "Tema 12: Comparações e Pares de Confusão",
+    "topicKey": "know-meet",
+    "lessonRole": "contrast"
   },
   {
     "id": "en-a2-170",
@@ -1559,7 +1591,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "REVIEW",
     "uiTitle": "Checkpoint — lições 161–170",
     "grammarFocus": "Revisão: lições 161–170",
-    "theme": "Tema 12: Expressando Opiniões e Comparações"
+    "theme": "Tema 12: Comparações e Pares de Confusão"
   },
   {
     "id": "en-a2-171",
@@ -1568,7 +1600,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "O Degrau Acima",
     "grammarFocus": "Par de Confusão: Bring VS Take",
-    "theme": "Tema 12: Expressando Opiniões e Comparações"
+    "theme": "Tema 12: Comparações e Pares de Confusão",
+    "topicKey": "bring-take",
+    "lessonRole": "contrast"
   },
   {
     "id": "en-a2-172",
@@ -1577,7 +1611,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "EXPR",
     "uiTitle": "Veredito Pessoal",
     "grammarFocus": "5 Expressões com o verbo Have (Have a meal, Have a shower)",
-    "theme": "Tema 12: Expressando Opiniões e Comparações"
+    "theme": "Tema 12: Comparações e Pares de Confusão"
   },
   {
     "id": "en-a2-173",
@@ -1586,7 +1620,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "O Crítico de Plantão",
     "grammarFocus": "Vocabulário: Borrow e Lend",
-    "theme": "Tema 12: Expressando Opiniões e Comparações"
+    "theme": "Tema 12: Comparações e Pares de Confusão",
+    "topicKey": "borrow-lend",
+    "lessonRole": "introduce"
   },
   {
     "id": "en-a2-174",
@@ -1595,7 +1631,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Notas do Avaliador",
     "grammarFocus": "Par de Confusão: Borrow VS Lend",
-    "theme": "Tema 12: Expressando Opiniões e Comparações"
+    "theme": "Tema 12: Comparações e Pares de Confusão",
+    "topicKey": "borrow-lend",
+    "lessonRole": "contrast"
   },
   {
     "id": "en-a2-175",
@@ -1604,7 +1642,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "O Fim do Jogo",
     "grammarFocus": "Vocabulário: Hear e Listen (to)",
-    "theme": "Tema 12: Expressando Opiniões e Comparações"
+    "theme": "Tema 12: Comparações e Pares de Confusão",
+    "topicKey": "hear-listen",
+    "lessonRole": "introduce"
   },
   {
     "id": "en-a2-176",
@@ -1613,7 +1653,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Bancando o Juíz",
     "grammarFocus": "Par de Confusão: Hear VS Listen (to)",
-    "theme": "Tema 12: Expressando Opiniões e Comparações"
+    "theme": "Tema 12: Comparações e Pares de Confusão",
+    "topicKey": "hear-listen",
+    "lessonRole": "contrast"
   },
   {
     "id": "en-a2-177",
@@ -1622,7 +1664,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Perspectiva",
     "grammarFocus": "Vocabulário: See, Watch e Look (at)",
-    "theme": "Tema 12: Expressando Opiniões e Comparações"
+    "theme": "Tema 12: Comparações e Pares de Confusão",
+    "topicKey": "see-watch-look",
+    "lessonRole": "introduce"
   },
   {
     "id": "en-a2-178",
@@ -1631,7 +1675,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Fechamento",
     "grammarFocus": "Par de Confusão: See VS Watch VS Look",
-    "theme": "Tema 12: Expressando Opiniões e Comparações"
+    "theme": "Tema 12: Comparações e Pares de Confusão",
+    "topicKey": "see-watch-look",
+    "lessonRole": "contrast"
   },
   {
     "id": "en-a2-179",
@@ -1640,7 +1686,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Resultado",
     "grammarFocus": "Vocabulário: Speak e Talk",
-    "theme": "Tema 12: Expressando Opiniões e Comparações"
+    "theme": "Tema 12: Comparações e Pares de Confusão",
+    "topicKey": "speak-talk",
+    "lessonRole": "introduce"
   },
   {
     "id": "en-a2-180",
@@ -1649,7 +1697,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "REVIEW",
     "uiTitle": "Checkpoint — lições 171–180",
     "grammarFocus": "Revisão: lições 171–180",
-    "theme": "Tema 12: Expressando Opiniões e Comparações"
+    "theme": "Tema 12: Comparações e Pares de Confusão"
   },
   {
     "id": "en-a2-181",
@@ -1676,7 +1724,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Um Acorde Distante",
     "grammarFocus": "Par de Confusão: Win VS Beat VS Earn",
-    "theme": "Tema 13: Clima, Natureza e Passeios"
+    "theme": "Tema 13: Clima, Natureza e Passeios",
+    "topicKey": "win-vs-beat-vs-earn",
+    "lessonRole": "contrast"
   },
   {
     "id": "en-a2-184",
@@ -1706,13 +1756,13 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
+    "id": "en-a2-187",
+    "language": "en",
     "level": "A2",
     "tag": "VOC",
     "uiTitle": "Big Price Tags",
     "grammarFocus": "Large Numbers: Hundred, Thousand and Million",
-    "theme": "Tema 13: Clima, Natureza e Passeios",
-    "language": "en",
-    "id": "en-a2-187"
+    "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
     "id": "en-a2-188",
@@ -1724,13 +1774,13 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
+    "id": "en-a2-189",
+    "language": "en",
     "level": "A2",
     "tag": "MISS",
     "uiTitle": "Buying the Ticket",
     "grammarFocus": "Public Transport: Oyster Card, Tube and Transfers",
-    "theme": "Tema 13: Clima, Natureza e Passeios",
-    "language": "en",
-    "id": "en-a2-189"
+    "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
     "id": "en-a2-190",
@@ -1811,7 +1861,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "O Refúgio do Café",
     "grammarFocus": "Par de Confusão: Still VS Yet VS Already",
-    "theme": "Tema 14: Rotina do Escritório e da Cidade"
+    "theme": "Tema 14: Rotina do Escritório e da Cidade",
+    "topicKey": "still-vs-yet-vs-already",
+    "lessonRole": "contrast"
   },
   {
     "id": "en-a2-199",
@@ -1823,13 +1875,13 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 14: Rotina do Escritório e da Cidade"
   },
   {
+    "id": "en-a2-200",
+    "language": "en",
     "level": "A2",
     "tag": "REVIEW",
     "uiTitle": "Checkpoint — lições 191–200",
     "grammarFocus": "Revisão: lições 191–200",
-    "theme": "Tema 14: Rotina do Escritório e da Cidade",
-    "language": "en",
-    "id": "en-a2-200"
+    "theme": "Tema 14: Rotina do Escritório e da Cidade"
   },
   {
     "id": "en-a2-201",
@@ -1847,7 +1899,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Conversa no Corredor",
     "grammarFocus": "Par de Confusão: Also VS Too VS Either",
-    "theme": "Tema 14: Rotina do Escritório e da Cidade"
+    "theme": "Tema 14: Rotina do Escritório e da Cidade",
+    "topicKey": "also-vs-too-vs-either",
+    "lessonRole": "contrast"
   },
   {
     "id": "en-a2-203",
@@ -1865,7 +1919,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "A Reunião do Projeto",
     "grammarFocus": "Par de Confusão: Hear VS Here",
-    "theme": "Tema 14: Rotina do Escritório e da Cidade"
+    "theme": "Tema 14: Rotina do Escritório e da Cidade",
+    "topicKey": "hear-vs-here",
+    "lessonRole": "contrast"
   },
   {
     "id": "en-a2-205",
@@ -1874,7 +1930,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Responsabilidade Diária",
     "grammarFocus": "Par de Confusão: Then VS Than",
-    "theme": "Tema 14: Rotina do Escritório e da Cidade"
+    "theme": "Tema 14: Rotina do Escritório e da Cidade",
+    "topicKey": "then-vs-than",
+    "lessonRole": "contrast"
   },
   {
     "id": "en-a2-206",
@@ -1883,7 +1941,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "O Ponto Final",
     "grammarFocus": "Par de Confusão: Lose VS Loose",
-    "theme": "Tema 14: Rotina do Escritório e da Cidade"
+    "theme": "Tema 14: Rotina do Escritório e da Cidade",
+    "topicKey": "lose-vs-loose",
+    "lessonRole": "contrast"
   },
   {
     "id": "en-a2-207",
@@ -1904,31 +1964,31 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 15: Saúde e Farmácia"
   },
   {
+    "id": "en-a2-209",
+    "language": "en",
     "level": "A2",
     "tag": "DIAL",
     "uiTitle": "At the Doctor",
     "grammarFocus": "5 Phrases for Appointments: Symptoms and Prescriptions",
-    "theme": "Tema 15: Saúde e Farmácia",
-    "language": "en",
-    "id": "en-a2-209"
+    "theme": "Tema 15: Saúde e Farmácia"
   },
   {
+    "id": "en-a2-210",
+    "language": "en",
     "level": "A2",
     "tag": "REVIEW",
     "uiTitle": "Checkpoint — lições 201–210",
     "grammarFocus": "Revisão: lições 201–210",
-    "theme": "Tema 15: Saúde e Farmácia",
-    "language": "en",
-    "id": "en-a2-210"
+    "theme": "Tema 15: Saúde e Farmácia"
   },
   {
+    "id": "en-a2-211",
+    "language": "en",
     "level": "A2",
     "tag": "VOC",
     "uiTitle": "Britânico vs Americano",
     "grammarFocus": "British vs American Vocabulary (Lift/Elevator, Queue/Line)",
-    "theme": "Tema 15: Saúde e Farmácia",
-    "language": "en",
-    "id": "en-a2-211"
+    "theme": "Tema 15: Saúde e Farmácia"
   },
   {
     "id": "en-a2-212",
@@ -1994,22 +2054,22 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 15: Saúde e Farmácia"
   },
   {
+    "id": "en-a2-219",
+    "language": "en",
     "level": "A2",
     "tag": "GRAM",
     "uiTitle": "Action in Progress",
     "grammarFocus": "Present Continuous: Be + -ing vs Simple Present",
-    "theme": "Tema 15: Saúde e Farmácia",
-    "language": "en",
-    "id": "en-a2-219"
+    "theme": "Tema 15: Saúde e Farmácia"
   },
   {
+    "id": "en-a2-220",
+    "language": "en",
     "level": "A2",
     "tag": "REVIEW",
     "uiTitle": "Checkpoint — lições 211–220",
     "grammarFocus": "Revisão: lições 211–220",
-    "theme": "Tema 15: Saúde e Farmácia",
-    "language": "en",
-    "id": "en-a2-220"
+    "theme": "Tema 15: Saúde e Farmácia"
   },
   {
     "id": "en-a2-221",
@@ -2039,40 +2099,40 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
+    "id": "en-b1-224",
+    "language": "en",
     "level": "B1",
     "tag": "PRON",
     "uiTitle": "Intonation and Rhythm",
     "grammarFocus": "Intonation in Questions, Negation and Emphasis",
-    "theme": "Tema 16: Relembrando a Infância",
-    "language": "en",
-    "id": "en-b1-224"
+    "theme": "Tema 16: Relembrando a Infância"
   },
   {
+    "id": "en-b1-225",
+    "language": "en",
     "level": "B1",
     "tag": "PRON",
     "uiTitle": "Linking Sounds",
     "grammarFocus": "Linking Sounds and Weak Forms (An apple, Cup of tea)",
-    "theme": "Tema 16: Relembrando a Infância",
-    "language": "en",
-    "id": "en-b1-225"
+    "theme": "Tema 16: Relembrando a Infância"
   },
   {
+    "id": "en-b1-226",
+    "language": "en",
     "level": "B1",
     "tag": "GRAM",
     "uiTitle": "Gonna, Wanna, Gotta",
     "grammarFocus": "Informal Reductions: Gonna, Wanna, Gotta, Kinda",
-    "theme": "Tema 16: Relembrando a Infância",
-    "language": "en",
-    "id": "en-b1-226"
+    "theme": "Tema 16: Relembrando a Infância"
   },
   {
+    "id": "en-b1-227",
+    "language": "en",
     "level": "B1",
     "tag": "DIAL",
     "uiTitle": "Small Talk Natural",
     "grammarFocus": "5 Small Talk Fillers (I mean, You know, Sort of)",
-    "theme": "Tema 16: Relembrando a Infância",
-    "language": "en",
-    "id": "en-b1-227"
+    "theme": "Tema 16: Relembrando a Infância"
   },
   {
     "id": "en-b1-228",
@@ -2081,7 +2141,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Aquele Ano Longe",
     "grammarFocus": "Narrativa: Simple Past VS Past Continuous",
-    "theme": "Tema 16: Relembrando a Infância"
+    "theme": "Tema 16: Relembrando a Infância",
+    "topicKey": "simple-past-past-continuous",
+    "lessonRole": "reinforce"
   },
   {
     "id": "en-b1-229",
@@ -2171,7 +2233,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Lá e Cá",
     "grammarFocus": "Par de Confusão: Who VS Whom",
-    "theme": "Tema 16: Relembrando a Infância"
+    "theme": "Tema 16: Relembrando a Infância",
+    "topicKey": "who-vs-whom",
+    "lessonRole": "contrast"
   },
   {
     "id": "en-b1-239",
@@ -2201,13 +2265,13 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 16: Relembrando a Infância"
   },
   {
+    "id": "en-b1-242",
+    "language": "en",
     "level": "B1",
     "tag": "DIAL",
     "uiTitle": "Phone Call",
     "grammarFocus": "5 Phrases for Phone Calls: Voicemail and Scheduling",
-    "theme": "Tema 17: Fofocas e Histórias Indiretas",
-    "language": "en",
-    "id": "en-b1-242"
+    "theme": "Tema 16: Relembrando a Infância"
   },
   {
     "id": "en-b1-243",
@@ -2225,7 +2289,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "A Caixa de Fotografias",
     "grammarFocus": "Par de Confusão: When VS If",
-    "theme": "Tema 16: Relembrando a Infância"
+    "theme": "Tema 16: Relembrando a Infância",
+    "topicKey": "when-vs-if",
+    "lessonRole": "contrast"
   },
   {
     "id": "en-b1-245",
@@ -2267,7 +2333,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-b1-249",
     "language": "en",
     "level": "B1",
-    "tag": "VOC",
+    "tag": "GRAM",
     "uiTitle": "Trocando Recados no Portão",
     "grammarFocus": "Conjunções: And, But, Or, So (Refinamento)",
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
@@ -2303,7 +2369,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-b1-253",
     "language": "en",
     "level": "B1",
-    "tag": "VOC",
+    "tag": "GRAM",
     "uiTitle": "Lembrando do que Ouviu",
     "grammarFocus": "Conjunções: Because, When, If, As, Since",
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
@@ -2333,7 +2399,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Concluindo a Fofoca",
     "grammarFocus": "Par de Confusão: Because VS Because of",
-    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+    "theme": "Tema 17: Fofocas e Histórias Indiretas",
+    "topicKey": "because-vs-because-of",
+    "lessonRole": "contrast"
   },
   {
     "id": "en-b1-257",
@@ -2378,7 +2446,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Voltando ao Tópico",
     "grammarFocus": "Par de Confusão: Think of VS Think about",
-    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+    "theme": "Tema 17: Fofocas e Histórias Indiretas",
+    "topicKey": "think-of-vs-think-about",
+    "lessonRole": "contrast"
   },
   {
     "id": "en-b1-262",
@@ -2390,22 +2460,22 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
+    "id": "en-b1-263",
+    "language": "en",
     "level": "B1",
     "tag": "MISS",
     "uiTitle": "Reserved Dinner",
     "grammarFocus": "At the Restaurant: Booking, Menu, Bill and Tip",
-    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro",
-    "language": "en",
-    "id": "en-b1-263"
+    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
+    "id": "en-b1-264",
+    "language": "en",
     "level": "B1",
     "tag": "CULT",
     "uiTitle": "NHS and Health Insurance",
     "grammarFocus": "UK Health System: NHS, GP and Private Insurance",
-    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro",
-    "language": "en",
-    "id": "en-b1-264"
+    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
     "id": "en-b1-265",
@@ -2414,7 +2484,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Enfatizando Culpados",
     "grammarFocus": "Pronomes Reflexivos como ênfase (Myself)",
-    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
     "id": "en-b1-266",
@@ -2423,7 +2493,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Palavras Indefinidas",
     "grammarFocus": "Adjetivos Indefinidos: Several, Few, A few",
-    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
     "id": "en-b1-267",
@@ -2432,7 +2502,7 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Antes ou Depois do Substantivo",
     "grammarFocus": "Ordem dos Adjetivos (Big red car)",
-    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
     "id": "en-b1-268",
@@ -2477,7 +2547,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Teorizando a Vida",
     "grammarFocus": "Par de Confusão: Place VS Spot VS Location",
-    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
+    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro",
+    "topicKey": "place-vs-spot-vs-location",
+    "lessonRole": "contrast"
   },
   {
     "id": "en-b1-273",
@@ -2513,7 +2585,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Deixando Voar",
     "grammarFocus": "Par de Confusão: Leave VS Quit VS Exit",
-    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
+    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro",
+    "topicKey": "leave-vs-quit-vs-exit",
+    "lessonRole": "contrast"
   },
   {
     "id": "en-b1-277",
@@ -2603,7 +2677,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Revisando o Currículo",
     "grammarFocus": "Par de Confusão: Affect VS Effect",
-    "theme": "Tema 19: Vida Profissional e Entrevistas"
+    "theme": "Tema 19: Vida Profissional e Entrevistas",
+    "topicKey": "affect-vs-effect",
+    "lessonRole": "contrast"
   },
   {
     "id": "en-b1-287",
@@ -2630,7 +2706,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Apresentando a Trajetória",
     "grammarFocus": "Par de Confusão: Advice VS Advise",
-    "theme": "Tema 19: Vida Profissional e Entrevistas"
+    "theme": "Tema 19: Vida Profissional e Entrevistas",
+    "topicKey": "advice-vs-advise",
+    "lessonRole": "contrast"
   },
   {
     "id": "en-b1-290",
@@ -2642,22 +2720,22 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
+    "id": "en-b1-291",
+    "language": "en",
     "level": "B1",
     "tag": "MISS",
     "uiTitle": "A Entrevista Decisiva",
     "grammarFocus": "Job Interview: Tell me about yourself, Strengths and Weaknesses",
-    "theme": "Tema 19: Vida Profissional e Entrevistas",
-    "language": "en",
-    "id": "en-b1-291"
+    "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
+    "id": "en-b1-292",
+    "language": "en",
     "level": "B1",
     "tag": "DIAL",
     "uiTitle": "E-mail Profissional",
     "grammarFocus": "5 Phrases for Professional Email (I am writing to, Please find attached)",
-    "theme": "Tema 19: Vida Profissional e Entrevistas",
-    "language": "en",
-    "id": "en-b1-292"
+    "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
     "id": "en-b1-293",
@@ -2675,7 +2753,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Negociando Salário",
     "grammarFocus": "Par de Confusão: Raise VS Rise",
-    "theme": "Tema 19: Vida Profissional e Entrevistas"
+    "theme": "Tema 19: Vida Profissional e Entrevistas",
+    "topicKey": "raise-vs-rise",
+    "lessonRole": "contrast"
   },
   {
     "id": "en-b1-295",
@@ -2693,7 +2773,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "A Pergunta Difícil",
     "grammarFocus": "Par de Confusão: Remember VS Remind",
-    "theme": "Tema 19: Vida Profissional e Entrevistas"
+    "theme": "Tema 19: Vida Profissional e Entrevistas",
+    "topicKey": "remember-vs-remind",
+    "lessonRole": "contrast"
   },
   {
     "id": "en-b1-297",
@@ -2792,7 +2874,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "O Post Viral",
     "grammarFocus": "Par de Confusão: Used to VS Would (Hábitos no passado)",
-    "theme": "Tema 20: Expressões e Redes Sociais"
+    "theme": "Tema 20: Expressões e Redes Sociais",
+    "topicKey": "used-to",
+    "lessonRole": "reinforce"
   },
   {
     "id": "en-b1-308",
@@ -2846,7 +2930,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "A Diferença é Fundamental",
     "grammarFocus": "Par de Confusão: For VS Since",
-    "theme": "Tema 20: Expressões e Redes Sociais"
+    "theme": "Tema 20: Expressões e Redes Sociais",
+    "topicKey": "for-vs-since",
+    "lessonRole": "contrast"
   },
   {
     "id": "en-b1-314",
@@ -2864,7 +2950,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "O Comentário Ambíguo",
     "grammarFocus": "Par de Confusão: Been to VS Gone to",
-    "theme": "Tema 20: Expressões e Redes Sociais"
+    "theme": "Tema 20: Expressões e Redes Sociais",
+    "topicKey": "been-to-vs-gone-to",
+    "lessonRole": "contrast"
   },
   {
     "id": "en-b1-316",
@@ -3125,7 +3213,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Suspeitas Fundadas",
     "grammarFocus": "Par de Confusão: Doubt VS Suspect",
-    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+    "theme": "Tema 22: Liderança, Imperativos e Julgamentos",
+    "topicKey": "doubt-vs-suspect",
+    "lessonRole": "contrast"
   },
   {
     "id": "en-b2-345",
@@ -3134,7 +3224,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Enfatizando a Urgência",
     "grammarFocus": "Par de Confusão: So VS Such (Causa e efeito)",
-    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+    "theme": "Tema 22: Liderança, Imperativos e Julgamentos",
+    "topicKey": "so-vs-such-causa-e-efeito",
+    "lessonRole": "contrast"
   },
   {
     "id": "en-b2-346",
@@ -3143,7 +3235,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Decidindo com Firmeza",
     "grammarFocus": "Par de Confusão: Decide VS Make up one's mind",
-    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+    "theme": "Tema 22: Liderança, Imperativos e Julgamentos",
+    "topicKey": "decide-vs-make-up-one-s-mind",
+    "lessonRole": "contrast"
   },
   {
     "id": "en-b2-347",
@@ -3152,7 +3246,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Mudança de Rumo",
     "grammarFocus": "Par de Confusão: Move VS Remove",
-    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+    "theme": "Tema 22: Liderança, Imperativos e Julgamentos",
+    "topicKey": "move-vs-remove",
+    "lessonRole": "contrast"
   },
   {
     "id": "en-b2-348",
@@ -3161,7 +3257,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Fatos Reais vs Aparentes",
     "grammarFocus": "Par de Confusão: In fact VS Actually",
-    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+    "theme": "Tema 22: Liderança, Imperativos e Julgamentos",
+    "topicKey": "in-fact-vs-actually",
+    "lessonRole": "contrast"
   },
   {
     "id": "en-b2-349",
@@ -3170,7 +3268,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Apontando com Precisão",
     "grammarFocus": "Par de Confusão: Continual VS Continuous",
-    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+    "theme": "Tema 22: Liderança, Imperativos e Julgamentos",
+    "topicKey": "continual-vs-continuous",
+    "lessonRole": "contrast"
   },
   {
     "id": "en-b2-350",
@@ -3602,7 +3702,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "That ou Which?",
     "grammarFocus": "Par de Confusão: That VS Which (Refinamento Final)",
-    "theme": "Tema 26: O Inglês das Ruas e o Formal"
+    "theme": "Tema 26: O Inglês das Ruas e o Formal",
+    "topicKey": "that-vs-which-refinamento-final",
+    "lessonRole": "contrast"
   },
   {
     "id": "en-c1-398",
@@ -3656,7 +3758,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Even ou Even though?",
     "grammarFocus": "Par de Confusão: Even, Even if, Even though",
-    "theme": "Tema 26: O Inglês das Ruas e o Formal"
+    "theme": "Tema 26: O Inglês das Ruas e o Formal",
+    "topicKey": "even-even-if-even-though",
+    "lessonRole": "contrast"
   },
   {
     "id": "en-c1-404",
