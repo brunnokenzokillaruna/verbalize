@@ -24,12 +24,12 @@ const DIALOGUE_LINE_RANGES: Record<ProficiencyLevel, { min: number; max: number 
 };
 
 const COMPACT_LEVEL: Record<ProficiencyLevel, string> = {
-  A1: 'A1: ≤8 words/line, present tense, top-300 words, friendly tone.',
-  A2: 'A2: 8–12 words/line, everyday vocab, conversational fillers ok.',
-  B1: 'B1: intermediate vocab, imparfait/conditionnel ok, 10–16 words/line.',
-  B2: 'B2: varied vocab, complex clauses, natural length.',
-  C1: 'C1: advanced vocab and grammar, native-like rhythm.',
-  C2: 'C2: native-level, all registers.',
+  A1: 'A1: ≤8 words/line, present tense, top-300 words, greeting → topic → soft close.',
+  A2: 'A2: 8–12 words/line, everyday vocab, short greeting then topic, fillers ok.',
+  B1: 'B1: intermediate vocab, imparfait/conditionnel ok, natural open→topic→close.',
+  B2: 'B2: varied vocab, complex clauses, natural open→topic→close.',
+  C1: 'C1: advanced vocab and grammar, native-like rhythm, natural social arc.',
+  C2: 'C2: native-level, all registers, natural social arc.',
 };
 
 export interface HookGenerationParams {
@@ -93,7 +93,7 @@ function pickTopic(level: ProficiencyLevel, interests: string[]): string {
 function compactTagInstruction(tag: LessonTag, grammarFocus: string, uiTitle?: string, theme?: string): string {
   switch (tag) {
     case 'MISS':
-      return `MISSION: "Você" + one local role in the target language. Urgent goal tied to "${grammarFocus}".`;
+      return `MISSION: "Você" + one local role in the target language. Start with Bonjour/Excusez-moi/Hi, then urgent goal tied to "${grammarFocus}", then resolve.`;
     case 'VOC':
       return `VOC: scene fits theme; target word from "${grammarFocus}" must be one of the 2 new vocab items.`;
     case 'VERB':
@@ -142,8 +142,8 @@ export function buildMinimalHookPrompt(params: HookGenerationParams): {
     .join(' · ');
 
   const antiReuse = lastScenarioSummary
-    ? `ANTI-REUSE: Do not repeat the previous scene's situation, mood adjectives, or stock openers. Invent a new micro-scene from Theme / Focus.`
-    : `SCENE VARIETY: Invent a fresh real-life micro-situation from Theme / Focus. Avoid repeating the same stock opener or mood adjective across lessons.`;
+    ? `ANTI-REUSE: Do not repeat the previous scene's situation or mood adjectives. A short greeting is fine — invent a NEW goal/problem after it.`
+    : `SCENE VARIETY: Invent a fresh real-life micro-situation from Theme / Focus. Vary places/goals/mood; short greetings are allowed and encouraged.`;
 
   const themeContext = theme
     ? `Theme: ${theme}${uiTitle ? ` · ${uiTitle}` : ''}${arcBlock ? ` · ${arcBlock}` : ''}`
@@ -186,6 +186,11 @@ export function buildMinimalHookPrompt(params: HookGenerationParams): {
 
   const systemPrompt = `You create ${lang} micro-dialogues for Brazilian learners. Respond with ONLY valid JSON. No markdown (** or ^^). Plain vocabulary words only.`;
 
+  const conversationArc =
+    tag === 'MISS'
+      ? `Arc: short transactional open ("Bonjour"/"Excusez-moi"/"Hi") → mission goal → clear resolution close`
+      : `Arc: short greeting/check-in (1 line, max 2) → scene topic (Focus) → soft close (thanks/plan/bye). Focus appears AFTER the open.`;
+
   const prompt = `${speakerIntro}
 
 Context: ${themeContext}
@@ -197,6 +202,7 @@ ${antiReuse}
 Rules:
 - ${minLines}–${maxLines} lines; each line starts with "Name: "
 - ONE scene; each line reacts to the previous line
+- ${conversationArc}
 - Sound like a real conversation people would have — specific to the scene, not a grammar drill
 - PREMISE ALIGNMENT: If speaker A frames something negatively (too expensive, too tiring, disappointing…), speaker B must agree, disagree, or nuance — NOT only enthusiastic positives that contradict it
 - Exactly 2 newVocabulary items (non-verbs, lowercase, appear in dialogue)

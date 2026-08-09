@@ -38,6 +38,7 @@ Output ONLY this JSON:
 
 Rules for breaks:
 - List ONLY concrete coherence failures (role flip, phantom object, wrong verb, magic resolution, false causal link, topic jump, premise/tonal contradiction).
+- A brief greeting or soft check-in before the topic is fine — do NOT list greetings as breaks.
 - If the dialogue is coherent, return an empty breaks array.
 - score must reflect overall nexo quality.`;
 

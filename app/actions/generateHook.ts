@@ -107,29 +107,32 @@ STRICT A1 BEGINNER rules — the learner knows almost nothing yet:
 - Vocabulary: use ONLY the 300–500 most common everyday words (e.g. hello, eat, drink, walk, look, house, water, go, have, be, name, like, today).
 - Grammar: present tense of être/avoir (FR) or to be/to have (EN) and basic -ER verbs (FR) or simple present (EN). Simple yes/no questions allowed. NO past, NO future (except futur proche with 'aller').
 - Sentence length: max 8 words per line.
-- Tone: Informal and friendly. Use "Salut !", "Ça va ?", "On + verb" (in FR).
+- Tone: Informal and friendly. Always open with a short greeting ("Salut !", "Ça va ?") and end with a soft close ("merci", "on y va").
 - CONVERSATION EXAMPLE (French, prepositions topic — notice the human reaction):
   Marie: "Salut Hugo ! Ça va ?"
   Hugo: "Salut ! Oui, ça va très bien."
   Marie: "Où est le café ?"
   Hugo: "Il est là, sur la table."
+  Marie: "Parfait, merci !"
 - CONVERSATION EXAMPLE (English):
   Emma: "Hi Jake! How are you?"
   Jake: "I'm great, thanks! And you?"
   Emma: "Good! Where is the coffee?"
-  Jake: "It's there, on the table."`,
+  Jake: "It's there, on the table."
+  Emma: "Perfect, thanks!"`,
 
   A2: `
 A2 ELEMENTARY rules — the learner handles basic everyday situations:
 - Vocabulary: common everyday vocabulary (500–1 500 words).
 - Grammar: present, passé composé with avoir (FR) / simple past (EN), futur proche/simple (FR) / going to/will (EN), basic modals.
 - Sentence length: 8–12 words per line.
-- Tone: Conversational and alive. Use common fillers (alors, donc, bah, eh bien / so, well, actually).
+- Tone: Conversational and alive. Use common fillers (alors, donc, bah, eh bien / so, well, actually). Start with a short greeting, then the topic.
 - CONVERSATION EXAMPLE (French):
   Sophie: "Salut Lucas ! Tu viens au café ?"
   Lucas: "Ah, j'aimerais bien, mais j'ai faim !"
   Sophie: "Moi aussi ! On mange une pizza ?"
-  Lucas: "Carrément ! On y va à 14h ?"`,
+  Lucas: "Carrément ! On y va à 14h ?"
+  Sophie: "Parfait, à tout de suite !"`,
 
   B1: `
 B1 INTERMEDIATE rules — the learner can handle familiar topics:
@@ -354,7 +357,7 @@ export async function generateHook(params: GenerateHookParams): Promise<HookResu
   const arcBlock = [
     arcSummary ? `Story arc for this theme: ${arcSummary}` : '',
     lastScenarioSummary
-      ? `Previous scene recap: ${lastScenarioSummary}\nANTI-REUSE: Do NOT reuse the same situation, mood adjectives, or opening line from that recap. Invent a new micro-scene that still fits Theme / Scenario / grammar.`
+      ? `Previous scene recap: ${lastScenarioSummary}\nANTI-REUSE: Do NOT reuse the same situation or mood adjectives from that recap. A short greeting ("Salut !", "Hi!") is fine and encouraged — invent a NEW goal/problem after it.`
       : '',
   ].filter(Boolean).join('\n');
 
@@ -391,6 +394,7 @@ export async function generateHook(params: GenerateHookParams): Promise<HookResu
 - The role label MUST be identical on every line spoken by Speaker B (no variation, no switching).
 - "Você" speaks in ${lang} (even though the label is Portuguese) — this is the learner practicing. The other speaker also speaks ${lang}.
 - The scenario MUST feel urgent/high-stakes. The learner NEEDS something from the local and has to communicate to get it. Do NOT write a generic casual chat — this is a mission with a concrete goal tied to "${grammarFocus}".
+- TRANSACTIONAL OPEN: Line 1 (or lines 1–2) MUST start with a short real-life service opening (FR: "Bonjour", "Excusez-moi"; EN: "Hi", "Excuse me") before the request. Then pursue the mission goal.
 - SATISFYING MISSION RESOLUTION: The dialogue must have a complete narrative arc that resolves the learner's mission. The final lines of the conversation MUST mark the successful completion of the goal or a clear final instruction/guidance (e.g., providing the requested directions, warning of a specific danger and advising what to do, handing over a key/item, or finalizing the purchase/transaction). The dialogue must never end on a cliffhanger, an unanswered question, or a statement that leaves the learner's needs unresolved.`;
   } else if (tag === 'VERB') {
     tagInstruction = `- VERB LESSON: The target verb from '${grammarFocus}' may appear 1–2 times ONLY where it sounds natural in this scene. Do NOT repeat it to teach conjugation — that happens later in Grammar Bridge and Practice exercises.
@@ -483,7 +487,15 @@ Format:
 - Unless 'MISS' lesson: speakers are friends — use informal 'tu'/'on' (FR) or casual tone (EN)
 - ONE location for the whole dialogue — no teleporting between scenes
 - If a line asks a question, the next line must answer it
-- Beginning → small development → natural conclusion, all in the same scene
+- CONVERSATION ARC (required — sounds like real life):
+  1. OPEN (1 line; max 2 at B1+): brief greeting and/or soft check-in
+     (FR: "Salut !", "Ça va ?", "Bonjour"; EN: "Hi", "Hey", "How's it going?")
+     then immediately pivot toward the scene goal.
+  2. TOPIC (majority of lines): develop the pedagogical focus in ONE scene.
+  3. SOFT CLOSE (final 1 line): agreement, thanks, goodbye, or next step
+     (FR: "merci", "on y va", "à tout à l'heure"; EN: "thanks", "let's go", "see you").
+  Open+close together must stay under ~25% of total lines. Do NOT skip the open just to fit grammar earlier — put Focus in the TOPIC beat.
+- For MISS lessons: use a transactional open ("Bonjour" / "Excusez-moi" / "Hi") instead of casual friend small-talk; still soft-close when the mission resolves.
 - Stay within ${themeContext} — do not drift to unrelated topics
 - Sound human: contractions, varied fillers (FR: Alors, Bah, Oh, Bon; EN: Well, So, Right). FORBIDDEN: "Tiens"
 - Strictly 2-party dialogue — never address an invisible waiter/cashier/receptionist
@@ -494,7 +506,7 @@ ACTION AND SEMANTICS:
 - NO PHANTOM PROPS: Do NOT introduce new objects or places (tree, bench, cupboard) unless mentioned in the previous 1-2 lines or part of the opening scene. Do NOT invent a location just to teach a preposition (e.g. no "under a tree" to use "sous").
 - PRESENT MOMENT: Keep the dialogue in present/immediate future. No past-tense anecdotes ("I waited 10 minutes...") unless explicitly reminiscing.
 - PREMISE ALIGNMENT: If speaker A frames something negatively (too expensive, too tiring, too late, disappointing…), speaker B must agree, disagree, or nuance that framing — NOT reply with only enthusiastic positives that contradict it.
-- SCENE VARIETY: Invent a fresh, realistic micro-situation from Theme / Scenario / grammar focus. Do NOT reuse the same stock weekend-recap opener or the same mood adjective across lessons. Vary places, goals, and mood (plans, errands, small problems, preferences, surprises) so consecutive lessons feel different.
+- SCENE VARIETY: Invent a fresh, realistic micro-situation from Theme / Scenario / grammar focus. Do NOT reuse the same weekend-recap *plot* or the same mood adjective across lessons. Short greetings are NOT banned — vary places, goals, and mood (plans, errands, small problems, preferences, surprises) so consecutive lessons feel different.
 - NATURAL LIFE: The dialogue must sound like something two people would actually say in real life — reactive, specific to the scene, not a grammar worksheet in disguise.
 - ENDING: If someone will go get something, end with them leaving or about to leave — NOT suddenly "I found it" without the fetch action.
 
@@ -508,6 +520,10 @@ Sarah: "N'oublie pas les vêtements de rechange !" ← BROKEN: new items with no
 ❌ BAD — disconnected observations (NEVER produce this):
 "Le hall est sombre." / "La porte est étroite." / "La clé est petite." — nobody is talking TO each other
 
+❌ BAD — cold-open mid-problem with no greeting (avoid this pattern):
+Julia: "Oh non, j'ai oublié ma clé sur la porte !"
+(starts mid-crisis with zero social framing)
+
 ❌ BAD — key on door (NEVER produce this):
 Julia: "j'ai oublié ma clé sur la porte"
 Victor: "j'attends pendant que tu la cherches" ← wrong verb; she knows where it is
@@ -515,28 +531,35 @@ Julia: "on attend ensemble devant l'immeuble" ← contradicts: both waiting now
 Victor: "j'ai attendu sous cet arbre" ← phantom tree + past tense
 Julia: "je l'ai trouvée" ← magic resolution without her going to get it
 
-✅ GOOD — key on door (USE THIS PATTERN):
+✅ GOOD — natural arc first (greeting → topic → soft close):
+Marie: "Salut Hugo ! Ça va ?"
+Hugo: "Salut ! Oui, et toi ?"
+Marie: "Bien ! Où est le café ?"
+Hugo: "Il est là, sur la table."
+Marie: "Parfait, merci !"
+
+✅ GOOD — after a short open, TOPIC beat can look like this (key on door):
+Julia: "Salut Victor ! Tu as deux minutes ?"
+Victor: "Salut ! Oui, qu'est-ce qu'il y a ?"
 Julia: "Oh non, j'ai oublié ma clé sur la porte !"
 Victor: "Bah, j'attends ici pendant que tu vas la chercher."
-Julia: "D'accord, attends-moi devant cet immeuble sombre."
-Victor: "Pas de souci, je ne bouge pas d'ici."
-Julia: "Super, je reviens tout de suite !"
+Julia: "D'accord, je reviens tout de suite !"
 
-✅ GOOD — each line reacts to the previous (gym bag scene):
-Sarah: "On va à la salle ? Tu as tes chaussures ?"
-Mathis: "Oui, et mes chaussettes propres aussi. Tu as tout, toi ?"
-Sarah: "Ah non, j'ai oublié ma serviette !"
-Mathis: "Pas grave, j'en ai une. On y va ?"
-Sarah: "Allez, on y va !"
+✅ GOOD — each line reacts to the previous (gym bag, with open+close):
+Sarah: "Salut Mathis ! On va à la salle ?"
+Mathis: "Salut ! Oui — tu as tes chaussures ?"
+Sarah: "Oui, et mes chaussettes propres aussi. Toi ?"
+Mathis: "Ah non, j'ai oublié ma serviette !"
+Sarah: "Pas grave, j'en ai une. Allez, on y va !"
 
 ❌ BAD — premise broken (NEVER produce this):
 Léa: "Ce resto est trop cher, non ?"
 Hugo: "Oui, et en plus c'était génial, j'adore tout !" ← contradicts the "too expensive / negative" framing without acknowledging it
 
 ✅ GOOD — premise stays consistent:
-Léa: "Ce resto est trop cher, non ?"
+Léa: "Salut Hugo ! Ce resto est trop cher, non ?"
 Hugo: "Un peu, oui… Mais le plat du jour vaut le coup."
-Léa: "Ah bon ? Moi, je vais juste prendre une entrée."
+Léa: "Ah bon ? Moi, je vais juste prendre une entrée. Merci !"
 
 Before returning JSON, re-read line by line: does line N make sense because of line N-1? If not, rewrite.
 ${knownVocabInstruction}
