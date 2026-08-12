@@ -62,9 +62,6 @@ export function ImageMatchExercise({
           <p className="text-xl sm:text-2xl font-display font-bold text-[var(--color-text-primary)]">
             {data.targetWord}
           </p>
-          <p className="text-xs sm:text-sm text-[var(--color-text-secondary)] italic">
-            {data.translation}
-          </p>
           {data.contextSentence && (
             <p className="text-xs sm:text-sm text-[var(--color-text-muted)] mt-0.5">
               &ldquo;{data.contextSentence}&rdquo;
@@ -178,7 +175,7 @@ export function ImageMatchExercise({
           className="text-center text-sm font-semibold"
           style={{ color: accentColor }}
         >
-          {data.targetWord} — {data.translation}
+          {data.targetWord}
         </p>
       )}
     </div>
