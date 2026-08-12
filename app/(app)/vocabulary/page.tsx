@@ -68,7 +68,6 @@ export default function VocabularyPage() {
   const [srsFilter, setSrsFilter] = useState<SrsFilter>('all');
   const [activeTab, setActiveTab] = useState<VocabularyTab>('review');
   const [tabInitialized, setTabInitialized] = useState(false);
-  const [initialDueCount, setInitialDueCount] = useState<number | null>(null);
 
   const language = (profile?.currentTargetLanguage ?? 'fr') as SupportedLanguage;
   const lang = LANG_LABEL[language];
@@ -148,12 +147,6 @@ export default function VocabularyPage() {
   }, [loading, tabInitialized, rawDueToday.length]);
 
   useEffect(() => {
-    if (!loading && initialDueCount === null) {
-      setInitialDueCount(rawDueToday.length);
-    }
-  }, [loading, initialDueCount, rawDueToday.length]);
-
-  useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isReviewActive) {
         closeAllReview();
@@ -170,7 +163,6 @@ export default function VocabularyPage() {
   const filteredItems = filterVocabulary(items, searchQuery, srsFilter);
   const noMatches = filteredItems.length === 0;
   const hasMoreDue = rawDueToday.length > sessionItems.length;
-  const dueBaseline = initialDueCount ?? rawDueToday.length;
 
   return (
     <>
