@@ -37,12 +37,12 @@ export function stripHighlights(text: string): string {
   return text.replace(/\^\^/g, '');
 }
 
-/** Collapses stray spaces around ^^ markers (e.g. "^^Eu^^ , acho" → "^^Eu^^, acho"). */
+/** Collapses stray spaces around ^^ markers (e.g. "^^Eu^^ , acho" → "^^Eu^^, acho") while preserving spaces outside markers. */
 export function normalizeHighlightMarkers(text: string): string {
+  if (!text) return '';
   return text
-    .replace(/\^\^([^*^]+?)\^\^[\s\u00a0]+([,.!?;:])/g, '^^$1^^$2')
-    .replace(/\^\^[\s\u00a0]+/g, '^^')
-    .replace(/[\s\u00a0]+\^\^/g, ' ^^');
+    .replace(/\^\^([^\^]+?)\^\^[\s\u00a0]+([,.!?;:])/g, (_, inner, punc) => `^^${inner}^^${punc}`)
+    .replace(/\^\^([^\^]+?)\^\^/g, (_, inner) => `^^${inner.trim()}^^`);
 }
 
 export function HighlightedText({ text, className }: { text: string; className: string }) {
