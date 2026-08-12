@@ -25,6 +25,7 @@ import { useVocabReview } from '@/hooks/useVocabReview';
 import {
   computeVocabCounts,
   filterVocabulary,
+  isReviewedToday,
   type SrsFilter,
 } from '@/utils/vocabPageHelpers';
 
@@ -137,6 +138,8 @@ export default function VocabularyPage() {
     void loadVocabulary();
   }, [loadVocabulary]);
 
+  const reviewedTodayCount = items.filter((item) => isReviewedToday(item)).length;
+
   useEffect(() => {
     if (!loading && !tabInitialized) {
       setActiveTab(rawDueToday.length > 0 ? 'review' : 'library');
@@ -187,7 +190,7 @@ export default function VocabularyPage() {
               {rawDueToday.length > 0 ? (
                 <VocabularyReviewHub
                   dueCount={rawDueToday.length}
-                  initialDueCount={dueBaseline}
+                  reviewedTodayCount={reviewedTodayCount}
                   sessionPreview={sessionPreview}
                   contextLoading={contextLoading}
                   onStartReview={startReview}

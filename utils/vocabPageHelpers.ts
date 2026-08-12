@@ -2,28 +2,52 @@ import type { UserVocabularyDocument } from '@/types';
 
 export type SrsFilter = 'all' | 'new' | 'learning' | 'mastered';
 
-export function getReviewDate(item: UserVocabularyDocument): Date | null {
+export function getReviewDate(
+  item: UserVocabularyDocument,
+  field: 'nextReview' | 'lastReview' = 'nextReview',
+): Date | null {
+  const ts = item[field];
   if (
-    item.nextReview &&
-    typeof (item.nextReview as { toDate?: () => Date }).toDate === 'function'
+    ts &&
+    typeof (ts as { toDate?: () => Date }).toDate === 'function'
   ) {
-    return (item.nextReview as { toDate: () => Date }).toDate();
+    return (ts as { toDate: () => Date }).toDate();
   }
+  if (
+    ts &&
+    typeof (ts as { toMillis?: () => number }).toMillis === 'function'
+  ) {
+    return new Date((ts as { toMillis: () => number }).toMillis());
+  }
+  if (ts instanceof Date) return ts;
   return null;
 }
 
 export function isDueForReview(item: UserVocabularyDocument, now = new Date()): boolean {
-  const reviewDate = getReviewDate(item);
+  const reviewDate = getReviewDate(item, 'nextReview');
   return reviewDate !== null && reviewDate <= now;
 }
 
-export function computeVocabCounts(items: UserVocabularyDocument[]) {
+export function isReviewedToday(item: UserVocabularyDocument, now = new Date()): boolean {
+  const lastReviewDate = getReviewDate(item, 'lastReview');
+  if (!lastReviewDate) return false;
+  return (
+    lastReviewDate.getFullYear() === now.getFullYear() &&
+    lastReviewDate.getMonth() === now.getMonth() &&
+    lastReviewDate.getDate() === now.getDate()
+  );
+}
+
+export function computeVocabCounts(items: UserVocabularyDocument[], now = new Date()) {
+  const dueTodayCount = items.filter((item) => isDueForReview(item, now)).length;
+  const reviewedTodayCount = items.filter((item) => isReviewedToday(item, now)).length;
   return {
     totalCount: items.length,
     newCount: items.filter((v) => (v.srsLevel ?? 0) <= 1).length,
     learningCount: items.filter((v) => (v.srsLevel ?? 0) >= 2 && (v.srsLevel ?? 0) <= 4).length,
     masteredCount: items.filter((v) => (v.srsLevel ?? 0) >= 5).length,
-    dueTodayCount: items.filter((item) => isDueForReview(item)).length,
+    dueTodayCount,
+    reviewedTodayCount,
   };
 }
 

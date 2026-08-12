@@ -18,7 +18,7 @@ import type { UserVocabularyDocument } from '@/types';
 
 type VocabularyReviewHubProps = {
   dueCount: number;
-  initialDueCount: number;
+  reviewedTodayCount: number;
   sessionPreview: UserVocabularyDocument[];
   contextLoading: boolean;
   onStartReview: (mode: ReviewMode) => void;
@@ -124,7 +124,7 @@ function ReviewProgressRing({
 
 export function VocabularyReviewHub({
   dueCount,
-  initialDueCount,
+  reviewedTodayCount,
   sessionPreview,
   contextLoading,
   onStartReview,
@@ -135,7 +135,8 @@ export function VocabularyReviewHub({
   const sessionCount = sessionPreview.length;
   const passiveInSession = countPassiveOnlyInSession(sessionPreview);
   const sessionsLeft = Math.ceil(dueCount / REVIEW_SESSION_SIZE);
-  const reviewedToday = Math.max(0, initialDueCount - dueCount);
+  const reviewedToday = reviewedTodayCount;
+  const totalToday = dueCount + reviewedToday;
   const remainingAfterSession = Math.max(0, dueCount - sessionCount);
   const queueSubtitle = [
     passiveInSession > 0
@@ -170,7 +171,7 @@ export function VocabularyReviewHub({
           boxShadow: '0 4px 0 rgba(29, 94, 212, 0.12)',
         }}
       >
-        <ReviewProgressRing done={reviewedToday} total={initialDueCount} />
+        <ReviewProgressRing done={reviewedToday} total={totalToday} />
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
