@@ -139,6 +139,19 @@ export function useLessonFlow({
       );
     }
 
+    // Retry once if AI exercises failed or returned empty
+    if (!aiExercises || aiExercises.length === 0) {
+      devLog('[useLessonFlow] ⚠️ AI exercises empty/null — retrying once...');
+      const tRetry = performance.now();
+      aiExercises = await fetchAiExercises();
+      devLog(
+        `[Timing] AI exercises retry: ${(performance.now() - tRetry).toFixed(0)}ms, count=${aiExercises?.length ?? 0}`,
+      );
+      if (!aiExercises || aiExercises.length === 0) {
+        console.warn('[useLessonFlow] AI exercises failed after retry — session will have visual-only exercises');
+      }
+    }
+
     let merged = assemblePracticeSession(
       aiExercises ?? [],
       [],
