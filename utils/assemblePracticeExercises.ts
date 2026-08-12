@@ -6,15 +6,11 @@ import { pinTagExclusiveFirst } from '@/utils/exerciseVariety';
 
 export function skipGrammarTrapIfQuizPassed(
   exercises: Exercise[],
-  tag: LessonTag,
-  bridgeQuizPassed: boolean,
+  _tag: LessonTag,
+  _bridgeQuizPassed: boolean,
 ): Exercise[] {
-  if (!bridgeQuizPassed || tag !== 'GRAM') return exercises;
-  const idx = exercises.findIndex((e) => e.type === 'grammar-trap');
-  if (idx !== 0) return exercises;
-  const result = [...exercises];
-  result.splice(idx, 1);
-  return result;
+  // Always return full AI exercises array (5 exercises) so total session has 5 AI + 5 visual = 10 exercises.
+  return exercises;
 }
 
 export function injectImageMatchIntoPool(

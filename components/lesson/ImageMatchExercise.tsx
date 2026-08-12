@@ -56,27 +56,24 @@ export function ImageMatchExercise({
   const hasPendingSelection = selectedWord !== null && !answered;
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-3 sm:gap-4 max-w-lg mx-auto w-full">
       {!hidePrompt && (
-        <div className="flex flex-col gap-2 px-1">
-          <p className="text-xs font-medium italic text-[var(--color-text-muted)]">
-            Qual imagem representa esta palavra?
-          </p>
-          <p className="text-2xl font-display font-bold text-[var(--color-text-primary)]">
+        <div className="flex flex-col gap-0.5 px-1 text-center sm:text-left">
+          <p className="text-xl sm:text-2xl font-display font-bold text-[var(--color-text-primary)]">
             {data.targetWord}
           </p>
-          <p className="text-sm text-[var(--color-text-secondary)] italic">
+          <p className="text-xs sm:text-sm text-[var(--color-text-secondary)] italic">
             {data.translation}
           </p>
           {data.contextSentence && (
-            <p className="text-sm text-[var(--color-text-muted)] mt-1">
+            <p className="text-xs sm:text-sm text-[var(--color-text-muted)] mt-0.5">
               &ldquo;{data.contextSentence}&rdquo;
             </p>
           )}
         </div>
       )}
 
-      <div className={`grid grid-cols-2 gap-3 ${isGallery ? 'gap-4 sm:gap-5' : ''}`}>
+      <div className={`grid grid-cols-2 gap-2.5 sm:gap-3.5 max-w-md mx-auto w-full`}>
         {data.options.map((option, idx) => {
           const isSelected = selectedWord === option.word;
           const isCorrect = option.word === data.correctWord;
@@ -94,7 +91,7 @@ export function ImageMatchExercise({
             ring = isGallery ? 'color-mix(in srgb, var(--color-warning) 35%, transparent)' : 'rgba(29, 94, 212, 0.2)';
           }
 
-          const galleryRotate = isGallery ? (idx % 2 === 0 ? -2 : 2) : 0;
+          const galleryRotate = isGallery ? (idx % 2 === 0 ? -1.5 : 1.5) : 0;
           const isDimmed = hasPendingSelection && !isSelected;
 
           return (
@@ -109,7 +106,7 @@ export function ImageMatchExercise({
               }
               className={`relative overflow-hidden transition-all duration-200 active:scale-[0.98] disabled:cursor-default ${
                 isGallery
-                  ? 'rounded-sm border-[10px] border-b-[28px] border-white shadow-md'
+                  ? 'rounded-sm border-4 border-b-[16px] sm:border-[6px] sm:border-b-[20px] border-white shadow-md'
                   : 'rounded-xl border-2'
               } ${isSelected && !answered ? 'z-10' : 'z-0'}`}
               style={{
@@ -120,18 +117,19 @@ export function ImageMatchExercise({
                     : undefined,
                 boxShadow: isGallery
                   ? isSelected && !answered
-                    ? `0 0 0 3px ${accentColor}, 0 10px 28px rgba(0,0,0,0.18)`
+                    ? `0 0 0 3px ${accentColor}, 0 6px 18px rgba(0,0,0,0.18)`
                     : answered && isCorrect
-                      ? `0 0 0 3px var(--color-success), 0 8px 20px rgba(0,0,0,0.12)`
+                      ? `0 0 0 3px var(--color-success), 0 6px 16px rgba(0,0,0,0.12)`
                       : answered && isSelected && !isCorrect
-                        ? `0 0 0 3px var(--color-error), 0 8px 20px rgba(0,0,0,0.12)`
-                        : '0 4px 12px rgba(0,0,0,0.08)'
+                        ? `0 0 0 3px var(--color-error), 0 6px 16px rgba(0,0,0,0.12)`
+                        : '0 3px 8px rgba(0,0,0,0.08)'
                   : isSelected || (answered && isCorrect)
                     ? `0 0 0 4px ${ring}`
                     : undefined,
                 aspectRatio: '4/3',
+                maxHeight: '145px',
                 transform: isGallery
-                  ? `rotate(${galleryRotate}deg) scale(${isSelected && !answered ? 1.05 : 1})`
+                  ? `rotate(${galleryRotate}deg) scale(${isSelected && !answered ? 1.03 : 1})`
                   : isSelected && !answered
                     ? 'scale(1.02)'
                     : undefined,

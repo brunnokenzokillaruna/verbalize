@@ -250,8 +250,8 @@ export default function LessonPage() {
       />
 
       <main
-        className={`mx-auto max-w-lg md:max-w-2xl lg:max-w-4xl px-6 pt-10 ${
-          phase === 'practice' || phase === 'review' || phase === 'production' ? 'pb-48' : 'pb-20'
+        className={`mx-auto max-w-lg md:max-w-2xl lg:max-w-4xl px-4 sm:px-6 pt-4 sm:pt-6 ${
+          phase === 'practice' || phase === 'review' || phase === 'production' ? 'pb-32 sm:pb-36' : 'pb-20'
         }`}
       >
         {phase === 'intro' && store.lesson ? (
