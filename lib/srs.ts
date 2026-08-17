@@ -28,10 +28,16 @@ export interface SrsUpdate {
  * Calculates the next review date and new SRS level based on answer correctness.
  * Correct → level up (max 5). Incorrect → level down (min 0).
  */
+function normalizeSrsLevel(currentLevel: number): number {
+  if (!Number.isFinite(currentLevel)) return 0;
+  return Math.max(0, Math.min(Math.trunc(currentLevel), SRS_INTERVALS_DAYS.length - 1));
+}
+
 export function calculateNextReview(currentLevel: number, correct: boolean): SrsUpdate {
+  const safeCurrent = normalizeSrsLevel(currentLevel);
   const newLevel = correct
-    ? Math.min(currentLevel + 1, SRS_INTERVALS_DAYS.length - 1)
-    : Math.max(currentLevel - 1, 0);
+    ? Math.min(safeCurrent + 1, SRS_INTERVALS_DAYS.length - 1)
+    : Math.max(safeCurrent - 1, 0);
 
   const daysUntilReview = SRS_INTERVALS_DAYS[newLevel];
   const nextReview = new Date();

@@ -2,25 +2,40 @@ import type { UserVocabularyDocument } from '@/types';
 
 export type SrsFilter = 'all' | 'new' | 'learning' | 'mastered';
 
+/** Reads Firestore Timestamp, Date, epoch ms, or a plain `{ seconds }` payload. */
+export function timestampToMillis(ts: unknown): number | undefined {
+  if (ts == null) return undefined;
+  if (typeof ts === 'number' && Number.isFinite(ts)) return ts;
+  if (ts instanceof Date) {
+    const ms = ts.getTime();
+    return Number.isNaN(ms) ? undefined : ms;
+  }
+  if (typeof ts !== 'object') return undefined;
+
+  const obj = ts as {
+    toMillis?: () => number;
+    toDate?: () => Date;
+    seconds?: number;
+    nanoseconds?: number;
+  };
+  if (typeof obj.toMillis === 'function') return obj.toMillis();
+  if (typeof obj.toDate === 'function') {
+    const ms = obj.toDate().getTime();
+    return Number.isNaN(ms) ? undefined : ms;
+  }
+  if (typeof obj.seconds === 'number') {
+    const nanos = typeof obj.nanoseconds === 'number' ? obj.nanoseconds : 0;
+    return obj.seconds * 1000 + Math.floor(nanos / 1e6);
+  }
+  return undefined;
+}
+
 export function getReviewDate(
   item: UserVocabularyDocument,
   field: 'nextReview' | 'lastReview' = 'nextReview',
 ): Date | null {
-  const ts = item[field];
-  if (
-    ts &&
-    typeof (ts as { toDate?: () => Date }).toDate === 'function'
-  ) {
-    return (ts as { toDate: () => Date }).toDate();
-  }
-  if (
-    ts &&
-    typeof (ts as { toMillis?: () => number }).toMillis === 'function'
-  ) {
-    return new Date((ts as { toMillis: () => number }).toMillis());
-  }
-  if (ts instanceof Date) return ts;
-  return null;
+  const ms = timestampToMillis(item[field]);
+  return ms == null ? null : new Date(ms);
 }
 
 export function isDueForReview(item: UserVocabularyDocument, now = new Date()): boolean {

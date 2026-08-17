@@ -267,7 +267,27 @@ export type VocabImagePoolItem = {
   srsLevel?: number;
   /** Epoch ms — used to prefer due review words. */
   nextReviewMs?: number;
+  /** Epoch ms — used to skip words already reviewed today. */
+  lastReviewMs?: number;
 };
+
+function isSameLocalDay(ms: number, nowMs: number): boolean {
+  const a = new Date(ms);
+  const b = new Date(nowMs);
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
+}
+
+function visualReviewScore(item: VocabImagePoolItem, nowMs: number): number {
+  const neverReviewed = item.lastReviewMs == null ? 1 : 0;
+  const due = item.nextReviewMs != null && item.nextReviewMs <= nowMs ? 1 : 0;
+  const srs = item.srsLevel ?? 0;
+  const recency = item.lastReviewMs ?? 0;
+  return neverReviewed * 1_000_000 + due * 10_000 - srs - recency / 1e13 + Math.random() * 0.01;
+}
 
 /**
  * Merge lesson-fetched images into the user's imaged vocabulary pool
@@ -295,6 +315,7 @@ export function mergeLessonImagesIntoPool(
       imageUrl: image.imageUrl,
       srsLevel: existing?.srsLevel ?? 0,
       nextReviewMs: existing?.nextReviewMs,
+      lastReviewMs: existing?.lastReviewMs,
     });
   }
 
@@ -303,11 +324,15 @@ export function mergeLessonImagesIntoPool(
 
 /**
  * Build up to `count` image-match exercises for lesson practice (vocab review).
- * Prefers lesson words and due / weaker SRS items. Needs ≥4 distinct images in the pool.
+ * Rotates through bank words that are not yet reviewed today. Current-lesson words
+ * are kept as distractors and only used as targets if the bank cannot fill the session.
+ * Needs ≥4 distinct images in the pool for distractors.
  */
 export function buildLessonVisualExercises(params: {
   imagePool: VocabImagePoolItem[];
+  /** @deprecated Use excludeTargetWords — current-lesson words should not consume review slots. */
   preferWords?: string[];
+  excludeTargetWords?: string[];
   count?: number;
   nowMs?: number;
 }): Exercise[] {
@@ -316,22 +341,31 @@ export function buildLessonVisualExercises(params: {
   const pool = params.imagePool.filter((item) => item.imageUrl);
   if (pool.length < MIN_VISUAL_REVIEW_ITEMS || count <= 0) return [];
 
-  const preferSet = new Set((params.preferWords ?? []).map(normalizeWord));
+  const excludeSet = new Set(
+    [...(params.excludeTargetWords ?? []), ...(params.preferWords ?? [])].map(normalizeWord),
+  );
 
-  const ranked = pool
-    .map((item) => {
-      const due = item.nextReviewMs != null && item.nextReviewMs <= now ? 1 : 0;
-      const preferred = preferSet.has(normalizeWord(item.word)) ? 1 : 0;
-      const srs = item.srsLevel ?? 0;
-      const score = preferred * 100 + due * 40 - srs + Math.random();
-      return { item, score };
-    })
-    .sort((a, b) => b.score - a.score);
+  const notReviewedToday = pool.filter(
+    (item) => item.lastReviewMs == null || !isSameLocalDay(item.lastReviewMs, now),
+  );
+
+  const rankItems = (items: VocabImagePoolItem[]) =>
+    items
+      .map((item) => ({ item, score: visualReviewScore(item, now) }))
+      .sort((a, b) => b.score - a.score)
+      .map(({ item }) => item);
+
+  const primary = rankItems(
+    notReviewedToday.filter((item) => !excludeSet.has(normalizeWord(item.word))),
+  );
+  const fillers = rankItems(
+    notReviewedToday.filter((item) => excludeSet.has(normalizeWord(item.word))),
+  );
 
   const exercises: Exercise[] = [];
   const usedTargets = new Set<string>();
 
-  for (const { item } of ranked) {
+  for (const item of [...primary, ...fillers]) {
     if (exercises.length >= count) break;
     const key = normalizeWord(item.word);
     if (usedTargets.has(key)) continue;

@@ -24,6 +24,7 @@ import {
 } from '@/lib/practiceExercises/constants';
 import type { UserDocument, UserVocabularyDocument, ImageCacheDocument, VerbDocument, LessonMistakeDocument, PregeneratedLessonDocument, SupportedLanguage, ProficiencyLevel, LessonLogDocument } from '@/types';
 import { calculateNextReview } from '@/lib/srs';
+import { isReviewedToday } from '@/utils/vocabPageHelpers';
 import { getNextLessonId, getLessonsForLanguage, getLessonById } from '@/lib/curriculum';
 import {
   buildCurriculumSyncNotice,
@@ -411,12 +412,20 @@ export async function upsertVocabularyItem(
     const snap = await transaction.get(docRef);
     if (snap.exists()) {
       const existing = snap.data() as UserVocabularyDocument;
-      const { newLevel, nextReview } = calculateNextReview(existing.srsLevel, true);
+      const alreadyReviewedToday = isReviewedToday(existing);
+      const srsPatch = alreadyReviewedToday
+        ? {}
+        : (() => {
+            const { newLevel, nextReview } = calculateNextReview(existing.srsLevel, true);
+            return {
+              srsLevel: newLevel,
+              lastReview: serverTimestamp(),
+              nextReview: Timestamp.fromDate(nextReview),
+            };
+          })();
       transaction.update(docRef, stripUndefinedDeep({
         wordKey,
-        srsLevel: newLevel,
-        lastReview: serverTimestamp(),
-        nextReview: Timestamp.fromDate(nextReview),
+        ...srsPatch,
         ...(imageUrl && { imageUrl }),
         ...(translation && translation !== displayWord && { translation }),
         ...(wordType && !existing.wordType && { wordType }),
@@ -924,29 +933,71 @@ export async function updateVocabImage(
 }
 
 
+export type VocabReviewExtras = {
+  translation?: string;
+  imageUrl?: string;
+};
+
 /**
  * Updates the SRS level and next review date for a vocabulary item after a review exercise.
  * Correct → level up (max 5). Incorrect → level down (min 0) + increment mistakeCount.
+ * Creates the document when the word is not yet in the user's bank (lesson visual drills).
+ * Skips a second SRS advance if the word was already reviewed today.
  */
 export async function updateVocabSrsAfterReview(
   uid: string,
   word: string,
   language: SupportedLanguage,
   correct: boolean,
+  extras?: VocabReviewExtras,
 ): Promise<void> {
-  const docRef = await resolveVocabularyDocRef(uid, language, word);
+  if (!(await ensureFirestoreAuth(uid))) {
+    throw new Error('Sessão expirada. Faça login novamente para registrar a revisão.');
+  }
+
+  const displayWord = cleanWordToken(word);
+  const wordKey = canonicalVocabKey(displayWord);
+  const docRef = await resolveVocabularyDocRef(uid, language, displayWord);
   const snap = await getDoc(docRef);
-  if (!snap.exists()) return;
 
-  const existing = snap.data() as UserVocabularyDocument;
-  const { newLevel, nextReview } = calculateNextReview(existing.srsLevel, correct);
+  if (snap.exists()) {
+    const existing = snap.data() as UserVocabularyDocument;
+    if (isReviewedToday(existing)) return;
 
-  await updateDoc(docRef, {
-    srsLevel: newLevel,
-    lastReview: serverTimestamp(),
-    nextReview: Timestamp.fromDate(nextReview),
-    ...(correct ? {} : { mistakeCount: (existing.mistakeCount ?? 0) + 1 }),
-  });
+    const { newLevel, nextReview } = calculateNextReview(existing.srsLevel, correct);
+    await updateDoc(docRef, stripUndefinedDeep({
+      wordKey,
+      srsLevel: newLevel,
+      lastReview: serverTimestamp(),
+      nextReview: Timestamp.fromDate(nextReview),
+      ...(correct ? {} : { mistakeCount: (existing.mistakeCount ?? 0) + 1 }),
+      ...(extras?.imageUrl && !existing.imageUrl ? { imageUrl: extras.imageUrl } : {}),
+      ...(extras?.translation && extras.translation !== displayWord && !existing.translation
+        ? { translation: extras.translation }
+        : {}),
+    }));
+    return;
+  }
+
+  const { newLevel, nextReview } = calculateNextReview(0, correct);
+  const canonicalRef = doc(await getDb(), 'user_vocabulary', buildVocabDocId(uid, language, displayWord));
+  await setDoc(
+    canonicalRef,
+    stripUndefinedDeep({
+      uid,
+      language,
+      word: displayWord,
+      wordKey,
+      translation: extras?.translation || displayWord,
+      ...(extras?.imageUrl && { imageUrl: extras.imageUrl }),
+      srsLevel: newLevel,
+      mistakeCount: correct ? 0 : 1,
+      firstSeen: serverTimestamp(),
+      lastReview: serverTimestamp(),
+      nextReview: Timestamp.fromDate(nextReview),
+    }),
+    { merge: true },
+  );
 }
 
 // ─── Verb Cache ───────────────────────────────────────────────────────────────

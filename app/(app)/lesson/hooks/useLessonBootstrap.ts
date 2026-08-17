@@ -24,6 +24,7 @@ import { getLessonSceneImage } from '@/app/actions/getLessonSceneImage';
 import { fetchPregeneratedLessonWithWait } from '@/lib/waitForPregeneratedLesson';
 import { deletePregeneratedLesson, getUserVocabulary, upsertVocabularyItem, tryStartPregeneratingLesson, abortPregeneratedLesson, getCachedImage } from '@/services/firestore';
 import { sanitizeVocabularyToken } from '@/lib/hookSanitize';
+import { timestampToMillis } from '@/utils/vocabPageHelpers';
 import { MIN_VISUAL_REVIEW_ITEMS } from '@/utils/imageMatchBuilder';
 import { canonicalVocabKey } from '@/lib/vocabCanonical';
 import { filterHookVocabularyForKnownWords, filterKnownFromNewChunks } from '@/lib/hookVocabulary';
@@ -47,14 +48,8 @@ type VocabImagePoolItem = {
   imageUrl?: string;
   srsLevel?: number;
   nextReviewMs?: number;
+  lastReviewMs?: number;
 };
-
-function nextReviewMsFromDoc(item: UserVocabularyDocument): number | undefined {
-  const nextReview = item.nextReview as { toMillis?: () => number; toDate?: () => Date } | undefined;
-  if (nextReview && typeof nextReview.toMillis === 'function') return nextReview.toMillis();
-  if (nextReview && typeof nextReview.toDate === 'function') return nextReview.toDate().getTime();
-  return undefined;
-}
 
 function poolItemFromVocabDoc(
   item: UserVocabularyDocument,
@@ -65,7 +60,8 @@ function poolItemFromVocabDoc(
     translation: item.translation,
     imageUrl: imageUrl ?? item.imageUrl,
     srsLevel: item.srsLevel,
-    nextReviewMs: nextReviewMsFromDoc(item),
+    nextReviewMs: timestampToMillis(item.nextReview),
+    lastReviewMs: timestampToMillis(item.lastReview),
   };
 }
 

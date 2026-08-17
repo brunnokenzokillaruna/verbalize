@@ -7,7 +7,7 @@ import { getPreviousTopics } from '@/lib/curriculum';
 import { generateGrammarBridge } from '@/app/actions/generateGrammarBridge';
 import { generatePracticeExercises } from '@/app/actions/generatePracticeExercises';
 import { getVerbConjugation } from '@/app/actions/getVerbConjugation';
-import { logLesson, updateLessonStats, upsertVocabularyItem, saveLessonMistake, updateUser } from '@/services/firestore';
+import { logLesson, updateLessonStats, upsertVocabularyItem, saveLessonMistake, updateUser, updateVocabSrsAfterReview } from '@/services/firestore';
 import { canonicalVocabKey } from '@/lib/vocabCanonical';
 import { sessionHasProduction } from '@/lib/practiceExercises/productionTypes';
 import { applyAdaptiveTier } from '@/lib/practiceExercises/adaptiveTier';
@@ -18,6 +18,7 @@ import {
   mergeLessonImagesIntoPool,
 } from '@/utils/imageMatchBuilder';
 import { trackExercisesPrefetch } from '@/lib/practiceExercises/trackExercisesPrefetch';
+import { collectLessonVisualReviews } from '@/utils/lessonVisualReviews';
 import { evaluateCheckpointPass } from '@/lib/curriculum/checkpointAssessment';
 import type { GrammarBridgeResult, Exercise, LessonTag } from '@/types';
 import type { LessonPhase } from '@/store/lessonStore';
@@ -93,7 +94,7 @@ export function useLessonFlow({
     );
     return buildLessonVisualExercises({
       imagePool: pool,
-      preferWords,
+      excludeTargetWords: preferWords,
       count: LESSON_VISUAL_EXERCISE_COUNT,
     });
   }, [store.hook, store.vocabImagePool, store.vocabImages, store.vocabTranslations]);
@@ -369,24 +370,36 @@ export function useLessonFlow({
     }
 
     const language = store.lesson.language;
-    store.hook.newVocabulary.forEach((word) => {
-      const translation = store.vocabTranslations[word] ?? word;
-      const imageUrl = store.vocabImages[word]?.imageUrl;
-      const wordType: 'verb' | 'noun' = word === store.hook!.verbWord ? 'verb' : 'noun';
-      upsertVocabularyItem(user.uid, word, translation, language, imageUrl, wordType).catch(console.error);
-    });
+    const visualReviews = collectLessonVisualReviews(store.exercises, store.mistakes);
 
-    store.hook.newChunks?.forEach((chunk) => {
-      upsertVocabularyItem(
-        user.uid,
-        chunk.phrase,
-        chunk.translation,
-        language,
-        undefined,
-        'noun',
-        chunk.entryType,
-      ).catch(console.error);
-    });
+    await Promise.all([
+      ...store.hook.newVocabulary.map((word) => {
+        const translation = store.vocabTranslations[word] ?? word;
+        const imageUrl = store.vocabImages[word]?.imageUrl;
+        const wordType: 'verb' | 'noun' = word === store.hook!.verbWord ? 'verb' : 'noun';
+        return upsertVocabularyItem(user.uid, word, translation, language, imageUrl, wordType).catch(console.error);
+      }),
+      ...(store.hook.newChunks ?? []).map((chunk) =>
+        upsertVocabularyItem(
+          user.uid,
+          chunk.phrase,
+          chunk.translation,
+          language,
+          undefined,
+          'noun',
+          chunk.entryType,
+        ).catch(console.error),
+      ),
+    ]);
+
+    await Promise.all(
+      visualReviews.map((review) =>
+        updateVocabSrsAfterReview(user.uid, review.word, language, review.correct, {
+          translation: review.translation,
+          imageUrl: review.imageUrl,
+        }).catch((err) => console.warn('[lesson] visual SRS update failed:', err)),
+      ),
+    );
 
     // Keep the in-session known list in sync with what was just persisted, so a
     // pregeneration triggered later in this session cannot reuse these words.

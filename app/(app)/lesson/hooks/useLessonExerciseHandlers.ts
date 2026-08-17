@@ -175,11 +175,15 @@ export function useLessonExerciseHandlers(
         user?.uid &&
         store.lesson
       ) {
+        const imageUrl = exercise.data.options.find(
+          (option) => option.word === exercise.data.correctWord,
+        )?.imageUrl;
         void updateVocabSrsAfterReview(
           user.uid,
           exercise.data.targetWord,
           store.lesson.language,
           correct,
+          { translation: exercise.data.translation, imageUrl },
         ).catch((err) => console.warn('[lesson] visual SRS update failed:', err));
       }
 
@@ -281,7 +285,7 @@ export function useLessonExerciseHandlers(
 
     store.setPhase('complete');
     resetExerciseState();
-    finishLesson();
+    await finishLesson();
 
     if (!user || !store.lesson) {
       playCompletionSound();

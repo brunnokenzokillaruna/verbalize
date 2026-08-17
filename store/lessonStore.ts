@@ -59,6 +59,7 @@ interface LessonState {
     imageUrl?: string;
     srsLevel?: number;
     nextReviewMs?: number;
+    lastReviewMs?: number;
   }>;
 
   // Practice exercises
@@ -133,6 +134,7 @@ interface LessonState {
       imageUrl?: string;
       srsLevel?: number;
       nextReviewMs?: number;
+      lastReviewMs?: number;
     }>,
   ) => void;
   setHook: (hook: HookResult) => void;
