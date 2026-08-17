@@ -24,6 +24,8 @@ interface OralProductionShellProps {
   /** When mic unavailable, call to continue without audio. */
   onContinueWithoutMic?: () => void;
   continueWithoutMicLabel?: string;
+  /** Hide the in-card confirm button when the lesson footer already handles it. */
+  hideConfirmButton?: boolean;
 }
 
 export function OralProductionShell({
@@ -34,6 +36,7 @@ export function OralProductionShell({
   children,
   onContinueWithoutMic,
   continueWithoutMicLabel = 'Continuar sem áudio',
+  hideConfirmButton = false,
 }: OralProductionShellProps) {
   const {
     phase,
@@ -154,13 +157,15 @@ export function OralProductionShell({
           </div>
 
           <div className="flex flex-col gap-2.5">
-            <button
-              type="button"
-              onClick={confirm}
-              className="flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-bold text-white bg-[var(--color-primary)]"
-            >
-              {phase === 'review-correct' ? 'Continuar' : 'Continuar mesmo assim'}
-            </button>
+            {!hideConfirmButton && (
+              <button
+                type="button"
+                onClick={confirm}
+                className="flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-bold text-white bg-[var(--color-primary)]"
+              >
+                {phase === 'review-correct' ? 'Continuar' : 'Continuar mesmo assim'}
+              </button>
+            )}
             <div className="grid grid-cols-2 gap-2.5">
               <button
                 type="button"

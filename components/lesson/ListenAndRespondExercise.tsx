@@ -152,6 +152,7 @@ export function ListenAndRespondExercise({
             state={oral}
             recordLabel="Gravar minha resposta"
             evaluatingLabel="Analisando adequação da resposta…"
+            hideConfirmButton
             onContinueWithoutMic={() => {
               recordOralExerciseOutcome(user?.uid, 'skipped');
               onAnswer(true);
