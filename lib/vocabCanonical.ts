@@ -157,6 +157,8 @@ export function mergeVocabularyGroup(group: UserVocabularyDocument[]): UserVocab
     return timestampMillis(item.lastReview) > timestampMillis(latest.lastReview) ? item : latest;
   }, best);
 
+  const lastReviewDay = lastReview.lastReviewDay ?? best.lastReviewDay;
+
   const nextReview = group.reduce((soonest, item) => {
     const itemMs = timestampMillis(item.nextReview);
     const soonestMs = timestampMillis(soonest.nextReview);
@@ -184,6 +186,7 @@ export function mergeVocabularyGroup(group: UserVocabularyDocument[]): UserVocab
     encounterCount: encounterCount || best.encounterCount,
     firstSeen: firstSeen.firstSeen,
     lastReview: lastReview.lastReview,
+    lastReviewDay,
     nextReview: nextReview.nextReview,
   };
 }

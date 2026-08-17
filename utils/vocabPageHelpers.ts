@@ -43,14 +43,20 @@ export function isDueForReview(item: UserVocabularyDocument, now = new Date()): 
   return reviewDate !== null && reviewDate <= now;
 }
 
+export function formatLocalDay(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 export function isReviewedToday(item: UserVocabularyDocument, now = new Date()): boolean {
+  if (item.lastReviewDay) {
+    return item.lastReviewDay === formatLocalDay(now);
+  }
   const lastReviewDate = getReviewDate(item, 'lastReview');
   if (!lastReviewDate) return false;
-  return (
-    lastReviewDate.getFullYear() === now.getFullYear() &&
-    lastReviewDate.getMonth() === now.getMonth() &&
-    lastReviewDate.getDate() === now.getDate()
-  );
+  return formatLocalDay(lastReviewDate) === formatLocalDay(now);
 }
 
 export function computeVocabCounts(items: UserVocabularyDocument[], now = new Date()) {

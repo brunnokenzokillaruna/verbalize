@@ -156,7 +156,7 @@ export function useLessonExerciseHandlers(
           ? store.exercises[store.checkpointProductionIndex]
           : phase === 'review'
             ? store.reviewExercises[store.reviewIndex]
-            : store.exercises[store.exerciseIndex];
+            : useLessonStore.getState().exercises[useLessonStore.getState().exerciseIndex];
 
       if (correct && exercise && store.lesson) {
         markExerciseProductionVocabulary(
@@ -169,21 +169,23 @@ export function useLessonExerciseHandlers(
       }
 
       // Visual drills also count as vocab review for SRS.
+      const live = useLessonStore.getState();
+      const visualExercise = live.exercises[live.exerciseIndex];
       if (
-        phase === 'practice' &&
-        exercise?.type === 'image-match' &&
+        live.phase === 'practice' &&
+        visualExercise?.type === 'image-match' &&
         user?.uid &&
-        store.lesson
+        live.lesson
       ) {
-        const imageUrl = exercise.data.options.find(
-          (option) => option.word === exercise.data.correctWord,
+        const imageUrl = visualExercise.data.options.find(
+          (option) => option.word === visualExercise.data.correctWord,
         )?.imageUrl;
         void updateVocabSrsAfterReview(
           user.uid,
-          exercise.data.targetWord,
-          store.lesson.language,
+          visualExercise.data.targetWord,
+          live.lesson.language,
           correct,
-          { translation: exercise.data.translation, imageUrl },
+          { translation: visualExercise.data.translation, imageUrl },
         ).catch((err) => console.warn('[lesson] visual SRS update failed:', err));
       }
 

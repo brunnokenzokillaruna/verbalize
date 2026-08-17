@@ -370,7 +370,8 @@ export function useLessonFlow({
     }
 
     const language = store.lesson.language;
-    const visualReviews = collectLessonVisualReviews(store.exercises, store.mistakes);
+    const live = useLessonStore.getState();
+    const visualReviews = collectLessonVisualReviews(live.exercises, live.mistakes);
 
     await Promise.all([
       ...store.hook.newVocabulary.map((word) => {

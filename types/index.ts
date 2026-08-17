@@ -86,6 +86,8 @@ export interface UserVocabularyDocument {
   // SRS Data
   firstSeen: Timestamp;
   lastReview: Timestamp;
+  /** Local calendar day `YYYY-MM-DD` of the last review — used for "hoje" progress. */
+  lastReviewDay?: string;
   nextReview: Timestamp;
   srsLevel: number; // 0–5 indicating memory strength
   mistakeCount: number;

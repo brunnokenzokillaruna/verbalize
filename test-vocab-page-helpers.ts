@@ -37,4 +37,17 @@ const missing: UserVocabularyDocument = {
 };
 assert(isReviewedToday(missing, now) === false, 'missing lastReview is not reviewed today');
 
+const withDay: UserVocabularyDocument = {
+  ...withSeconds,
+  lastReview: undefined as never,
+  lastReviewDay: '2026-08-17',
+};
+assert(isReviewedToday(withDay, now), 'lastReviewDay counts as reviewed today even without a timestamp');
+
+const yesterdayDay: UserVocabularyDocument = {
+  ...withSeconds,
+  lastReviewDay: '2026-08-16',
+};
+assert(isReviewedToday(yesterdayDay, now) === false, 'yesterday lastReviewDay is not today');
+
 console.log('\nAll vocab page helper tests passed.');
