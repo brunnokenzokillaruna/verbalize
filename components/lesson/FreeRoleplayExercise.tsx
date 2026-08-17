@@ -33,6 +33,7 @@ export function FreeRoleplayExercise({
       promptLine: data.promptLine,
       evaluationCriteria: data.evaluationCriteria,
       acceptableThemes: data.acceptableThemes,
+      openEnded: true,
     }),
     [data, language],
   );

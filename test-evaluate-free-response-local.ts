@@ -51,4 +51,21 @@ const weak = evaluateFreeResponseLocal({
 });
 assert(weak.isCorrect === false, 'rejects weak off-topic response');
 
+const hatReaction = evaluateFreeResponseLocal({
+  language: 'fr',
+  previousContext: ['Oh non ! Regarde, ton chapeau est tombé dans la boue !'],
+  intent:
+    'Você está caminhando em um parque com um amigo francês. De repente, uma rajada de vento forte faz seu chapéu voar e cair dentro de uma poça de lama.',
+  promptLine: 'Oh non ! Regarde, ton chapeau est tombé dans la boue !',
+  expectedLine: 'Oh non ! Je dois vite nettoyer mon chapeau.',
+  evaluationCriteria: 'Reagir ao chapéu na lama e mencionar a necessidade de limpar.',
+  acceptableThemes: ['lamentar o chapéu', 'oferecer limpar o chapéu', 'comentar o vento'],
+  openEnded: true,
+  transcript: "C'est dommage! Je n'ai pas été assez rapide pour t'aider.",
+});
+assert(
+  hatReaction.isCorrect === true,
+  'open-ended roleplay accepts a natural reaction without an unstated cleaning action',
+);
+
 console.log('\nAll evaluateFreeResponseLocal tests passed.');

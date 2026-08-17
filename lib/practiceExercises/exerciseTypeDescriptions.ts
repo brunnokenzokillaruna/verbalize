@@ -127,14 +127,14 @@ export function buildTypeDescriptions(langLabel: string): Record<ExerciseTypeId,
    - "dialogueAudio" (1–3 lines in ${langLabel}, Speaker: line format): ONLY the interlocutor speaking to the learner (e.g. recruiter, waiter, friend). ONE speaker name for all lines. NEVER include the learner's lines ("Você:", "Client:", etc.). NEVER copy or paraphrase the lesson hook dialogue — invent a NEW short prompt that fits the situation.
    - "promptLine" (${langLabel}): the final interlocutor line the learner must answer (must match the last line of dialogueAudio).
    - "contextPt" (PT-BR): situation setup for the learner (who is speaking to them).
-   - "evaluationCriteria" (PT-BR): rubric for acceptable responses (intent, register, key ideas).
-   - "acceptableThemes" (array of 2-4 PT-BR phrases describing valid response ideas).
+   - "evaluationCriteria" (PT-BR): rubric for acceptable responses (intent, register). FORBIDDEN: requiring extra actions the interlocutor did not ask for.
+   - "acceptableThemes" (array of 2-4 PT-BR phrases describing ALTERNATIVE valid response ideas — any one is enough).
    - "exampleResponse" (${langLabel}): one natural example answer (not the only valid answer).`,
     'free-roleplay': `type "free-roleplay":
    - "context" (PT-BR): situational setup.
    - "promptLine" (${langLabel}): what the interlocutor says.
-   - "evaluationCriteria" (PT-BR): what a good response must accomplish.
-   - "acceptableThemes" (2-4 PT-BR valid response ideas).
+   - "evaluationCriteria" (PT-BR): communicative goal only (react, answer the question, keep the register). FORBIDDEN: requiring extra plot beats, objects, or actions that context + promptLine do not ask for (e.g. do NOT require "limpar o chapéu" if nobody asked the learner to clean anything).
+   - "acceptableThemes" (2-4 PT-BR ALTERNATIVE valid reactions — any ONE is enough; not a checklist of required ingredients).
    - "exampleResponse" (${langLabel}): model answer.
    - "explanation" (PT-BR): why the example works pragmatically.`,
     'micro-message': `type "micro-message":

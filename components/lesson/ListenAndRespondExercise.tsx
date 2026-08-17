@@ -62,6 +62,7 @@ export function ListenAndRespondExercise({
         promptLine: data.promptLine,
         evaluationCriteria: data.evaluationCriteria,
         acceptableThemes: data.acceptableThemes,
+        openEnded: true,
       }),
     [data, language, dialogue.lines],
   );

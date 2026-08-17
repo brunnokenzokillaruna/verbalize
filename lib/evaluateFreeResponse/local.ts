@@ -91,6 +91,14 @@ export function evaluateFreeResponseLocal(
     };
   }
 
+  if (params.openEnded && wordCount >= 4) {
+    return {
+      isCorrect: true,
+      feedback: 'Boa reação — a mensagem ficou clara nesta situação.',
+      evaluator: 'local',
+    };
+  }
+
   return {
     isCorrect: false,
     feedback:

@@ -196,6 +196,10 @@ VARIETY RULE (mandatory): use at least 3 DIFFERENT exercise types; no type may a
 
 ${poolSection}
 
+FREE PRODUCTION RUBRIC (mandatory for free-roleplay, listen-and-respond, micro-message):
+evaluationCriteria must match what the learner can infer from the visible context and the interlocutor's line. Never invent a required next action (cleaning, paying, calling, offering help) that nobody asked for.
+acceptableThemes are ALTERNATIVE valid replies — matching any one is enough. They are not ingredients that must all appear in the answer.
+
 --- OUTPUT FORMAT ---
 Return a JSON array of ${PRACTICE_EXERCISE_COUNT} objects, each with "type" and "data".
 Example for listen-and-respond:

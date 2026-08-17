@@ -16,6 +16,11 @@ export interface EvaluateFreeResponseParams {
   evaluationCriteria?: string;
   /** Themes that count as acceptable even without exact wording. */
   acceptableThemes?: string[];
+  /**
+   * When true, a relevant in-character reply is success — criteria/themes are
+   * optional directions, not a hidden checklist of required details.
+   */
+  openEnded?: boolean;
   /** When false, skip Gemini and use local heuristics only. */
   preferGemini?: boolean;
 }
