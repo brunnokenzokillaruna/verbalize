@@ -393,14 +393,18 @@ export function useLessonFlow({
       ),
     ]);
 
-    await Promise.all(
-      visualReviews.map((review) =>
-        updateVocabSrsAfterReview(user.uid, review.word, language, review.correct, {
-          translation: review.translation,
-          imageUrl: review.imageUrl,
-        }).catch((err) => console.warn('[lesson] visual SRS update failed:', err)),
-      ),
-    );
+    try {
+      await Promise.all(
+        visualReviews.map((review) =>
+          updateVocabSrsAfterReview(user.uid, review.word, language, review.correct, {
+            translation: review.translation,
+            imageUrl: review.imageUrl,
+          }),
+        ),
+      );
+    } catch (err) {
+      console.error('[lesson] visual SRS persistence failed:', err);
+    }
 
     // Keep the in-session known list in sync with what was just persisted, so a
     // pregeneration triggered later in this session cannot reuse these words.

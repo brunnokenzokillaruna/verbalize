@@ -263,6 +263,15 @@ async function ensureFirestoreAuth(expectedUid: string): Promise<boolean> {
   }
 }
 
+function isAuthRetryableFirestoreError(err: unknown): boolean {
+  const code = (err as { code?: string } | null)?.code;
+  return (
+    code === 'permission-denied' ||
+    code === 'unauthenticated' ||
+    code === 'auth/user-token-expired'
+  );
+}
+
 async function resolveVocabularyDocRef(
   uid: string,
   language: SupportedLanguage,
@@ -961,58 +970,64 @@ export async function updateVocabSrsAfterReview(
   correct: boolean,
   extras?: VocabReviewExtras,
 ): Promise<void> {
-  const authOk = await ensureFirestoreAuth(uid);
-  if (!authOk) {
-    console.warn('[updateVocabSrsAfterReview] Auth refresh failed — attempting write anyway');
-  }
+  const persistReview = async () => {
+    const displayWord = cleanWordToken(word);
+    const wordKey = canonicalVocabKey(displayWord);
+    const docRef = await resolveVocabularyDocRef(uid, language, displayWord);
+    const snap = await getDoc(docRef);
+    const now = new Date();
+    const lastReviewAt = Timestamp.fromDate(now);
+    const lastReviewDay = formatLocalDay(now);
 
-  const displayWord = cleanWordToken(word);
-  const wordKey = canonicalVocabKey(displayWord);
-  const docRef = await resolveVocabularyDocRef(uid, language, displayWord);
-  const snap = await getDoc(docRef);
-  const now = new Date();
-  const lastReviewAt = Timestamp.fromDate(now);
-  const lastReviewDay = formatLocalDay(now);
+    if (snap.exists()) {
+      const existing = snap.data() as UserVocabularyDocument;
+      const stillDue = isDueForReview(existing, now);
+      if (isReviewedToday(existing, now) && !stillDue) return;
 
-  if (snap.exists()) {
-    const existing = snap.data() as UserVocabularyDocument;
-    const stillDue = isDueForReview(existing, now);
-    if (isReviewedToday(existing, now) && !stillDue) return;
+      const { newLevel, nextReview } = calculateNextReview(existing.srsLevel, correct);
+      await updateDoc(docRef, {
+        uid,
+        language,
+        wordKey,
+        srsLevel: newLevel,
+        lastReview: lastReviewAt,
+        lastReviewDay,
+        nextReview: Timestamp.fromDate(nextReview),
+        ...(correct ? {} : { mistakeCount: (existing.mistakeCount ?? 0) + 1 }),
+        ...(extras?.imageUrl && !existing.imageUrl ? { imageUrl: extras.imageUrl } : {}),
+        ...(extras?.translation && extras.translation !== displayWord && !existing.translation
+          ? { translation: extras.translation }
+          : {}),
+      });
+      return;
+    }
 
-    const { newLevel, nextReview } = calculateNextReview(existing.srsLevel, correct);
-    await updateDoc(docRef, {
+    const { newLevel, nextReview } = calculateNextReview(0, correct);
+    const canonicalRef = doc(await getDb(), 'user_vocabulary', buildVocabDocId(uid, language, displayWord));
+    await setDoc(canonicalRef, {
       uid,
       language,
+      word: displayWord,
       wordKey,
+      translation: extras?.translation || displayWord,
+      ...(extras?.imageUrl ? { imageUrl: extras.imageUrl } : {}),
       srsLevel: newLevel,
+      mistakeCount: correct ? 0 : 1,
+      firstSeen: lastReviewAt,
       lastReview: lastReviewAt,
       lastReviewDay,
       nextReview: Timestamp.fromDate(nextReview),
-      ...(correct ? {} : { mistakeCount: (existing.mistakeCount ?? 0) + 1 }),
-      ...(extras?.imageUrl && !existing.imageUrl ? { imageUrl: extras.imageUrl } : {}),
-      ...(extras?.translation && extras.translation !== displayWord && !existing.translation
-        ? { translation: extras.translation }
-        : {}),
-    });
-    return;
-  }
+    }, { merge: true });
+  };
 
-  const { newLevel, nextReview } = calculateNextReview(0, correct);
-  const canonicalRef = doc(await getDb(), 'user_vocabulary', buildVocabDocId(uid, language, displayWord));
-  await setDoc(canonicalRef, {
-    uid,
-    language,
-    word: displayWord,
-    wordKey,
-    translation: extras?.translation || displayWord,
-    ...(extras?.imageUrl ? { imageUrl: extras.imageUrl } : {}),
-    srsLevel: newLevel,
-    mistakeCount: correct ? 0 : 1,
-    firstSeen: lastReviewAt,
-    lastReview: lastReviewAt,
-    lastReviewDay,
-    nextReview: Timestamp.fromDate(nextReview),
-  }, { merge: true });
+  try {
+    await persistReview();
+  } catch (err) {
+    if (!isAuthRetryableFirestoreError(err)) throw err;
+    const refreshed = await ensureFirestoreAuth(uid);
+    if (!refreshed) throw err;
+    await persistReview();
+  }
 }
 
 // ─── Verb Cache ───────────────────────────────────────────────────────────────

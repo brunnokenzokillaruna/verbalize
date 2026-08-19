@@ -186,7 +186,9 @@ export function useLessonExerciseHandlers(
           live.lesson.language,
           correct,
           { translation: visualExercise.data.translation, imageUrl },
-        ).catch((err) => console.warn('[lesson] visual SRS update failed:', err));
+        ).catch((err) =>
+          console.warn('[lesson] visual SRS update failed:', visualExercise.data.targetWord, err),
+        );
       }
 
       if (phase === 'production') {
