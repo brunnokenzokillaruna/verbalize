@@ -11,12 +11,20 @@ service cloud.firestore {
     // ── User Vocabulary ───────────────────────────────────────────────────────
     // A user may only access vocabulary items that belong to them.
     match /user_vocabulary/{docId} {
+      function isOwnerByDocId() {
+        return request.auth != null
+          && docId.matches('^' + request.auth.uid + '_.*');
+      }
+      function isOwnerByData() {
+        return request.auth != null
+          && resource.data.uid == request.auth.uid;
+      }
       allow read, delete: if request.auth != null
-        && resource.data.uid == request.auth.uid;
+        && (isOwnerByDocId() || isOwnerByData());
       allow create: if request.auth != null
         && request.resource.data.uid == request.auth.uid;
       allow update: if request.auth != null
-        && resource.data.uid == request.auth.uid
+        && (isOwnerByDocId() || isOwnerByData())
         && request.resource.data.uid == request.auth.uid;
     }
 
