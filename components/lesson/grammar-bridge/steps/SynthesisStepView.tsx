@@ -28,7 +28,7 @@ export function SynthesisStepView({ step }: { step: SynthesisStep }) {
       {formulaItems.length > 0 && (
         <div className="flex flex-col gap-3 items-center w-full">
           <span className="grammar-step-label">Lembre a forma</span>
-          {formulaItems.slice(0, 1).map((item, i) => (
+          {formulaItems.map((item, i) => (
             <div key={i} className="flex flex-col gap-1.5 items-center w-full">
               {item.label && (
                 <span className="text-[10px] font-bold text-primary uppercase tracking-wide text-center">

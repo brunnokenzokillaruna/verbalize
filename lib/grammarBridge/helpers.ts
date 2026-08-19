@@ -74,35 +74,33 @@ export function getTrap(bridge: GrammarBridgeResult) {
 }
 
 /**
- * Âncora de fixação: só mnemônico (survivalTip) + no máximo 1 fórmula-chave.
+ * Âncora de fixação: mnemônico (survivalTip) + fórmulas-chave.
  * Não reexibe insight nem trap — o aluno já viu isso nas fases anteriores.
  */
 export function buildSynthesisData(bridge: GrammarBridgeResult): SynthesisStep['data'] {
   const tip = filterUniqueSurvivalTip(bridge.survivalTip, bridge);
-  const keyFormula = bridge.structureFormulas?.[0]
-    ? {
-        label: bridge.structureFormulas[0].label,
-        formula: bridge.structureFormulas[0].formula,
-        hint: bridge.structureFormulas[0].hint,
-      }
+  const formulas = bridge.structureFormulas?.length
+    ? bridge.structureFormulas.map((f) => ({
+        label: f.label,
+        formula: f.formula,
+        hint: f.hint,
+      }))
     : bridge.structureFormula?.trim()
-      ? { formula: bridge.structureFormula.trim() }
+      ? [{ formula: bridge.structureFormula.trim() }]
       : undefined;
 
-  // Prefer tip-only anchor; add one formula line only when tip exists (mnemonic + shape).
   if (tip) {
     return {
       survivalTip: tip,
-      formulas: keyFormula ? [keyFormula] : undefined,
-      formula: keyFormula?.formula,
+      formulas,
+      formula: formulas?.[0]?.formula,
     };
   }
 
-  // Fallback: formula alone if tip missing (still better than repeating insight/trap).
-  if (keyFormula) {
+  if (formulas?.length) {
     return {
-      formulas: [keyFormula],
-      formula: keyFormula.formula,
+      formulas,
+      formula: formulas[0].formula,
     };
   }
 
