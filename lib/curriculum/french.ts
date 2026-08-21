@@ -1651,8 +1651,8 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "A2",
     "tag": "EXPR",
-    "uiTitle": "Céu Aberto",
-    "grammarFocus": "5 Expressões com Aller e Faire",
+    "uiTitle": "Expressões com Aller e Faire",
+    "grammarFocus": "5 expressões com Aller e Faire",
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
@@ -1660,8 +1660,8 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "A2",
     "tag": "DIAL",
-    "uiTitle": "Os Pássaros da Manhã",
-    "grammarFocus": "5 Maneiras de Dizer Je suis fatigué(e)",
+    "uiTitle": "Dizendo que Está Cansado",
+    "grammarFocus": "5 maneiras de dizer que está cansado",
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
@@ -1669,8 +1669,8 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "A2",
     "tag": "GRAM",
-    "uiTitle": "Um Acorde Distante",
-    "grammarFocus": "Par de Confusão: Avoir mal à VS Avoir du mal à",
+    "uiTitle": "Dor ou Dificuldade",
+    "grammarFocus": "Par de confusão: sentir dor VS ter dificuldade",
     "theme": "Tema 13: Clima, Natureza e Passeios",
     "topicKey": "avoir-mal",
     "lessonRole": "contrast"
@@ -1680,8 +1680,8 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "A2",
     "tag": "MISS",
-    "uiTitle": "A Vida Selvagem",
-    "grammarFocus": "No Restaurante (Reservas e Pedidos)",
+    "uiTitle": "Reserva no Restaurante",
+    "grammarFocus": "No restaurante: reservas e pedidos",
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
@@ -1689,8 +1689,8 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "A2",
     "tag": "DIAL",
-    "uiTitle": "Sol e Respiro",
-    "grammarFocus": "5 Maneiras de se desculpar em francês",
+    "uiTitle": "Pedindo Desculpas",
+    "grammarFocus": "5 maneiras de se desculpar",
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
@@ -1698,8 +1698,8 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "A2",
     "tag": "VOC",
-    "uiTitle": "A Caminhada no Verde",
-    "grammarFocus": "Números Ordinais e Rankings",
+    "uiTitle": "Números Ordinais",
+    "grammarFocus": "Números ordinais e rankings",
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
@@ -1716,8 +1716,8 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "A2",
     "tag": "MISS",
-    "uiTitle": "Os Relógios do Sol",
-    "grammarFocus": "Na Estação de Trem e Aeroporto",
+    "uiTitle": "Na Estação e no Aeroporto",
+    "grammarFocus": "Na estação de trem e no aeroporto",
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
@@ -1734,8 +1734,8 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "A2",
     "tag": "DIAL",
-    "uiTitle": "O Som da Natureza",
-    "grammarFocus": "5 Maneiras de expressar sentimentos e afeto",
+    "uiTitle": "Expressando Afeto",
+    "grammarFocus": "5 maneiras de expressar sentimentos e afeto",
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
@@ -1743,8 +1743,8 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "A2",
     "tag": "VOC",
-    "uiTitle": "Os Parques da Metrópole",
-    "grammarFocus": "Animais da Floresta",
+    "uiTitle": "Animais da Floresta",
+    "grammarFocus": "Vocabulário de animais da floresta",
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
@@ -1752,8 +1752,8 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "A2",
     "tag": "VOC",
-    "uiTitle": "Desconectando",
-    "grammarFocus": "Instrumentos Musicais",
+    "uiTitle": "Instrumentos Musicais",
+    "grammarFocus": "Vocabulário de instrumentos musicais",
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
@@ -1761,36 +1761,36 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "A2",
     "tag": "VOC",
-    "uiTitle": "Folhas Caindo",
-    "grammarFocus": "Vocabulário de Casa: Cozinha e Quarto",
-    "theme": "Tema 13: Clima, Natureza e Passeios"
+    "uiTitle": "Cozinha e Quarto",
+    "grammarFocus": "Vocabulário de casa: cozinha e quarto",
+    "theme": "Tema 13: Casa, Trabalho e Saúde"
   },
   {
     "id": "fr-a2-187",
     "language": "fr",
     "level": "A2",
     "tag": "VOC",
-    "uiTitle": "Respirando",
-    "grammarFocus": "Vocabulário de Casa: Sala e Banheiro",
-    "theme": "Tema 13: Clima, Natureza e Passeios"
+    "uiTitle": "Sala e Banheiro",
+    "grammarFocus": "Vocabulário de casa: sala e banheiro",
+    "theme": "Tema 13: Casa, Trabalho e Saúde"
   },
   {
     "id": "fr-a2-188",
     "language": "fr",
     "level": "A2",
     "tag": "VOC",
-    "uiTitle": "O Descanso",
-    "grammarFocus": "Empregos e Profissões",
-    "theme": "Tema 13: Clima, Natureza e Passeios"
+    "uiTitle": "Empregos e Profissões",
+    "grammarFocus": "Vocabulário de empregos e profissões",
+    "theme": "Tema 13: Casa, Trabalho e Saúde"
   },
   {
     "id": "fr-a2-189",
     "language": "fr",
     "level": "A2",
     "tag": "VOC",
-    "uiTitle": "Voltando",
-    "grammarFocus": "Saúde e Corpo: Avoir mal à",
-    "theme": "Tema 13: Clima, Natureza e Passeios",
+    "uiTitle": "Saúde e Corpo",
+    "grammarFocus": "Saúde e corpo: dores e mal-estar",
+    "theme": "Tema 13: Casa, Trabalho e Saúde",
     "topicKey": "avoir-mal",
     "lessonRole": "reinforce"
   },

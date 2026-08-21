@@ -140,8 +140,8 @@ const ENGLISH_NEW: NewLessonSpec[] = [
     insertAfterId: 'en-a2-177',
     level: 'A2',
     tag: 'VOC',
-    uiTitle: 'Big Price Tags',
-    grammarFocus: 'Large Numbers: Hundred, Thousand and Million',
+    uiTitle: 'Preços Grandes',
+    grammarFocus: 'Números grandes: cem, mil e milhão',
     theme: 'Tema 13: Clima, Natureza e Passeios',
   },
   {

@@ -1704,8 +1704,8 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "language": "en",
     "level": "A2",
     "tag": "EXPR",
-    "uiTitle": "Céu Aberto",
-    "grammarFocus": "5 Expressões com Get (Get up, Get tired, Get ready)",
+    "uiTitle": "Expressões com Get",
+    "grammarFocus": "5 expressões com Get: levantar, cansar e preparar",
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
@@ -1713,8 +1713,8 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "language": "en",
     "level": "A2",
     "tag": "DIAL",
-    "uiTitle": "Os Pássaros da Manhã",
-    "grammarFocus": "8 Maneiras de Dizer I'm tired",
+    "uiTitle": "Dizendo que Está Cansado",
+    "grammarFocus": "8 maneiras de dizer que está cansado",
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
@@ -1722,8 +1722,8 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "language": "en",
     "level": "A2",
     "tag": "GRAM",
-    "uiTitle": "Um Acorde Distante",
-    "grammarFocus": "Par de Confusão: Win VS Beat VS Earn",
+    "uiTitle": "Ganhar, Vencer ou Receber",
+    "grammarFocus": "Par de confusão: ganhar, vencer e receber (win, beat, earn)",
     "theme": "Tema 13: Clima, Natureza e Passeios",
     "topicKey": "win-vs-beat-vs-earn",
     "lessonRole": "contrast"
@@ -1733,8 +1733,8 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "language": "en",
     "level": "A2",
     "tag": "MISS",
-    "uiTitle": "A Vida Selvagem",
-    "grammarFocus": "No Restaurante (Reservas e Pedidos)",
+    "uiTitle": "Reserva no Restaurante",
+    "grammarFocus": "No restaurante: reservas e pedidos",
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
@@ -1742,8 +1742,8 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "language": "en",
     "level": "A2",
     "tag": "DIAL",
-    "uiTitle": "Sol e Respiro",
-    "grammarFocus": "10 Maneiras de Dizer I'm Sorry",
+    "uiTitle": "Pedindo Desculpas",
+    "grammarFocus": "10 maneiras de pedir desculpas",
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
@@ -1751,8 +1751,8 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "language": "en",
     "level": "A2",
     "tag": "VOC",
-    "uiTitle": "A Caminhada no Verde",
-    "grammarFocus": "Números Ordinais (1st, 2nd, 3rd, 4th)",
+    "uiTitle": "Números Ordinais",
+    "grammarFocus": "Números ordinais: 1º, 2º, 3º e 4º",
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
@@ -1760,8 +1760,8 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "language": "en",
     "level": "A2",
     "tag": "VOC",
-    "uiTitle": "Big Price Tags",
-    "grammarFocus": "Large Numbers: Hundred, Thousand and Million",
+    "uiTitle": "Preços Grandes",
+    "grammarFocus": "Números grandes: cem, mil e milhão",
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
@@ -1769,8 +1769,8 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "language": "en",
     "level": "A2",
     "tag": "MISS",
-    "uiTitle": "Os Relógios do Sol",
-    "grammarFocus": "Na Estação de Trem e Aeroporto",
+    "uiTitle": "Na Estação e no Aeroporto",
+    "grammarFocus": "Na estação de trem e no aeroporto",
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
@@ -1796,8 +1796,8 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "language": "en",
     "level": "A2",
     "tag": "VOC",
-    "uiTitle": "Os Parques da Metrópole",
-    "grammarFocus": "Animais da Floresta",
+    "uiTitle": "Animais da Floresta",
+    "grammarFocus": "Vocabulário de animais da floresta",
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
@@ -1805,8 +1805,8 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "language": "en",
     "level": "A2",
     "tag": "VOC",
-    "uiTitle": "Desconectando",
-    "grammarFocus": "Instrumentos Musicais e Hobbies",
+    "uiTitle": "Instrumentos e Hobbies",
+    "grammarFocus": "Vocabulário de instrumentos musicais e hobbies",
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
@@ -1814,36 +1814,36 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "language": "en",
     "level": "A2",
     "tag": "VOC",
-    "uiTitle": "Folhas Caindo",
-    "grammarFocus": "Vocabulário de Casa: Cozinha e Quarto",
-    "theme": "Tema 13: Clima, Natureza e Passeios"
+    "uiTitle": "Cozinha e Quarto",
+    "grammarFocus": "Vocabulário de casa: cozinha e quarto",
+    "theme": "Tema 13: Casa, Trabalho e Saúde"
   },
   {
     "id": "en-a2-194",
     "language": "en",
     "level": "A2",
     "tag": "VOC",
-    "uiTitle": "Respirando",
-    "grammarFocus": "Vocabulário de Casa: Sala e Banheiro",
-    "theme": "Tema 13: Clima, Natureza e Passeios"
+    "uiTitle": "Sala e Banheiro",
+    "grammarFocus": "Vocabulário de casa: sala e banheiro",
+    "theme": "Tema 13: Casa, Trabalho e Saúde"
   },
   {
     "id": "en-a2-195",
     "language": "en",
     "level": "A2",
     "tag": "VOC",
-    "uiTitle": "O Descanso",
-    "grammarFocus": "Empregos e Profissões",
-    "theme": "Tema 13: Clima, Natureza e Passeios"
+    "uiTitle": "Empregos e Profissões",
+    "grammarFocus": "Vocabulário de empregos e profissões",
+    "theme": "Tema 13: Casa, Trabalho e Saúde"
   },
   {
     "id": "en-a2-196",
     "language": "en",
     "level": "A2",
     "tag": "VOC",
-    "uiTitle": "Voltando",
-    "grammarFocus": "Saúde e Corpo: Ache e Pain (I have a headache)",
-    "theme": "Tema 13: Clima, Natureza e Passeios"
+    "uiTitle": "Saúde e Corpo",
+    "grammarFocus": "Saúde e corpo: dores e mal-estar",
+    "theme": "Tema 13: Casa, Trabalho e Saúde"
   },
   {
     "id": "en-a2-197",
