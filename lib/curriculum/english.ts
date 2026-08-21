@@ -1777,9 +1777,9 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-a2-189",
     "language": "en",
     "level": "A2",
-    "tag": "MISS",
-    "uiTitle": "Buying the Ticket",
-    "grammarFocus": "Public Transport: Oyster Card, Tube and Transfers",
+    "tag": "VOC",
+    "uiTitle": "Comprando o Bilhete",
+    "grammarFocus": "Bilhetes de transporte público e baldeações",
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {

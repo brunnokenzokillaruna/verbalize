@@ -13,17 +13,17 @@ import {
 
 const GAP_V2_MARKERS = [
   'Vogais Fechadas: EU e U',
-  'O Som Vibrante do R',
-  'Números Grandes: Cent',
-  'Metro, RER e Navigo',
-  'Liaison Avançada',
-  '5 Frases para Consultas',
-  'Vocabulário: Banque',
-  'Gérondif e Être en train de',
+  'O som vibrante do R',
+  'Números grandes: cem',
+  'Bilhetes de transporte e troca de linha',
+  'Ligação fonética: quando é obrigatória',
+  '5 frases para consulta',
+  'Vocabulário de banco, conta',
+  "Gerúndio e 'estar fazendo'",
   'Intonação em Perguntas',
-  '5 Frases para Telefone',
-  'Au Restaurant: Réservation',
-  'Carte Vitale et Mutuelle',
+  '5 frases para telefone',
+  'No restaurante: reserva',
+  'Sistema de saúde francês',
 ];
 
 const GAP_V3_EN_MARKERS = [

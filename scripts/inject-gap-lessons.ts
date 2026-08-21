@@ -28,7 +28,7 @@ const FRENCH_NEW: NewLessonSpec[] = [
     level: 'A2',
     tag: 'PRON',
     uiTitle: 'O R Francês',
-    grammarFocus: 'O Som Vibrante do R (Uvular e Liaison com R)',
+    grammarFocus: 'O som vibrante do R e a ligação entre palavras',
     theme: 'Tema 9: Minha Casa, Minha Rotina',
   },
   // ── A2 Numbers ──────────────────────────────────────────────────────────────
@@ -37,16 +37,16 @@ const FRENCH_NEW: NewLessonSpec[] = [
     level: 'A2',
     tag: 'VOC',
     uiTitle: 'Preços Grandes',
-    grammarFocus: 'Números Grandes: Cent, Mille e Million',
+    grammarFocus: 'Números grandes: cem, mil e milhão',
     theme: 'Tema 13: Clima, Natureza e Passeios',
   },
   // ── A2 Transport ────────────────────────────────────────────────────────────
   {
     insertAfterId: 'fr-a2-178',
     level: 'A2',
-    tag: 'MISS',
+    tag: 'VOC',
     uiTitle: 'Comprando o Bilhete',
-    grammarFocus: 'Metro, RER e Navigo: Bilhetes e Correspondance',
+    grammarFocus: 'Bilhetes de transporte e troca de linha',
     theme: 'Tema 13: Clima, Natureza e Passeios',
   },
   // ── A2 Phonetics (liaison) ──────────────────────────────────────────────────
@@ -54,8 +54,8 @@ const FRENCH_NEW: NewLessonSpec[] = [
     insertAfterId: 'fr-a2-188',
     level: 'A2',
     tag: 'PRON',
-    uiTitle: 'Liaison Obrigatória',
-    grammarFocus: 'Liaison Avançada: Obrigatória vs Proibida',
+    uiTitle: 'Ligação entre Palavras',
+    grammarFocus: 'Ligação fonética: quando é obrigatória ou proibida',
     theme: 'Tema 14: Rotina do Escritório e da Cidade',
   },
   // ── A2 Health & Admin ───────────────────────────────────────────────────────
@@ -64,7 +64,7 @@ const FRENCH_NEW: NewLessonSpec[] = [
     level: 'A2',
     tag: 'DIAL',
     uiTitle: 'Na Consulta Médica',
-    grammarFocus: '5 Frases para Consultas: Rendez-vous, Symptômes e Ordonnance',
+    grammarFocus: '5 frases para consulta: marcar horário, sintomas e receita',
     theme: 'Tema 15: Saúde e Farmácia',
   },
   {
@@ -72,7 +72,7 @@ const FRENCH_NEW: NewLessonSpec[] = [
     level: 'A2',
     tag: 'VOC',
     uiTitle: 'Abrir uma Conta',
-    grammarFocus: 'Vocabulário: Banque, Compte, RIB e Préfecture',
+    grammarFocus: 'Vocabulário de banco, conta e documentos administrativos',
     theme: 'Tema 15: Saúde e Farmácia',
   },
   // ── A2 Gérondif (before A2 review) ──────────────────────────────────────────
@@ -81,7 +81,7 @@ const FRENCH_NEW: NewLessonSpec[] = [
     level: 'A2',
     tag: 'GRAM',
     uiTitle: 'Ação em Andamento',
-    grammarFocus: 'Gérondif e Être en train de + Infinitif',
+    grammarFocus: "Gerúndio e 'estar fazendo' + infinitivo",
     theme: 'Tema 15: Saúde e Farmácia',
   },
   // ── B1 Phonetics & Communication ────────────────────────────────────────────
@@ -98,7 +98,7 @@ const FRENCH_NEW: NewLessonSpec[] = [
     level: 'B1',
     tag: 'DIAL',
     uiTitle: 'Ligação Telefônica',
-    grammarFocus: '5 Frases para Telefone: Appels, Messages et Rendez-vous',
+    grammarFocus: '5 frases para telefone: ligações, recados e compromissos',
     theme: 'Tema 17: Fofocas e Histórias Indiretas',
   },
   {
@@ -106,15 +106,15 @@ const FRENCH_NEW: NewLessonSpec[] = [
     level: 'B1',
     tag: 'MISS',
     uiTitle: 'Jantar Reservado',
-    grammarFocus: 'Au Restaurant: Réservation, Menu, Addition et Pourboire',
+    grammarFocus: 'No restaurante: reserva, cardápio, conta e gorjeta',
     theme: 'Tema 18: Sonhos, Hipóteses e O Futuro',
   },
   {
     insertAfterId: 'fr-b1-240',
     level: 'B1',
     tag: 'CULT',
-    uiTitle: 'Carte Vitale e Mutuelle',
-    grammarFocus: 'Système de Santé Français: Carte Vitale et Mutuelle',
+    uiTitle: 'Saúde na França',
+    grammarFocus: 'Sistema de saúde francês: cartão de saúde e plano complementar',
     theme: 'Tema 18: Sonhos, Hipóteses e O Futuro',
   },
 ];
@@ -147,9 +147,9 @@ const ENGLISH_NEW: NewLessonSpec[] = [
   {
     insertAfterId: 'en-a2-178',
     level: 'A2',
-    tag: 'MISS',
-    uiTitle: 'Buying the Ticket',
-    grammarFocus: 'Public Transport: Oyster Card, Tube and Transfers',
+    tag: 'VOC',
+    uiTitle: 'Comprando o Bilhete',
+    grammarFocus: 'Bilhetes de transporte público e baldeações',
     theme: 'Tema 13: Clima, Natureza e Passeios',
   },
   {

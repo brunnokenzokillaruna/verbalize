@@ -128,7 +128,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "level": "A1",
     "tag": "PRON",
     "uiTitle": "Saindo da Aeronave",
-    "grammarFocus": "Letras Mudas e Liaison",
+    "grammarFocus": "Letras mudas e ligação entre palavras",
     "theme": "Tema 1: A Bordo do Avião e Aeroporto",
     "arcCharacters": { "learner": "Lucas", "local": "Camille" },
     "arcSummary": "Você chega a Paris de avião; Camille, uma parisiense, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
@@ -1147,7 +1147,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "level": "A2",
     "tag": "PRON",
     "uiTitle": "O R Francês",
-    "grammarFocus": "O Som Vibrante do R (Uvular e Liaison com R)",
+    "grammarFocus": "O som vibrante do R e a ligação entre palavras",
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
@@ -1724,9 +1724,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "id": "fr-a2-182",
     "language": "fr",
     "level": "A2",
-    "tag": "MISS",
+    "tag": "VOC",
     "uiTitle": "Comprando o Bilhete",
-    "grammarFocus": "Metro, RER e Navigo: Bilhetes e Correspondance",
+    "grammarFocus": "Bilhetes de transporte e troca de linha",
     "theme": "Tema 13: Clima, Natureza e Passeios"
   },
   {
@@ -1828,8 +1828,8 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "A2",
     "tag": "PRON",
-    "uiTitle": "Liaison Obrigatória",
-    "grammarFocus": "Liaison Avançada: Obrigatória vs Proibida",
+    "uiTitle": "Ligação entre Palavras",
+    "grammarFocus": "Ligação fonética: quando é obrigatória ou proibida",
     "theme": "Tema 14: Rotina do Escritório e da Cidade"
   },
   {
@@ -1920,7 +1920,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "level": "A2",
     "tag": "DIAL",
     "uiTitle": "Na Consulta Médica",
-    "grammarFocus": "5 Frases para Consultas: Rendez-vous, Symptômes e Ordonnance",
+    "grammarFocus": "5 frases para consulta: marcar horário, sintomas e receita",
     "theme": "Tema 15: Saúde e Farmácia"
   },
   {
@@ -1929,7 +1929,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "level": "A2",
     "tag": "VOC",
     "uiTitle": "Abrir uma Conta",
-    "grammarFocus": "Vocabulário: Banque, Compte, RIB e Préfecture",
+    "grammarFocus": "Vocabulário de banco, conta e documentos administrativos",
     "theme": "Tema 15: Saúde e Farmácia"
   },
   {
@@ -2007,7 +2007,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "level": "A2",
     "tag": "GRAM",
     "uiTitle": "Ação em Andamento",
-    "grammarFocus": "Gérondif e Être en train de + Infinitif",
+    "grammarFocus": "Gerúndio e 'estar fazendo' + infinitivo",
     "theme": "Tema 15: Saúde e Farmácia"
   },
   {
@@ -2381,7 +2381,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "level": "B1",
     "tag": "MISS",
     "uiTitle": "Jantar Reservado",
-    "grammarFocus": "Au Restaurant: Réservation, Menu, Addition et Pourboire",
+    "grammarFocus": "No restaurante: reserva, cardápio, conta e gorjeta",
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
@@ -2389,8 +2389,8 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "B1",
     "tag": "CULT",
-    "uiTitle": "Carte Vitale e Mutuelle",
-    "grammarFocus": "Système de Santé Français: Carte Vitale et Mutuelle",
+    "uiTitle": "Saúde na França",
+    "grammarFocus": "Sistema de saúde francês: cartão de saúde e plano complementar",
     "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
   },
   {
@@ -3830,17 +3830,17 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "C2",
     "tag": "GRAM",
-    "uiTitle": "La Mise en Relief",
-    "grammarFocus": "La Mise en Relief e Deslocamento Estilístico Superior",
+    "uiTitle": "Ênfase na Frase",
+    "grammarFocus": "Ênfase e deslocamento estilístico na frase",
     "theme": "Tema 27: Geopolítica e Filosofia"
   },
   {
     "id": "fr-c2-408",
     "language": "fr",
     "level": "C2",
-    "tag": "MISS",
+    "tag": "GRAM",
     "uiTitle": "Sistema de Relativos Avançado",
-    "grammarFocus": "Revisão de Sistemas de Relativos e Artigos Final",
+    "grammarFocus": "Revisão de relativos e artigos",
     "theme": "Tema 27: Geopolítica e Filosofia"
   },
   {
