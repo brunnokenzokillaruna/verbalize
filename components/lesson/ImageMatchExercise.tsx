@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Check } from 'lucide-react';
 import type { ImageMatchData } from '@/types';
+import { distinctPtBrTranslation } from '@/utils/imageMatchBuilder';
 
 interface ImageMatchExerciseProps {
   data: ImageMatchData;
@@ -54,6 +55,8 @@ export function ImageMatchExercise({
 
   const isGallery = variant === 'gallery';
   const hasPendingSelection = selectedWord !== null && !answered;
+  const answerCorrect = selectedWord === data.correctWord;
+  const ptBrTranslation = distinctPtBrTranslation(data.targetWord, data.translation);
 
   return (
     <div className="flex flex-col gap-3 sm:gap-4 max-w-lg mx-auto w-full">
@@ -93,7 +96,7 @@ export function ImageMatchExercise({
 
           return (
             <button
-              key={`${option.word}-${option.imageUrl}`}
+              key={`${idx}-${option.word}`}
               type="button"
               disabled={answered}
               onClick={() => handlePick(option.word)}
@@ -171,12 +174,29 @@ export function ImageMatchExercise({
       </div>
 
       {answered && (
-        <p
-          className="text-center text-sm font-semibold"
-          style={{ color: accentColor }}
+        <div
+          role="status"
+          className="rounded-2xl px-4 py-3 text-center animate-slide-up-spring"
+          style={{
+            backgroundColor: answerCorrect ? 'var(--color-success-bg)' : 'var(--color-error-bg)',
+            border: `1px solid ${answerCorrect ? 'var(--color-success)' : 'var(--color-error)'}`,
+          }}
         >
-          {data.targetWord}
-        </p>
+          <p
+            className="text-xs font-bold"
+            style={{ color: answerCorrect ? 'var(--color-success)' : 'var(--color-error)' }}
+          >
+            {answerCorrect ? 'Correto!' : 'Resposta incorreta'}
+          </p>
+          <p className="mt-1 font-display text-xl font-bold leading-tight text-[var(--color-text-primary)]">
+            {data.targetWord}
+          </p>
+          {ptBrTranslation && (
+            <p className="mt-0.5 text-base font-semibold leading-snug text-[var(--color-text-secondary)]">
+              {ptBrTranslation}
+            </p>
+          )}
+        </div>
       )}
     </div>
   );

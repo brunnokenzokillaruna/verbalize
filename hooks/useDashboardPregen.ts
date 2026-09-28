@@ -1,7 +1,10 @@
 import { useEffect, useRef } from 'react';
 import { devLog } from '@/lib/devLog';
 import { isAggressivePregenEnabled } from '@/lib/geminiDevGuard';
-import { isPregenSchemaCurrent } from '@/lib/practiceExercises/constants';
+import {
+  isPregenPracticePayloadComplete,
+  isPregenSchemaCurrent,
+} from '@/lib/practiceExercises/constants';
 import { pregenerateNextLesson } from '@/app/actions/pregenerateNextLesson';
 import { getPregeneratedLesson, getUserVocabulary } from '@/services/firestore';
 import { canonicalVocabKey } from '@/lib/vocabCanonical';
@@ -53,14 +56,23 @@ export function useDashboardPregen(
 
         const isStaleReady =
           cached?.status === 'ready' && !isPregenSchemaCurrent(cached.schemaVersion);
+        const isIncompleteReady =
+          cached?.status === 'ready' &&
+          isPregenSchemaCurrent(cached.schemaVersion) &&
+          !isPregenPracticePayloadComplete(cached);
 
         if (
           !cached ||
           cached.status === 'failed' ||
           isStaleReady ||
+          isIncompleteReady ||
           (cached.status === 'generating' && isTimedOut(cached.createdAt))
         ) {
-          if (isStaleReady && cached) {
+          if (isIncompleteReady && cached) {
+            devLog(
+              `[Dashboard Pregen] 🔄 Active lesson ${lessonId} cache missing AI exercises (${cached.exercises?.length ?? 0}) — regenerating...`,
+            );
+          } else if (isStaleReady && cached) {
             devLog(
               `[Dashboard Pregen] 🔄 Active lesson ${lessonId} cache STALE (schema ${cached.schemaVersion ?? 'none'}) — regenerating...`,
             );

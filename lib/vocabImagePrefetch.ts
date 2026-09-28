@@ -1,6 +1,7 @@
 import { devLog } from '@/lib/devLog';
 import { getVocabImage } from '@/app/actions/getVocabImage';
 import { sanitizeVocabularyToken } from '@/lib/hookSanitize';
+import { urlsAreSamePhoto } from '@/utils/canonicalImageKey';
 import type { HookResult, LessonDefinition, VocabImageResult } from '@/types';
 
 type PrefetchVocabImagesParams = {
@@ -48,7 +49,7 @@ export async function prefetchVocabImages({
   const refetchWords: Array<{ word: string; fallback: VocabImageResult }> = [];
 
   imageResults.forEach(({ word, result }) => {
-    if (result?.imageUrl && usedUrls.includes(result.imageUrl)) {
+    if (result?.imageUrl && usedUrls.some((u) => urlsAreSamePhoto(u, result.imageUrl))) {
       refetchWords.push({ word, fallback: result });
     } else if (result?.imageUrl) {
       usedUrls.push(result.imageUrl);
@@ -64,7 +65,7 @@ export async function prefetchVocabImages({
       precomputedKeyword,
     });
 
-    if (result?.imageUrl && !usedUrls.includes(result.imageUrl)) {
+    if (result?.imageUrl && !usedUrls.some((u) => urlsAreSamePhoto(u, result.imageUrl))) {
       setVocabImage(word, result);
       usedUrls.push(result.imageUrl);
     } else {

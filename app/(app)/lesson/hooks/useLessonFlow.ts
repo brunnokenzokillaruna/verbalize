@@ -13,6 +13,10 @@ import { sessionHasProduction } from '@/lib/practiceExercises/productionTypes';
 import { applyAdaptiveTier } from '@/lib/practiceExercises/adaptiveTier';
 import { assemblePracticeSession } from '@/utils/assemblePracticeExercises';
 import {
+  preferRicherExerciseSet,
+  resolveAiPracticeExercises,
+} from '@/lib/practiceExercises/resolveAiPracticeExercises';
+import {
   buildLessonVisualExercises,
   LESSON_VISUAL_EXERCISE_COUNT,
   mergeLessonImagesIntoPool,
@@ -49,12 +53,14 @@ interface UseLessonFlowProps {
   exitingRef: React.MutableRefObject<boolean>;
   grammarBridgePrefetchRef: React.MutableRefObject<Promise<GrammarBridgeResult | null> | null>;
   exercisesPrefetchRef: React.MutableRefObject<Promise<Exercise[] | null> | null>;
+  exercisesFallbackRef: React.MutableRefObject<Exercise[] | null>;
 }
 
 export function useLessonFlow({
   exitingRef,
   grammarBridgePrefetchRef,
   exercisesPrefetchRef,
+  exercisesFallbackRef,
 }: UseLessonFlowProps) {
   const router = useRouter();
   const { user, profile, setProfile } = useAuthStore();
@@ -100,90 +106,106 @@ export function useLessonFlow({
   }, [store.hook, store.vocabImagePool, store.vocabImages, store.vocabTranslations]);
 
   const advanceFromGrammar = useCallback(async () => {
-    if (!store.lesson || !store.hook || store.isLoading) return;
-    store.setIsLoading(true);
+    const live = useLessonStore.getState();
+    if (!live.lesson || !live.hook || live.isLoading) return;
+    live.setIsLoading(true);
 
-    const tEx = performance.now();
-    const statusBefore = store.exercisesPrefetchStatus;
-    const prefetchPromise = exercisesPrefetchRef.current;
-    const source = prefetchPromise
-      ? statusBefore === 'ready'
-        ? 'prefetch-ready'
-        : statusBefore === 'pending'
-          ? 'prefetch-pending'
-          : `prefetch-${statusBefore}`
-      : 'on-demand';
-
-    let aiExercises: Exercise[] | null;
-    if (prefetchPromise) {
-      aiExercises = await prefetchPromise;
+    try {
+      const tEx = performance.now();
+      const statusBefore = live.exercisesPrefetchStatus;
+      const prefetchPromise = exercisesPrefetchRef.current;
+      const source = prefetchPromise
+        ? statusBefore === 'ready'
+          ? 'prefetch-ready'
+          : statusBefore === 'pending'
+            ? 'prefetch-pending'
+            : `prefetch-${statusBefore}`
+        : 'on-demand';
       exercisesPrefetchRef.current = null;
-    } else {
-      aiExercises = await trackExercisesPrefetch(fetchAiExercises());
-    }
 
-    const waitMs = performance.now() - tEx;
-    devLog(
-      `[Timing] Exercícios advance: source=${source}, statusBefore=${statusBefore}, wait=${waitMs.toFixed(0)}ms, count=${aiExercises?.length ?? 0}`,
-    );
-    if (waitMs > 300 && source === 'prefetch-pending') {
-      devLog(
-        `[Timing] ⚠️ Usuário chegou à prática antes do prefetch terminar (esperou ${waitMs.toFixed(0)}ms)`,
-      );
-    } else if (source === 'on-demand') {
-      console.warn(
-        `[Timing] Prefetch ausente na transição grammar→practice (status=${statusBefore}) — gerou sob demanda (${waitMs.toFixed(0)}ms)`,
-      );
-    } else if (statusBefore === 'empty' || statusBefore === 'error') {
-      console.warn(
-        `[Timing] Prefetch falhou/vazio antes da prática (status=${statusBefore}) — resultado: ${aiExercises?.length ?? 0} exercícios`,
-      );
-    }
+      let initial: Exercise[] | null;
+      if (prefetchPromise) {
+        initial = await prefetchPromise;
+      } else {
+        initial = await trackExercisesPrefetch(fetchAiExercises());
+      }
 
-    // Retry once if AI exercises failed or returned empty
-    if (!aiExercises || aiExercises.length === 0) {
-      devLog('[useLessonFlow] ⚠️ AI exercises empty/null — retrying once...');
-      const tRetry = performance.now();
-      aiExercises = await fetchAiExercises();
+      const waitMs = performance.now() - tEx;
       devLog(
-        `[Timing] AI exercises retry: ${(performance.now() - tRetry).toFixed(0)}ms, count=${aiExercises?.length ?? 0}`,
+        `[Timing] Exercícios advance: source=${source}, statusBefore=${statusBefore}, wait=${waitMs.toFixed(0)}ms, count=${initial?.length ?? 0}`,
       );
-      if (!aiExercises || aiExercises.length === 0) {
-        console.warn('[useLessonFlow] AI exercises failed after retry — session will have visual-only exercises');
+      if (waitMs > 300 && source === 'prefetch-pending') {
+        devLog(
+          `[Timing] ⚠️ Usuário chegou à prática antes do prefetch terminar (esperou ${waitMs.toFixed(0)}ms)`,
+        );
+      } else if (source === 'on-demand') {
+        console.warn(
+          `[Timing] Prefetch ausente na transição grammar→practice (status=${statusBefore}) — gerou sob demanda (${waitMs.toFixed(0)}ms)`,
+        );
+      } else if (statusBefore === 'empty' || statusBefore === 'error') {
+        console.warn(
+          `[Timing] Prefetch falhou/vazio antes da prática (status=${statusBefore}) — resultado: ${initial?.length ?? 0} exercícios`,
+        );
+      }
+
+      const seeded = preferRicherExerciseSet(initial, exercisesFallbackRef.current);
+      const aiExercises = await resolveAiPracticeExercises(seeded, async () => {
+        const fresh = await fetchAiExercises();
+        return preferRicherExerciseSet(fresh, exercisesFallbackRef.current);
+      });
+
+      if (aiExercises.length === 0) {
+        console.warn(
+          '[useLessonFlow] AI exercises unavailable after retries — staying on the current phase',
+        );
+        useLessonStore.getState().setExercisesPrefetchStatus('error');
+        return;
+      }
+
+      const snapshot = useLessonStore.getState();
+      if (!snapshot.lesson) return;
+
+      let merged = assemblePracticeSession(
+        aiExercises,
+        [],
+        snapshot.lesson.tag,
+        snapshot.bridgeQuizPassed,
+        snapshot.lesson.level,
+      );
+
+      // Drop any AI/cache image-match — visual review is appended as a dedicated block.
+      merged = merged.filter((ex) => ex.type !== 'image-match');
+      merged = applyAdaptiveTier(merged, snapshot.masteredVocabulary);
+
+      if (merged.length === 0) {
+        console.warn(
+          '[useLessonFlow] AI block was empty after assembly — staying on the current phase',
+        );
+        useLessonStore.getState().setExercisesPrefetchStatus('error');
+        return;
+      }
+
+      const visualExercises = buildVisualExercises();
+      if (visualExercises.length > 0) {
+        merged = [...merged, ...visualExercises];
+        devLog(`[useLessonFlow] Appended ${visualExercises.length} visual vocab exercises`);
+      }
+
+      if (!sessionHasProduction(merged)) {
+        devLog('[useLessonFlow] Warning: practice session has no production exercise after assembly');
+      }
+
+      snapshot.setExercises(merged);
+      snapshot.setPhase('practice');
+    } catch (err) {
+      console.error('[useLessonFlow] Failed to open practice:', err);
+      useLessonStore.getState().setExercisesPrefetchStatus('error');
+    } finally {
+      if (useLessonStore.getState().phase !== 'practice') {
+        useLessonStore.getState().setIsLoading(false);
       }
     }
-
-    let merged = assemblePracticeSession(
-      aiExercises ?? [],
-      [],
-      store.lesson.tag,
-      store.bridgeQuizPassed,
-      store.lesson.level,
-    );
-
-    // Drop any AI/cache image-match — visual review is appended as a dedicated block.
-    merged = merged.filter((ex) => ex.type !== 'image-match');
-    merged = applyAdaptiveTier(merged, store.masteredVocabulary);
-
-    const visualExercises = buildVisualExercises();
-    if (visualExercises.length > 0) {
-      merged = [...merged, ...visualExercises];
-      devLog(`[useLessonFlow] Appended ${visualExercises.length} visual vocab exercises`);
-    }
-
-    if (merged.length === 0) {
-      console.error('[useLessonFlow] Empty practice session — staying on grammar phase');
-      store.setIsLoading(false);
-      return;
-    }
-
-    if (!sessionHasProduction(merged)) {
-      devLog('[useLessonFlow] Warning: practice session has no production exercise after assembly');
-    }
-
-    store.setExercises(merged);
-    store.setPhase('practice');
-  }, [store, exercisesPrefetchRef, fetchAiExercises, buildVisualExercises]);
+  }, [exercisesPrefetchRef, exercisesFallbackRef, fetchAiExercises, buildVisualExercises]);
 
   const advanceFromBriefing = useCallback(() => {
     if (!store.lesson) return;

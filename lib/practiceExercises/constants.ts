@@ -43,6 +43,20 @@ export function isPregenSchemaCurrent(schemaVersion?: number): boolean {
   return (schemaVersion ?? 0) >= PREGEN_SCHEMA_VERSION;
 }
 
+/**
+ * A cached lesson is usable as the practice source only when it already holds
+ * the full AI set. REVIEW docs are complete via checkpointSession alone.
+ * A ready hook without 5 exercises must be regenerated — otherwise the lesson
+ * opens and the practice step falls through to image-match only.
+ */
+export function isPregenPracticePayloadComplete(input: {
+  exercises?: readonly unknown[] | null;
+  checkpointSession?: unknown | null;
+}): boolean {
+  if (input.checkpointSession) return true;
+  return (input.exercises?.length ?? 0) >= PRACTICE_EXERCISE_COUNT;
+}
+
 /** When true, every lesson practice session must include at least one production exercise. */
 export const ENFORCE_PRODUCTION_PER_LESSON =
   process.env.NEXT_PUBLIC_ENFORCE_PRODUCTION !== 'false';

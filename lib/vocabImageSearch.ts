@@ -1,6 +1,7 @@
 import { callGemini } from '@/services/gemini';
 import { sanitizeVocabularyToken } from '@/lib/hookSanitize';
 import { normalizeWord } from '@/lib/wordTooltipUtils';
+import { urlsAreSamePhoto } from '@/utils/canonicalImageKey';
 import type { SupportedLanguage } from '@/types';
 
 const LANG_LABEL: Record<SupportedLanguage, string> = {
@@ -141,7 +142,9 @@ export async function pickValidatedPhoto(
   translation?: string,
   excludeUrls: string[] = [],
 ): Promise<PexelsPhotoCandidate | null> {
-  const filtered = candidates.filter((photo) => !excludeUrls.includes(photo.imageUrl));
+  const filtered = candidates.filter(
+    (photo) => !excludeUrls.some((excluded) => urlsAreSamePhoto(excluded, photo.imageUrl)),
+  );
   if (filtered.length === 0) return null;
 
   const ranked = [...filtered].sort(

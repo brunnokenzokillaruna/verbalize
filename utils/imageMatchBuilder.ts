@@ -1,4 +1,7 @@
 import type { Exercise, HookResult, ImageMatchData, VocabImageResult } from '@/types';
+import { canonicalImageKey } from '@/utils/canonicalImageKey';
+
+export { canonicalImageKey } from '@/utils/canonicalImageKey';
 
 export interface ImageMatchCandidate {
   word: string;
@@ -23,8 +26,8 @@ function isConcreteNoun(candidate: ImageMatchCandidate): boolean {
 }
 
 function uniqueUrls(options: ImageMatchCandidate[]): boolean {
-  const urls = options.map((o) => o.imageUrl);
-  return new Set(urls).size === urls.length;
+  const keys = options.map((o) => canonicalImageKey(o.imageUrl));
+  return new Set(keys).size === keys.length;
 }
 
 function uniqueSemanticFields(fields: (string | undefined)[]): boolean {
@@ -47,11 +50,12 @@ function pickUniqueImageDistractors(
   count = 3,
 ): ImageMatchCandidate[] {
   const picked: ImageMatchCandidate[] = [];
-  const usedUrls = new Set<string>([targetUrl]);
+  const usedKeys = new Set<string>([canonicalImageKey(targetUrl)]);
 
   for (const candidate of shuffleInPlace([...candidates])) {
-    if (usedUrls.has(candidate.imageUrl)) continue;
-    usedUrls.add(candidate.imageUrl);
+    const key = canonicalImageKey(candidate.imageUrl);
+    if (!key || usedKeys.has(key)) continue;
+    usedKeys.add(key);
     picked.push(candidate);
     if (picked.length >= count) break;
   }
@@ -89,6 +93,18 @@ export function canBuildImageMatch(
   return true;
 }
 
+function normalizeFeedbackLabel(value: string): string {
+  return value.trim().toLocaleLowerCase('pt-BR');
+}
+
+/** PT-BR gloss for image-match feedback. Empty or identical to the target word is omitted. */
+export function distinctPtBrTranslation(targetWord: string, translation: string | undefined): string | null {
+  const trimmed = translation?.trim() ?? '';
+  if (!trimmed) return null;
+  if (normalizeFeedbackLabel(trimmed) === normalizeFeedbackLabel(targetWord)) return null;
+  return trimmed;
+}
+
 export function buildImageMatchExercise(
   targetWord: string,
   targetImage: VocabImageResult,
@@ -102,29 +118,35 @@ export function buildImageMatchExercise(
   let distractors: ImageMatchCandidate[] = [];
 
   if (hookOptions?.distractors?.length) {
-    distractors = hookOptions.distractors
-      .map((word, i) => {
-        const match = distractorCandidates.find(
-          (c) => normalizeWord(c.word) === normalizeWord(word),
-        );
-        if (!match?.imageUrl) return null;
-        return {
-          ...match,
-          semanticField: hookOptions.semanticFields?.[i],
-        };
-      })
-      .filter(Boolean) as ImageMatchCandidate[];
+    distractors = pickUniqueImageDistractors(
+      targetImage.imageUrl,
+      hookOptions.distractors
+        .map((word, i) => {
+          const match = distractorCandidates.find(
+            (c) => normalizeWord(c.word) === normalizeWord(word),
+          );
+          if (!match?.imageUrl) return null;
+          return {
+            ...match,
+            semanticField: hookOptions.semanticFields?.[i],
+          };
+        })
+        .filter(Boolean) as ImageMatchCandidate[],
+      3,
+    );
   }
 
   if (distractors.length < 3) {
-    distractors = distractorCandidates
-      .filter(
+    distractors = pickUniqueImageDistractors(
+      targetImage.imageUrl,
+      distractorCandidates.filter(
         (c) =>
           normalizeWord(c.word) !== normalizeWord(targetWord) &&
           c.imageUrl &&
           isConcreteNoun(c),
-      )
-      .slice(0, 3);
+      ),
+      3,
+    );
   }
 
   const target: ImageMatchCandidate = {

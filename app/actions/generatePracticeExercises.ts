@@ -152,51 +152,57 @@ export async function generatePracticeExercises(
     let bestEffort: Exercise[] = [];
 
     for (let attempt = 1; attempt <= attemptLimit; attempt++) {
-      let prompt = attempt === 1
-        ? basePrompt
-        : basePrompt + buildRetrySuffix(attempt, [...allowedSet] as ExerciseTypeId[]);
+      try {
+        let prompt = attempt === 1
+          ? basePrompt
+          : basePrompt + buildRetrySuffix(attempt, [...allowedSet] as ExerciseTypeId[]);
 
-      if (attempt >= 2 && requiredProduction) {
-        prompt += buildProductionRetrySuffix(requiredProduction);
-      }
-
-      const raw = await callGeminiJSON<unknown>(prompt, systemPrompt, 3072, undefined, 'standard');
-      const exercises = normalizeExerciseArray(raw);
-
-      if (!exercises) {
-        console.warn(
-          `[generatePracticeExercises] Attempt ${attempt}: expected an exercise array, got ${Array.isArray(raw) ? `array(${raw.length})` : typeof raw}`,
-        );
-        continue;
-      }
-
-      if (exercises.length < PRACTICE_EXERCISE_COUNT) {
-        console.warn(
-          `[generatePracticeExercises] Attempt ${attempt}: got ${exercises.length}/${PRACTICE_EXERCISE_COUNT} raw exercises — composing what we have`,
-        );
-      }
-
-      const finalExercises = await composePracticeSession(
-        exercises,
-        allowedSet,
-        params,
-        tagExclusive,
-      );
-
-      if (finalExercises.length > bestEffort.length) {
-        bestEffort = finalExercises;
-      }
-
-      if (finalExercises.length >= PRACTICE_EXERCISE_COUNT) {
-        if (varietyNeedsRegeneration(finalExercises)) {
-          console.warn('[generatePracticeExercises] Variety insufficient after enforcement — returning set anyway');
+        if (attempt >= 2 && requiredProduction) {
+          prompt += buildProductionRetrySuffix(requiredProduction);
         }
-        return finalExercises;
-      }
 
-      console.warn(
-        `[generatePracticeExercises] Attempt ${attempt}: only ${finalExercises.length} exercises passed validation`,
-      );
+        const raw = await callGeminiJSON<unknown>(prompt, systemPrompt, 3072, undefined, 'standard');
+        const exercises = normalizeExerciseArray(raw);
+
+        if (!exercises) {
+          console.warn(
+            `[generatePracticeExercises] Attempt ${attempt}: expected an exercise array, got ${Array.isArray(raw) ? `array(${raw.length})` : typeof raw}`,
+          );
+          continue;
+        }
+
+        if (exercises.length < PRACTICE_EXERCISE_COUNT) {
+          console.warn(
+            `[generatePracticeExercises] Attempt ${attempt}: got ${exercises.length}/${PRACTICE_EXERCISE_COUNT} raw exercises — composing what we have`,
+          );
+        }
+
+        const finalExercises = await composePracticeSession(
+          exercises,
+          allowedSet,
+          params,
+          tagExclusive,
+        );
+
+        if (finalExercises.length > bestEffort.length) {
+          bestEffort = finalExercises;
+        }
+
+        if (finalExercises.length >= PRACTICE_EXERCISE_COUNT) {
+          if (varietyNeedsRegeneration(finalExercises)) {
+            console.warn('[generatePracticeExercises] Variety insufficient after enforcement — returning set anyway');
+          }
+          return finalExercises;
+        }
+
+        console.warn(
+          `[generatePracticeExercises] Attempt ${attempt}: only ${finalExercises.length} exercises passed validation`,
+        );
+      } catch (err) {
+        // A thrown call (rate limit, invalid JSON) used to abort the whole function
+        // and throw away any exercises already composed. Keep trying.
+        console.error(`[generatePracticeExercises] Attempt ${attempt} failed:`, err);
+      }
     }
 
     if (bestEffort.length === 0) {

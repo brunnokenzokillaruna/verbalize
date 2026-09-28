@@ -11,6 +11,7 @@ import {
   abortPregeneratedLesson,
 } from '@/services/firestore';
 import { getPreviousTopics } from '@/lib/curriculum';
+import { PRACTICE_EXERCISE_COUNT } from '@/lib/practiceExercises/constants';
 import { isAggressivePregenEnabled } from '@/lib/geminiDevGuard';
 import type { LessonDefinition, LessonTag, GrammarBridgeResult, MissionBriefingResult } from '@/types';
 
@@ -129,11 +130,21 @@ async function runPregenerateNextLesson(
     return null;
   });
 
+  // Saving a ready hook without the 5 AI exercises marks the lesson as cached,
+  // so later visits never retry generation and practice can open visual-only.
+  if (!exercises || exercises.length < PRACTICE_EXERCISE_COUNT) {
+    await abortPregeneratedLesson(uid, lesson.id).catch(() => {});
+    console.error(
+      `[pregenerateNextLesson] Exercises incomplete (${exercises?.length ?? 0}/${PRACTICE_EXERCISE_COUNT}) — cache cleared.`,
+    );
+    return false;
+  }
+
   await savePregeneratedLesson(uid, lesson.id, {
     hook,
     ...(grammarBridge ? { grammarBridge } : {}),
     ...(missionBriefing ? { missionBriefing } : {}),
-    ...(exercises && exercises.length > 0 ? { exercises } : {}),
+    exercises,
   });
   return true;
 }

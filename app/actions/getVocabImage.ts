@@ -7,6 +7,7 @@ import {
   buildVisualSearchKeyword,
   pickValidatedPhoto,
 } from '@/lib/vocabImageSearch';
+import { urlsAreSamePhoto } from '@/utils/canonicalImageKey';
 import type { SupportedLanguage, VocabImageResult } from '@/types';
 
 function buildImageCachePayload(
@@ -57,7 +58,7 @@ export async function getVocabImage(
       options?.allowCached !== false &&
       cached?.approved &&
       cached.imageUrl &&
-      !excludeUrls.includes(cached.imageUrl)
+      !excludeUrls.some((excluded) => urlsAreSamePhoto(excluded, cached.imageUrl))
     ) {
       return { imageUrl: cached.imageUrl, imageAlt: cached.photographer };
     }

@@ -11,7 +11,12 @@ import { generatePhoneticsTip } from '@/app/actions/generatePhoneticsTip';
 import { generateMissionBriefing } from '@/app/actions/generateMissionBriefing';
 import { generatePracticeExercises } from '@/app/actions/generatePracticeExercises';
 import { generateCheckpointSession } from '@/app/actions/generateCheckpointSession';
-import { isPregenSchemaCurrent, PREGEN_SCHEMA_VERSION } from '@/lib/practiceExercises/constants';
+import {
+  isPregenSchemaCurrent,
+  PRACTICE_EXERCISE_COUNT,
+  PREGEN_SCHEMA_VERSION,
+} from '@/lib/practiceExercises/constants';
+import { preferRicherExerciseSet } from '@/lib/practiceExercises/resolveAiPracticeExercises';
 import {
   markExercisesPrefetchReady,
   trackExercisesPrefetch,
@@ -113,18 +118,25 @@ function applyPregenCache(
   store: ReturnType<typeof useLessonStore.getState>,
   grammarBridgePrefetchRef: React.MutableRefObject<Promise<GrammarBridgeResult | null> | null>,
   exercisesPrefetchRef: React.MutableRefObject<Promise<Exercise[] | null> | null>,
+  exercisesFallbackRef: React.MutableRefObject<Exercise[] | null>,
 ): HookResult | null {
   const schemaOk = isPregenSchemaCurrent(pregenDoc.schemaVersion);
+  const cachedExercises = pregenDoc.exercises ?? [];
+  const fullAiSet = schemaOk && cachedExercises.length >= PRACTICE_EXERCISE_COUNT;
 
   if (pregenDoc.grammarBridge) {
     grammarBridgePrefetchRef.current = Promise.resolve(pregenDoc.grammarBridge);
   }
-  if (schemaOk && pregenDoc.exercises && pregenDoc.exercises.length > 0) {
-    exercisesPrefetchRef.current = Promise.resolve(pregenDoc.exercises);
-    markExercisesPrefetchReady(pregenDoc.exercises);
-  } else if (!schemaOk && pregenDoc.exercises?.length) {
+  if (fullAiSet) {
+    exercisesPrefetchRef.current = Promise.resolve(cachedExercises);
+    exercisesFallbackRef.current = null;
+    markExercisesPrefetchReady(cachedExercises);
+  } else if (cachedExercises.length > 0) {
+    exercisesFallbackRef.current = cachedExercises;
     devLog(
-      `[Timing] Cache pregen exercises STALE (schema ${pregenDoc.schemaVersion ?? 'none'} < ${PREGEN_SCHEMA_VERSION}) — regenerating exercises`,
+      schemaOk
+        ? `[Timing] Cache pregen exercises incomplete (${cachedExercises.length}/${PRACTICE_EXERCISE_COUNT}) — regenerating exercises`
+        : `[Timing] Cache pregen exercises STALE (schema ${pregenDoc.schemaVersion ?? 'none'} < ${PREGEN_SCHEMA_VERSION}) — regenerating exercises`,
     );
   }
   if (pregenDoc.missionBriefing) {
@@ -147,6 +159,7 @@ interface UseLessonBootstrapProps {
   lessonInitiatedRef: React.MutableRefObject<boolean>;
   grammarBridgePrefetchRef: React.MutableRefObject<Promise<GrammarBridgeResult | null> | null>;
   exercisesPrefetchRef: React.MutableRefObject<Promise<Exercise[] | null> | null>;
+  exercisesFallbackRef: React.MutableRefObject<Exercise[] | null>;
   fetchAiExercises: () => Promise<Exercise[] | null>;
 }
 
@@ -156,6 +169,7 @@ export function useLessonBootstrap({
   lessonInitiatedRef,
   grammarBridgePrefetchRef,
   exercisesPrefetchRef,
+  exercisesFallbackRef,
 }: UseLessonBootstrapProps) {
   const router = useRouter();
   const { user, profile } = useAuthStore();
@@ -174,6 +188,7 @@ export function useLessonBootstrap({
     lessonInitiatedRef.current = true;
 
     setHookError(false);
+    exercisesFallbackRef.current = null;
     const language = profile.currentTargetLanguage;
     const lesson =
       (requestedLessonId ? getLessonById(requestedLessonId) : undefined) ??
@@ -210,7 +225,13 @@ export function useLessonBootstrap({
             const pregenDoc = await fetchPregeneratedLessonWithWait(user.uid, lesson.id);
 
             if (pregenDoc?.hook || pregenDoc?.checkpointSession) {
-              hook = applyPregenCache(pregenDoc, store, grammarBridgePrefetchRef, exercisesPrefetchRef);
+              hook = applyPregenCache(
+                pregenDoc,
+                store,
+                grammarBridgePrefetchRef,
+                exercisesPrefetchRef,
+                exercisesFallbackRef,
+              );
               const parts: string[] = [];
               if (pregenDoc.hook) parts.push('hook');
               if (pregenDoc.grammarBridge) parts.push('grammarBridge');
@@ -283,7 +304,13 @@ export function useLessonBootstrap({
               devLog(`[Timing] Lock pregen indisponível — verificando cache uma vez...`);
               const pregenDoc = await fetchPregeneratedLessonWithWait(user.uid, lesson.id);
               if (pregenDoc?.hook || pregenDoc?.checkpointSession) {
-                hook = applyPregenCache(pregenDoc, store, grammarBridgePrefetchRef, exercisesPrefetchRef);
+                hook = applyPregenCache(
+                  pregenDoc,
+                  store,
+                  grammarBridgePrefetchRef,
+                  exercisesPrefetchRef,
+                  exercisesFallbackRef,
+                );
                 deletePregeneratedLesson(user.uid, lesson.id).catch(console.error);
                 devLog(`[Timing] Conteúdo recebido do pregen após lock: ${(performance.now() - tHook).toFixed(0)}ms`);
               }
@@ -518,10 +545,11 @@ export function useLessonBootstrap({
               previousTopics: getPreviousTopics(language, lesson.id),
               grammarBridge: bridge ?? hook.grammarBridge ?? null,
             });
+            const chosen = preferRicherExerciseSet(result, exercisesFallbackRef.current);
             devLog(
-              `[Timing] ✅ Prefetch exercícios Gemini terminou: ${(performance.now() - tEx).toFixed(0)}ms (${result?.length ?? 0} exercícios)`,
+              `[Timing] ✅ Prefetch exercícios Gemini terminou: ${(performance.now() - tEx).toFixed(0)}ms (${chosen?.length ?? 0} exercícios)`,
             );
-            return result;
+            return chosen;
           }),
         );
       }
@@ -548,10 +576,11 @@ export function useLessonBootstrap({
             masteredVocabulary: store.masteredVocabulary,
             previousTopics: getPreviousTopics(language, lesson.id),
           }).then((result) => {
+            const chosen = preferRicherExerciseSet(result, exercisesFallbackRef.current);
             devLog(
-              `[Timing] ✅ Prefetch exercícios Gemini terminou: ${(performance.now() - tEx).toFixed(0)}ms (${result?.length ?? 0} exercícios)`,
+              `[Timing] ✅ Prefetch exercícios Gemini terminou: ${(performance.now() - tEx).toFixed(0)}ms (${chosen?.length ?? 0} exercícios)`,
             );
-            return result;
+            return chosen;
           }),
         );
       }

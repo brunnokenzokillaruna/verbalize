@@ -79,6 +79,7 @@ export default function LessonPage() {
   const lessonInitiatedRef = useRef(false);
   const grammarBridgePrefetchRef = useRef<Promise<GrammarBridgeResult | null> | null>(null);
   const exercisesPrefetchRef = useRef<Promise<Exercise[] | null> | null>(null);
+  const exercisesFallbackRef = useRef<Exercise[] | null>(null);
 
   useEffect(() => {
     if (!user || !profile) {
@@ -105,6 +106,7 @@ export default function LessonPage() {
     exitingRef,
     grammarBridgePrefetchRef,
     exercisesPrefetchRef,
+    exercisesFallbackRef,
   });
 
   const { hookError, setHookError } = useLessonBootstrap({
@@ -113,6 +115,7 @@ export default function LessonPage() {
     lessonInitiatedRef,
     grammarBridgePrefetchRef,
     exercisesPrefetchRef,
+    exercisesFallbackRef,
     fetchAiExercises,
   });
 
@@ -287,6 +290,14 @@ export default function LessonPage() {
             onDebriefExit={() => router.push('/profile')}
           />
         )}
+
+        {(phase === 'grammar' || phase === 'phonetics' || phase === 'role-play') &&
+          store.exercisesPrefetchStatus === 'error' &&
+          !store.isLoading && (
+            <p className="mt-4 text-center text-sm font-semibold text-warning">
+              Os exercícios desta lição não carregaram. Toque de novo para tentar outra vez.
+            </p>
+          )}
 
         {phase !== 'practice' && phase !== 'review' && phase !== 'production' && phase !== 'grammar' && (
           <LessonContinueButton

@@ -18,6 +18,7 @@ import { getDb, getAuthInstance } from './firebase';
 import { normalizeHookPtBr } from '@/lib/naturalPtBr';
 import { getPregenGeneratingTimeoutMs } from '@/lib/pregenTiming';
 import {
+  isPregenPracticePayloadComplete,
   isPregenSchemaCurrent,
   PREGEN_SCHEMA_VERSION,
   SEPARATE_PASSIVE_SRS,
@@ -1209,7 +1210,13 @@ export async function tryStartPregeneratingLesson(uid: string, lessonId: string)
       const snap = await tx.get(ref);
       if (snap.exists()) {
         const data = snap.data() as PregeneratedLessonDocument;
-        if (data.status === 'ready' && isPregenSchemaCurrent(data.schemaVersion)) return false;
+        if (
+          data.status === 'ready' &&
+          isPregenSchemaCurrent(data.schemaVersion) &&
+          isPregenPracticePayloadComplete(data)
+        ) {
+          return false;
+        }
         if (data.status === 'generating') {
           const age = Date.now() - pregenCreatedAtMs(data.createdAt);
           if (age < getPregenGeneratingTimeoutMs()) return false;
