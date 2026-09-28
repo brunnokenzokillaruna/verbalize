@@ -174,29 +174,13 @@ export function ImageMatchExercise({
       </div>
 
       {answered && (
-        <div
+        <p
           role="status"
-          className="rounded-2xl px-4 py-3 text-center animate-slide-up-spring"
-          style={{
-            backgroundColor: answerCorrect ? 'var(--color-success-bg)' : 'var(--color-error-bg)',
-            border: `1px solid ${answerCorrect ? 'var(--color-success)' : 'var(--color-error)'}`,
-          }}
+          className="text-center text-sm font-semibold"
+          style={{ color: answerCorrect ? 'var(--color-success)' : 'var(--color-error)' }}
         >
-          <p
-            className="text-xs font-bold"
-            style={{ color: answerCorrect ? 'var(--color-success)' : 'var(--color-error)' }}
-          >
-            {answerCorrect ? 'Correto!' : 'Resposta incorreta'}
-          </p>
-          <p className="mt-1 font-display text-xl font-bold leading-tight text-[var(--color-text-primary)]">
-            {data.targetWord}
-          </p>
-          {ptBrTranslation && (
-            <p className="mt-0.5 text-base font-semibold leading-snug text-[var(--color-text-secondary)]">
-              {ptBrTranslation}
-            </p>
-          )}
-        </div>
+          {ptBrTranslation ?? data.targetWord}
+        </p>
       )}
     </div>
   );

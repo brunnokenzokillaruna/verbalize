@@ -8,7 +8,15 @@ import {
   canonicalImageKey,
   distinctPtBrTranslation,
 } from './utils/imageMatchBuilder';
-import type { VocabImageResult } from './types';
+import type { Exercise, ImageMatchData, VocabImageResult } from './types';
+
+function imageMatchData(exercise: Exercise | null, message: string): ImageMatchData {
+  if (!exercise || exercise.type !== 'image-match') {
+    console.error(`FAIL: ${message}`);
+    process.exit(1);
+  }
+  return exercise.data;
+}
 
 function assert(condition: boolean, message: string) {
   if (!condition) {
@@ -48,16 +56,15 @@ const pool = [
 ];
 
 const reviewExercise = buildImageMatchFromReviewWords('choisir', pool);
-assert(reviewExercise !== null, 'builds review exercise when enough distinct photos exist');
-assert(reviewExercise!.type === 'image-match', 'review exercise is image-match');
+const reviewData = imageMatchData(reviewExercise, 'builds review exercise when enough distinct photos exist');
 
-const reviewKeys = reviewExercise!.data.options.map((o) => canonicalImageKey(o.imageUrl));
+const reviewKeys = reviewData.options.map((o) => canonicalImageKey(o.imageUrl));
 assert(
   new Set(reviewKeys).size === reviewKeys.length,
   'review options never reuse the same Pexels photo (even with different query params)',
 );
 assert(
-  !reviewExercise!.data.options.some((o) => o.word === 'doigt'),
+  !reviewData.options.some((o) => o.word === 'doigt'),
   'skips distractor that shares the target photo identity',
 );
 
@@ -87,15 +94,15 @@ const lessonExercise = buildImageMatchExercise(
     { word: 'livre', imageUrl: 'https://images.pexels.com/photos/333/c.jpeg?h=650', wordType: 'noun' },
   ],
 );
-assert(lessonExercise !== null, 'lesson builder fills distractors with distinct photos');
+const lessonData = imageMatchData(lessonExercise, 'lesson builder fills distractors with distinct photos');
 assert(
-  lessonExercise?.type === 'image-match' && lessonExercise.data.translation === 'escolher',
+  lessonData.translation === 'escolher',
   'image-match keeps the PT-BR translation for post-answer feedback',
 );
 assert(distinctPtBrTranslation('Livre', 'Livro') === 'Livro', 'shows a real PT-BR translation');
 assert(distinctPtBrTranslation('Livre', '  livre  ') === null, 'hides a translation that only repeats the target word');
 assert(distinctPtBrTranslation('Livre', '   ') === null, 'hides an empty translation');
-const lessonKeys = lessonExercise!.data.options.map((o) => canonicalImageKey(o.imageUrl));
+const lessonKeys = lessonData.options.map((o) => canonicalImageKey(o.imageUrl));
 assert(
   new Set(lessonKeys).size === lessonKeys.length,
   'lesson options never reuse the same Pexels photo',
