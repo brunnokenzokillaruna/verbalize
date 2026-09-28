@@ -1090,6 +1090,19 @@ export async function updateImageCacheTranslation(word: string, translation: str
   await updateDoc(doc(await getDb(), 'image_cache', word), { translation });
 }
 
+/** Writes a pt-BR translation without replacing an existing image. */
+export async function upsertImageCacheTranslation(
+  cacheKey: string,
+  translation: string,
+  language: SupportedLanguage,
+): Promise<void> {
+  await setDoc(doc(await getDb(), 'image_cache', cacheKey), {
+    word: cacheKey,
+    language,
+    translation,
+  }, { merge: true });
+}
+
 // ─── Lesson Mistakes ──────────────────────────────────────────────────────────
 
 /**

@@ -2,6 +2,7 @@ import React from 'react';
 import { Loader2 } from 'lucide-react';
 import { VisualVocabCard } from './VisualVocabCard';
 import { sanitizeVocabularyToken } from '@/lib/hookSanitize';
+import { lookupStoredTranslation } from '@/lib/vocabTranslation';
 
 import type { SupportedLanguage, ProficiencyLevel } from '@/types';
 
@@ -66,7 +67,8 @@ export function LessonVocabularyScreen({
         {[...new Set(newVocabulary)].map((word, idx) => {
           const cleanWord = sanitizeVocabularyToken(word);
           const img = vocabImages[cleanWord] ?? vocabImages[word];
-          const translation = vocabTranslations[cleanWord] ?? vocabTranslations[word] ?? cleanWord;
+          const translation = lookupStoredTranslation(vocabTranslations, cleanWord)
+            ?? lookupStoredTranslation(vocabTranslations, word);
           const isImageLoading = !(cleanWord in vocabImages) && !(word in vocabImages);
           return (
             <div
@@ -79,7 +81,8 @@ export function LessonVocabularyScreen({
             >
               <VisualVocabCard
                 word={cleanWord}
-                translation={translation}
+                translation={translation ?? ''}
+                isTranslationLoading={!translation}
                 language={language}
                 imageUrl={img?.imageUrl}
                 imageAlt={img?.imageAlt}

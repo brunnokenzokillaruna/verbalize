@@ -19,6 +19,8 @@ interface VisualVocabCardProps {
   immersive?: boolean;
   /** True while the image is still being fetched from the server. */
   isImageLoading?: boolean;
+  /** True while the pt-BR translation is still being fetched. */
+  isTranslationLoading?: boolean;
 }
 
 export function VisualVocabCard({
@@ -31,6 +33,7 @@ export function VisualVocabCard({
   targetDefinition,
   immersive = false,
   isImageLoading = false,
+  isTranslationLoading = false,
 }: VisualVocabCardProps) {
   const [revealed, setRevealed] = useState(false);
   const [useNativeImage, setUseNativeImage] = useState(false);
@@ -121,6 +124,10 @@ export function VisualVocabCard({
                   · toque
                 </span>
               </button>
+            ) : isTranslationLoading ? (
+              <p className="mt-0.5 text-xs font-semibold leading-snug text-text-muted animate-pulse">
+                traduzindo…
+              </p>
             ) : (
               <p className="mt-0.5 text-xs font-semibold leading-snug text-text-secondary truncate">
                 {translation}

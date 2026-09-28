@@ -27,11 +27,16 @@ import { translateWord, translateWordsBatch } from '@/app/actions/translateWord'
 import { prefetchVocabImages } from '@/lib/vocabImagePrefetch';
 import { getLessonSceneImage } from '@/app/actions/getLessonSceneImage';
 import { fetchPregeneratedLessonWithWait } from '@/lib/waitForPregeneratedLesson';
-import { deletePregeneratedLesson, getUserVocabulary, upsertVocabularyItem, tryStartPregeneratingLesson, abortPregeneratedLesson, getCachedImage } from '@/services/firestore';
+import { deletePregeneratedLesson, getUserVocabulary, upsertVocabularyItem, tryStartPregeneratingLesson, abortPregeneratedLesson, getCachedImage, upsertImageCacheTranslation } from '@/services/firestore';
 import { sanitizeVocabularyToken } from '@/lib/hookSanitize';
 import { timestampToMillis } from '@/utils/vocabPageHelpers';
 import { MIN_VISUAL_REVIEW_ITEMS } from '@/utils/imageMatchBuilder';
 import { canonicalVocabKey } from '@/lib/vocabCanonical';
+import {
+  isUntranslatedCopy,
+  lookupStoredTranslation,
+  trackVocabTranslationFill,
+} from '@/lib/vocabTranslation';
 import { filterHookVocabularyForKnownWords, filterKnownFromNewChunks } from '@/lib/hookVocabulary';
 import { collectDialogueTranslationTargets } from '@/lib/dialogueNarration';
 import { tooltipCacheKey } from '@/lib/wordTooltipUtils';
@@ -586,59 +591,114 @@ export function useLessonBootstrap({
       }
     }
 
-    const translatedKeys = new Set<string>();
+    const lessonItems = [...new Set(
+      [
+        ...words,
+        ...(hook.newChunks?.map((chunk) => chunk.phrase) ?? []),
+      ]
+        .map((item) => sanitizeVocabularyToken(item))
+        .filter((item) => item.length > 0),
+    )];
+
+    const rememberTranslation = (
+      word: string,
+      translation: string | undefined,
+      allowCopy: boolean,
+      tooltip?: { translation: string; explanation?: string; example?: string },
+    ): boolean => {
+      const value = translation?.trim();
+      if (!value) return false;
+      if (!allowCopy && isUntranslatedCopy(word, value)) return false;
+      const key = sanitizeVocabularyToken(word) || word.trim();
+      store.setVocabTranslation(key, value);
+      store.cacheWordTooltip(tooltipCacheKey(key, language, false), {
+        translation: value,
+        explanation: tooltip?.explanation ?? '',
+        example: tooltip?.example ?? '',
+      });
+      return true;
+    };
+
     if (hook.vocabTranslations) {
       for (const [word, result] of Object.entries(hook.vocabTranslations)) {
-        if (!result?.translation) continue;
-        translatedKeys.add(canonicalVocabKey(word));
-        store.setVocabTranslation(word, result.translation);
-        store.cacheWordTooltip(tooltipCacheKey(word, language, false), result);
+        rememberTranslation(word, result?.translation, false, result);
       }
     }
     hook.newChunks?.forEach((chunk) => {
-      translatedKeys.add(canonicalVocabKey(chunk.phrase));
-      store.setVocabTranslation(chunk.phrase, chunk.translation);
+      rememberTranslation(chunk.phrase, chunk.translation, false);
     });
+
+    const missingTranslations = (targets: string[]) => {
+      const stored = useLessonStore.getState().vocabTranslations;
+      return targets.filter((target) => !lookupStoredTranslation(stored, target));
+    };
 
     const dialogueTranslationTargets = collectDialogueTranslationTargets(
       dialogue,
       hook.newChunks,
-    ).filter((target) => !translatedKeys.has(canonicalVocabKey(target)));
+    );
     const tTrans = performance.now();
-    void (async () => {
-      const batch = await translateWordsBatch(
-        dialogueTranslationTargets,
-        language,
-        dialogue,
-      );
-      if (batch?.length) {
-        for (const item of batch) {
-          if (!item.translation) continue;
-          store.setVocabTranslation(item.word, item.translation);
-          store.cacheWordTooltip(tooltipCacheKey(item.word, language, false), {
-            translation: item.translation,
-            explanation: '',
-            example: '',
-          });
-        }
-        devLog(
-          `[Timing] Traduções sincronizadas: ${(performance.now() - tTrans).toFixed(0)}ms (${batch.length} itens, 1 chamada Gemini)`,
-        );
-        return;
+    trackVocabTranslationFill((async () => {
+      for (const word of missingTranslations(lessonItems)) {
+        const cached = await getCachedImage(`${sanitizeVocabularyToken(word)}_${language}`);
+        rememberTranslation(word, cached?.translation, false);
       }
 
-      // Preserve the old resilient fallback for the two lesson vocabulary items.
-      for (const word of words) {
-        if (translatedKeys.has(canonicalVocabKey(word))) continue;
-        const result = await translateWord(word, dialogue, language);
-        if (result?.translation) {
-          store.setVocabTranslation(word, result.translation);
-          store.cacheWordTooltip(tooltipCacheKey(word, language, false), result);
+      const firstWave = [...new Set([
+        ...missingTranslations(dialogueTranslationTargets),
+        ...missingTranslations(lessonItems),
+      ])];
+      if (firstWave.length > 0) {
+        const batch = await translateWordsBatch(firstWave, language, dialogue, 'initial');
+        for (const item of batch ?? []) {
+          rememberTranslation(item.word, item.translation, false);
         }
       }
-    })();
+
+      let unresolved = missingTranslations(lessonItems);
+      if (unresolved.length > 0) {
+        const strictBatch = await translateWordsBatch(unresolved, language, dialogue, 'strict');
+        for (const item of strictBatch ?? []) {
+          rememberTranslation(item.word, item.translation, true);
+        }
+      }
+
+      unresolved = missingTranslations(lessonItems);
+      for (const word of unresolved) {
+        const result = await translateWord(word, dialogue, language);
+        rememberTranslation(word, result?.translation, true);
+      }
+
+      const stored = useLessonStore.getState().vocabTranslations;
+      const chunks = useLessonStore.getState().hook?.newChunks;
+      if (chunks?.length) {
+        let changed = false;
+        const nextChunks = chunks.map((chunk) => {
+          const translation = lookupStoredTranslation(stored, chunk.phrase);
+          if (!translation || translation === chunk.translation) return chunk;
+          changed = true;
+          return { ...chunk, translation };
+        });
+        if (changed) useLessonStore.getState().mergeHook({ newChunks: nextChunks });
+      }
+
+      await Promise.all(lessonItems.map(async (word) => {
+        const translation = lookupStoredTranslation(useLessonStore.getState().vocabTranslations, word);
+        if (!translation || isUntranslatedCopy(word, translation)) return;
+        const cacheKey = `${sanitizeVocabularyToken(word)}_${language}`;
+        const cached = await getCachedImage(cacheKey);
+        if (cached?.translation && !isUntranslatedCopy(word, cached.translation)) return;
+        await upsertImageCacheTranslation(cacheKey, translation, language);
+      }));
+
+      devLog(
+        `[Timing] Traduções sincronizadas: ${(performance.now() - tTrans).toFixed(0)}ms (${lessonItems.length} itens da lição)`,
+      );
+    })().catch((err) => {
+      console.error('[Prefetch] vocabulary translations error:', err);
+    }));
     devLog(
-      `[Timing] Traduções sincronizadas iniciadas (${dialogueTranslationTargets.length} itens)`,
+      `[Timing] Traduções sincronizadas iniciadas (${lessonItems.length} palavras/expressões)`,
     );
 
     const tImages = performance.now();

@@ -1,4 +1,5 @@
 import type { Exercise, HookResult, ImageMatchData, VocabImageResult } from '@/types';
+import { lookupStoredTranslation } from '@/lib/vocabTranslation';
 import { canonicalImageKey } from '@/utils/canonicalImageKey';
 
 export { canonicalImageKey } from '@/utils/canonicalImageKey';
@@ -196,7 +197,7 @@ export function buildImageMatchFromLessonVocab(params: {
     word,
     imageUrl: vocabImages[word]?.imageUrl ?? '',
     imageAlt: vocabImages[word]?.imageAlt,
-    translation: vocabTranslations[word],
+    translation: lookupStoredTranslation(vocabTranslations, word) ?? vocabTranslations[word],
     wordType: word === hook.verbWord ? 'verb' : 'noun',
   }));
 
@@ -211,7 +212,7 @@ export function buildImageMatchFromLessonVocab(params: {
   return buildImageMatchExercise(
     targetWord,
     vocabImages[targetWord]!,
-    vocabTranslations[targetWord] ?? targetWord,
+    lookupStoredTranslation(vocabTranslations, targetWord) ?? vocabTranslations[targetWord] ?? targetWord,
     candidates.filter((c) => c.word !== targetWord),
     hook,
   );
@@ -333,7 +334,7 @@ export function mergeLessonImagesIntoPool(
     const existing = byWord.get(key);
     byWord.set(key, {
       word: existing?.word ?? word,
-      translation: vocabTranslations[word] ?? existing?.translation ?? word,
+      translation: lookupStoredTranslation(vocabTranslations, word) ?? vocabTranslations[word] ?? existing?.translation ?? word,
       imageUrl: image.imageUrl,
       srsLevel: existing?.srsLevel ?? 0,
       nextReviewMs: existing?.nextReviewMs,

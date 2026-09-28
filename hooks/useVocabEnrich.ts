@@ -3,6 +3,7 @@ import { translateWordsBatch } from '@/app/actions/translateWord';
 import { getVocabImage } from '@/app/actions/getVocabImage';
 import { updateVocabTranslation, updateVocabImage } from '@/services/firestore';
 import { findVocabularyItem, wordsMatchCanonically } from '@/lib/vocabCanonical';
+import { isUntranslatedCopy } from '@/lib/vocabTranslation';
 import { isMissingImage, isMissingTranslation } from '@/utils/vocabHelpers';
 import type { UserVocabularyDocument, SupportedLanguage } from '@/types';
 import type { User } from 'firebase/auth';
@@ -35,7 +36,7 @@ export function useVocabEnrich(
         if (needsTranslation) {
           const results = await translateWordsBatch([word], language);
           const match = results?.find((r) => r.word.toLowerCase() === word.toLowerCase());
-          if (match?.translation && match.translation !== word) {
+          if (match?.translation && !isUntranslatedCopy(word, match.translation)) {
             translation = match.translation;
             await updateVocabTranslation(user.uid, word, language, translation, item.id);
           }

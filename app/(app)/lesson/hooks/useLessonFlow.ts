@@ -9,6 +9,7 @@ import { generatePracticeExercises } from '@/app/actions/generatePracticeExercis
 import { getVerbConjugation } from '@/app/actions/getVerbConjugation';
 import { logLesson, updateLessonStats, upsertVocabularyItem, saveLessonMistake, updateUser, updateVocabSrsAfterReview } from '@/services/firestore';
 import { canonicalVocabKey } from '@/lib/vocabCanonical';
+import { lookupStoredTranslation, waitForVocabTranslations } from '@/lib/vocabTranslation';
 import { sessionHasProduction } from '@/lib/practiceExercises/productionTypes';
 import { applyAdaptiveTier } from '@/lib/practiceExercises/adaptiveTier';
 import { assemblePracticeSession } from '@/utils/assemblePracticeExercises';
@@ -392,21 +393,22 @@ export function useLessonFlow({
     }
 
     const language = store.lesson.language;
-    const live = useLessonStore.getState();
-    const visualReviews = collectLessonVisualReviews(live.exercises, live.mistakes);
+    await waitForVocabTranslations();
+    const fresh = useLessonStore.getState();
+    const visualReviews = collectLessonVisualReviews(fresh.exercises, fresh.mistakes);
 
     await Promise.all([
-      ...store.hook.newVocabulary.map((word) => {
-        const translation = store.vocabTranslations[word] ?? word;
-        const imageUrl = store.vocabImages[word]?.imageUrl;
-        const wordType: 'verb' | 'noun' = word === store.hook!.verbWord ? 'verb' : 'noun';
+      ...(fresh.hook?.newVocabulary ?? []).map((word) => {
+        const translation = lookupStoredTranslation(fresh.vocabTranslations, word) ?? word;
+        const imageUrl = fresh.vocabImages[word]?.imageUrl;
+        const wordType: 'verb' | 'noun' = word === fresh.hook?.verbWord ? 'verb' : 'noun';
         return upsertVocabularyItem(user.uid, word, translation, language, imageUrl, wordType).catch(console.error);
       }),
-      ...(store.hook.newChunks ?? []).map((chunk) =>
+      ...(fresh.hook?.newChunks ?? []).map((chunk) =>
         upsertVocabularyItem(
           user.uid,
           chunk.phrase,
-          chunk.translation,
+          lookupStoredTranslation(fresh.vocabTranslations, chunk.phrase) ?? chunk.translation,
           language,
           undefined,
           'noun',

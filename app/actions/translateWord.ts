@@ -63,6 +63,7 @@ export async function translateWordsBatch(
   words: string[],
   language: SupportedLanguage,
   context?: string,
+  pass: 'initial' | 'strict' = 'initial',
 ): Promise<{ word: string; translation: string }[] | null> {
   'use cache';
   cacheLife('weeks');
@@ -89,7 +90,10 @@ Rules:
 - Keep translations brief, accurate, and natural.
 - Preserve each original item exactly in the "word" field.
 - Translate the meaning used in the dialogue, not every possible dictionary meaning.
-- Respond ONLY with the JSON array, no markdown fences, no extra text.
+- The translation MUST be Brazilian Portuguese. Never copy the ${LANG_LABEL[language]} spelling when Portuguese has its own word or spelling.
+- Examples: "précieuse" → "preciosa", "retard" → "atraso", "en retard" → "atrasado".
+- Keep the original spelling only when that exact form is already the normal Brazilian word (pizza, jazz).
+${pass === 'strict' ? '- This is a second pass. A previous answer copied the source. Return the everyday PT-BR word for every item.\n' : ''}- Respond ONLY with the JSON array, no markdown fences, no extra text.
 ${NATURAL_PT_BR_RULE}`;
 
     const items = await callGeminiJSON<{ word: string; translation: string }[]>(prompt, systemPrompt, 4096, 0, 'lightweight');
