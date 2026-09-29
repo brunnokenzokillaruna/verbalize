@@ -164,7 +164,7 @@ export const EXERCISE_TYPE_META: Record<ExerciseType, ExerciseTypeMeta> = {
   },
   'scrambled-conversation': {
     title: 'Ordem do diálogo',
-    instruction: 'Organize as falas na sequência lógica.',
+    instruction: 'Escolha só a fala que vem agora.',
     icon: Shuffle,
     accent: '#7c3aed',
     accentBg: 'rgba(124, 58, 237, 0.1)',
@@ -173,7 +173,7 @@ export const EXERCISE_TYPE_META: Record<ExerciseType, ExerciseTypeMeta> = {
   },
   'interactive-subtitles': {
     title: 'Legendas interativas',
-    instruction: 'Toque nos erros e escolha a correção.',
+    instruction: 'Ouça a frase e toque no erro da legenda.',
     icon: Subtitles,
     accent: '#f59e0b',
     accentBg: 'var(--color-warning-bg)',
@@ -290,7 +290,7 @@ export const EXERCISE_TYPE_META: Record<ExerciseType, ExerciseTypeMeta> = {
   },
   'voicemail-dictation': {
     title: 'Correio de voz',
-    instruction: 'Ouça a mensagem e resuma em português.',
+    instruction: 'Ouça e resuma os pontos principais em português.',
     icon: Voicemail,
     accent: '#0891b2',
     accentBg: 'rgba(8, 145, 178, 0.1)',
@@ -335,7 +335,7 @@ export const EXERCISE_TYPE_META: Record<ExerciseType, ExerciseTypeMeta> = {
   },
   'prompted-monologue': {
     title: 'Mini-monólogo',
-    instruction: 'Fale por 30–60 segundos sobre o tema proposto.',
+    instruction: 'Fale duas ou três frases sobre o tema.',
     icon: Podcast,
     accent: '#e11d48',
     accentBg: 'rgba(225, 29, 72, 0.1)',

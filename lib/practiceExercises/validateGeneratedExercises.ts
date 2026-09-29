@@ -11,6 +11,37 @@ import {
 } from './validateChoiceConsistency';
 import { isListeningComprehensionPtBrPure, findLeakedTargetWord } from './validatePtBrText';
 
+function bankWithDistractors(correctOrder: string[], words: string[] | undefined): string[] {
+  const correct = correctOrder.map((word) => word.trim()).filter(Boolean);
+  const remaining = new Map<string, number>();
+  for (const word of correct) {
+    const key = word.toLowerCase();
+    remaining.set(key, (remaining.get(key) ?? 0) + 1);
+  }
+  const extras: string[] = [];
+  for (const raw of words ?? []) {
+    const word = raw.trim();
+    if (!word) continue;
+    const key = word.toLowerCase();
+    const left = remaining.get(key) ?? 0;
+    if (left > 0) {
+      remaining.set(key, left - 1);
+      continue;
+    }
+    if (extras.length < 2 && !extras.some((extra) => extra.toLowerCase() === key)) {
+      extras.push(word);
+    }
+  }
+  const bank = [...correct, ...extras];
+  for (let i = bank.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const current = bank[i]!;
+    bank[i] = bank[j]!;
+    bank[j] = current;
+  }
+  return bank;
+}
+
 export interface ValidateExercisesOptions {
   lessonVocabulary?: string[];
   lessonDialogue?: string;
@@ -93,16 +124,7 @@ export async function validateAndSanitizeExercises(
         return false;
       }
 
-      // Always rebuild words from correctOrder to guarantee exact casing and content match.
-      // Previously we only checked case-insensitively, which let casing mismatches slip through
-      // (e.g. words had "la" but correctOrder had "La", causing false negatives on comparison).
-      const sortedWords = [...data.words].map(w => w.trim()).sort();
-      const sortedCorrect = [...data.correctOrder].map(w => w.trim()).sort();
-
-      if (sortedWords.join(',') !== sortedCorrect.join(',')) {
-        console.warn('[generatePracticeExercises] Auto-fixing mismatched words in sentence-builder');
-        data.words = [...data.correctOrder].sort(() => Math.random() - 0.5);
-      }
+      data.words = bankWithDistractors(data.correctOrder, data.words);
 
       return true;
     }
@@ -246,11 +268,7 @@ export async function validateAndSanitizeExercises(
         console.warn('[generatePracticeExercises] Dropped malformed word-bank-translation');
         return false;
       }
-      const sortedWords = [...d.words].map(w => w.trim()).sort();
-      const sortedCorrect = [...d.correctOrder].map(w => w.trim()).sort();
-      if (sortedWords.join(',') !== sortedCorrect.join(',')) {
-        (ex.data as { words: string[] }).words = [...d.correctOrder].sort(() => Math.random() - 0.5);
-      }
+      (ex.data as { words: string[] }).words = bankWithDistractors(d.correctOrder, d.words);
       return true;
     }
     if (ex.type === 'bridge-choice') {
@@ -468,18 +486,22 @@ export async function validateAndSanitizeExercises(
         contextPt?: string;
         expected_summary?: string;
         acceptable_summaries?: string[];
+        key_points?: string[];
       };
       const wordCount = d.audioText?.trim().split(/\s+/).length ?? 0;
+      const points = (d.key_points ?? []).map((point) => point.trim()).filter(Boolean);
       if (
         wordCount < 12 ||
         !d.contextPt?.trim() ||
         !d.expected_summary?.trim() ||
         !Array.isArray(d.acceptable_summaries) ||
-        d.acceptable_summaries.length === 0
+        d.acceptable_summaries.length === 0 ||
+        points.length < 2
       ) {
         console.warn('[generatePracticeExercises] Dropped malformed voicemail-dictation');
         return false;
       }
+      d.key_points = points.slice(0, 3);
       return true;
     }
     if (ex.type === 'inference-tone') {

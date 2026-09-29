@@ -158,7 +158,13 @@ export function LessonPracticeScreen({
       case 'scrambled-conversation':
         return <ScrambledConversation data={currentExercise.data} {...common} />;
       case 'interactive-subtitles':
-        return <InteractiveSubtitles data={currentExercise.data} {...common} />;
+        return (
+          <InteractiveSubtitles
+            data={currentExercise.data}
+            language={language}
+            {...common}
+          />
+        );
       case 'logic-connectors':
         return <LogicConnectors data={currentExercise.data} {...common} />;
       case 'grammar-trap':

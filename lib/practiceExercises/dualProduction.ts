@@ -21,7 +21,7 @@ export function tagRequiresDualProduction(tag: LessonTag): boolean {
 }
 
 function pickOralType(allowed: ExerciseTypeId[]): ExerciseTypeId | null {
-  const order: ExerciseTypeId[] = ['listen-and-respond', 'shadowing', 'speak-repeat'];
+  const order: ExerciseTypeId[] = ['listen-and-respond', 'speak-repeat'];
   for (const t of order) {
     if (allowed.includes(t)) return t;
   }

@@ -281,7 +281,7 @@ export function buildImageMatchFromReviewWords(
 }
 
 /** How many visual (image-match) drills to append after AI lesson practice. */
-export const LESSON_VISUAL_EXERCISE_COUNT = 5;
+export const LESSON_VISUAL_EXERCISE_COUNT = 3;
 
 export type VocabImagePoolItem = {
   word: string;

@@ -23,7 +23,7 @@ function targetsOf(
   return exercises.map((ex) => (ex.type === 'image-match' ? ex.data.targetWord : ''));
 }
 
-assert(LESSON_VISUAL_EXERCISE_COUNT === 5, 'lesson visual count is 5');
+assert(LESSON_VISUAL_EXERCISE_COUNT === 3, 'lesson visual count is 3');
 assert(MIN_VISUAL_REVIEW_ITEMS === 4, 'needs at least 4 imaged words');
 
 const now = Date.UTC(2026, 7, 17, 15, 0, 0);

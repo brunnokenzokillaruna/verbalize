@@ -26,7 +26,7 @@ export function buildTagGuidance(
     const slot0 = level && ['A2', 'B1', 'B2', 'C1', 'C2'].includes(level)
       ? 'minimal-pair-production'
       : 'minimal-pair';
-    const types = pick(['speak-repeat', 'shadowing', 'connected-speech', 'audio-dictation', 'interactive-subtitles', 'listen-and-select']);
+    const types = pick(['speak-repeat', 'connected-speech', 'audio-dictation', 'listen-and-select']);
     return [
       `- The FIRST exercise (index 0) MUST be of type '${slot0}'. This is mandatory for PRON lessons.`,
       types.length ? `- The remaining 4 exercises should focus heavily on ${list(types)} (at least 3 out of 4).` : '',
@@ -40,12 +40,11 @@ export function buildTagGuidance(
       'context-choice',
       'fill-gap-production',
       'translation-with-constraint',
-      'bridge-choice',
     ]);
     return [
       `- The FIRST exercise (index 0) MUST be of type 'grammar-trap'. This is mandatory for GRAM lessons.`,
       `- For pronoun placement, negation order, or adverb position: NEVER use 'error-correction'. Use 'sentence-builder', 'grammar-trap', 'bridge-choice', or 'context-choice' with a blank BEFORE the verb.`,
-      types.length ? `- The remaining 4 exercises should focus on ${list(types)} to reinforce the grammar structure.` : '',
+      types.length ? `- The remaining exercises should focus on ${list(types)}. Do NOT also include 'bridge-choice' — grammar-trap already tests the same trap.` : '',
       productionLine,
     ].filter(Boolean).join('\n');
   }
@@ -84,11 +83,13 @@ export function buildTagGuidance(
     const hasFreeProduction = allowed.has('free-roleplay') || allowed.has('micro-message');
     return [
       hasListenRespond
-        ? `- At least 1 exercise MUST be 'listen-and-respond' — the learner hears ONLY the interlocutor (1–3 lines, one speaker), then responds orally with their own words (not repetition).`
+        ? `- At least 1 exercise MUST be 'listen-and-respond'. Do NOT also include 'speak-repeat', 'social-roleplay', or 'free-roleplay' — those repeat the same reply.`
         : '',
-      hasFreeProduction
-        ? `- At least 1 exercise MUST be 'free-roleplay' OR 'micro-message' — the learner writes their own response (not MCQ).`
-        : '',
+      hasListenRespond
+        ? `- Written production must be 'micro-message' or 'reverse-translation', not another reply to the same prompt.`
+        : hasFreeProduction
+          ? `- At least 1 exercise MUST be 'free-roleplay' OR 'micro-message' — the learner writes their own response (not MCQ).`
+          : '',
       types.length
         ? `- Focus on ${list(types)} to simulate real-world usage. Use scenarios a Brazilian would realistically encounter: at a French restaurant, at a hotel in Lyon, on the Paris metro, at a French pharmacy, at an airport, in a Parisian shop.`
         : '',
@@ -114,11 +115,13 @@ export function buildTagGuidance(
     const hasFreeProduction = allowed.has('free-roleplay') || allowed.has('micro-message');
     return [
       hasListenRespond
-        ? `- At least 1 exercise MUST be 'listen-and-respond' — spontaneous oral response after hearing ONLY the interlocutor (1–3 lines, one speaker; not the lesson dialogue).`
+        ? `- At least 1 exercise MUST be 'listen-and-respond'. Do NOT also include 'social-roleplay' or 'free-roleplay'.`
         : '',
-      hasFreeProduction
-        ? `- At least 1 exercise MUST be 'free-roleplay' OR 'micro-message' for written production in the mission context.`
-        : '',
+      hasListenRespond
+        ? `- Written production must be 'micro-message' or 'reverse-translation'.`
+        : hasFreeProduction
+          ? `- At least 1 exercise MUST be 'free-roleplay' OR 'micro-message' for written production in the mission context.`
+          : '',
       types.length
         ? `- Focus on ${list(types)} to simulate real-world usage. Use scenarios a Brazilian would realistically encounter.`
         : '',

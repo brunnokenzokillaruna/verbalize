@@ -13,6 +13,7 @@ import {
   type EnsureProductionContext,
 } from './ensureMinimumProduction';
 import { resolveRequiredProductionType, sessionHasProduction } from './productionTypes';
+import { dropOverlappingExercises, stripRetiredExercises } from './sessionBalance';
 import type { GeneratePracticeParams } from './types';
 import { validateAndSanitizeExercises } from './validateGeneratedExercises';
 import { gateExerciseAnswerKeys } from './verifyAnswerKeys';
@@ -26,7 +27,9 @@ export async function composePracticeSession(
   params: GeneratePracticeParams,
   tagExclusive: ExerciseTypeId | null,
 ): Promise<Exercise[]> {
-  let result = await validateAndSanitizeExercises(exercises, allowedSet, params.language, {
+  let result = stripRetiredExercises(exercises);
+  result = dropOverlappingExercises(result);
+  result = await validateAndSanitizeExercises(result, allowedSet, params.language, {
     lessonVocabulary: params.newVocabulary,
     lessonDialogue: params.dialogue,
   });

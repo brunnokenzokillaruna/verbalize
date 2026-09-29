@@ -36,6 +36,11 @@ export function ConjugationSpeedExercise({
     [data.correctForm, data.pronoun, lang],
   );
   const tenseLabel = TENSE_LABELS[data.tense] ?? data.tense;
+  const sentencePrompt = useMemo(() => {
+    const pattern = new RegExp(data.correctForm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+    if (!pattern.test(data.exampleSentence)) return null;
+    return data.exampleSentence.replace(pattern, '______');
+  }, [data.correctForm, data.exampleSentence]);
 
   // Deduplicate verb-only options, then shuffle once
   const shuffledOptions = useMemo(() => {
@@ -147,6 +152,11 @@ export function ConjugationSpeedExercise({
       </div>
 
       {/* 4 option buttons — 2x2 grid */}
+      {sentencePrompt && (
+        <p className="font-display text-lg leading-relaxed text-[var(--color-text-primary)]">
+          {sentencePrompt}
+        </p>
+      )}
       <div className="grid grid-cols-2 gap-3">
         {shuffledOptions.map((opt, i) => {
           const isSelected = selectedIndex === i;

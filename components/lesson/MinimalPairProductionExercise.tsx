@@ -188,7 +188,6 @@ export function MinimalPairProductionExercise({
         <p className="font-display text-lg leading-relaxed text-[var(--color-text-primary)]">
           {data.sentenceContext.replace(data.correctWord, '______')}
         </p>
-        <p className="mt-2 text-xs italic text-[var(--color-text-muted)]">{data.translation}</p>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
@@ -201,7 +200,7 @@ export function MinimalPairProductionExercise({
             >
               <AudioPlayerButton text={word} language={language} size="md" />
               <span className="text-xl font-black tracking-tight text-[var(--color-text-primary)]">
-                {word}
+                {phase === 'review' || phase === 'answered' ? word : `Som ${choice === 'A' ? '1' : '2'}`}
               </span>
             </div>
           );

@@ -191,6 +191,12 @@ ${grammarAccuracyBlock}
 Generate exactly ${PRACTICE_EXERCISE_COUNT} exercises as a JSON array. Choose varied types from the following pool for a balanced practice session. You MUST use ONLY the types listed below — any other type is forbidden.
 
 VARIETY RULE (mandatory): use at least 3 DIFFERENT exercise types; no type may appear more than twice.
+SESSION SHAPE (mandatory, 5 exercises):
+- 2 recognition items (choice, trap, or word bank)
+- 1 listening item where the answer is NOT written on screen before the learner hears it (listening-comprehension, listen-and-select, or audio-dictation)
+- 2 production items when the pool allows: one spoken (listen-and-respond, or speak-repeat only if listen-and-respond is unavailable) and one written (reverse-translation, micro-message, fill-gap-production, or word-bank-translation)
+- NEVER use type "shadowing"
+- Do NOT pair exercises that test the same skill: listen-and-respond with speak-repeat, social-roleplay, or free-roleplay; grammar-trap with bridge-choice; fill-gap-production with context-choice; audio-dictation with listen-and-select.
 
 --- POOL OF EXERCISE TYPES (the ONLY types you may use) ---
 

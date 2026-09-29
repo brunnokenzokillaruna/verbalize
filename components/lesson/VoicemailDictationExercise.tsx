@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Loader2, Voicemail, Lightbulb, XCircle } from 'lucide-react';
 import { AudioPlayerButton } from './AudioPlayerButton';
 import type { SupportedLanguage, VoicemailDictationData } from '@/types';
+import { evaluateVoicemailSummary } from '@/app/actions/evaluateVoicemailSummary';
 import { validateReverseTranslation } from '@/app/actions/validateAnswer';
 import { incrementProductionStats } from '@/services/firestore';
 import { useAuthStore } from '@/store/authStore';
@@ -67,6 +68,25 @@ export function VoicemailDictationExercise({
     if (isExactMatch) {
       setAnswerStatus('correct');
       reportProduction(true);
+      return;
+    }
+
+    const points = (data.key_points ?? []).map((point) => point.trim()).filter(Boolean);
+    if (points.length >= 2) {
+      setAnswerStatus('validating');
+      const result = await evaluateVoicemailSummary({
+        summary: input,
+        keyPoints: points,
+        contextPt: data.contextPt,
+      });
+      if (result.accepted) {
+        setAnswerStatus('correct');
+        reportProduction(true);
+      } else {
+        setAnswerStatus('wrong');
+        setAiNote(result.note);
+        reportProduction(false);
+      }
       return;
     }
 

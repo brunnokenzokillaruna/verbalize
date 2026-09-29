@@ -15,9 +15,9 @@ export type ProductionStatKind = 'oral' | 'oralSpontaneous' | 'freeWrite';
 
 export const SCAFFOLDED_PRODUCTION_TYPES = ['word-bank-translation'] as const satisfies readonly ExerciseTypeId[];
 
-export const ORAL_ECHO_TYPES = ['speak-repeat', 'minimal-pair-production', 'shadowing'] as const satisfies readonly ExerciseTypeId[];
+export const ORAL_ECHO_TYPES = ['speak-repeat', 'minimal-pair-production'] as const satisfies readonly ExerciseTypeId[];
 
-export const ORAL_PRODUCTION_TYPES = ['listen-and-respond', 'prompted-monologue', 'speak-repeat', 'minimal-pair-production', 'shadowing'] as const satisfies readonly ExerciseTypeId[];
+export const ORAL_PRODUCTION_TYPES = ['listen-and-respond', 'prompted-monologue', 'speak-repeat', 'minimal-pair-production'] as const satisfies readonly ExerciseTypeId[];
 
 export const ORAL_SPONTANEOUS_TYPES = ['listen-and-respond', 'prompted-monologue'] as const satisfies readonly ExerciseTypeId[];
 
@@ -126,7 +126,7 @@ export function getProductionTier(requiredType: ExerciseTypeId): ProductionTier 
   if (requiredType === 'micro-message') return 'free_pragmatic';
   if (requiredType === 'free-roleplay') return 'free_pragmatic';
   if (requiredType === 'listen-and-respond' || requiredType === 'prompted-monologue') return 'oral_spontaneous';
-  if (requiredType === 'speak-repeat' || requiredType === 'minimal-pair-production' || requiredType === 'shadowing') return 'oral_echo';
+  if (requiredType === 'speak-repeat' || requiredType === 'minimal-pair-production') return 'oral_echo';
   return 'scaffolded';
 }
 

@@ -175,7 +175,7 @@ export function useLessonFlow({
       );
 
       // Drop any AI/cache image-match — visual review is appended as a dedicated block.
-      merged = merged.filter((ex) => ex.type !== 'image-match');
+      merged = merged.filter((ex) => ex.type !== 'image-match' && ex.type !== 'shadowing');
       merged = applyAdaptiveTier(merged, snapshot.masteredVocabulary);
 
       if (merged.length === 0) {

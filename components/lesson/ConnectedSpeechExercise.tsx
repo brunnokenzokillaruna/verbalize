@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ArrowRight, ChevronDown, Waves } from 'lucide-react';
+import { ChevronDown, Waves } from 'lucide-react';
 import { AudioPlayerButton } from './AudioPlayerButton';
 import type { ConnectedSpeechData, SupportedLanguage } from '@/types';
 import { isAccentOnlyDiff } from '@/utils/accent';
@@ -100,34 +100,6 @@ export function ConnectedSpeechExercise({
             {data.contextPt}
           </p>
           <p className="text-xs text-[var(--color-text-secondary)]">{data.phenomenonPt}</p>
-        </div>
-      </div>
-
-      <div
-        className="flex flex-col items-center gap-3 rounded-xl p-5 border border-dashed"
-        style={{
-          backgroundColor: 'rgba(13, 148, 136, 0.04)',
-          borderColor: 'rgba(13, 148, 136, 0.2)',
-        }}
-      >
-        <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text-muted)]">
-          Segmentado → ligado
-        </p>
-        <div className="flex flex-wrap items-center justify-center gap-2 text-sm font-semibold">
-          <span className="rounded-lg bg-[var(--color-surface)] px-3 py-1.5 border border-[var(--color-border)]">
-            {data.segmentedForm}
-          </span>
-          <ArrowRight size={16} className="text-[#0d9488] shrink-0" />
-          <span
-            className="rounded-lg px-3 py-1.5 border"
-            style={{
-              backgroundColor: 'rgba(13, 148, 136, 0.12)',
-              borderColor: 'rgba(13, 148, 136, 0.35)',
-              color: '#0f766e',
-            }}
-          >
-            {data.linkedForm}
-          </span>
         </div>
       </div>
 

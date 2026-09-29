@@ -74,24 +74,11 @@ export function MinimalPairExercise({
             className="text-sm font-medium leading-relaxed"
             style={{ color: 'var(--color-text-primary)' }}
           >
-            Ouça os dois sons e escolha a palavra que completa a frase corretamente.
+            Ouça os dois sons e escolha qual completa a frase.
           </p>
         </div>
       </div>
 
-      {/* Sentence context with blank */}
-      <div
-        className="rounded-xl p-5 bg-[var(--color-surface-raised)]/30 border border-[var(--color-border)]"
-      >
-        <p className="font-display text-lg leading-relaxed text-[var(--color-text-primary)]">
-          {data.sentenceContext.replace(data.correctWord, '______')}
-        </p>
-        <p className="mt-2 text-xs italic text-[var(--color-text-muted)]">
-          {data.translation}
-        </p>
-      </div>
-
-      {/* Two audio option cards */}
       <div className="grid grid-cols-2 gap-4">
         {(['A', 'B'] as const).map((choice) => {
           const word = choice === 'A' ? data.wordA : data.wordB;
@@ -134,7 +121,7 @@ export function MinimalPairExercise({
                 className="text-xl font-black tracking-tight"
                 style={{ color: textColor }}
               >
-                {word}
+                {answered ? word : `Som ${choice === 'A' ? '1' : '2'}`}
               </span>
             </button>
           );
@@ -166,6 +153,12 @@ export function MinimalPairExercise({
               </p>
             </div>
           )}
+          <div className="rounded-xl p-4 bg-[var(--color-surface)] border border-[var(--color-border)]">
+            <p className="font-display text-lg leading-relaxed text-[var(--color-text-primary)]">
+              {data.sentenceContext}
+            </p>
+            <p className="mt-2 text-xs italic text-[var(--color-text-muted)]">{data.translation}</p>
+          </div>
           <div className="px-1 border-l-2 border-[var(--color-primary)]/20 pl-4 py-2 opacity-90">
             <p className="text-sm italic leading-relaxed text-[var(--color-text-muted)]">
               {data.tip}

@@ -1,21 +1,31 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { InteractiveSubtitlesData } from '@/types';
-import { CheckCircle2, AlertCircle, Languages } from 'lucide-react';
+import { InteractiveSubtitlesData, SupportedLanguage } from '@/types';
+import { AlertCircle, CheckCircle2 } from 'lucide-react';
+import { AudioPlayerButton } from './AudioPlayerButton';
 
 interface InteractiveSubtitlesProps {
   data: InteractiveSubtitlesData;
+  language: SupportedLanguage;
   onAnswer: (correct: boolean) => void;
   answered: boolean;
   setIsExerciseReady: (ready: boolean) => void;
   submitTrigger: number;
 }
 
-type Phase = 'detect' | 'correct';
+type Phase = 'listen' | 'detect' | 'correct';
 
-export function InteractiveSubtitles({ data, onAnswer, answered, setIsExerciseReady, submitTrigger }: InteractiveSubtitlesProps) {
-  const [phase, setPhase] = useState<Phase>('detect');
+export function InteractiveSubtitles({
+  data,
+  language,
+  onAnswer,
+  answered,
+  setIsExerciseReady,
+  submitTrigger,
+}: InteractiveSubtitlesProps) {
+  const [phase, setPhase] = useState<Phase>('listen');
+  const [heard, setHeard] = useState(false);
   const [selectedIndices, setSelectedIndices] = useState<number[]>([]);
   const [corrections, setCorrections] = useState<Record<string, string>>({});
   const [detectCorrect, setDetectCorrect] = useState<boolean | null>(null);
@@ -72,7 +82,7 @@ export function InteractiveSubtitles({ data, onAnswer, answered, setIsExerciseRe
   };
 
   useEffect(() => {
-    if (submitTrigger === 0 || answered) return;
+    if (submitTrigger === 0 || answered || phase === 'listen') return;
     if (phase === 'detect' && selectedIndices.length > 0) {
       handleDetectCheck();
     } else if (phase === 'correct') {
@@ -85,20 +95,29 @@ export function InteractiveSubtitles({ data, onAnswer, answered, setIsExerciseRe
     <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
 
       <div
-        className="rounded-2xl p-4.5 border border-dashed border-[var(--color-border)]"
-        style={{ backgroundColor: 'var(--color-surface)' }}
+        className="flex flex-col items-center gap-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6"
+        onClick={() => setHeard(true)}
       >
-        <div className="flex items-center gap-2 mb-2.5 text-[var(--color-text-muted)]">
-          <Languages size={15} className="text-[var(--color-vocab)]" />
-          <span className="text-[10px] font-black uppercase tracking-[0.15em]">Frase em português:</span>
-        </div>
-        <div className="border-l-4 border-[var(--color-vocab)] pl-3.5 py-1">
-          <p className="text-[17px] font-semibold text-[var(--color-text-primary)] leading-relaxed italic">
-            &ldquo;{data.translations}&rdquo;
-          </p>
-        </div>
+        <AudioPlayerButton text={data.correctText} language={language} size="lg" />
+        <p className="max-w-xs text-center text-sm font-medium leading-relaxed text-[var(--color-text-muted)]">
+          Ouça a frase. A legenda abaixo tem um erro — ele só aparece depois do áudio.
+        </p>
+        {phase === 'listen' && (
+          <button
+            type="button"
+            disabled={!heard}
+            onClick={() => {
+              setPhase('detect');
+              setIsExerciseReady(false);
+            }}
+            className="rounded-xl border border-[var(--color-border)] px-4 py-2 text-sm font-bold disabled:opacity-40"
+          >
+            Mostrar legenda
+          </button>
+        )}
       </div>
 
+      {phase !== 'listen' && (
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2 text-[var(--color-text-muted)] mb-1">
           <AlertCircle size={14} className="text-amber-500" />
@@ -151,6 +170,7 @@ export function InteractiveSubtitles({ data, onAnswer, answered, setIsExerciseRe
           })}
         </div>
       </div>
+      )}
 
       {phase === 'correct' && !answered && (
         <div className="flex flex-col gap-4">
@@ -208,6 +228,7 @@ export function InteractiveSubtitles({ data, onAnswer, answered, setIsExerciseRe
           <p className="text-lg text-[var(--color-text-primary)] leading-relaxed font-bold italic pl-0.5">
             {data.correctText}
           </p>
+          <p className="text-sm italic text-[var(--color-text-muted)]">{data.translations}</p>
         </div>
       )}
     </div>

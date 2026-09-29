@@ -4,9 +4,9 @@ export function buildTypeDescriptions(langLabel: string): Record<ExerciseTypeId,
   return {
     'context-choice': `type "context-choice":
    - Write an ORIGINAL sentence with a blank (___) for a key vocabulary word or grammar item.
-   - "blankWord" is correct answer. "options" has 4 items: the correct word plus 3 highly plausible distractors of the same grammatical category, similar spelling/tense, or common learner mistakes. Do NOT use obviously different or unrelated words. The options must make the student think.
+   - "blankWord" is the correct answer. "options" has 4 items: the correct word, ONE Brazilian calque (the word a Portuguese speaker would wrongly use), and 2 other plausible same-category distractors. Do NOT use unrelated words.
    - "translation" in PT-BR.
-   - French directional verbs: PT "trazer" → apporter (coisa) / amener (pessoa); PT "levar" → emporter (coisa) / emmener (pessoa). blankWord MUST match the PT cue (ignore parenthetical glosses like "(trazer para lá)"). NEVER use apporter/emporter for a person.`,
+   - French directional verbs: PT "trazer" → apporter (coisa) / amener (pessoa); PT "levar" → emporter (coisa) / emmener (pessoa). blankWord MUST match the PT cue. NEVER use apporter/emporter for a person.`,
     'error-correction': `type "error-correction":
    - Write an ORIGINAL sentence with ONE deliberate error.
    - "sentence_with_error", "error_word", "correct_word", "corrected_sentence", "translation" (PT-BR: translation of corrected_sentence), "explanation" (PT-BR).
@@ -21,7 +21,7 @@ export function buildTypeDescriptions(langLabel: string): Record<ExerciseTypeId,
     'reverse-translation': `type "reverse-translation":
    - "portuguese_sentence" (PT-BR) → "target_translation" (${langLabel}).
    - portuguese_sentence MUST be entirely Brazilian Portuguese — NEVER mix ${langLabel} lesson words into the PT prompt (express the meaning in Portuguese; the ${langLabel} word belongs only in target_translation / variants).
-   - "acceptable_variants" (2-4 alternative phrasings).
+   - "acceptable_variants" MUST include both a spoken form and a written form when they differ (FR: "j'ai pas" and "je n'ai pas"; "t'as" and "tu as"). Either is correct if the lesson point is present.
    - "hint" (optional grammar tip in PT-BR).
    - PT-BR ADVERB CLARITY: when the target uses an adverb (-ment / vite / -ly), write portuguese_sentence with explicit "-mente" (or "logo"/"depressa") — NOT colloquial "rápido/direto/forte" after a noun (e.g. avoid "organizar o mercado rápido"; prefer "organizar o mercado rapidamente").
    - If target_translation uses a French adverb like "rapidement", include "vite" (or equivalent) in acceptable_variants.
@@ -29,8 +29,8 @@ export function buildTypeDescriptions(langLabel: string): Record<ExerciseTypeId,
     'word-bank-translation': `type "word-bank-translation":
    - "portuguese_sentence" (PT-BR sentence to translate).
    - "correctOrder" (array of ${langLabel} words in correct order).
-   - "words" (EXACT same words as correctOrder, shuffled).
-   - "acceptable_variants" (0-2 alternative word orders as arrays).
+   - "words" MUST contain every correctOrder word PLUS 1 or 2 extra plausible words that do NOT belong in the sentence.
+   - "acceptable_variants" (0-2 alternative word orders as arrays, without the extra words).
    - "hint" (optional PT-BR grammar tip).`,
     'bridge-choice': `type "bridge-choice":
    - MCQ testing Brazilian Portuguese interference on the lesson grammar focus.
@@ -42,7 +42,7 @@ export function buildTypeDescriptions(langLabel: string): Record<ExerciseTypeId,
    - "trapRule" (optional PT-BR, 1 sentence about the interference pattern).`,
     'listen-and-select': `type "listen-and-select":
    - "audioText" (${langLabel} sentence to be played via TTS).
-   - "options" (4 written transcriptions — 1 correct, 3 plausible but wrong).
+   - "options" (4 written transcriptions — 1 correct, 3 near misses: a minimal pair, a liaison/elision mis-hearing, or one wrong function word). Not a random different sentence.
    - "correctIndex" (0-based).
    - "translation" (PT-BR hint).`,
     'listening-comprehension': `type "listening-comprehension":
@@ -59,33 +59,30 @@ export function buildTypeDescriptions(langLabel: string): Record<ExerciseTypeId,
    - Short ORIGINAL sentence. "text" (${langLabel}), "translation" (PT-BR).`,
     'speak-repeat': `type "speak-repeat":
    - Short ORIGINAL sentence. "text" (${langLabel}), "translation" (PT-BR).`,
-    shadowing: `type "shadowing":
-   - Short ORIGINAL sentence (6-14 words) for speak-along practice.
-   - "text" (${langLabel}), "translation" (PT-BR).
-   - "tip" (optional PT-BR): brief note on rhythm, liaison, or intonation to mimic.`,
+    shadowing: `type "shadowing": DO NOT GENERATE. This type is retired.`,
     'sentence-builder': `type "sentence-builder":
    - Short ORIGINAL sentence (3-8 words).
-   - "correctOrder" (array of words in the correct order), "words" (array of the EXACT same words, shuffled), "translation" (PT-BR).
-   - "explanation" (PT-BR): 1-2 short sentences explaining the word order — especially adverb placement vs Portuguese when relevant.
-   - CRITICAL: "words" MUST contain the exact same words as "correctOrder". No missing words, no extra distractors.`,
+   - "correctOrder" (array of words in the correct order).
+   - "words" MUST contain every correctOrder word PLUS 1 or 2 extra plausible words that do NOT belong.
+   - "translation" (PT-BR).
+   - "explanation" (PT-BR): 1-2 short sentences explaining the word order — especially adverb placement vs Portuguese when relevant.`,
     'social-roleplay': `type "social-roleplay":
    - "context" (PT-BR) describing the situation.
    - "promptLine" (${langLabel}) what the NPC says.
    - "options" (3 responses in target language). The correct option must use the target expression naturally. The other 2 options MUST be highly plausible, grammatically correct responses in target language that are contextually inappropriate or slightly incorrect (e.g. wrong pronoun, incorrect politeness level, or a subtle mismatch in context). DO NOT generate silly, obviously wrong, or unrelated distractors. The options should make the student think.
    - "correctIndex" (0-2), "explanation" (PT-BR). In "explanation", NEVER refer to "primeira opção", "segunda opção", etc. — quote key phrases from each response or describe the grammatical difference directly, because options are shuffled on screen.`,
     'scrambled-conversation': `type "scrambled-conversation":
-   - A short sequence of 3-4 dialogue lines.
-   - "lines" (correct order), "shuffledLines" (random order).
-   - CRITICAL COHERENCE:
-     1. Labeled Speakers: Every line MUST start with a speaker's name (e.g., "Marie: ...", "Thomas: ..."). The speakers MUST alternate (A -> B -> A -> B) to establish structure.
-     2. Unambiguous Logical Ordering: The conversation must have exactly ONE logical chronological order. Use strong chronological clues: greeting at the start, question followed by its direct answer, request followed by its fulfillment, and a closing remark/despedida at the end.
-     3. No Ambiguity: Do not write lines that could logically be swapped or placed in multiple positions (e.g., multiple general thank-yous or remarks). Every line must have a unique, necessary position in the chain.`,
+   - 3 or 4 spoken dialogue lines. "lines" is the only sensible order. "shuffledLines" is the same lines in another order.
+   - Every line starts with a speaker name. Speakers alternate.
+   - The learner only chooses the NEXT line, one at a time. The first line is shown already.
+   - Order must come from a reaction: a question is answered, a plan is accepted, a short reaction ("Ouais.") belongs in one place.
+   - Do NOT build the order out of a "Ça va ?" ritual and a "merci" closer.
+   - Do not write two lines that could swap (two thank-yous, two generic agreements).`,
     'interactive-subtitles': `type "interactive-subtitles":
-   - "correctText" (original sentence).
-   - "errorText" (copy of correctText but with 1-2 words swapped for wrong ones or misspelled).
-   - "wrongWords" (array of the words that are WRONG in errorText).
-   - "corrections" (array with ONE entry per wrong word): each { "wrong": "word in errorText", "correct": "replacement word", "options": [correct + 2 plausible distractors of same category] }.
-   - "translations" (PT-BR).`,
+   - The learner HEARS "correctText" first, then sees "errorText" as a subtitle with 1 or 2 wrong words.
+   - "wrongWords" are exactly those wrong words, each appearing once.
+   - "corrections": one entry per wrong word, { "wrong", "correct", "options": [correct + 2 same-category distractors] }.
+   - "translations" (PT-BR) is shown only after the answer. Do not put the answer in the Portuguese gloss.`,
     'logic-connectors': `type "logic-connectors":
     - "partA" (first half), "partB" (second half).
     - "options" (3 connectors like 'but', 'because', 'so').
@@ -99,7 +96,7 @@ export function buildTypeDescriptions(langLabel: string): Record<ExerciseTypeId,
      - "translation" (PT-BR): natural translation
      - "isCorrect" (boolean): EXACTLY ONE must be true
    - The 3 incorrect options MUST contain classic errors Brazilians make due to Portuguese interference on the grammar focus of this lesson.
-   - The 1 correct option must be perfectly grammatical.
+   - The 1 correct option must be perfectly grammatical AND sound spoken (not a textbook closer like "Parfait, merci !").
    - "explanation" (PT-BR): clear explanation of WHY the correct answer is right and why the traps are wrong. NEVER use "primeira opção", "segunda opção", etc. — quote key phrases from each sentence, because options are shuffled on screen.
    - "trapRule" (PT-BR, 1 sentence): the core Brazilian error pattern.`,
     'minimal-pair': `type "minimal-pair":
@@ -162,12 +159,12 @@ export function buildTypeDescriptions(langLabel: string): Record<ExerciseTypeId,
    - "acceptable_variants" (2-4 valid alternatives that also include required_chunk).
    - "constraint_explanation" (PT-BR): why this chunk is required/natural here (may mention the ${langLabel} word in quotes).`,
     'voicemail-dictation': `type "voicemail-dictation":
-   - A longer voicemail message (2-4 sentences in ${langLabel}) the learner listens to.
-   - "audioText" (${langLabel}): the full voicemail (natural spoken register, 25-60 words).
-   - "contextPt" (PT-BR): scenario setup (e.g. "Correio de voz do chefe").
-   - "expected_summary" (PT-BR): 1-2 sentence summary of the key message.
-   - "acceptable_summaries" (2-3 valid PT-BR summary variants).
-   - "key_points" (optional array of 2-3 PT-BR bullet ideas covered in the message).`,
+   - A spoken voicemail (2-4 sentences in ${langLabel}, 25-60 words).
+   - "audioText": the message in spoken register.
+   - "contextPt": who left the message. Do NOT list the facts of the message here.
+   - "key_points": EXACTLY 3 short PT-BR facts from the message. The learner passes by covering at least 2, in their own words.
+   - "expected_summary": one PT-BR summary that covers all 3 points.
+   - "acceptable_summaries": 2 other PT-BR summaries that also cover at least 2 points, worded differently.`,
     'inference-tone': `type "inference-tone":
    - Two short utterances in ${langLabel} that differ in TONE/REGISTER (not just vocabulary) — e.g. polite vs impatient, sincere vs sarcastic, formal vs casual.
    - "contextPt" (PT-BR scenario).
@@ -211,13 +208,13 @@ export function buildTypeDescriptions(langLabel: string): Record<ExerciseTypeId,
    - "correctedLine" (${langLabel}): the wrong line rewritten with appropriate register (same meaning).
    - "explanationPt" (PT-BR): why the original fails socially and why the correction fits.`,
     'prompted-monologue': `type "prompted-monologue":
-   - Extended oral production: learner speaks 30-60 seconds (aim for 3-6 sentences) on a given topic in ${langLabel}.
+   - Short oral production: the learner speaks 2–3 sentences in ${langLabel}, not a long speech.
    - "contextPt" (PT-BR scenario — who/where/why they are speaking).
-   - "promptPt" (PT-BR topic question, e.g. "Fale sobre sua rotina de manhã").
-   - "speakingGoalPt" (PT-BR): duration/scope cue, e.g. "Fale por 30-60 segundos, 3-5 frases".
-   - "evaluationCriteria" (PT-BR): rubric — coherence, vocabulary from lesson, complete answer to prompt.
-   - "acceptableThemes" (2-4 PT-BR themes/points the answer should touch).
-   - "exampleMonologue" (${langLabel}): 3-6 sentence model answer (not necessarily read aloud by learner).
+   - "promptPt" (PT-BR topic question).
+   - "speakingGoalPt" (PT-BR): "Duas ou três frases", naming 2 ideas that must appear.
+   - "evaluationCriteria" (PT-BR): those 2 ideas, lesson vocabulary, and a complete answer.
+   - "acceptableThemes" (2 ideas; covering both is enough).
+   - "exampleMonologue" (${langLabel}): 2–3 sentence model answer.
    - "keyPoints" (optional array of 2-3 PT-BR bullet ideas to cover).
    - "explanationPt" (PT-BR): why the model monologue works structurally.`,
   };

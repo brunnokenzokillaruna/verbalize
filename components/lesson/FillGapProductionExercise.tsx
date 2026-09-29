@@ -128,9 +128,6 @@ export function FillGapProductionExercise({
             Complete escrevendo a palavra
           </span>
         </div>
-        <p className="text-sm text-[var(--color-text-secondary)] italic mb-3 border-l-4 border-[var(--color-vocab)] pl-3">
-          {data.translation}
-        </p>
         <p className="font-display text-xl sm:text-2xl font-bold leading-relaxed text-[var(--color-text-primary)]">
           {parts[0]}
           <span
@@ -191,6 +188,12 @@ export function FillGapProductionExercise({
             </div>
           )}
         </>
+      )}
+
+      {isAnswered && (
+        <p className="text-sm text-[var(--color-text-secondary)] italic border-l-4 border-[var(--color-vocab)] pl-3">
+          {sanitized.translation}
+        </p>
       )}
 
       {isAnswered && answerStatus === 'wrong' && (
