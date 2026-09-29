@@ -141,6 +141,7 @@ export async function pickValidatedPhoto(
   keyword: string,
   translation?: string,
   excludeUrls: string[] = [],
+  acceptBestEffort = false,
 ): Promise<PexelsPhotoCandidate | null> {
   const filtered = candidates.filter(
     (photo) => !excludeUrls.some((excluded) => urlsAreSamePhoto(excluded, photo.imageUrl)),
@@ -160,7 +161,7 @@ export async function pickValidatedPhoto(
   }
 
   const best = ranked[0];
-  if (best && scorePhotoCandidate(best, keyword, translation) >= 2) {
+  if (best && (acceptBestEffort || scorePhotoCandidate(best, keyword, translation) >= 2)) {
     return best;
   }
 

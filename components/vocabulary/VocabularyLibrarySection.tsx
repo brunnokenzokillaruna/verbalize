@@ -201,6 +201,37 @@ export function VocabularyLibrarySection({
         {/* Search / letter results */}
         {showResults && (
           <div className="flex flex-col gap-3 animate-slide-up">
+            {!isSearching && selectedLetter && (
+              <button
+                type="button"
+                onClick={() => setSelectedLetter(null)}
+                className="flex w-full min-h-14 items-center gap-3 rounded-xl border-2 border-b-[5px] px-4 py-3 text-left transition-transform cursor-pointer active:translate-y-0.5 active:border-b-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vocab"
+                style={{
+                  backgroundColor: 'var(--color-vocab-bg)',
+                  borderColor: 'var(--color-vocab)',
+                  color: 'var(--color-text-primary)',
+                }}
+              >
+                <span
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+                  style={{
+                    backgroundColor: 'var(--color-vocab)',
+                    color: 'var(--color-text-inverse)',
+                  }}
+                  aria-hidden
+                >
+                  <ArrowLeft size={18} strokeWidth={2.5} />
+                </span>
+                <span className="min-w-0">
+                  <span className="block text-base font-extrabold leading-tight">
+                    Voltar ao alfabeto
+                  </span>
+                  <span className="mt-0.5 block text-xs font-semibold text-text-secondary">
+                    Sair da letra {selectedLetter.toUpperCase()}
+                  </span>
+                </span>
+              </button>
+            )}
             <div className="flex items-center justify-between gap-2">
               <p className="text-sm font-bold text-text-primary">
                 {isSearching ? (
@@ -220,16 +251,6 @@ export function VocabularyLibrarySection({
                 )}
               </p>
               <div className="flex items-center gap-2">
-                {!isSearching && selectedLetter && (
-                  <button
-                    type="button"
-                    onClick={() => setSelectedLetter(null)}
-                    className="flex items-center gap-1 text-xs font-bold text-text-muted hover:text-text-primary transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg px-2 py-1"
-                  >
-                    <ArrowLeft size={13} />
-                    Alfabeto
-                  </button>
-                )}
                 {resultItems.length > 0 && (
                   <div
                     className="flex rounded-lg p-0.5 border border-border"

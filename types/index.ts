@@ -76,6 +76,8 @@ export interface UserVocabularyDocument {
   word: string;
   wordKey?: string;
   translation: string;
+  /** Set when the learner explicitly generated this translation, including cognates identical to the source word. */
+  translationConfirmed?: boolean;
   imageUrl?: string;
   wordType?: 'verb' | 'noun';
   entryType?: 'word' | 'chunk' | 'collocation' | 'expression' | 'phrasal_verb';

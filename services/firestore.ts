@@ -331,6 +331,7 @@ async function consolidateLegacyVocabularySiblings(
       word: merged.word,
       wordKey,
       translation: merged.translation,
+      ...(merged.translationConfirmed ? { translationConfirmed: true } : {}),
       imageUrl: merged.imageUrl,
       wordType: merged.wordType,
       entryType: merged.entryType,
@@ -893,6 +894,7 @@ export async function updateVocabTranslation(
 
   const payload = stripUndefinedDeep({
     translation,
+    translationConfirmed: true,
     wordKey: canonicalVocabKey(word),
     uid,
     language,

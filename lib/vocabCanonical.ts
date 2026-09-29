@@ -139,9 +139,12 @@ export function mergeVocabularyGroup(group: UserVocabularyDocument[]): UserVocab
   const productionCount = group.reduce((sum, i) => sum + (i.productionCount ?? 0), 0);
   const encounterCount = group.reduce((sum, i) => sum + (i.encounterCount ?? 0), 0);
 
+  const confirmed = group.find((i) => i.translationConfirmed && i.translation?.trim());
   const translation =
+    confirmed?.translation ??
     group.find((i) => !isPlaceholderTranslation(i.word, i.translation))?.translation ??
     best.translation;
+  const translationConfirmed = Boolean(confirmed);
 
   const imageUrl = group.find((i) => i.imageUrl)?.imageUrl ?? best.imageUrl;
   const wordType = group.find((i) => i.wordType === 'verb')?.wordType ?? best.wordType;
@@ -176,6 +179,7 @@ export function mergeVocabularyGroup(group: UserVocabularyDocument[]): UserVocab
     word: displayWord,
     wordKey,
     translation,
+    ...(translationConfirmed ? { translationConfirmed: true } : {}),
     imageUrl,
     wordType,
     entryType,

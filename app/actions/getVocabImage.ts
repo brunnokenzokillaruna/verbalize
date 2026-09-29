@@ -33,6 +33,8 @@ export interface GetVocabImageOptions {
   precomputedKeyword?: string;
   /** When false, always re-search even if a cached image exists (unless admin-approved). */
   allowCached?: boolean;
+  /** Learner asked for the missing image: keep the closest photo if strict validation rejects every candidate. */
+  acceptBestEffort?: boolean;
 }
 
 /**
@@ -92,10 +94,12 @@ export async function getVocabImage(
       return { imageUrl: validated.imageUrl, imageAlt: validated.photographer };
     }
 
+    let fallbackCandidates: Awaited<ReturnType<typeof searchPexelsPhotos>> = [];
+    let fallbackKeyword = '';
     if (translation) {
-      const fallbackKeyword = `${translation} photo isolated`;
+      fallbackKeyword = `${translation} photo isolated`;
       if (fallbackKeyword !== keyword) {
-        const fallbackCandidates = await searchPexelsPhotos(fallbackKeyword, { perPage: 8, maxPages: 1 });
+        fallbackCandidates = await searchPexelsPhotos(fallbackKeyword, { perPage: 8, maxPages: 1 });
         const fallbackValidated = await pickValidatedPhoto(
           fallbackCandidates,
           cleanWord,
@@ -114,6 +118,34 @@ export async function getVocabImage(
           ));
           return { imageUrl: fallbackValidated.imageUrl, imageAlt: fallbackValidated.photographer };
         }
+      }
+    }
+
+    if (options?.acceptBestEffort) {
+      const loosePrimary = await pickValidatedPhoto(
+        candidates,
+        cleanWord,
+        language,
+        keyword,
+        translation,
+        excludeUrls,
+        true,
+      );
+      const loose = loosePrimary ?? (fallbackCandidates.length > 0
+        ? await pickValidatedPhoto(
+            fallbackCandidates,
+            cleanWord,
+            language,
+            fallbackKeyword,
+            translation,
+            excludeUrls,
+            true,
+          )
+        : null);
+      if (loose) {
+        // Keep this off the shared cache. setDoc would replace an approved photo,
+        // and a best-effort pick is only for the card the learner asked to fill.
+        return { imageUrl: loose.imageUrl, imageAlt: loose.photographer };
       }
     }
 

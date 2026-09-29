@@ -1,4 +1,4 @@
-import { canonicalVocabKey } from '@/lib/vocabCanonical';
+import { canonicalVocabKey, wordsMatchCanonically } from '@/lib/vocabCanonical';
 
 /**
  * True when the candidate is missing or is the source word itself
@@ -10,6 +10,29 @@ export function isUntranslatedCopy(source: string, translation: string | undefin
   const value = translation?.trim();
   if (!value) return true;
   return canonicalVocabKey(source) === canonicalVocabKey(value);
+}
+
+/**
+ * Picks the translation for one vocabulary word from a batch response.
+ * Gemini often "corrects" accents or articles in the echoed word, so an exact
+ * string match drops a usable translation and the library button looks dead.
+ * A single-item batch is used when the echoed word still does not match.
+ * Copies of the source are kept only when allowCopy is set (later retry).
+ */
+export function pickBatchTranslation(
+  word: string,
+  results: { word: string; translation: string }[] | null | undefined,
+  allowCopy: boolean,
+): string | undefined {
+  if (!results?.length) return undefined;
+
+  const echoed =
+    results.find((item) => wordsMatchCanonically(item.word, word)) ??
+    (results.length === 1 ? results[0] : undefined);
+  const translation = echoed?.translation?.trim();
+  if (!translation) return undefined;
+  if (!allowCopy && isUntranslatedCopy(word, translation)) return undefined;
+  return translation;
 }
 
 /** Finds a stored translation even when the key differs by case or accents. */

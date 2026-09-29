@@ -1,12 +1,32 @@
 import { useState, useCallback, type Dispatch, type SetStateAction } from 'react';
-import { translateWordsBatch } from '@/app/actions/translateWord';
+import { translateWord, translateWordsBatch } from '@/app/actions/translateWord';
 import { getVocabImage } from '@/app/actions/getVocabImage';
 import { updateVocabTranslation, updateVocabImage } from '@/services/firestore';
 import { findVocabularyItem, wordsMatchCanonically } from '@/lib/vocabCanonical';
-import { isUntranslatedCopy } from '@/lib/vocabTranslation';
+import { pickBatchTranslation } from '@/lib/vocabTranslation';
 import { isMissingImage, isMissingTranslation } from '@/utils/vocabHelpers';
 import type { UserVocabularyDocument, SupportedLanguage } from '@/types';
 import type { User } from 'firebase/auth';
+
+async function resolveLibraryTranslation(
+  word: string,
+  language: SupportedLanguage,
+): Promise<string | undefined> {
+  const initial = await translateWordsBatch([word], language, undefined, 'initial');
+  const first = pickBatchTranslation(word, initial, false);
+  if (first) return first;
+
+  // Different cache key than the first pass. A copied or failed answer is
+  // otherwise reused for weeks and the button never changes the card.
+  const strict = await translateWordsBatch([word], language, undefined, 'strict');
+  const second = pickBatchTranslation(word, strict, true);
+  if (second) return second;
+
+  const single = await translateWord(word, word, language);
+  return pickBatchTranslation(word, single?.translation
+    ? [{ word, translation: single.translation }]
+    : null, true);
+}
 
 export function useVocabEnrich(
   user: User | null,
@@ -32,30 +52,47 @@ export function useVocabEnrich(
       try {
         let translation = item.translation;
         let imageUrl = item.imageUrl;
+        let translationSaved = false;
 
         if (needsTranslation) {
-          const results = await translateWordsBatch([word], language);
-          const match = results?.find((r) => r.word.toLowerCase() === word.toLowerCase());
-          if (match?.translation && !isUntranslatedCopy(word, match.translation)) {
-            translation = match.translation;
+          const resolved = await resolveLibraryTranslation(word, language);
+          if (resolved) {
+            translation = resolved;
             await updateVocabTranslation(user.uid, word, language, translation, item.id);
+            translationSaved = true;
           }
         }
 
         if (needsImage) {
-          const context = translation && translation !== word ? translation : item.word;
-          const imgResult = await getVocabImage(word, context, language, [], undefined, {
-            translation: translation !== word ? translation : undefined,
-          });
-          if (imgResult?.imageUrl) {
-            imageUrl = imgResult.imageUrl;
-            await updateVocabImage(user.uid, word, language, imageUrl, item.id);
+          const meaning = translation?.trim() && translation.trim() !== word.trim()
+            ? translation.trim()
+            : undefined;
+          try {
+            const imgResult = await getVocabImage(word, meaning ?? item.word, language, [], undefined, {
+              translation: meaning,
+              acceptBestEffort: true,
+            });
+            if (imgResult?.imageUrl) {
+              imageUrl = imgResult.imageUrl;
+              await updateVocabImage(user.uid, word, language, imageUrl, item.id);
+            }
+          } catch (err) {
+            console.error('[handleEnrichItem] Image failed for', word, err);
           }
         }
 
-        if (translation !== item.translation || imageUrl !== item.imageUrl) {
+        if (translationSaved || imageUrl !== item.imageUrl) {
           setItems((prev) =>
-            prev.map((v) => (wordsMatchCanonically(v.word, word) ? { ...v, translation, imageUrl } : v)),
+            prev.map((v) => (
+              wordsMatchCanonically(v.word, word)
+                ? {
+                    ...v,
+                    translation,
+                    imageUrl,
+                    ...(translationSaved ? { translationConfirmed: true } : {}),
+                  }
+                : v
+            )),
           );
         }
       } catch (err) {

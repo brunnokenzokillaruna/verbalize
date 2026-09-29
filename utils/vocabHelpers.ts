@@ -1,7 +1,10 @@
 import type { UserVocabularyDocument } from '@/types';
 
 export function isMissingTranslation(item: UserVocabularyDocument): boolean {
-  return !item.translation || item.translation === item.word;
+  const translation = item.translation?.trim() ?? '';
+  if (!translation) return true;
+  if (item.translationConfirmed) return false;
+  return translation === item.word;
 }
 
 export function isMissingImage(item: UserVocabularyDocument): boolean {
