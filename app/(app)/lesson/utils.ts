@@ -70,7 +70,6 @@ export function buildMistakeContext(exercise: Exercise): string {
 
 export function phaseToStage(phase: string): LessonStage {
   switch (phase) {
-    case 'intro':      return 'intro';
     case 'mission':    return 'mission';
     case 'vocabulary': return 'vocabulary';
     case 'hook':       return 'hook';

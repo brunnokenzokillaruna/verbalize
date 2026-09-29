@@ -2,7 +2,12 @@
 
 import { callGeminiJSON } from '@/services/gemini';
 import { validateDialogueCoherence } from '@/lib/validateDialogueCoherence';
-import { buildMinimalHookPrompt, type HookGenerationParams } from '@/lib/hookGeneration/buildHookContext';
+import {
+  buildMinimalHookPrompt,
+  DIALOGUE_LINE_RANGES,
+  spokenDialogueGuidance,
+  type HookGenerationParams,
+} from '@/lib/hookGeneration/buildHookContext';
 import { filterHookVocabularyForKnownWords } from '@/lib/hookVocabulary';
 import { buildKnownVocabularyMatcher } from '@/lib/vocabCanonical';
 import { sanitizeDialogueText, sanitizeVocabularyToken, stripMarkdownEmphasis } from '@/lib/hookSanitize';
@@ -92,77 +97,45 @@ function pickTopic(level: ProficiencyLevel, interests: string[]) {
   return weighted[Math.floor(Math.random() * weighted.length)];
 }
 
-const DIALOGUE_LINE_RANGES: Record<ProficiencyLevel, { min: number; max: number }> = {
-  A1: { min: 4, max: 6 },
-  A2: { min: 5, max: 7 },
-  B1: { min: 6, max: 8 },
-  B2: { min: 7, max: 9 },
-  C1: { min: 8, max: 10 },
-  C2: { min: 10, max: 12 },
-};
-
 const LEVEL_DESCRIPTORS: Record<ProficiencyLevel, string> = {
   A1: `
 STRICT A1 BEGINNER rules — the learner knows almost nothing yet:
-- Vocabulary: use ONLY the 300–500 most common everyday words (e.g. hello, eat, drink, walk, look, house, water, go, have, be, name, like, today).
-- Grammar: present tense of être/avoir (FR) or to be/to have (EN) and basic -ER verbs (FR) or simple present (EN). Simple yes/no questions allowed. NO past, NO future (except futur proche with 'aller').
-- Sentence length: max 8 words per line.
-- Tone: Informal and friendly. Always open with a short greeting ("Salut !", "Ça va ?") and end with a soft close ("merci", "on y va").
-- CONVERSATION EXAMPLE (French, prepositions topic — notice the human reaction):
-  Marie: "Salut Hugo ! Ça va ?"
-  Hugo: "Salut ! Oui, ça va très bien."
-  Marie: "Où est le café ?"
-  Hugo: "Il est là, sur la table."
-  Marie: "Parfait, merci !"
-- CONVERSATION EXAMPLE (English):
-  Emma: "Hi Jake! How are you?"
-  Jake: "I'm great, thanks! And you?"
-  Emma: "Good! Where is the coffee?"
-  Jake: "It's there, on the table."
-  Emma: "Perfect, thanks!"`,
+- Vocabulary: the 300–500 most common everyday words.
+- Grammar: present tense of être/avoir (FR) or to be/to have (EN) and basic -ER verbs. Intonation questions. NO future except futur proche with "aller". Immediate "j'ai" + past participle is ok only if the scene needs it (j'ai oublié).
+- Length: most lines ≤ 8 words. A 1–3 word reaction is a real line, not an error.
+- Follow the spoken-register block. Do not run a "Ça va ?" ritual.`,
 
   A2: `
-A2 ELEMENTARY rules — the learner handles basic everyday situations:
+A2 ELEMENTARY rules — everyday situations, spoken not written:
 - Vocabulary: common everyday vocabulary (500–1 500 words).
-- Grammar: present, passé composé with avoir (FR) / simple past (EN), futur proche/simple (FR) / going to/will (EN), basic modals.
-- Sentence length: 8–12 words per line.
-- Tone: Conversational and alive. Use common fillers (alors, donc, bah, eh bien / so, well, actually). Start with a short greeting, then the topic.
-- CONVERSATION EXAMPLE (French):
-  Sophie: "Salut Lucas ! Tu viens au café ?"
-  Lucas: "Ah, j'aimerais bien, mais j'ai faim !"
-  Sophie: "Moi aussi ! On mange une pizza ?"
-  Lucas: "Carrément ! On y va à 14h ?"
-  Sophie: "Parfait, à tout de suite !"`,
+- Grammar: present, passé composé, futur proche, basic modals — only when the scene needs them.
+- Length: content lines about 6–12 words, plus at least one 1–3 word reaction.
+- Follow the spoken-register block. No greeting ritual, no "Parfait, à tout de suite !".`,
 
   B1: `
-B1 INTERMEDIATE rules — the learner can handle familiar topics:
-- Vocabulary: intermediate vocabulary (1 500–3 000 words). Can use descriptive adjectives, common idiomatic expressions, and topic-specific words.
-- Grammar: all A1–A2 structures plus imparfait (FR) / past continuous (EN), futur simple (FR) / will-future (EN), conditionnel présent (FR) / would (EN), simple relative clauses (qui/que/where/who).
-- Sentence length: 10–16 words per line.
-- Topics: travel, work plans, opinions, health, environment, culture, learning.
-- CONVERSATION EXAMPLE (French):
-  Camille: "Tu as déjà visité la Bretagne ? J'aimerais y aller cet été."
-  Thomas: "Oui, j'y suis allé l'année dernière. C'est magnifique, surtout les côtes."
-  Camille: "Vraiment ? Qu'est-ce que tu as fait là-bas ?"
-  Thomas: "On faisait du vélo tous les jours et on mangeait des crêpes. Je te recommande vraiment !"`,
+B1 INTERMEDIATE rules — familiar topics, still spoken:
+- Vocabulary: intermediate (1 500–3 000 words), idioms that people actually say.
+- Grammar: A2 plus imparfait, conditionnel, simple relatives — only when the scene needs them.
+- Length: mix of short reactions and lines of about 8–16 words.
+- Follow the spoken-register block. A story about last summer is a conversation, not a report.`,
 
   B2: `
-B2 UPPER-INTERMEDIATE rules — the learner handles complex ideas:
-- Vocabulary: varied vocabulary (3 000–6 000 words). Abstract nouns, nuanced verbs, fixed expressions, and collocations are welcome.
-- Grammar: all B1 plus subjonctif présent (FR) / subjunctive (EN), plus-que-parfait (FR) / past perfect (EN), passive voice, complex conjunctions (bien que, alors que / although, whereas). Multiple subordinate clauses allowed.
-- Sentence length: natural length, typically 12–20 words per line.
-- Topics: society, technology, environment, business, cross-cultural issues.`,
+B2 UPPER-INTERMEDIATE rules:
+- Vocabulary: varied, including collocations people use in speech.
+- Grammar: subjonctif, complex conjunctions, when the point needs them — not every line.
+- Length: natural, mixed with short reactions. Not a row of 20-word sentences.
+- Follow the spoken-register block.`,
 
   C1: `
-C1 ADVANCED rules — the learner operates with sophistication:
-- Vocabulary: rich, precise vocabulary including formal register, idioms, and low-frequency words. Stylistic variation is expected.
-- Grammar: all B2 structures plus complex inversion, cleft sentences, advanced connectors. Participial clauses and gerunds freely used.
-- Sentence length: varied, can be long and complex. Native-like rhythm.`,
+C1 ADVANCED rules:
+- Precise spoken register for the relationship (friend vs colleague vs stranger).
+- Native rhythm: understatement, repair, short reactions. Avoid speech-like clauses.
+- Follow the spoken-register block.`,
 
   C2: `
-C2 MASTERY rules — the learner approaches native-speaker fluency:
-- Vocabulary: fully native-level including argot, formal/literary registers, and cultural references. No restrictions.
-- Grammar: all tenses and moods including literary forms for recognition (passé simple, subjonctif imparfait FR). Stylistic choices freely made.`,
+C2 MASTERY rules:
+- Native spoken language, including irony. Literary tenses stay out of a casual chat.
+- Follow the spoken-register block.`,
 };
 
 function fixDialogueLabels(dialogue: string, nameA: string, nameB: string): string {
@@ -184,19 +157,12 @@ function fixDialogueLabels(dialogue: string, nameA: string, nameB: string): stri
     .join('\n');
 }
 
-function stripForbiddenFillers(dialogue: string): string {
-  return dialogue
-    .replace(/\bTiens\s*,\s*/gi, '')
-    .replace(/\bTiens\s*!\s*/gi, '')
-    .replace(/\bTiens\b\s*/gi, '');
-}
-
 function normalizeHookResult(
   result: HookResult,
   nameA: string,
   nameB: string,
 ): HookResult {
-  result.dialogue = sanitizeDialogueText(stripForbiddenFillers(result.dialogue));
+  result.dialogue = sanitizeDialogueText(result.dialogue);
   result.dialogue = fixDialogueLabels(result.dialogue, nameA, nameB);
 
   result.newVocabulary = [...new Set(
@@ -357,7 +323,7 @@ export async function generateHook(params: GenerateHookParams): Promise<HookResu
   const arcBlock = [
     arcSummary ? `Story arc for this theme: ${arcSummary}` : '',
     lastScenarioSummary
-      ? `Previous scene recap: ${lastScenarioSummary}\nANTI-REUSE: Do NOT reuse the same situation or mood adjectives from that recap. A short greeting ("Salut !", "Hi!") is fine and encouraged — invent a NEW goal/problem after it.`
+      ? `Previous scene recap: ${lastScenarioSummary}\nANTI-REUSE: Do NOT reuse the same situation or mood adjectives from that recap. Start inside a NEW goal or problem — do not replay a "Ça va ?" ritual.`
       : '',
   ].filter(Boolean).join('\n');
 
@@ -380,7 +346,7 @@ export async function generateHook(params: GenerateHookParams): Promise<HookResu
   } else if (tag === 'VOC') {
     tagInstruction = `- VOCABULARY LESSON: The 2 new words must fit naturally in the same scene. Conversation flow is priority #1 — never break the dialogue just to showcase a word.
 - PREFERRED TARGET: If the Pedagogical Focus names a word (e.g. 'Vocabulário: Bon'), prefer it as one of the 2 new words — but if it does not fit the scene without breaking coherence, pick a different word from the same theme instead.
-- SIMPLICITY: Keep lines short (max 8 words) and grammar basic (être/avoir/aller/faire in FR; be/have/go/do in EN).`;
+- SIMPLICITY: Everyday words. Short reactions are fine. Content lines stay readable, about 4–12 words. Grammar stays basic (être/avoir/aller/faire in FR; be/have/go/do in EN) unless the focus needs one other form.`;
   } else if (tag === 'PRON') {
     tagInstruction = `- PHONETIC FOCUS: The dialogue should naturally feature many instances of the sounds or letters in '${grammarFocus}'.
 - AUDIO QUALITY: Keep sentences short and clear so the student can focus on hearing the target sounds.`;
@@ -411,7 +377,7 @@ export async function generateHook(params: GenerateHookParams): Promise<HookResu
 - CHUNKS: Include 1 cultural collocation or fixed phrase in newChunks when it appears naturally in the dialogue.`;
   }
 
-  const systemPrompt = `Você é um amigo brasileiro muito gente boa e fluente em ${lang}. Seu objetivo é criar conteúdo que pareça 100% humano e zero robótico.
+  const systemPrompt = `Você é um amigo brasileiro muito gente boa e fluente em ${lang}. O diálogo no idioma alvo tem que soar falado, como no dia a dia — não como livro didático.
 Regras de Humanidade:
 - NUNCA use aberturas de IA como "Certamente!", "Aqui está", "Com certeza".
 - Use português brasileiro natural, de conversa (ex: "só pra você saber", "olha que legal", "né").
@@ -484,84 +450,75 @@ ${tagInstruction}
 Format:
 - Between ${minLines} and ${maxLines} lines, alternating speakers
 - Every line MUST begin with the speaker name and a colon
-- Unless 'MISS' lesson: speakers are friends — use informal 'tu'/'on' (FR) or casual tone (EN)
 - ONE location for the whole dialogue — no teleporting between scenes
 - If a line asks a question, the next line must answer it
-- CONVERSATION ARC (required — sounds like real life):
-  1. OPEN (1 line; max 2 at B1+): brief greeting and/or soft check-in
-     (FR: "Salut !", "Ça va ?", "Bonjour"; EN: "Hi", "Hey", "How's it going?")
-     then immediately pivot toward the scene goal.
-  2. TOPIC (majority of lines): develop the pedagogical focus in ONE scene.
-  3. SOFT CLOSE (final 1 line): agreement, thanks, goodbye, or next step
-     (FR: "merci", "on y va", "à tout à l'heure"; EN: "thanks", "let's go", "see you").
-  Open+close together must stay under ~25% of total lines. Do NOT skip the open just to fit grammar earlier — put Focus in the TOPIC beat.
-- For MISS lessons: use a transactional open ("Bonjour" / "Excusez-moi" / "Hi") instead of casual friend small-talk; still soft-close when the mission resolves.
+- CONVERSATION ARC:
+  1. Start inside the scene. A "Ça va ?" / "How are you?" ritual is forbidden. A mission opens with Bonjour / Excusez-moi / Hi, then the goal.
+  2. TOPIC: the pedagogical focus, including at least one 1–3 word reaction turn.
+  3. CLOSE on a decision or next step. Never "Parfait, merci !", "Merci !", "Perfect, thanks!", or "à tout à l'heure" alone.
 - Stay within ${themeContext} — do not drift to unrelated topics
-- Sound human: contractions, varied fillers (FR: Alors, Bah, Oh, Bon; EN: Well, So, Right). FORBIDDEN: "Tiens"
 - Strictly 2-party dialogue — never address an invisible waiter/cashier/receptionist
+
+${spokenDialogueGuidance(language, level, tag)}
 
 ACTION AND SEMANTICS:
 - ACTION PLAN STABILITY: When line N assigns roles (A waits, B goes to get something), lines N+1 onward MUST keep those roles unless someone explicitly changes the plan. BAD: "I wait while you search" → next line "let's wait together".
 - FETCH vs SEARCH (FR: chercher vs aller chercher/récupérer): If the speaker already said WHERE the object is, use "aller la/le chercher", "récupérer", "vais la prendre" — NOT "chercher" (unknown location). EN: "go get it" not "look for it" when location is known.
 - NO PHANTOM PROPS: Do NOT introduce new objects or places (tree, bench, cupboard) unless mentioned in the previous 1-2 lines or part of the opening scene. Do NOT invent a location just to teach a preposition (e.g. no "under a tree" to use "sous").
-- PRESENT MOMENT: Keep the dialogue in present/immediate future. No past-tense anecdotes ("I waited 10 minutes...") unless explicitly reminiscing.
+- IMMEDIATE PAST IS FINE ("j'ai oublié", "t'as vu"). Do not add a long reminiscence that leaves the scene ("j'ai attendu dix minutes sous un arbre").
 - PREMISE ALIGNMENT: If speaker A frames something negatively (too expensive, too tiring, too late, disappointing…), speaker B must agree, disagree, or nuance that framing — NOT reply with only enthusiastic positives that contradict it.
-- SCENE VARIETY: Invent a fresh, realistic micro-situation from Theme / Scenario / grammar focus. Do NOT reuse the same weekend-recap *plot* or the same mood adjective across lessons. Short greetings are NOT banned — vary places, goals, and mood (plans, errands, small problems, preferences, surprises) so consecutive lessons feel different.
-- NATURAL LIFE: The dialogue must sound like something two people would actually say in real life — reactive, specific to the scene, not a grammar worksheet in disguise.
+- SCENE VARIETY: Invent a fresh, realistic micro-situation from Theme / Scenario / grammar focus. Do NOT reuse the same weekend-recap plot or the same mood adjective across lessons. Vary places, goals, and mood.
 - ENDING: If someone will go get something, end with them leaving or about to leave — NOT suddenly "I found it" without the fetch action.
+
+❌ BAD — textbook ritual (NEVER produce this):
+Marie: "Salut Hugo ! Ça va ?"
+Hugo: "Salut ! Oui, ça va très bien."
+Marie: "Où est le café ?"
+Hugo: "Il est là, sur la table."
+Marie: "Parfait, merci !"
 
 ❌ BAD — vocabulary checklist (NEVER produce this):
 Sarah: "Tu as des chaussures pour le sport dans ton sac ?"
 Mathis: "Non, j'ai seulement des baskets."
-Sarah: "C'est dommage, car j'ai des chaussettes mais pas de serviettes." ← BROKEN: 'car' has no link to sneakers; towels appear from nowhere
+Sarah: "C'est dommage, car j'ai des chaussettes mais pas de serviettes." ← BROKEN: 'car' has no link; towels appear from nowhere
 Mathis: "Je vais chercher des serviettes dans l'armoire."
-Sarah: "N'oublie pas les vêtements de rechange !" ← BROKEN: new items with no setup
 
 ❌ BAD — disconnected observations (NEVER produce this):
-"Le hall est sombre." / "La porte est étroite." / "La clé est petite." — nobody is talking TO each other
-
-❌ BAD — cold-open mid-problem with no greeting (avoid this pattern):
-Julia: "Oh non, j'ai oublié ma clé sur la porte !"
-(starts mid-crisis with zero social framing)
+"Le hall est sombre." / "La porte est étroite." — nobody is talking TO each other
 
 ❌ BAD — key on door (NEVER produce this):
 Julia: "j'ai oublié ma clé sur la porte"
 Victor: "j'attends pendant que tu la cherches" ← wrong verb; she knows where it is
 Julia: "on attend ensemble devant l'immeuble" ← contradicts: both waiting now
-Victor: "j'ai attendu sous cet arbre" ← phantom tree + past tense
+Victor: "j'ai attendu sous cet arbre" ← phantom tree
 Julia: "je l'ai trouvée" ← magic resolution without her going to get it
 
-✅ GOOD — natural arc first (greeting → topic → soft close):
-Marie: "Salut Hugo ! Ça va ?"
-Hugo: "Salut ! Oui, et toi ?"
-Marie: "Bien ! Où est le café ?"
-Hugo: "Il est là, sur la table."
-Marie: "Parfait, merci !"
+✅ GOOD — key, spoken, with a short reaction:
+Julia: "Victor ?"
+Victor: "Ouais ?"
+Julia: "J'ai oublié la clé sur la porte."
+Victor: "Attends. Je reste ici, tu vas la chercher."
+Julia: "Ça marche. Je reviens."
 
-✅ GOOD — after a short open, TOPIC beat can look like this (key on door):
-Julia: "Salut Victor ! Tu as deux minutes ?"
-Victor: "Salut ! Oui, qu'est-ce qu'il y a ?"
-Julia: "Oh non, j'ai oublié ma clé sur la porte !"
-Victor: "Bah, j'attends ici pendant que tu vas la chercher."
-Julia: "D'accord, je reviens tout de suite !"
-
-✅ GOOD — each line reacts to the previous (gym bag, with open+close):
-Sarah: "Salut Mathis ! On va à la salle ?"
-Mathis: "Salut ! Oui — tu as tes chaussures ?"
-Sarah: "Oui, et mes chaussettes propres aussi. Toi ?"
-Mathis: "Ah non, j'ai oublié ma serviette !"
-Sarah: "Pas grave, j'en ai une. Allez, on y va !"
+✅ GOOD — gym bag, each line reacts:
+Sarah: "On va à la salle ?"
+Mathis: "Ouais. T'as tes chaussures ?"
+Sarah: "Ouais, et des chaussettes propres. Toi ?"
+Mathis: "Ah non. J'ai oublié ma serviette."
+Sarah: "T'inquiète, j'en ai une."
+Mathis: "Grave. On y va."
 
 ❌ BAD — premise broken (NEVER produce this):
-Léa: "Ce resto est trop cher, non ?"
-Hugo: "Oui, et en plus c'était génial, j'adore tout !" ← contradicts the "too expensive / negative" framing without acknowledging it
+Léa: "C'est trop cher, ce resto, non ?"
+Hugo: "Oui, et en plus c'était génial, j'adore tout !"
 
 ✅ GOOD — premise stays consistent:
-Léa: "Salut Hugo ! Ce resto est trop cher, non ?"
-Hugo: "Un peu, oui… Mais le plat du jour vaut le coup."
-Léa: "Ah bon ? Moi, je vais juste prendre une entrée. Merci !"
+Léa: "C'est trop cher, ce resto, non ?"
+Hugo: "Un peu, ouais."
+Léa: "Moi je prends juste une entrée."
+Hugo: "Ça marche."
 
-Before returning JSON, re-read line by line: does line N make sense because of line N-1? If not, rewrite.
+Before returning JSON, re-read line by line: does line N make sense because of line N-1? Does it sound spoken? If not, rewrite.
 ${knownVocabInstruction}
 ${dialogueVocabGuard}
 ${translationInstruction}

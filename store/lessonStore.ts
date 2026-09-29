@@ -16,7 +16,6 @@ import type {
 export type LessonPhase =
   | 'idle'
   | 'loading'
-  | 'intro'
   | 'vocabulary'
   | 'hook'
   | 'role-play'
@@ -31,7 +30,7 @@ export type LessonPhase =
   | 'production'
   | 'debrief';
 
-/** Background generation of practice exercises (prefetch during intro→grammar). */
+/** Background generation of practice exercises (prefetch before practice). */
 export type ExercisesPrefetchStatus = 'idle' | 'pending' | 'ready' | 'empty' | 'error';
 
 interface LessonState {

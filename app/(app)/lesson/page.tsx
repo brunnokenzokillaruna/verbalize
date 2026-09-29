@@ -15,7 +15,6 @@ import { LessonErrorScreen } from '@/components/lesson/LessonErrorScreen';
 import { LessonPhaseContent } from '@/components/lesson/LessonPhaseContent';
 import { LessonContinueButton } from '@/components/lesson/LessonContinueButton';
 import { LessonCompleteViews } from '@/components/lesson/LessonCompleteViews';
-import { LessonIntroScreen } from '@/components/lesson/LessonIntroScreen';
 
 import { useLessonAudio } from './hooks/useLessonAudio';
 import { useLessonFlow } from './hooks/useLessonFlow';
@@ -89,7 +88,6 @@ export default function LessonPage() {
 
   const {
     fetchAiExercises,
-    advanceFromIntro,
     advanceFromMission,
     advanceFromVocabulary,
     advanceFromHook,
@@ -156,9 +154,6 @@ export default function LessonPage() {
 
   const handleAdvance = useCallback(() => {
     switch (phase) {
-      case 'intro':
-        advanceFromIntro();
-        break;
       case 'vocabulary':
         advanceFromVocabulary();
         break;
@@ -196,7 +191,6 @@ export default function LessonPage() {
   }, [
     phase,
     comprehensionAnswered,
-    advanceFromIntro,
     advanceFromVocabulary,
     advanceFromHook,
     advanceFromMission,
@@ -240,8 +234,6 @@ export default function LessonPage() {
     return <LessonCompleteViews onExit={exitLesson} />;
   }
 
-  const introHookReady = !!store.hook && !store.isLoading;
-
   return (
     <div style={{ backgroundColor: 'var(--color-bg)', minHeight: '100dvh' }}>
       <LessonProgressHeader
@@ -257,39 +249,29 @@ export default function LessonPage() {
           phase === 'practice' || phase === 'review' || phase === 'production' ? 'pb-32 sm:pb-36' : 'pb-20'
         }`}
       >
-        {phase === 'intro' && store.lesson ? (
-          <LessonIntroScreen
-            tag={store.lesson.tag}
-            grammarFocus={store.lesson.grammarFocus}
-            uiTitle={store.lesson.uiTitle}
-            hookReady={introHookReady}
-            sceneImage={store.sceneImage}
-          />
-        ) : (
-          <LessonPhaseContent
-            phase={phase}
-            exerciseAnswer={exerciseAnswer}
-            setIsExerciseReady={setIsExerciseReady}
-            submitTrigger={submitTrigger}
-            exerciseRetryKey={exerciseRetryKey}
-            currentExercise={currentExercise}
-            currentReviewExercise={currentReviewExercise}
-            isPlaying={isPlaying}
-            isLoadingAudio={isLoadingAudio}
-            playingLineIdx={playingLineIdx}
-            narratedRange={narratedRange}
-            speakerVoices={speakerVoices}
-            onAudioButton={handleAudioButton}
-            onWordClick={handleWordClick}
-            onAnswer={handleAnswer}
-            onReviewAnswer={handleReviewAnswer}
-            onAdvanceFromGrammar={advanceFromGrammar}
-            comprehensionAnswered={comprehensionAnswered}
-            comprehensionLastCorrect={comprehensionLastCorrect}
-            onComprehensionAnswer={handleComprehensionAnswer}
-            onDebriefExit={() => router.push('/profile')}
-          />
-        )}
+        <LessonPhaseContent
+          phase={phase}
+          exerciseAnswer={exerciseAnswer}
+          setIsExerciseReady={setIsExerciseReady}
+          submitTrigger={submitTrigger}
+          exerciseRetryKey={exerciseRetryKey}
+          currentExercise={currentExercise}
+          currentReviewExercise={currentReviewExercise}
+          isPlaying={isPlaying}
+          isLoadingAudio={isLoadingAudio}
+          playingLineIdx={playingLineIdx}
+          narratedRange={narratedRange}
+          speakerVoices={speakerVoices}
+          onAudioButton={handleAudioButton}
+          onWordClick={handleWordClick}
+          onAnswer={handleAnswer}
+          onReviewAnswer={handleReviewAnswer}
+          onAdvanceFromGrammar={advanceFromGrammar}
+          comprehensionAnswered={comprehensionAnswered}
+          comprehensionLastCorrect={comprehensionLastCorrect}
+          onComprehensionAnswer={handleComprehensionAnswer}
+          onDebriefExit={() => router.push('/profile')}
+        />
 
         {(phase === 'grammar' || phase === 'phonetics' || phase === 'role-play') &&
           store.exercisesPrefetchStatus === 'error' &&
@@ -302,7 +284,7 @@ export default function LessonPage() {
         {phase !== 'practice' && phase !== 'review' && phase !== 'production' && phase !== 'grammar' && (
           <LessonContinueButton
             phase={phase}
-            isLoading={phase === 'intro' ? !introHookReady : store.isLoading}
+            isLoading={store.isLoading}
             rolePlayComplete={store.rolePlayComplete}
             lessonTag={store.lesson?.tag}
             comprehensionAnswered={comprehensionAnswered}

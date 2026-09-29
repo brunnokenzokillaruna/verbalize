@@ -261,12 +261,6 @@ export function useLessonFlow({
     store.setPhase('complete');
   }, [store]);
 
-  const advanceFromIntro = useCallback(() => {
-    if (!store.lesson) return;
-    const initial = getInitialPhase(store.lesson.tag);
-    store.setPhase(initial);
-  }, [store]);
-
   const advanceFromMission = useCallback(() => {
     if (!store.lesson) return;
     const next = getNextPhase(store.lesson.tag, 'mission');
@@ -483,7 +477,6 @@ export function useLessonFlow({
   return {
     fetchAiExercises,
     buildVisualExercises,
-    advanceFromIntro,
     advanceFromMission,
     advanceFromVocabulary,
     advanceFromHook,

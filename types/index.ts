@@ -178,7 +178,6 @@ export interface PregeneratedLessonDocument {
 // ─── Lesson ───────────────────────────────────────────────────────────────────
 
 export type LessonStage =
-  | 'intro'
   | 'vocabulary'
   | 'hook'
   | 'role-play'

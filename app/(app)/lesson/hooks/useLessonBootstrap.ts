@@ -41,6 +41,7 @@ import {
 import { filterHookVocabularyForKnownWords, filterKnownFromNewChunks } from '@/lib/hookVocabulary';
 import { collectDialogueTranslationTargets } from '@/lib/dialogueNarration';
 import { tooltipCacheKey } from '@/lib/wordTooltipUtils';
+import { getInitialPhase } from '@/app/(app)/lesson/hooks/useLessonFlow';
 import type {
   GrammarBridgeResult,
   Exercise,
@@ -127,8 +128,15 @@ function applyPregenCache(
   exercisesFallbackRef: React.MutableRefObject<Exercise[] | null>,
 ): HookResult | null {
   const schemaOk = isPregenSchemaCurrent(pregenDoc.schemaVersion);
+  if (!schemaOk) {
+    devLog(
+      `[Timing] Cache pregen STALE (schema ${pregenDoc.schemaVersion ?? 'none'} < ${PREGEN_SCHEMA_VERSION}) — regenerating hook and exercises`,
+    );
+    return null;
+  }
+
   const cachedExercises = pregenDoc.exercises ?? [];
-  const fullAiSet = schemaOk && cachedExercises.length >= PRACTICE_EXERCISE_COUNT;
+  const fullAiSet = cachedExercises.length >= PRACTICE_EXERCISE_COUNT;
 
   if (pregenDoc.grammarBridge) {
     grammarBridgePrefetchRef.current = Promise.resolve(pregenDoc.grammarBridge);
@@ -140,20 +148,14 @@ function applyPregenCache(
   } else if (cachedExercises.length > 0) {
     exercisesFallbackRef.current = cachedExercises;
     devLog(
-      schemaOk
-        ? `[Timing] Cache pregen exercises incomplete (${cachedExercises.length}/${PRACTICE_EXERCISE_COUNT}) — regenerating exercises`
-        : `[Timing] Cache pregen exercises STALE (schema ${pregenDoc.schemaVersion ?? 'none'} < ${PREGEN_SCHEMA_VERSION}) — regenerating exercises`,
+      `[Timing] Cache pregen exercises incomplete (${cachedExercises.length}/${PRACTICE_EXERCISE_COUNT}) — regenerating exercises`,
     );
   }
   if (pregenDoc.missionBriefing) {
     store.setMissionBriefing(pregenDoc.missionBriefing);
   }
-  if (schemaOk && pregenDoc.checkpointSession) {
+  if (pregenDoc.checkpointSession) {
     store.setCheckpointSession(pregenDoc.checkpointSession);
-  } else if (!schemaOk && pregenDoc.checkpointSession) {
-    devLog(
-      `[Timing] Cache pregen checkpoint STALE (schema ${pregenDoc.schemaVersion ?? 'none'} < ${PREGEN_SCHEMA_VERSION}) — regenerating checkpoint`,
-    );
   }
 
   return pregenDoc.hook ?? null;
@@ -201,9 +203,7 @@ export function useLessonBootstrap({
       getNextLesson(language, profile.lessonProgress?.[language]);
     store.init(lesson, profile.interests ?? []);
 
-    // Show cover immediately while hook/scene load in the background.
-    store.setPhase('intro');
-
+    // Stay on the loading screen until the first real phase can render.
     // Scene/cover image only needs LessonDefinition — start before hook generation.
     // Cache hit is cheap; always refetch on new lesson init (retry-safe).
     getLessonSceneImage({
@@ -397,11 +397,11 @@ export function useLessonBootstrap({
             }).catch((err) => console.error('[Prefetch] vocab images error:', err));
           }
 
-          // Stay on intro until the learner taps "Começar" (advanceFromIntro).
-          // REVIEW still jumps straight to briefing above.
+          // Open the first real phase. REVIEW already jumped to briefing above.
+          // Skip if the learner left while this was still generating.
           const currentPhase = useLessonStore.getState().phase;
           if (currentPhase === 'loading') {
-            store.setPhase('intro');
+            store.setPhase(getInitialPhase(lesson.tag));
           }
           devLog(`[Timing] ✅ Bootstrap total: ${(performance.now() - t0).toFixed(0)}ms → fase '${useLessonStore.getState().phase}'`);
 
@@ -485,7 +485,14 @@ export function useLessonBootstrap({
   }, [user, store.hook, store.lesson]);
 
   useEffect(() => {
-    if ((store.phase !== 'hook' && store.phase !== 'role-play' && store.phase !== 'vocabulary' && store.phase !== 'intro') || !store.hook || !store.lesson) return;
+    if (
+      store.phase !== 'hook' &&
+      store.phase !== 'role-play' &&
+      store.phase !== 'vocabulary' &&
+      store.phase !== 'mission' &&
+      store.phase !== 'loading'
+    ) return;
+    if (!store.hook || !store.lesson) return;
     // Only fire once per lesson regardless of how many times phase/hook change
     if (prefetchFiredRef.current) return;
     prefetchFiredRef.current = true;
@@ -718,7 +725,7 @@ export function useLessonBootstrap({
     } else {
       devLog(`[Timing] Imagens: já iniciadas no bootstrap (0ms)`);
     }
-  // store.hook added so the effect re-fires when hook arrives while still on 'intro' phase
+  // store.hook added so prefetch starts as soon as the hook arrives during loading
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [store.phase, store.hook]);
 

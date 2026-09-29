@@ -14,23 +14,104 @@ const LANG_LABEL: Record<SupportedLanguage, string> = {
   en: 'English',
 };
 
-const DIALOGUE_LINE_RANGES: Record<ProficiencyLevel, { min: number; max: number }> = {
-  A1: { min: 4, max: 6 },
-  A2: { min: 5, max: 7 },
-  B1: { min: 6, max: 8 },
-  B2: { min: 7, max: 9 },
-  C1: { min: 8, max: 10 },
-  C2: { min: 10, max: 12 },
+export const DIALOGUE_LINE_RANGES: Record<ProficiencyLevel, { min: number; max: number }> = {
+  A1: { min: 6, max: 8 },
+  A2: { min: 8, max: 10 },
+  B1: { min: 10, max: 12 },
+  B2: { min: 10, max: 13 },
+  C1: { min: 12, max: 14 },
+  C2: { min: 12, max: 16 },
 };
 
 const COMPACT_LEVEL: Record<ProficiencyLevel, string> = {
-  A1: 'A1: ≤8 words/line, present tense, top-300 words, greeting → topic → soft close.',
-  A2: 'A2: 8–12 words/line, everyday vocab, short greeting then topic, fillers ok.',
-  B1: 'B1: intermediate vocab, imparfait/conditionnel ok, natural open→topic→close.',
-  B2: 'B2: varied vocab, complex clauses, natural open→topic→close.',
-  C1: 'C1: advanced vocab and grammar, native-like rhythm, natural social arc.',
-  C2: 'C2: native-level, all registers, natural social arc.',
+  A1: 'A1: simple words, present or aller+infinitive. Fragments and one short reaction. No "Ça va ?" ritual.',
+  A2: 'A2: spoken forms (t\'as, j\'ai pas, y a, on, ouais). Intonation questions. One short reaction. Close on a next step.',
+  B1: 'B1: same spoken rhythm; imparfait/conditionnel only when the scene needs them.',
+  B2: 'B2: spoken rhythm, varied vocab, a real back-and-forth — not an interview.',
+  C1: 'C1: native spoken rhythm, register fits the relationship.',
+  C2: 'C2: native spoken rhythm, including irony and understatement. Still a conversation, not a speech.',
 };
+
+/** Few-shot rhythm + register. The model copies this more than abstract rules. */
+export function spokenDialogueGuidance(
+  language: SupportedLanguage,
+  level: ProficiencyLevel,
+  tag: LessonTag,
+): string {
+  const advanced = level !== 'A1';
+  const mission = tag === 'MISS';
+
+  const relationship = mission
+    ? `Register: "Você" speaks to one staff member or stranger. French uses "vous" unless they are clearly friends. English stays polite. Open with Bonjour / Excusez-moi / Hi, then the goal. Include one short reaction ("D'accord.", "Tout de suite.").`
+    : `Register — pick ONE relationship and keep it for the whole dialogue:
+- Friends, classmates, family, couple: French "tu", English casual.
+- Shop, café staff, receptionist, stranger: French "vous", English polite.
+Do not turn friends into waiter-talk mid-scene.`;
+
+  const speech = language === 'fr'
+    ? advanced
+      ? `Spoken French, required:
+- Write how people talk, not a textbook.
+- Drop "ne": "j'ai pas", "c'est pas".
+- Use "t'as", "t'es", "j'sais pas", "y a", and "on" for "nous".
+- Questions by intonation ("t'as faim ?"), not "est-ce que" or inversion.
+- Prefer "ouais" / "nan" over "oui" / "non".
+- At least one turn is ONLY a short reaction (1–3 words): "Ah bon ?", "Ouais.", "Grave.", "Attends.", "Ça marche.", "T'inquiète."
+- Do not start lines with "Alors".
+- Do not open with "Ça va ?" and do not close with "Parfait, merci !" or a bare "Merci".
+- Close on a decision or next step.`
+      : `Spoken French for beginners:
+- Simple everyday words. Present tense, or "aller" + infinitive.
+- Fragments are real lines: "Sur la table.", "J'arrive.", "Le bus ?"
+- At least one turn is a short reaction (1–3 words): "Ah bon ?", "D'accord.", "Oui."
+- Questions by intonation. "y a" and "on" are fine. Keep "ne" when dropping it would hide the grammar point.
+- Do not open with "Ça va ?" and do not close with "Parfait, merci !".`
+    : advanced
+      ? `Spoken English, required:
+- Contractions and short turns. "Yeah" / "Nah", not "Yes, I would like that."
+- Intonation questions ("You hungry?") instead of "Do you want to…?" on every line.
+- At least one turn is 1–3 words: "Yeah.", "Hold on.", "No way.", "Got it."
+- Do not open with "How are you?" and do not close with "Perfect, thanks!".
+- Close on a decision or next step.`
+      : `Spoken English for beginners:
+- Simple words and fragments: "On the table.", "I'm coming.", "The bus?"
+- At least one short reaction: "Yeah?", "Okay."
+- Do not open with "How are you?" and do not close with "Perfect, thanks!".`;
+
+  const example = mission
+    ? ''
+    : language === 'fr'
+      ? advanced
+        ? `Copy this rhythm, not this topic or this length. Add beats until you hit the line count:
+Sophie: "T'es où ?"
+Lucas: "Au taf, pourquoi ?"
+Sophie: "J'ai trop faim. On se prend un truc ?"
+Lucas: "Ouais, vas-y."
+Sophie: "Devant la boulangerie, à une heure ?"
+Lucas: "Ça marche. J'arrive."`
+        : `Copy this rhythm, not this topic or this length. Add beats until you hit the line count:
+Marie: "Le café ?"
+Hugo: "Sur la table."
+Marie: "Ah bon ?"
+Hugo: "Oui, là."
+Marie: "J'arrive."`
+      : advanced
+        ? `Copy this rhythm, not this topic or this length. Add beats until you hit the line count:
+Emma: "Where are you?"
+Jake: "Still at work. Why?"
+Emma: "I'm starving. Food?"
+Jake: "Yeah, let's go."
+Emma: "Bakery at one?"
+Jake: "Works. I'm coming."`
+        : `Copy this rhythm, not this topic or this length. Add beats until you hit the line count:
+Emma: "The coffee?"
+Jake: "On the table."
+Emma: "Yeah?"
+Jake: "Right there."
+Emma: "I'm coming."`;
+
+  return [relationship, speech, example].filter(Boolean).join('\n');
+}
 
 export interface HookGenerationParams {
   language: SupportedLanguage;
@@ -142,8 +223,8 @@ export function buildMinimalHookPrompt(params: HookGenerationParams): {
     .join(' · ');
 
   const antiReuse = lastScenarioSummary
-    ? `ANTI-REUSE: Do not repeat the previous scene's situation or mood adjectives. A short greeting is fine — invent a NEW goal/problem after it.`
-    : `SCENE VARIETY: Invent a fresh real-life micro-situation from Theme / Focus. Vary places/goals/mood; short greetings are allowed and encouraged.`;
+    ? `ANTI-REUSE: Do not repeat the previous scene's situation or mood adjectives. Start inside a NEW goal or problem.`
+    : `SCENE VARIETY: Invent a fresh real-life micro-situation from Theme / Focus. Vary places, goals, and mood.`;
 
   const themeContext = theme
     ? `Theme: ${theme}${uiTitle ? ` · ${uiTitle}` : ''}${arcBlock ? ` · ${arcBlock}` : ''}`
@@ -188,8 +269,8 @@ export function buildMinimalHookPrompt(params: HookGenerationParams): {
 
   const conversationArc =
     tag === 'MISS'
-      ? `Arc: short transactional open ("Bonjour"/"Excusez-moi"/"Hi") → mission goal → clear resolution close`
-      : `Arc: short greeting/check-in (1 line, max 2) → scene topic (Focus) → soft close (thanks/plan/bye). Focus appears AFTER the open.`;
+      ? `Arc: Bonjour / Excusez-moi / Hi → the concrete goal → a clear resolution. Include one short reaction.`
+      : `Arc: start inside the scene (a "Ça va ?" / "How are you?" ritual is forbidden) → the lesson focus, with one short reaction turn → close on a decision or next step, never "Parfait, merci !" / "Perfect, thanks!".`;
 
   const prompt = `${speakerIntro}
 
@@ -199,11 +280,13 @@ ${compactTagInstruction(tag, grammarFocus, uiTitle, theme)}
 ${knownBlock}
 ${antiReuse}
 
+${spokenDialogueGuidance(language, level, tag)}
+
 Rules:
 - ${minLines}–${maxLines} lines; each line starts with "Name: "
 - ONE scene; each line reacts to the previous line
 - ${conversationArc}
-- Sound like a real conversation people would have — specific to the scene, not a grammar drill
+- A 1–3 word reaction counts as a full line. Most other lines stay short. Fragments are correct.
 - PREMISE ALIGNMENT: If speaker A frames something negatively (too expensive, too tiring, disappointing…), speaker B must agree, disagree, or nuance — NOT only enthusiastic positives that contradict it
 - Exactly 2 newVocabulary items (non-verbs, lowercase, appear in dialogue)
 - NEVER include days of the week, months of the year, speaker names, or other proper nouns in newVocabulary (e.g. Alice, Marie, Paris)
