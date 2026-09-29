@@ -1,8 +1,10 @@
 import type { UserVocabularyDocument } from '@/types';
+import { isFrenchElisionCopy } from '@/lib/vocabTranslation';
 
 export function isMissingTranslation(item: UserVocabularyDocument): boolean {
   const translation = item.translation?.trim() ?? '';
   if (!translation) return true;
+  if (isFrenchElisionCopy(item.word, translation)) return true;
   if (item.translationConfirmed) return false;
   return translation === item.word;
 }

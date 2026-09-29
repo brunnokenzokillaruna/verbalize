@@ -33,6 +33,7 @@ import { timestampToMillis } from '@/utils/vocabPageHelpers';
 import { MIN_VISUAL_REVIEW_ITEMS } from '@/utils/imageMatchBuilder';
 import { canonicalVocabKey } from '@/lib/vocabCanonical';
 import {
+  isFrenchElisionCopy,
   isUntranslatedCopy,
   lookupStoredTranslation,
   trackVocabTranslationFill,
@@ -608,6 +609,7 @@ export function useLessonBootstrap({
     ): boolean => {
       const value = translation?.trim();
       if (!value) return false;
+      if (isFrenchElisionCopy(word, value)) return false;
       if (!allowCopy && isUntranslatedCopy(word, value)) return false;
       const key = sanitizeVocabularyToken(word) || word.trim();
       store.setVocabTranslation(key, value);

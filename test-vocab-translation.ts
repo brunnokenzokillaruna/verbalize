@@ -18,6 +18,11 @@ assert(isUntranslatedCopy('precieuse', 'précieuse'), 'accent-only copy is not a
 assert(!isUntranslatedCopy('precieuse', 'preciosa'), 'preciosa is a real translation');
 assert(!isUntranslatedCopy('retard', 'atraso'), 'atraso is a real translation');
 assert(isUntranslatedCopy('précieuse', ''), 'empty translation is missing');
+assert(isUntranslatedCopy('sinstaller', "s'installer"), 'apostrophe elision is still the French word');
+assert(
+  pickBatchTranslation('sinstaller', [{ word: 'sinstaller', translation: "s'installer" }], true) === undefined,
+  'retry refuses a French elision such as sinstaller → s\'installer',
+);
 
 const stored = { Précieuse: 'preciosa', retard: 'atraso' };
 assert(lookupStoredTranslation(stored, 'precieuse') === 'preciosa', 'lookup ignores accents and case');

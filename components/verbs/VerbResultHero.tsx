@@ -38,10 +38,11 @@ export function VerbResultHero({
         <button
           type="button"
           onClick={onClear}
-          className="self-start flex items-center gap-1.5 text-xs font-bold text-text-muted hover:text-text-primary transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-verb rounded-lg px-1 py-0.5 -ml-1"
+          aria-label="Voltar à biblioteca"
+          className="duo-level-chip self-start flex items-center gap-1 rounded-full border border-primary/25 bg-primary-light px-3 py-1.5 text-xs font-bold whitespace-nowrap text-primary dark:text-text-primary cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
         >
-          <ArrowLeft size={14} />
-          Pesquisar outro verbo
+          <ArrowLeft size={13} strokeWidth={2.25} aria-hidden />
+          Voltar
         </button>
 
         <div className="flex items-start justify-between gap-4">
