@@ -1,6 +1,6 @@
 'use server';
 
-import { NATURAL_PT_BR_RULE, normalizeToEverydayPtBr } from '@/lib/naturalPtBr';
+import { NATURAL_PT_BR_RULE, PT_BR_WORD_TRANSLATION_RULE, normalizeToEverydayPtBr } from '@/lib/naturalPtBr';
 import { callGeminiJSON } from '@/services/gemini';
 import type { SupportedLanguage, TranslateWordResult } from '@/types';
 import { unstable_cacheLife as cacheLife } from 'next/cache';
@@ -41,6 +41,7 @@ Respond with ONLY this JSON (no markdown):
 {"translation":"PT-BR translation","explanation":"one PT-BR sentence, max 20 words","example":"new sentence in ${LANG_LABEL[language]} using the same word","partOfSpeech":${isNewVerb ? '"Verbo"' : 'null'},"infinitive":${isNewVerb ? '"infinitive lowercase"' : 'null'}}
 
 Rules: example must be ${LANG_LABEL[language]} only; beginner vocabulary.
+${PT_BR_WORD_TRANSLATION_RULE}
 ${NATURAL_PT_BR_RULE}`;
 
     const result = await callGeminiJSON<TranslateWordResult>(prompt, systemPrompt, 256, 0, 'lightweight');
@@ -88,12 +89,10 @@ Output a JSON array of objects in exactly this format:
 
 Rules:
 - Keep translations brief, accurate, and natural.
-- Preserve each original item exactly in the "word" field.
+- Preserve each original item exactly in the "word" field. Put the PT-BR gloss only in "translation".
 - Translate the meaning used in the dialogue, not every possible dictionary meaning.
-- The translation MUST be Brazilian Portuguese. Never copy the ${LANG_LABEL[language]} spelling when Portuguese has its own word or spelling.
-- Examples: "précieuse" → "preciosa", "retard" → "atraso", "en retard" → "atrasado".
-- Keep the original spelling only when that exact form is already the normal Brazilian word (pizza, jazz).
-${pass === 'strict' ? '- This is a second pass. A previous answer copied the source. Return the everyday PT-BR word for every item.\n' : ''}- Respond ONLY with the JSON array, no markdown fences, no extra text.
+${PT_BR_WORD_TRANSLATION_RULE}
+${pass === 'strict' ? '- Previous answer copied or repaired the source word instead of translating it. "s\'installer" is wrong; "instalar-se" is right.\n' : ''}- Respond ONLY with the JSON array, no markdown fences, no extra text.
 ${NATURAL_PT_BR_RULE}`;
 
     const items = await callGeminiJSON<{ word: string; translation: string }[]>(prompt, systemPrompt, 4096, 0, 'lightweight');

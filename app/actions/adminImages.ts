@@ -8,6 +8,7 @@ import {
 } from '@/services/firestore';
 import { searchPexels } from '@/services/pexels';
 import { callGemini, callGeminiJSON } from '@/services/gemini';
+import { NATURAL_PT_BR_RULE, PT_BR_WORD_TRANSLATION_RULE } from '@/lib/naturalPtBr';
 import type { ImageCacheDocument } from '@/types';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -57,13 +58,16 @@ export async function translateMissingEntries(
   });
 
   const inputJson = JSON.stringify(items);
-  const prompt = `Translate each word to Portuguese (pt-BR).
+  const prompt = `Translate each word to everyday Brazilian Portuguese (pt-BR).
 Input is a JSON array where each item has a "key", "word", and "language".
 Return ONLY a valid JSON object mapping each "key" to its Portuguese translation.
 
+${PT_BR_WORD_TRANSLATION_RULE}
+${NATURAL_PT_BR_RULE}
+
 Input: ${inputJson}
 
-Example output: {"aimer_fr": "amar", "manger_fr": "comer"}
+Example output: {"aimer_fr": "amar", "sinstaller_fr": "instalar-se", "precieuse_fr": "preciosa"}
 Output ONLY the JSON object, nothing else.`;
 
   try {

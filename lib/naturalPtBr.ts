@@ -15,6 +15,19 @@ export const NATURAL_PT_BR_RULE_COMPACT =
   'PT-BR do dia a dia: nunca use palavra rara, técnica, literária ou de Portugal ("em pousio", "relvado", "telemóvel"). Prefira o termo comum ("abandonado", "gramado", "celular"), mesmo que fique mais longo.';
 
 /**
+ * Word- and expression-level glosses. The model otherwise "repairs" the
+ * source (sinstaller → s'installer) and stores that as the translation.
+ */
+export const PT_BR_WORD_TRANSLATION_RULE = `- The translation is ONLY everyday Brazilian Portuguese. It is never the source word repaired.
+- Do NOT add an apostrophe, accent, pronoun, or article to the source and call that a translation.
+  Forbidden: "sinstaller" → "s'installer". Required: "sinstaller" / "s'installer" → "instalar-se".
+  Forbidden: "precieuse" → "précieuse". Required: "preciosa".
+- Pronominal verbs take the Portuguese reflexive form: se lever → levantar-se; se dépêcher → se apressar; s'installer → instalar-se.
+- If Portuguese spelling differs at all, use the Portuguese word: ceinture → cinto (not "cinta"); madame → senhora; hôtel → hotel; retard → atraso.
+- Repeat the source spelling only when that exact form is already a normal Brazilian word (pizza, jazz, piano, dormir, animal).
+- Never put a French apostrophe (s', l', d', n') inside the translation.`;
+
+/**
  * Correct Portuguese that is effectively absent from Brazilian everyday speech.
  *
  * Two invariants keep this from corrupting sentences it rewrites:
