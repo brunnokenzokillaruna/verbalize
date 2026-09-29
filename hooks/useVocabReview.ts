@@ -48,7 +48,7 @@ export function useVocabReview(
   );
 
   const sessionPreview = useMemo(
-    () => pickReviewSession(rawDueToday),
+    () => pickReviewSession(rawDueToday, undefined, sessionSeed),
     [rawDueToday, sessionSeed],
   );
 
@@ -95,7 +95,7 @@ export function useVocabReview(
   }, []);
 
   const prepareSession = useCallback(() => {
-    const session = pickReviewSession(rawDueToday);
+    const session = pickReviewSession(rawDueToday, undefined, sessionSeed);
     setSessionItems(session);
     setResults([]);
     setCardIdx(0);
@@ -103,7 +103,7 @@ export function useVocabReview(
     setLastCorrect(null);
     streakRef.current = 0;
     return session;
-  }, [rawDueToday]);
+  }, [rawDueToday, sessionSeed]);
 
   const openReviewPicker = useCallback(() => {
     if (!user || rawDueToday.length === 0) return;

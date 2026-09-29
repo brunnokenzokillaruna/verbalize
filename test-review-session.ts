@@ -1,14 +1,9 @@
 /**
- * Smoke tests for passive-first review session selection.
+ * Review session selection: most overdue words first.
  * Run: npx tsx test-review-session.ts
  */
 import { isPassiveOnlyVocabulary, isVocabularyProduced } from './lib/vocabKnowledgeMode';
-import {
-  countPassiveOnlyInSession,
-  PASSIVE_REVIEW_WEIGHT,
-  pickReviewSession,
-  REVIEW_SESSION_SIZE,
-} from './utils/reviewSession';
+import { pickReviewSession, REVIEW_SESSION_SIZE } from './utils/reviewSession';
 import type { UserVocabularyDocument } from './types';
 
 function assert(condition: boolean, message: string) {
@@ -25,44 +20,68 @@ const base = {
   srsLevel: 2,
 };
 
-const passive: UserVocabularyDocument[] = Array.from({ length: 8 }, (_, i) => ({
-  ...base,
-  id: `p${i}`,
-  word: `passive-${i}`,
-  translation: `p${i}`,
-}));
-
-const produced: UserVocabularyDocument[] = Array.from({ length: 8 }, (_, i) => ({
-  ...base,
-  id: `a${i}`,
-  word: `active-${i}`,
-  translation: `a${i}`,
-  productionCount: 1,
-}));
-
-assert(isPassiveOnlyVocabulary(passive[0]), 'no productionCount is passive');
-assert(!isVocabularyProduced(passive[0]), 'passive is not produced');
-assert(isVocabularyProduced(produced[0]), 'productionCount marks produced');
-
-const mixed = [...passive, ...produced];
-let passiveHeavyRuns = 0;
-const runs = 200;
-
-for (let i = 0; i < runs; i++) {
-  const session = pickReviewSession(mixed, 6);
-  assert(session.length === 6, 'session size');
-  const passiveCount = countPassiveOnlyInSession(session);
-  if (passiveCount >= 4) passiveHeavyRuns++;
+function dueDaysAgo(daysAgo: number): UserVocabularyDocument['nextReview'] {
+  const ms = Date.UTC(2026, 0, 20) - daysAgo * 86_400_000;
+  return { seconds: Math.floor(ms / 1000), nanoseconds: 0 } as UserVocabularyDocument['nextReview'];
 }
 
+function word(
+  id: string,
+  daysAgo: number,
+  produced = false,
+): UserVocabularyDocument {
+  return {
+    ...base,
+    id,
+    word: id,
+    translation: id,
+    nextReview: dueDaysAgo(daysAgo),
+    ...(produced ? { productionCount: 1 } : {}),
+  };
+}
+
+const freshPassive = word('fresh-passive', 0);
+const weekOld = word('week-old', 7, true);
+const monthOld = word('month-old', 30, true);
+
+assert(isPassiveOnlyVocabulary(freshPassive), 'no productionCount is passive');
+assert(!isVocabularyProduced(freshPassive), 'passive is not produced');
+assert(isVocabularyProduced(weekOld), 'productionCount marks produced');
+
+const ranked = pickReviewSession([freshPassive, weekOld, monthOld], 2);
 assert(
-  passiveHeavyRuns / runs >= 0.7,
-  `passive-only words should dominate sessions (got ${passiveHeavyRuns}/${runs})`,
+  ranked.map((item) => item.word).join(',') === 'month-old,week-old',
+  'the most overdue words fill the session even when a newer one was never produced',
+);
+
+const sameDayPassive = word('same-passive', 4);
+const sameDayProduced = word('same-produced', 4, true);
+assert(
+  pickReviewSession([sameDayProduced, sameDayPassive], 1)[0].word === 'same-passive',
+  'passive-only wins only when the due dates match',
+);
+
+const pool = Array.from({ length: 15 }, (_, i) => word(`w${i}`, i, i % 2 === 0));
+const session = pickReviewSession(pool, 12);
+assert(session.length === 12, 'session size');
+assert(
+  session.every((item) => Number(item.word.slice(1)) >= 3),
+  'the three most recently due words stay out of a full session',
 );
 
 assert(
-  pickReviewSession(mixed.slice(0, 3), REVIEW_SESSION_SIZE).length === 3,
+  pickReviewSession(pool.slice(0, 3), REVIEW_SESSION_SIZE).length === 3,
   'short pool returns all items',
 );
 
-console.log(`✓ review session smoke tests passed (${PASSIVE_REVIEW_WEIGHT}× passive weight)`);
+const reshuffled = pickReviewSession(pool, 12, 1);
+assert(
+  reshuffled.map((item) => item.word).sort().join(',') === session.map((item) => item.word).sort().join(','),
+  'reshuffle keeps the same overdue words',
+);
+assert(
+  reshuffled.map((item) => item.word).join(',') !== session.map((item) => item.word).join(','),
+  'reshuffle changes the practice order',
+);
+
+console.log('✓ review session overdue-first tests passed');

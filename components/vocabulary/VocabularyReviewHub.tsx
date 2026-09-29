@@ -10,7 +10,7 @@ import {
   Loader2,
   Zap,
 } from 'lucide-react';
-import { REVIEW_SESSION_SIZE, countPassiveOnlyInSession } from '@/utils/reviewSession';
+import { REVIEW_SESSION_SIZE } from '@/utils/reviewSession';
 import { isPassiveOnlyVocabulary } from '@/lib/vocabKnowledgeMode';
 import { SRS_BAR_COLOR } from '@/components/vocabulary/SrsBar';
 import type { ReviewMode } from '@/hooks/useVocabReview';
@@ -133,23 +133,13 @@ export function VocabularyReviewHub({
   const [startingMode, setStartingMode] = useState<ReviewMode | null>(null);
 
   const sessionCount = sessionPreview.length;
-  const passiveInSession = countPassiveOnlyInSession(sessionPreview);
   const sessionsLeft = Math.ceil(dueCount / REVIEW_SESSION_SIZE);
   const reviewedToday = reviewedTodayCount;
   const totalToday = dueCount + reviewedToday;
   const remainingAfterSession = Math.max(0, dueCount - sessionCount);
-  const queueSubtitle = [
-    passiveInSession > 0
-      ? `${passiveInSession} ${passiveInSession === 1 ? 'priorizada' : 'priorizadas'} para produção`
-      : null,
-    remainingAfterSession > 0
-      ? `${remainingAfterSession} ficam para a próxima rodada`
-      : passiveInSession === 0
-        ? 'Todas as pendentes nesta sessão'
-        : null,
-  ]
-    .filter(Boolean)
-    .join(' · ');
+  const queueSubtitle = remainingAfterSession > 0
+    ? `As mais atrasadas entram primeiro · ${remainingAfterSession} ficam para a próxima rodada`
+    : 'Todas as pendentes nesta sessão';
 
   async function handleStart(mode: ReviewMode) {
     setStartingMode(mode);
@@ -281,7 +271,7 @@ export function VocabularyReviewHub({
                   borderColor: passiveOnly ? 'color-mix(in srgb, var(--color-primary) 35%, var(--color-border))' : 'var(--color-border)',
                   color: 'var(--color-text-primary)',
                 }}
-                title={passiveOnly ? 'Ainda não produzida — prioridade na revisão' : undefined}
+                title={passiveOnly ? 'Ainda não produzida' : undefined}
               >
                 <span
                   className="h-1.5 w-1.5 rounded-full shrink-0"

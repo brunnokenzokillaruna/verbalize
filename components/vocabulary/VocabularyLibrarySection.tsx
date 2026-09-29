@@ -130,22 +130,35 @@ export function VocabularyLibrarySection({
 
       <div className="px-5 pb-5 flex flex-col gap-4 border-t border-border pt-4">
         {/* SRS filters */}
-        <div className="flex gap-2 overflow-x-auto pb-0.5" style={{ scrollbarWidth: 'none' }}>
-          {srsFilters.map(({ key, label, count, active }) => (
+        <div className="flex items-center gap-2">
+          <div className="flex min-w-0 flex-1 gap-2 overflow-x-auto pb-0.5" style={{ scrollbarWidth: 'none' }}>
+            {srsFilters.map(({ key, label, count, active }) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => onSrsFilterChange(key)}
+                className={`duo-level-chip shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border cursor-pointer ${
+                  srsFilter === key
+                    ? `${active} shadow-sm`
+                    : 'bg-surface text-text-secondary border-border hover:bg-surface-raised'
+                }`}
+              >
+                {label}{' '}
+                <span className="text-[10px] opacity-75 font-extrabold">{count}</span>
+              </button>
+            ))}
+          </div>
+          {!isSearching && selectedLetter && (
             <button
-              key={key}
               type="button"
-              onClick={() => onSrsFilterChange(key)}
-              className={`duo-level-chip shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border cursor-pointer ${
-                srsFilter === key
-                  ? `${active} shadow-sm`
-                  : 'bg-surface text-text-secondary border-border hover:bg-surface-raised'
-              }`}
+              onClick={() => setSelectedLetter(null)}
+              aria-label="Voltar ao alfabeto"
+              className="duo-level-chip flex shrink-0 items-center gap-1 rounded-full border border-primary/25 bg-primary-light px-3 py-1.5 text-xs font-bold whitespace-nowrap text-primary dark:text-text-primary cursor-pointer hover:bg-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
-              {label}{' '}
-              <span className="text-[10px] opacity-75 font-extrabold">{count}</span>
+              <ArrowLeft size={13} strokeWidth={2.25} aria-hidden />
+              Voltar
             </button>
-          ))}
+          )}
         </div>
 
         {/* Recent preview */}
@@ -201,37 +214,6 @@ export function VocabularyLibrarySection({
         {/* Search / letter results */}
         {showResults && (
           <div className="flex flex-col gap-3 animate-slide-up">
-            {!isSearching && selectedLetter && (
-              <button
-                type="button"
-                onClick={() => setSelectedLetter(null)}
-                className="flex w-full min-h-14 items-center gap-3 rounded-xl border-2 border-b-[5px] px-4 py-3 text-left transition-transform cursor-pointer active:translate-y-0.5 active:border-b-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vocab"
-                style={{
-                  backgroundColor: 'var(--color-vocab-bg)',
-                  borderColor: 'var(--color-vocab)',
-                  color: 'var(--color-text-primary)',
-                }}
-              >
-                <span
-                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
-                  style={{
-                    backgroundColor: 'var(--color-vocab)',
-                    color: 'var(--color-text-inverse)',
-                  }}
-                  aria-hidden
-                >
-                  <ArrowLeft size={18} strokeWidth={2.5} />
-                </span>
-                <span className="min-w-0">
-                  <span className="block text-base font-extrabold leading-tight">
-                    Voltar ao alfabeto
-                  </span>
-                  <span className="mt-0.5 block text-xs font-semibold text-text-secondary">
-                    Sair da letra {selectedLetter.toUpperCase()}
-                  </span>
-                </span>
-              </button>
-            )}
             <div className="flex items-center justify-between gap-2">
               <p className="text-sm font-bold text-text-primary">
                 {isSearching ? (
