@@ -1,7 +1,7 @@
 'use client';
 
 import { SentenceBuilder } from './SentenceBuilder';
-import type { WordBankTranslationData } from '@/types';
+import type { SupportedLanguage, WordBankTranslationData } from '@/types';
 
 function normalize(s: string): string {
   return s.toLowerCase().replace(/[.,!?;:'"-]/g, '').replace(/\s+/g, ' ').trim();
@@ -17,6 +17,7 @@ function isWordBankCorrect(data: WordBankTranslationData, assembled: string): bo
 
 interface WordBankTranslationProps {
   data: WordBankTranslationData;
+  language?: SupportedLanguage;
   onAnswer: (correct: boolean) => void;
   answered: boolean;
   setIsExerciseReady: (ready: boolean) => void;
@@ -25,6 +26,7 @@ interface WordBankTranslationProps {
 
 export function WordBankTranslation({
   data,
+  language = 'fr',
   onAnswer,
   answered,
   setIsExerciseReady,
@@ -47,6 +49,7 @@ export function WordBankTranslation({
         )}
       </div>
       <SentenceBuilder
+        language={language}
         data={{
           words: data.words,
           correctOrder: data.correctOrder,

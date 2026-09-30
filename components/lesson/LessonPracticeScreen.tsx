@@ -95,7 +95,7 @@ export function LessonPracticeScreen({
       case 'context-choice':
         return <ContextChoiceExercise data={currentExercise.data} {...common} />;
       case 'sentence-builder':
-        return <SentenceBuilder data={currentExercise.data} {...common} />;
+        return <SentenceBuilder data={currentExercise.data} language={language} {...common} />;
       case 'reverse-translation':
         return (
           <ReverseTranslationInput
@@ -124,7 +124,7 @@ export function LessonPracticeScreen({
           />
         );
       case 'word-bank-translation':
-        return <WordBankTranslation data={currentExercise.data} {...common} />;
+        return <WordBankTranslation data={currentExercise.data} language={language} {...common} />;
       case 'bridge-choice':
         return <BridgeChoiceExercise data={currentExercise.data} {...common} />;
       case 'listen-and-select':

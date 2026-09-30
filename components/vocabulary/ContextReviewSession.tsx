@@ -146,6 +146,7 @@ export function ContextReviewSession({
           {exercise.type === 'word-bank-translation' && (
             <WordBankTranslation
               data={exercise.data}
+              language={language}
               onAnswer={onAnswer}
               answered={answered}
               setIsExerciseReady={setIsExerciseReady}

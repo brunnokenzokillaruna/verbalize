@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import type { SentenceBuilderData } from '@/types';
+import { buildWordTiles } from '@/lib/practiceExercises/wordTiles';
+import type { SentenceBuilderData, SupportedLanguage } from '@/types';
 import { Languages, XCircle } from 'lucide-react';
 
 interface SentenceBuilderProps {
   data: SentenceBuilderData;
+  language?: SupportedLanguage;
   onAnswer: (correct: boolean) => void;
   answered: boolean;
   setIsExerciseReady: (ready: boolean) => void;
@@ -20,20 +22,17 @@ function normalize(s: string): string {
 
 export function SentenceBuilder({ 
   data, 
+  language = 'fr',
   onAnswer, 
   answered,
   setIsExerciseReady,
   submitTrigger
 }: SentenceBuilderProps) {
   // Store the randomized list of words once, so they stay at static positions.
-  const [shuffled] = useState<string[]>(() => {
-    // Filter out items that are purely punctuation (like "?", ".", "!")
-    const wordsFromCorrect = data.correctOrder.filter(
-      w => !/^[.,!?;:'"-\s]+$/.test(w)
-    );
-    // Shuffle
-    return wordsFromCorrect.sort(() => Math.random() - 0.5);
-  });
+  const [shuffled] = useState<string[]>(() =>
+    buildWordTiles(data.correctOrder, data.words, language),
+  );
+  const hasSpareTiles = shuffled.length > data.correctOrder.filter((word) => !/^[.,!?;:'"-\s]+$/.test(word)).length;
 
   // Track the indices of selected words in the order they were selected.
   const [selectedIndices, setSelectedIndices] = useState<number[]>([]);
@@ -73,8 +72,8 @@ export function SentenceBuilder({
       // Add to selected (move to assembled)
       const newSelected = [...selectedIndices, index];
       setSelectedIndices(newSelected);
-      // Auto-check when all words are placed
-      if (newSelected.length === shuffled.length) {
+      // With spare tiles, the right answer leaves some words unused.
+      if (!hasSpareTiles && newSelected.length === shuffled.length) {
         const currentSentence = newSelected.map(idx => shuffled[idx]).join(' ');
         onAnswer(normalize(currentSentence) === normalize(correctAnswer));
       }
@@ -115,7 +114,7 @@ export function SentenceBuilder({
       >
         {selectedIndices.length === 0 ? (
           <p className="text-xs text-center font-bold opacity-30 text-[var(--color-text-muted)] uppercase tracking-[0.15em] leading-relaxed max-w-[250px] select-none">
-            Toque nas palavras abaixo para montar a frase
+            Toque nas palavras para montar a frase. Nem todas entram.
           </p>
         ) : (
           <div className="flex flex-wrap items-center justify-center gap-2.5 w-full">
