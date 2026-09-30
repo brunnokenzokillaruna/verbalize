@@ -5,10 +5,11 @@ import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { buildGrammarSteps } from '@/lib/grammarBridgeSteps';
 import { GrammarStepProgress } from './GrammarStepProgress';
 import { GrammarStepRenderer } from './GrammarStepRenderer';
+import { GrammarRevealState } from './reveal';
 import { useGrammarSwipe } from './useGrammarSwipe';
 import { useSoundEffects } from '@/hooks/useSoundEffects';
 import { devLog } from '@/lib/devLog';
-import type { GrammarBridgeResult, LessonTag, SupportedLanguage } from '@/types';
+import type { GrammarBridgeResult, LessonTag, SupportedLanguage, VocabImageResult } from '@/types';
 import type { WordClickPayload } from '../ClickableWord';
 
 interface GrammarBridgeFlowProps {
@@ -22,6 +23,7 @@ interface GrammarBridgeFlowProps {
   onAdvanceToPractice?: () => void;
   onQuizCorrect?: (correct: boolean) => void;
   previewMode?: boolean;
+  sceneImage?: VocabImageResult | null;
   /** True while practice exercises are still generating in the background. */
   isPreparingPractice?: boolean;
   /** True when the user already tapped advance and we're awaiting the session. */
@@ -41,6 +43,7 @@ export function GrammarBridgeFlow({
   onAdvanceToPractice,
   onQuizCorrect,
   previewMode = false,
+  sceneImage = null,
   isPreparingPractice = false,
   isAdvancingToPractice = false,
   exercisesReady = false,
@@ -139,6 +142,22 @@ export function GrammarBridgeFlow({
 
   if (steps.length === 0 || !currentStep) return null;
 
+  const hideApplyList = steps.some(
+    (step) =>
+      step.type === 'formula' ||
+      step.type === 'compare' ||
+      step.type === 'item' ||
+      step.type === 'pattern',
+  );
+  const hideSurvivalTip = steps.some((step) => step.type === 'synthesis');
+  const revealResetKey = [
+    language,
+    tag ?? '',
+    bridge.insight ?? '',
+    bridge.bridge?.target ?? '',
+    bridge.verbSpotlight?.infinitive ?? '',
+  ].join('|');
+
   const prefersReducedMotion =
     typeof window !== 'undefined' &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -162,24 +181,31 @@ export function GrammarBridgeFlow({
           currentIndex={currentIndex}
         />
 
-        <div
-          key={currentStep.id}
-          className={['flex w-full items-start justify-center', animationClass].join(' ')}
-          onAnimationEnd={() => setSlideDirection(null)}
-        >
-          <GrammarStepRenderer
-            step={currentStep}
-            language={language}
-            newVocabulary={newVocabulary}
-            newVerbs={newVerbs}
-            onWordClick={onWordClick}
-            onQuizAnswered={(correct) => {
-              setQuizAnswered(true);
-              onQuizCorrect?.(correct);
-            }}
-            onPlaySound={handlePlaySound}
-          />
-        </div>
+        <GrammarRevealState resetKey={revealResetKey}>
+          <div
+            key={currentStep.id}
+            className={['flex w-full items-start justify-center', animationClass].join(' ')}
+            onAnimationEnd={() => setSlideDirection(null)}
+          >
+            <GrammarStepRenderer
+              step={currentStep}
+              language={language}
+              tag={tag}
+              sceneImage={sceneImage}
+              hideApplyList={hideApplyList}
+              hideSurvivalTip={hideSurvivalTip}
+              verbInfinitive={tag === 'VERB' ? bridge.verbSpotlight?.infinitive : undefined}
+              newVocabulary={newVocabulary}
+              newVerbs={newVerbs}
+              onWordClick={onWordClick}
+              onQuizAnswered={(correct) => {
+                setQuizAnswered(true);
+                onQuizCorrect?.(correct);
+              }}
+              onPlaySound={handlePlaySound}
+            />
+          </div>
+        </GrammarRevealState>
 
         <div className="flex items-center justify-between gap-3 pt-1 sm:pt-2">
           <button

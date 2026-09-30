@@ -10,6 +10,8 @@ import { buildFocusCompletenessPromptBlock } from '@/lib/grammarBridge/focusComp
 import {
   formatIssuesForRegen,
   gateGrammarBridge,
+  salvageRejectedBridge,
+  type BridgeIssue,
 } from '@/lib/grammarBridge/verifyGrammarBridge';
 import { filterUniqueSurvivalTip } from '@/lib/grammarBridgeDedup';
 import type { SupportedLanguage, GrammarBridgeResult, LessonTag, LessonRole } from '@/types';
@@ -135,7 +137,14 @@ REGRAS EXTRA PARA LIÇÃO DE VERBO:
       : "Para inglês use separadamente exatamente: 'I, you, he, she, it, we, they'."
   }
 - verbSpotlight.idiomaticExpressions: FORNEÇA 1-2 expressões fixas reais, não invente. Se não houver expressão canônica com esse verbo, deixe como array vazio []. NUNCA misture palavras em português nos textos da língua-alvo (ex: "jouer avec le feu", NUNCA "jouer avec o feu").
-- verbSpotlight.personality e frequencyNote: linguagem SIMPLES, frases curtas, como amigo explicando.`;
+- verbSpotlight.personality e frequencyNote: linguagem SIMPLES, uma frase COMPLETA com ponto final. A frase tem de falar DESTE verbo (cite o infinitivo). PROIBIDO truque genérico que sirva para qualquer verbo ("decorar a forma", "muda conforme a pessoa"). Se não couber em 15 palavras sem cortar, escreva menos — nunca deixe a frase pela metade.
+- insight: UMA sacada que só existe para ESTE verbo (a irregularidade dele, o jeito que a forma muda, a confusão específica com o português). Cite o infinitivo. PROIBIDO insight que serviria para qualquer verbo, por exemplo "o presente serve para hábitos" ou "o verbo muda conforme a pessoa".
+- analogy: null, a menos que mencione ESTE verbo e termine com ponto final em até 20 palavras.
+- structureFormula: funções por extenso. Escreva [Sujeito], nunca [Suj] ou [Subj].
+- brazilianTrap nesta lição:
+  - wrongPortuguese: português NATURAL e gramatical, o pensamento do brasileiro ("Eu leio o livro"). NUNCA português quebrado ("Eu ler o livro", "Eu lire o livro").
+  - wrong: a frase ERRADA na língua-alvo que sai desse pensamento ("Je lire le livre"). Tem que ser um erro real com ESTE verbo, não uma frase aleatória.
+  - rightPortuguese: português natural da frase certa. Pode repetir o wrongPortuguese quando o pensamento está certo e só a forma na língua-alvo está errada.`;
 
   return { verbSpotlightBlock, verbRulesBlock };
 }
@@ -274,7 +283,7 @@ Output ONLY este JSON (sem markdown):
   ],
   "survivalTip": "Âncora memorizável (mnemônico), NÃO reexplica a regra. MAX 12 palavras.",
   "culturalNote": "Detalhe cultural real de uso. MAX 15 palavras.",
-  "structureFormula": "fórmula única quando há só UMA construção. Use colchetes e '+'. null se usar structureFormulas.",
+  "structureFormula": "fórmula única quando há só UMA construção. Use colchetes e '+'. Escreva [Sujeito], nunca [Suj]. null se usar structureFormulas.",
   "formulaExample": { "target": "Frase real que instancia a fórmula única", "portuguese": "Tradução natural PT-BR" },
   "structureFormulas": [
     {
@@ -292,10 +301,10 @@ Output ONLY este JSON (sem markdown):
   ],
   "usageContext": "Vibe social em 1-3 palavras (ex: 'Casual/Amigos').",
   "brazilianTrap": {
-    "wrong": "frase errada que um brasileiro diria/pensaria ao traduzir direto",
+    "wrong": "frase ERRADA na língua-alvo, o erro clássico do brasileiro com este ponto",
     "right": "frase CORRETA na língua-alvo",
-    "wrongPortuguese": "tradução PT-BR do que o brasileiro pensaria",
-    "rightPortuguese": "tradução PT-BR da frase correta",
+    "wrongPortuguese": "português natural e gramatical do que a pessoa pensa. NUNCA infinitivo quebrado tipo 'Eu ler'.",
+    "rightPortuguese": "tradução natural PT-BR da frase correta",
     "subtitle": "Subtítulo curto do erro",
     "explanation": "só o motivo do erro clássico. MAX 2 frases curtas."
   },
@@ -331,7 +340,7 @@ ${verbRulesBlock}
 Regras Cruciais:
 1. Se o tema for uma REGRA SISTÊMICA (ex: Plural, Passado), use 'bridge' e 'patterns' (2-3). Deixe 'items' como null.
 2. Se o tema for uma LISTA de expressões, preencha 'items' (máx. 3). Deixe 'bridge' e 'patterns' como null.
-3. brazilianTrap: FOQUE no erro clássico. SEMPRE preencha wrongPortuguese e rightPortuguese. right DEVE estar correto na língua-alvo.
+3. brazilianTrap: FOQUE no erro clássico DESTE ponto. wrongPortuguese é o pensamento em português natural e gramatical ("Eu leio o livro"), NUNCA português quebrado ("Eu ler o livro"). wrong é a frase errada na língua-alvo ("Je lire le livre"). right DEVE estar correto na língua-alvo. SEMPRE preencha wrongPortuguese e rightPortuguese.
 4. Destaque Visual: Use ^^ em bridge.target e bridge.portuguese.
 5. explanation: array de 1-2 strings em GRAM. Nunca repita insight nem bridge.difference.
 5b. structureFormulas: use quando a regra tiver 2+ construções. Cada item com label + hint + formula + example.
@@ -389,6 +398,8 @@ export async function generateGrammarBridge(
 
     let correctionBlock: string | undefined;
     let lastRaw: GrammarBridgeResult | null = null;
+    let lastNormalized: GrammarBridgeResult | null = null;
+    let lastIssues: BridgeIssue[] = [];
 
     for (let attempt = 0; attempt <= MAX_REGEN_ATTEMPTS; attempt++) {
       const prompt = buildUserPrompt({
@@ -413,12 +424,15 @@ export async function generateGrammarBridge(
 
       const normalized = finalizeBridge(raw, language, grammarFocus);
       if (!normalized) continue;
+      lastNormalized = normalized;
 
       const gate = await gateGrammarBridge(normalized, language, grammarFocus);
 
       if (gate.ok) {
         return gate.sanitized ?? normalized;
       }
+
+      lastIssues = gate.issues;
 
       console.warn(
         `[generateGrammarBridge] Attempt ${attempt + 1} failed accuracy gate:`,
@@ -434,6 +448,18 @@ ${formatIssuesForRegen(gate.issues)}
 JSON anterior (corrija o necessário, mantenha o que estiver certo):
 ${JSON.stringify(normalized)}
 `;
+    }
+
+    const salvaged = lastNormalized ? salvageRejectedBridge(lastNormalized, lastIssues) : null;
+    if (salvaged) {
+      const dropped = lastIssues
+        .filter((issue) => issue.severity === 'core')
+        .map((issue) => issue.field)
+        .join(', ');
+      console.warn(
+        `[generateGrammarBridge] Salvaged bridge after dropping rejected claims: ${dropped}`,
+      );
+      return finalizeBridge(salvaged, language, grammarFocus);
     }
 
     console.error(

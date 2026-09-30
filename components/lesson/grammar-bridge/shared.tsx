@@ -1,11 +1,35 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AudioPlayerButton } from '../AudioPlayerButton';
 import { ClickableSentence } from '../ClickableSentence';
+import { ClickableWord } from '../ClickableWord';
 import { BrazilFlag, LanguageFlag } from '@/components/LanguageFlag';
 import type { WordClickPayload } from '../ClickableWord';
 import type { GrammarBridgeResult, SupportedLanguage } from '@/types';
+import {
+  chipLabel,
+  colorizeExample,
+  formulaParts,
+  matchChipInExample,
+  segmentExample,
+  slotRole,
+  type SlotRole,
+} from '@/lib/grammarBridge/formulaSlots';
+
+const SLOT_TEXT: Record<SlotRole, string> = {
+  subject: 'rounded px-1 bg-[var(--color-primary-light)] text-[var(--color-primary-dark)]',
+  verb: 'rounded px-1 bg-[var(--color-vocab-bg)] text-[var(--color-vocab)]',
+  complement: 'rounded px-1 bg-[var(--color-success-bg)] text-[var(--color-success)]',
+};
+
+const SLOT_CLASS: Record<SlotRole, string> = {
+  subject:
+    'bg-[var(--color-primary-light)] text-[var(--color-primary-dark)] border border-[var(--color-primary)]/25',
+  verb: 'bg-[var(--color-vocab-bg)] text-[var(--color-vocab)] border border-[var(--color-vocab)]/35',
+  complement:
+    'bg-[var(--color-success-bg)] text-[var(--color-success)] border border-[var(--color-success)]/30',
+};
 
 export function GrammarFlagAvatar({
   variant,
@@ -69,6 +93,7 @@ export function TargetPhrase({
   onWordClick,
   className = '',
   highlightClassName,
+  emphasis,
 }: {
   text: string;
   language: SupportedLanguage;
@@ -77,9 +102,15 @@ export function TargetPhrase({
   onWordClick?: (payload: WordClickPayload) => void;
   className?: string;
   highlightClassName?: string;
+  emphasis?: string | null;
 }) {
   const clean = stripHighlights(text);
   const hasHighlights = text.includes('^^');
+  const emphasisIndex = emphasis ? clean.toLowerCase().indexOf(emphasis.toLowerCase()) : -1;
+  const emphasisRange =
+    emphasis && emphasisIndex >= 0
+      ? { start: emphasisIndex, end: emphasisIndex + emphasis.length }
+      : null;
 
   if (onWordClick) {
     return (
@@ -89,6 +120,7 @@ export function TargetPhrase({
         newVerbs={newVerbs}
         onWordClick={onWordClick}
         className={className}
+        emphasisRange={emphasisRange}
       />
     );
   }
@@ -104,26 +136,37 @@ export function TargetPhrase({
   return <p className={className}>{clean}</p>;
 }
 
-export function FormulaLine({ formula }: { formula: string }) {
-  const parts = formula.split(/\s*\+\s*/);
+export function FormulaLine({
+  formula,
+  activeIndex = null,
+  onSelect,
+}: {
+  formula: string;
+  activeIndex?: number | null;
+  onSelect?: (index: number) => void;
+}) {
+  const parts = formulaParts(formula);
   return (
     <div className="flex flex-wrap items-center justify-center gap-2">
       {parts.map((part, i) => {
-        const trimmedPart = part.trim();
-        const isVar = trimmedPart.startsWith('[') && trimmedPart.endsWith(']');
-        const cleanPart = isVar ? trimmedPart.slice(1, -1) : trimmedPart;
+        const role = slotRole(i, parts.length);
+        const selected = activeIndex === i;
+        const className = [
+          'px-2.5 py-1.5 rounded-xl text-xs font-bold shadow-sm',
+          SLOT_CLASS[role],
+          selected ? 'ring-2 ring-offset-1 ring-[var(--color-primary)]' : '',
+        ].join(' ');
+        const label = chipLabel(part);
 
         return (
           <div key={i} className="flex items-center gap-2">
-            <span
-              className={`px-2.5 py-1.5 rounded-xl text-xs font-bold shadow-sm ${
-                isVar
-                  ? 'bg-[var(--color-primary-light)]/20 text-[var(--color-primary-dark)] border border-[var(--color-primary)]/15'
-                  : 'bg-[var(--color-surface-raised)] text-[var(--color-text-primary)] border border-[var(--color-border)]'
-              }`}
-            >
-              {cleanPart}
-            </span>
+            {onSelect ? (
+              <button type="button" onClick={() => onSelect(i)} className={className} aria-pressed={selected}>
+                {label}
+              </button>
+            ) : (
+              <span className={className}>{label}</span>
+            )}
             {i < parts.length - 1 && (
               <span className="text-[var(--color-text-muted)] font-black text-xs px-0.5">+</span>
             )}
@@ -150,20 +193,54 @@ type FormulaBranch = {
   example?: { target: string; portuguese: string };
 };
 
+function ColoredExample({
+  chunks,
+  onWordClick,
+}: {
+  chunks: ReturnType<typeof colorizeExample>;
+  onWordClick?: (payload: WordClickPayload) => void;
+}) {
+  if (!chunks) return null;
+
+  return (
+    <p className="text-base font-bold leading-relaxed text-[var(--color-text-primary)]">
+      {chunks.map((chunk, index) => (
+        <span key={index}>
+          {index > 0 ? ' ' : null}
+          <span className={SLOT_TEXT[chunk.role]}>
+            {chunk.text.split(/(\s+)/).map((token, tokenIndex) =>
+              token.trim() ? (
+                <ClickableWord key={tokenIndex} word={token} onWordClick={onWordClick} />
+              ) : (
+                token
+              ),
+            )}
+          </span>
+        </span>
+      ))}
+    </p>
+  );
+}
+
 export function FormulaExampleCard({
   example,
+  formula,
   language,
   newVocabulary = [],
   newVerbs = [],
   onWordClick,
+  emphasis,
 }: {
   example: { target: string; portuguese: string };
+  formula?: string;
   language: SupportedLanguage;
   newVocabulary?: string[];
   newVerbs?: string[];
   onWordClick?: (payload: WordClickPayload) => void;
+  emphasis?: string | null;
 }) {
   const cleanTarget = stripHighlights(example.target);
+  const chunks = formula ? colorizeExample(formula, cleanTarget) : null;
 
   return (
     <div className="w-full max-w-md rounded-2xl bg-[var(--color-surface-raised)]/25 border border-[var(--color-border)]/60 p-4 flex flex-col gap-2.5 items-center text-center">
@@ -171,21 +248,160 @@ export function FormulaExampleCard({
         Exemplo na prática
       </span>
       <AudioPlayerButton text={cleanTarget} language={language} size="sm" />
-      <TargetPhrase
-        text={cleanTarget}
-        language={language}
-        newVocabulary={newVocabulary}
-        newVerbs={newVerbs}
-        onWordClick={onWordClick}
-        className="text-base font-bold text-[var(--color-text-primary)] leading-relaxed"
-        highlightClassName="bg-[var(--color-primary)] text-white px-1 py-0.5 rounded"
-      />
+      {chunks ? (
+        <ColoredExample chunks={chunks} onWordClick={onWordClick} />
+      ) : (
+        <TargetPhrase
+          text={cleanTarget}
+          language={language}
+          newVocabulary={newVocabulary}
+          newVerbs={newVerbs}
+          onWordClick={onWordClick}
+          emphasis={emphasis}
+          className="text-base font-bold text-[var(--color-text-primary)] leading-relaxed"
+          highlightClassName="bg-[var(--color-primary)] text-white px-1 py-0.5 rounded"
+        />
+      )}
       <p className="text-sm italic text-[var(--color-text-secondary)]">
         <HighlightedText
           text={example.portuguese}
           className="text-[var(--color-text-primary)] font-semibold not-italic"
         />
       </p>
+    </div>
+  );
+}
+
+function shuffleChips<T>(items: T[]): T[] {
+  const next = [...items];
+  for (let i = next.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [next[i], next[j]] = [next[j], next[i]];
+  }
+  return next;
+}
+
+function FormulaBuild({ formula, portuguese }: { formula: string; portuguese: string }) {
+  const parts = formulaParts(formula);
+  const [order, setOrder] = useState<number[] | null>(null);
+  const [picked, setPicked] = useState<number[]>([]);
+  const [status, setStatus] = useState<'idle' | 'ok' | 'retry'>('idle');
+
+  useEffect(() => {
+    const nextParts = formulaParts(formula);
+    setOrder(shuffleChips(nextParts.map((_, index) => index)));
+    setPicked([]);
+    setStatus('idle');
+  }, [formula]);
+
+  if (!order) return null;
+
+  const tap = (originalIndex: number) => {
+    if (status === 'ok' || picked.includes(originalIndex)) return;
+    const next = [...picked, originalIndex];
+    if (originalIndex !== next.length - 1) {
+      setPicked([]);
+      setStatus('retry');
+      return;
+    }
+    setPicked(next);
+    setStatus(next.length === parts.length ? 'ok' : 'idle');
+  };
+
+  const remaining = order.filter((index) => !picked.includes(index));
+
+  return (
+    <div className="w-full max-w-md flex flex-col gap-3 items-center">
+      <span className="grammar-step-label">Monte a fórmula</span>
+      <p className="text-sm text-center text-text-secondary">{portuguese}</p>
+      <div className="flex flex-wrap justify-center gap-2 min-h-[44px]">
+        {picked.map((index) => (
+          <span key={index} className={`px-2.5 py-1.5 rounded-xl text-xs font-bold ${SLOT_CLASS[slotRole(index, parts.length)]}`}>
+            {chipLabel(parts[index])}
+          </span>
+        ))}
+      </div>
+      <div className="flex flex-wrap justify-center gap-2">
+        {remaining.map((index) => (
+          <button
+            key={index}
+            type="button"
+            onClick={() => tap(index)}
+            className={`px-2.5 py-2 rounded-xl text-xs font-bold min-h-[44px] ${SLOT_CLASS[slotRole(index, parts.length)]}`}
+          >
+            {chipLabel(parts[index])}
+          </button>
+        ))}
+      </div>
+      {status === 'ok' && (
+        <p className="text-sm font-semibold text-[var(--color-success)] text-center">Nessa ordem.</p>
+      )}
+      {status === 'retry' && (
+        <p className="text-sm font-medium text-text-secondary text-center">
+          A ordem é a da fórmula. Tenta de novo.
+        </p>
+      )}
+    </div>
+  );
+}
+
+function FormulaBranchBlock({
+  branch,
+  showLabel,
+  language,
+  newVocabulary,
+  newVerbs,
+  onWordClick,
+}: {
+  branch: FormulaBranch;
+  showLabel: boolean;
+  language?: SupportedLanguage;
+  newVocabulary: string[];
+  newVerbs: string[];
+  onWordClick?: (payload: WordClickPayload) => void;
+}) {
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const parts = formulaParts(branch.formula);
+  const exampleTarget = branch.example?.target ?? '';
+  const emphasis =
+    activeIndex !== null && exampleTarget
+      ? matchChipInExample(parts[activeIndex] ?? '', exampleTarget)
+      : null;
+  const canBuild = Boolean(branch.example && segmentExample(branch.formula, exampleTarget));
+
+  return (
+    <div className="flex flex-col gap-3 items-center w-full">
+      {showLabel && branch.label && (
+        <div className="flex flex-col gap-1 items-center">
+          <span className="text-[10px] font-bold text-[var(--color-primary)] uppercase tracking-wide text-center">
+            {branch.label}
+          </span>
+          {branch.hint && (
+            <p className="text-xs text-[var(--color-text-muted)] text-center max-w-sm leading-relaxed">
+              {branch.hint}
+            </p>
+          )}
+        </div>
+      )}
+      <FormulaLine
+        formula={branch.formula}
+        activeIndex={activeIndex}
+        onSelect={(index) => setActiveIndex((current) => (current === index ? null : index))}
+      />
+      {language && branch.example && (
+          <FormulaExampleCard
+            example={branch.example}
+            formula={branch.formula}
+            language={language}
+          newVocabulary={newVocabulary}
+          newVerbs={newVerbs}
+          onWordClick={onWordClick}
+          emphasis={emphasis}
+        />
+      )}
+      {canBuild && branch.example && (
+        <FormulaBuild formula={branch.formula} portuguese={branch.example.portuguese} />
+      )}
     </div>
   );
 }
@@ -224,35 +440,18 @@ export function FormulaRenderer({
 
   if (branches.length === 0) return null;
 
-  const showExamples = Boolean(language);
-
   return (
     <div className="flex flex-col gap-5 items-center w-full">
       {branches.map((branch, i) => (
-        <div key={i} className="flex flex-col gap-3 items-center w-full">
-          {branch.label && branches.length > 1 && (
-            <div className="flex flex-col gap-1 items-center">
-              <span className="text-[10px] font-bold text-[var(--color-primary)] uppercase tracking-wide text-center">
-                {branch.label}
-              </span>
-              {branch.hint && (
-                <p className="text-xs text-[var(--color-text-muted)] text-center max-w-sm leading-relaxed">
-                  {branch.hint}
-                </p>
-              )}
-            </div>
-          )}
-          <FormulaLine formula={branch.formula} />
-          {showExamples && branch.example && (
-            <FormulaExampleCard
-              example={branch.example}
-              language={language!}
-              newVocabulary={newVocabulary}
-              newVerbs={newVerbs}
-              onWordClick={onWordClick}
-            />
-          )}
-        </div>
+        <FormulaBranchBlock
+          key={i}
+          branch={branch}
+          showLabel={branches.length > 1}
+          language={language}
+          newVocabulary={newVocabulary}
+          newVerbs={newVerbs}
+          onWordClick={onWordClick}
+        />
       ))}
     </div>
   );

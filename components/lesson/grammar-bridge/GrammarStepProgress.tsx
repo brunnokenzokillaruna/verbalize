@@ -26,19 +26,12 @@ export function GrammarStepProgress({
   const phaseLabel = GRAMMAR_PHASE_LABELS[step.phase];
   const stepNumber = Math.min(currentIndex + 1, allSteps.length);
   const total = allSteps.length;
-  const remaining = Math.max(total - stepNumber, 0);
 
   return (
     <div className="flex flex-col gap-2.5 sm:gap-3">
       <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
         <p className="text-xs font-semibold text-text-muted uppercase tracking-wide">
           {phaseLabel} · {stepNumber} de {total}
-          {remaining > 0 ? (
-            <span className="font-medium normal-case tracking-normal text-text-muted/80">
-              {' '}
-              · {remaining === 1 ? '1 restante' : `${remaining} restantes`}
-            </span>
-          ) : null}
         </p>
         <span className="text-xs font-bold text-primary truncate sm:max-w-[50%] sm:text-right">
           {step.label}

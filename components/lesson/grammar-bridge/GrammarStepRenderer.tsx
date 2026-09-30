@@ -15,12 +15,17 @@ import { CulturaStepView } from './steps/CulturaStepView';
 import { SynthesisStepView } from './steps/SynthesisStepView';
 import { QuizStepView } from './steps/QuizStepView';
 import type { GrammarStep } from '@/lib/grammarBridgeSteps';
-import type { SupportedLanguage } from '@/types';
+import type { LessonTag, SupportedLanguage, VocabImageResult } from '@/types';
 import type { WordClickPayload } from '../ClickableWord';
 
 interface GrammarStepRendererProps {
   step: GrammarStep;
   language: SupportedLanguage;
+  tag?: LessonTag;
+  sceneImage?: VocabImageResult | null;
+  hideApplyList?: boolean;
+  hideSurvivalTip?: boolean;
+  verbInfinitive?: string;
   newVocabulary?: string[];
   newVerbs?: string[];
   onWordClick?: (payload: WordClickPayload) => void;
@@ -31,6 +36,11 @@ interface GrammarStepRendererProps {
 export function GrammarStepRenderer({
   step,
   language,
+  tag,
+  sceneImage = null,
+  hideApplyList = false,
+  hideSurvivalTip = false,
+  verbInfinitive,
   newVocabulary = [],
   newVerbs = [],
   onWordClick,
@@ -43,13 +53,16 @@ export function GrammarStepRenderer({
         <RegraStepView
           step={step}
           language={language}
+          tag={tag}
+          verbInfinitive={verbInfinitive}
+          hideApplyList={hideApplyList}
           newVocabulary={newVocabulary}
           newVerbs={newVerbs}
           onWordClick={onWordClick}
         />
       );
     case 'cuidado':
-      return <CuidadoStepView step={step} />;
+      return <CuidadoStepView step={step} hideSurvivalTip={hideSurvivalTip} />;
     case 'formula':
       return (
         <FormulaStepView
@@ -95,6 +108,7 @@ export function GrammarStepRenderer({
           language={language}
           newVocabulary={newVocabulary}
           newVerbs={newVerbs}
+          sceneImage={sceneImage}
           onWordClick={onWordClick}
         />
       );

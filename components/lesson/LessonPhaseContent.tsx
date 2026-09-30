@@ -203,6 +203,7 @@ export function LessonPhaseContent({
           onQuizCorrect={(correct) => {
             if (correct) store.setBridgeQuizPassed(true);
           }}
+          sceneImage={store.sceneImage}
         />
       )}
 

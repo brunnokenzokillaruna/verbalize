@@ -3,12 +3,9 @@ import type { GrammarBridgeResult, SupportedLanguage } from '@/types';
 import { sanitizeBridgeExample } from '@/lib/grammarBridgeValidation';
 import { applyPtBrLocalizationFixes } from '@/lib/grammarBridge/ptBrLocalization';
 import { stripUndefinedDeep } from '@/utils/stripUndefined';
+import { limitToCompleteSentence } from '@/lib/grammarBridge/textClamp';
 
-const wordLimit = (max: number) =>
-  z.string().transform((s) => {
-    const words = s.trim().split(/\s+/);
-    return words.length <= max ? s.trim() : words.slice(0, max).join(' ');
-  });
+const wordLimit = (max: number) => z.string().transform((s) => limitToCompleteSentence(s, max));
 
 const bridgeRowSchema = z.object({
   portuguese: z.string(),

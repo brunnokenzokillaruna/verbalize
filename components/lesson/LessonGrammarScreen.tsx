@@ -2,7 +2,7 @@
 
 import { GrammarBridgeFlow } from './grammar-bridge/GrammarBridgeFlow';
 import { useLessonStore } from '@/store/lessonStore';
-import type { GrammarBridgeResult, LessonTag, SupportedLanguage } from '@/types';
+import type { GrammarBridgeResult, LessonTag, SupportedLanguage, VocabImageResult } from '@/types';
 import type { WordClickPayload } from './ClickableWord';
 
 interface LessonGrammarScreenProps {
@@ -16,6 +16,7 @@ interface LessonGrammarScreenProps {
   onComplete?: (complete: boolean) => void;
   onAdvanceToPractice?: () => void;
   onQuizCorrect?: (correct: boolean) => void;
+  sceneImage?: VocabImageResult | null;
 }
 
 export function LessonGrammarScreen({
@@ -29,6 +30,7 @@ export function LessonGrammarScreen({
   onComplete,
   onAdvanceToPractice,
   onQuizCorrect,
+  sceneImage = null,
 }: LessonGrammarScreenProps) {
   const isLoading = useLessonStore((s) => s.isLoading);
   const exercisesPrefetchStatus = useLessonStore((s) => s.exercisesPrefetchStatus);
@@ -65,6 +67,7 @@ export function LessonGrammarScreen({
         isPreparingPractice={isPreparingPractice}
         isAdvancingToPractice={isLoading}
         exercisesReady={exercisesReady}
+        sceneImage={sceneImage}
       />
     </div>
   );

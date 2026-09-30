@@ -280,6 +280,69 @@ export function stripSecondaryIssues(
   return next;
 }
 
+/**
+ * After regen is exhausted, drop claims the verifier rejected and keep the rest.
+ * A false trap or a false insight must not erase a valid conjugation table.
+ * Returns null when the verifier never ran, a required focus term is missing,
+ * or nothing teachable remains.
+ */
+export function salvageRejectedBridge(
+  bridge: GrammarBridgeResult,
+  issues: BridgeIssue[],
+): GrammarBridgeResult | null {
+  if (issues.some((issue) => issue.field === '_verifier')) return null;
+  if (issues.some((issue) => issue.severity === 'core' && issue.field === 'focusCompleteness')) {
+    return null;
+  }
+
+  const next: GrammarBridgeResult = {
+    ...bridge,
+    verbSpotlight: bridge.verbSpotlight ? { ...bridge.verbSpotlight } : undefined,
+    structureFormulas: bridge.structureFormulas ? [...bridge.structureFormulas] : undefined,
+  };
+
+  for (const issue of issues) {
+    if (issue.severity !== 'core') continue;
+    const field = issue.field;
+
+    if (field === 'insight' || field.startsWith('insight')) {
+      delete next.insight;
+      delete next.explanation;
+      delete next.analogy;
+      delete next.survivalTip;
+    } else if (field === 'brazilianTrap' || field.startsWith('brazilianTrap')) {
+      delete next.brazilianTrap;
+    } else if (field === 'bridge' || field.startsWith('bridge')) {
+      delete next.bridge;
+    } else if (field === 'retentionCheck' || field.startsWith('retentionCheck')) {
+      delete next.retentionCheck;
+    } else if (field === 'formulaExample' || field.startsWith('formulaExample')) {
+      delete next.formulaExample;
+    } else if (field === 'verbSpotlight.conjugationPreview' || field.startsWith('verbSpotlight.conjugationPreview')) {
+      if (next.verbSpotlight) {
+        next.verbSpotlight = { ...next.verbSpotlight, conjugationPreview: [] };
+      }
+    } else if (field.startsWith('structureFormulas[')) {
+      const index = Number(field.match(/structureFormulas\[(\d+)\]/)?.[1]);
+      if (Number.isInteger(index) && next.structureFormulas) {
+        next.structureFormulas = next.structureFormulas.filter((_, i) => i !== index);
+      }
+    }
+  }
+
+  const stripped = stripSecondaryIssues(next, issues);
+  const hasTeaching = Boolean(
+    stripped.verbSpotlight?.infinitive ||
+      stripped.bridge?.target ||
+      stripped.structureFormula ||
+      stripped.structureFormulas?.length ||
+      stripped.patterns?.length ||
+      stripped.items?.length,
+  );
+
+  return hasTeaching ? stripped : null;
+}
+
 export function extractBridgeClaims(
   bridge: GrammarBridgeResult,
   language: SupportedLanguage,

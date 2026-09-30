@@ -8,8 +8,11 @@ import {
   extractBridgeClaims,
   formatIssuesForRegen,
   stripSecondaryIssues,
+  salvageRejectedBridge,
 } from './lib/grammarBridge/verifyGrammarBridge';
 import { buildGrammarSteps } from './lib/grammarBridge/buildGrammarSteps';
+import { matchChipInExample, segmentExample, chipLabel, colorizeExample } from './lib/grammarBridge/formulaSlots';
+import { looksCutOff, limitToCompleteSentence, looksLikeBrokenPortuguese, mentionsVerb } from './lib/grammarBridge/textClamp';
 import {
   filterUniqueSurvivalTip,
   shouldIncludeSynthesis,
@@ -255,5 +258,88 @@ if (transfer?.type === 'transfer') {
     'Generalize step shows faithful PT for Lui-dislocation',
   );
 }
+
+assert(
+  segmentExample('[il faut] + [verbo no infinitivo]', 'Il faut ranger.')?.join('|') === 'Il faut|ranger.',
+  'segments a bracketed literal plus a slot name',
+);
+assert(
+  segmentExample('[Sujeito] + am / is / are + [número]', 'I am 25.')?.join('|') === 'I|am|25.',
+  'segments subject, verb alternative, and number',
+);
+assert(
+  segmentExample('[Sujeito] + [devoir conjugado]', 'Je dois ranger.') === null,
+  'skips the builder when a literal chip is absent from the example',
+);
+assert(matchChipInExample('am / is / are', 'She is 30.') === 'is', 'matches a verb alternative in the example');
+assert(matchChipInExample('[sujeito]', 'I am 25.') === null, 'a slot name does not highlight the example');
+
+const verbWithBadTrap: GrammarBridgeResult = {
+  insight: 'Prendre serve para tudo que entra no corpo.',
+  brazilianTrap: {
+    wrong: 'Je bois ce sirop.',
+    right: 'Je prends ce sirop.',
+    explanation: 'Remédio líquido também usa prendre.',
+  },
+  verbSpotlight: {
+    infinitive: 'prendre',
+    meaning: 'tomar / pegar',
+    personality: 'O verbo de quando você toma ou pega algo.',
+    conjugationPreview: [
+      { pronoun: 'je', form: 'prends' },
+      { pronoun: 'tu', form: 'prends' },
+      { pronoun: 'il', form: 'prend' },
+    ],
+  },
+};
+const salvaged = salvageRejectedBridge(verbWithBadTrap, [
+  {
+    field: 'insight',
+    severity: 'core',
+    problem: 'prendre is not used for every drink',
+  },
+  {
+    field: 'brazilianTrap',
+    severity: 'core',
+    problem: 'Je bois ce sirop is correct French',
+  },
+  {
+    field: 'insight',
+    severity: 'secondary',
+    problem: 'insight may not cover all structureFormulas uses',
+  },
+]);
+assert(salvaged !== null && !salvaged.insight && !salvaged.brazilianTrap, 'salvage drops the rejected trap and insight');
+assert(
+  salvaged?.verbSpotlight?.conjugationPreview?.length === 3,
+  'salvage keeps the conjugation table',
+);
+const salvagedSteps = salvaged ? buildGrammarSteps(salvaged, 'fr', 'VERB') : [];
+assert(
+  salvagedSteps.some((step) => step.type === 'conjugation' || step.type === 'verb-intro'),
+  'salvaged verb bridge still builds a grammar step',
+);
+assert(!salvagedSteps.some((step) => step.type === 'cuidado'), 'salvaged verb bridge has no error radar');
+
+assert(chipLabel('[Suj]') === 'Sujeito', 'expands Suj to Sujeito');
+assert(
+  colorizeExample('[Suj] + [verbo em -re conjugado] + [complemento]', 'Je lis le journal le matin.')
+    ?.map((chunk) => `${chunk.role}:${chunk.text}`)
+    .join('|') === 'subject:Je|verb:lis|complement:le journal le matin.',
+  'colors subject, verb, and complement in the example',
+);
+assert(
+  looksCutOff("é só encaixar o motor no"),
+  'flags a sentence cut before the end',
+);
+assert(
+  limitToCompleteSentence('Primeira frase curta. Segunda frase que passa do limite de palavras de propósito.', 4) ===
+    'Primeira frase curta.',
+  'keeps a finished sentence instead of slicing the next one',
+);
+assert(looksLikeBrokenPortuguese('Eu ler o livro.') === true, 'flags infinitive Portuguese as a fake thought');
+assert(looksLikeBrokenPortuguese('Eu leio o livro.') === false, 'keeps a conjugated Portuguese thought');
+assert(mentionsVerb('O presente serve para hábitos.', 'lire') === false, 'generic insight does not name lire');
+assert(mentionsVerb('Com lire, o eu vira je lis.', 'lire') === true, 'verb insight names lire');
 
 console.log('\nAll verify-grammar-bridge local tests passed.');

@@ -10,6 +10,8 @@ interface ClickableSentenceProps {
   newVerbs?: string[];
   onWordClick?: (payload: WordClickPayload) => void;
   narratedRange?: { start: number; end: number } | null;
+  emphasisRange?: { start: number; end: number } | null;
+  as?: 'p' | 'span';
   className?: string;
 }
 
@@ -50,8 +52,11 @@ export function ClickableSentence({
   newVerbs = [],
   onWordClick,
   narratedRange = null,
+  emphasisRange = null,
+  as = 'p',
   className = '',
 }: ClickableSentenceProps) {
+  const Tag = as;
   type Token =
     | { type: 'separator'; value: string; start: number; end: number }
     | { type: 'word'; value: string; start: number; end: number };
@@ -80,7 +85,7 @@ export function ClickableSentence({
   }
 
   return (
-    <p
+    <Tag
       className={`lesson-text leading-[1.9] ${className}`}
       style={{ color: 'var(--color-text-primary)' }}
     >
@@ -94,6 +99,10 @@ export function ClickableSentence({
           !!narratedRange &&
           token.start < narratedRange.end &&
           token.end > narratedRange.start;
+        const marked =
+          !!emphasisRange &&
+          token.start < emphasisRange.end &&
+          token.end > emphasisRange.start;
         return (
           <ClickableWord
             key={i}
@@ -101,10 +110,11 @@ export function ClickableSentence({
             isNewVocabulary={matchesVocab(clean, newVocabulary)}
             isNewVerb={matchesVocab(clean, newVerbs)}
             isNarrating={isNarrating}
+            marked={marked}
             onWordClick={onWordClick}
           />
         );
       })}
-    </p>
+    </Tag>
   );
 }

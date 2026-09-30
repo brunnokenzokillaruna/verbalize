@@ -15,6 +15,7 @@ interface ClickableWordProps {
   isNewVerb?: boolean;
   isPunctuation?: boolean;
   isNarrating?: boolean;
+  marked?: boolean;
   onWordClick?: (payload: WordClickPayload) => void;
 }
 
@@ -24,6 +25,7 @@ export function ClickableWord({
   isNewVerb = false,
   isPunctuation = false,
   isNarrating = false,
+  marked = false,
   onWordClick,
 }: ClickableWordProps) {
   const [ripple, setRipple] = useState(false);
@@ -59,7 +61,7 @@ export function ClickableWord({
           color: mainColor,
           borderBottom: `2px solid ${ripple || isNarrating ? mainColor : rippleBorderColor}`,
           fontWeight: 700,
-          backgroundColor: isNarrating
+          backgroundColor: isNarrating || marked
             ? 'var(--color-primary-light)'
             : ripple
               ? bgColor
@@ -98,14 +100,14 @@ export function ClickableWord({
       className="inline-block cursor-pointer select-none rounded px-0.5 transition-all duration-150 hover:bg-[var(--color-surface-raised)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-primary"
       style={{
         color: 'var(--color-text-primary)',
-        backgroundColor: isNarrating
+        backgroundColor: isNarrating || marked
           ? 'var(--color-primary-light)'
           : 'transparent',
-        boxShadow: isNarrating
+        boxShadow: isNarrating || marked
           ? '0 0 0 2px var(--color-primary-light)'
           : undefined,
         transform: isNarrating ? 'translateY(-1px)' : undefined,
-        fontWeight: isNarrating ? 700 : undefined,
+        fontWeight: isNarrating || marked ? 700 : undefined,
       }}
       aria-label={`Traduzir: ${word}`}
       aria-current={isNarrating ? 'true' : undefined}
