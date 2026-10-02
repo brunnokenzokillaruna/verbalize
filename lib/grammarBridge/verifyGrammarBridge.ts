@@ -12,6 +12,7 @@ import {
   looksLikePortugueseInTargetField,
 } from '@/lib/grammarBridgeValidation';
 import { findMissingFocusTerms } from '@/lib/grammarBridge/focusCompleteness';
+import { regraTeachingGap } from '@/lib/grammarBridge/regraContent';
 
 export type BridgeIssueSeverity = 'core' | 'secondary';
 
@@ -191,6 +192,31 @@ export function collectLocalBridgeIssues(
         issues.push(...targetFieldIssues('retentionCheck.correctOption', marked, language, 'core'));
       }
     }
+  }
+
+  const teachingGap = regraTeachingGap({
+    tag: bridge.verbSpotlight?.infinitive ? 'VERB' : undefined,
+    verbInfinitive: bridge.verbSpotlight?.infinitive,
+    insight: bridge.insight,
+    analogy: bridge.analogy,
+    usageContext: bridge.usageContext,
+    culturalNote: bridge.culturalNote,
+    difference: bridge.bridge?.difference,
+    explanationItems: Array.isArray(bridge.explanation)
+      ? bridge.explanation
+      : bridge.explanation
+        ? [bridge.explanation]
+        : [],
+    hideApplyList: false,
+  });
+  if (teachingGap) {
+    issues.push({
+      field: 'regra',
+      severity: 'core',
+      problem: teachingGap,
+      fixHint:
+        'Escreva insight em 1-2 frases completas que expliquem ESTA regra. Em lição de verbo, cite o infinitivo ou a forma da frase. bridge.difference compara os dois exemplos. usageContext continua sendo só um rótulo de 1-3 palavras.',
+    });
   }
 
   const formulas = bridge.structureFormulas ?? [];

@@ -12,7 +12,8 @@ import {
 } from './lib/grammarBridge/verifyGrammarBridge';
 import { buildGrammarSteps } from './lib/grammarBridge/buildGrammarSteps';
 import { matchChipInExample, segmentExample, chipLabel, colorizeExample } from './lib/grammarBridge/formulaSlots';
-import { looksCutOff, limitToCompleteSentence, looksLikeBrokenPortuguese, mentionsVerb } from './lib/grammarBridge/textClamp';
+import { looksCutOff, limitToCompleteSentence, looksLikeBrokenPortuguese, mentionsVerb, isUsableTeachingText } from './lib/grammarBridge/textClamp';
+import { resolveRegraContent, regraTeachingGap } from './lib/grammarBridge/regraContent';
 import {
   filterUniqueSurvivalTip,
   shouldIncludeSynthesis,
@@ -341,5 +342,71 @@ assert(looksLikeBrokenPortuguese('Eu ler o livro.') === true, 'flags infinitive 
 assert(looksLikeBrokenPortuguese('Eu leio o livro.') === false, 'keeps a conjugated Portuguese thought');
 assert(mentionsVerb('O presente serve para hábitos.', 'lire') === false, 'generic insight does not name lire');
 assert(mentionsVerb('Com lire, o eu vira je lis.', 'lire') === true, 'verb insight names lire');
+assert(mentionsVerb("O eu vira j'écris.", 'écrire') === true, 'conjugated écrire still names the verb');
+assert(mentionsVerb('Écrire perde o s final.', 'ecrire') === true, 'accent-insensitive infinitive match');
+assert(mentionsVerb('O presente serve para hábitos.', 'écrire') === false, 'generic insight does not name écrire');
+assert(isUsableTeachingText('é só encaixar o motor no') === false, 'hanging word is not a usable rule');
+assert(
+  isUsableTeachingText("Em francês o sujeito já está dentro de j'écris") === true,
+  'finished clause without a period stays',
+);
+
+const ecrireRegra = resolveRegraContent({
+  tag: 'VERB',
+  verbInfinitive: 'écrire',
+  insight: "O eu de escrever vira j'écris.",
+  usageContext: 'Casual, Amigos',
+  difference: "Em francês o sujeito já está dentro de j'écris",
+  explanationItems: ['Complete com a forma da pessoa.'],
+  hideApplyList: true,
+});
+assert(ecrireRegra.showRuleReveal, 'écrire regra still has a rule to reveal');
+assert(
+  ecrireRegra.differenceText.includes("j'écris"),
+  'difference stays even without a period or the infinitive spelled out',
+);
+assert(ecrireRegra.insightText.includes('écris'), 'insight about the conjugated form is kept');
+
+const hollowRegra = resolveRegraContent({
+  tag: 'VERB',
+  verbInfinitive: 'écrire',
+  insight: 'O presente serve para hábitos.',
+  usageContext: 'Casual, Amigos',
+  difference: 'é só encaixar o motor no',
+  explanationItems: [],
+  hideApplyList: true,
+});
+assert(hollowRegra.showRuleReveal, 'a finished sentence still opens instead of the vibe chip');
+assert(hollowRegra.usedUnscopedInsight, 'generic insight is only a last resort');
+assert(
+  regraTeachingGap({
+    tag: 'VERB',
+    verbInfinitive: 'écrire',
+    insight: 'O presente serve para hábitos.',
+    usageContext: 'Casual, Amigos',
+    difference: 'é só encaixar o motor no',
+    explanationItems: [],
+    hideApplyList: true,
+  }) !== null,
+  'generation rejects a rule that does not name the verb',
+);
+assert(
+  collectLocalBridgeIssues(
+    { usageContext: 'Casual, Amigos', insight: '' },
+    'fr',
+  ).some((issue) => issue.field === 'regra'),
+  'a label-only bridge fails the local gate',
+);
+assert(
+  resolveRegraContent({
+    tag: 'VERB',
+    verbInfinitive: 'lire',
+    insight: 'O presente serve para hábitos.',
+    difference: 'Je lis já traz a pessoa.',
+    explanationItems: [],
+    hideApplyList: true,
+  }).insightText === '',
+  'generic insight stays hidden when the difference already teaches',
+);
 
 console.log('\nAll verify-grammar-bridge local tests passed.');

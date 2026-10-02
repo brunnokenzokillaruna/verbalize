@@ -12,6 +12,7 @@ import {
   resolveFormulaStepData,
   splitConjugationSteps,
 } from '@/lib/grammarBridge/helpers';
+import { resolveRegraContent } from '@/lib/grammarBridge/regraContent';
 import type { StepDraft } from '@/lib/grammarBridge/types';
 
 export function pushRegraStep(
@@ -20,16 +21,25 @@ export function pushRegraStep(
   tag?: LessonTag,
 ): void {
   const sacadaHasCulture = tag === 'DIAL' || tag === 'CULT';
-  const hasInsight = Boolean(bridge.insight || bridge.usageContext);
   const hasBridge = Boolean(bridge.bridge?.portuguese && bridge.bridge?.target);
-
-  if (!hasInsight && !hasBridge) return;
-
   const explanationItems = filterUniqueExplanation(
     bridge.insight,
     bridge.bridge?.difference,
     bridge.explanation,
   );
+  const content = resolveRegraContent({
+    tag,
+    verbInfinitive: bridge.verbSpotlight?.infinitive,
+    insight: bridge.insight,
+    analogy: bridge.analogy,
+    usageContext: bridge.usageContext,
+    culturalNote: sacadaHasCulture ? bridge.culturalNote : undefined,
+    difference: bridge.bridge?.difference,
+    explanationItems,
+    hideApplyList: false,
+  });
+
+  if (!content.showRuleReveal && !content.showMore && !hasBridge) return;
 
   drafts.push({
     id: 'regra',

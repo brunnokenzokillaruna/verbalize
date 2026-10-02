@@ -138,7 +138,8 @@ REGRAS EXTRA PARA LIÇÃO DE VERBO:
   }
 - verbSpotlight.idiomaticExpressions: FORNEÇA 1-2 expressões fixas reais, não invente. Se não houver expressão canônica com esse verbo, deixe como array vazio []. NUNCA misture palavras em português nos textos da língua-alvo (ex: "jouer avec le feu", NUNCA "jouer avec o feu").
 - verbSpotlight.personality e frequencyNote: linguagem SIMPLES, uma frase COMPLETA com ponto final. A frase tem de falar DESTE verbo (cite o infinitivo). PROIBIDO truque genérico que sirva para qualquer verbo ("decorar a forma", "muda conforme a pessoa"). Se não couber em 15 palavras sem cortar, escreva menos — nunca deixe a frase pela metade.
-- insight: UMA sacada que só existe para ESTE verbo (a irregularidade dele, o jeito que a forma muda, a confusão específica com o português). Cite o infinitivo. PROIBIDO insight que serviria para qualquer verbo, por exemplo "o presente serve para hábitos" ou "o verbo muda conforme a pessoa".
+- insight: UMA sacada que só existe para ESTE verbo (a irregularidade dele, o jeito que a forma muda, a confusão específica com o português). Cite o infinitivo ou a forma conjugada da frase-exemplo. PROIBIDO insight que serviria para qualquer verbo, por exemplo "o presente serve para hábitos" ou "o verbo muda conforme a pessoa".
+- bridge.difference: frase completa comparando os dois exemplos. Sem ela, a tela de "A regra" só mostra o rótulo usageContext — isso é erro.
 - analogy: null, a menos que mencione ESTE verbo e termine com ponto final em até 20 palavras.
 - structureFormula: funções por extenso. Escreva [Sujeito], nunca [Suj] ou [Subj].
 - brazilianTrap nesta lição:
@@ -299,7 +300,7 @@ Output ONLY este JSON (sem markdown):
       "example": { "target": "Je dois ranger.", "portuguese": "Eu preciso organizar." }
     }
   ],
-  "usageContext": "Vibe social em 1-3 palavras (ex: 'Casual/Amigos').",
+  "usageContext": "Rótulo de 1-3 palavras do contexto DESTA frase (ex: 'No trabalho'). Nunca copie um exemplo genérico. Este campo NÃO substitui insight.",
   "brazilianTrap": {
     "wrong": "frase ERRADA na língua-alvo, o erro clássico do brasileiro com este ponto",
     "right": "frase CORRETA na língua-alvo",

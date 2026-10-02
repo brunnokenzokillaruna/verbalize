@@ -4,7 +4,7 @@ import { ArrowRight } from 'lucide-react';
 import { AudioPlayerButton } from '../../AudioPlayerButton';
 import { GrammarFlagAvatar, stripHighlights, TargetPhrase } from '../shared';
 import { RevealOnTap } from '../reveal';
-import { looksCutOff, mentionsVerb } from '@/lib/grammarBridge/textClamp';
+import { resolveRegraContent } from '@/lib/grammarBridge/regraContent';
 import type { RegraStep } from '@/lib/grammarBridgeSteps';
 import type { LessonTag, SupportedLanguage } from '@/types';
 import type { WordClickPayload } from '../../ClickableWord';
@@ -90,23 +90,30 @@ export function RegraStepView({
   onWordClick,
 }: RegraStepViewProps) {
   const { insight, analogy, usageContext, culturalNote, bridge, explanationItems } = step.data;
-  const verbSpecific = tag === 'VERB';
-  const keepForVerb = (text: string | undefined) =>
-    !verbSpecific || mentionsVerb(text, verbInfinitive);
-  const insightText = keepForVerb(insight) ? insight : '';
-  const analogyText = looksCutOff(analogy) || !keepForVerb(analogy) ? '' : analogy;
-  const differenceText =
-    bridge?.difference && keepForVerb(bridge.difference) && !looksCutOff(bridge.difference)
-      ? bridge.difference
-      : '';
-  const cultureFirst = (tag === 'DIAL' || tag === 'CULT') && Boolean(culturalNote || usageContext);
-  const visibleItems = hideApplyList ? [] : explanationItems;
-  const showMore = Boolean(analogyText || visibleItems.length > 0 || (!cultureFirst && culturalNote));
+  const {
+    insightText,
+    analogyText,
+    differenceText,
+    visibleItems,
+    cultureFirst,
+    showRuleReveal,
+    showMore,
+  } = resolveRegraContent({
+    tag,
+    verbInfinitive,
+    insight,
+    analogy,
+    usageContext,
+    culturalNote,
+    difference: bridge?.difference,
+    explanationItems,
+    hideApplyList,
+  });
 
   if (!bridge) {
     return (
       <div className="flex flex-col gap-4 sm:gap-5 px-1 w-full max-w-lg mx-auto">
-        {(usageContext || insightText) && (
+        {(insightText || analogyText) && (
           <div className="flex flex-col items-center gap-2 text-center">
             {usageContext && (
               <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-primary/10 text-primary border border-primary/15">
@@ -160,7 +167,7 @@ export function RegraStepView({
         onWordClick={onWordClick}
       />
 
-      {cultureFirst && (
+      {cultureFirst && culturalNote && (
         <RevealOnTap revealKey={`${step.id}-culture`} label="O que isso mostra?">
           {usageContext && (
             <span className="self-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-primary/10 text-primary border border-primary/15">
@@ -176,16 +183,11 @@ export function RegraStepView({
         </RevealOnTap>
       )}
 
-      {(differenceText || insightText || (!cultureFirst && usageContext)) && (
+      {showRuleReveal && (
         <RevealOnTap
           revealKey={`${step.id}-difference`}
           label={differenceText ? 'Qual a diferença?' : 'Qual a sacada?'}
         >
-          {!cultureFirst && usageContext && (
-            <span className="self-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-primary/10 text-primary border border-primary/15">
-              ✦ {usageContext}
-            </span>
-          )}
           {differenceText && (
             <div className="rounded-xl border border-border/40 bg-surface-raised/20 px-4 py-3">
               <span className="grammar-step-label block mb-1.5">A diferença</span>
@@ -197,6 +199,11 @@ export function RegraStepView({
               <span className="grammar-step-label text-primary">A Sacada Central</span>
               <p className="grammar-secondary font-medium text-text-primary leading-snug">{insightText}</p>
             </div>
+          )}
+          {!cultureFirst && usageContext && (
+            <span className="self-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-primary/10 text-primary border border-primary/15">
+              ✦ {usageContext}
+            </span>
           )}
         </RevealOnTap>
       )}

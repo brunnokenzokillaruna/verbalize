@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { AudioPlayerButton } from '../../AudioPlayerButton';
 import { getVocabImage } from '@/app/actions/getVocabImage';
-import { looksCutOff, mentionsVerb } from '@/lib/grammarBridge/textClamp';
+import { isUsableTeachingText, mentionsVerb } from '@/lib/grammarBridge/textClamp';
 import type { VerbIntroStep } from '@/lib/grammarBridgeSteps';
 import type { SupportedLanguage } from '@/types';
 
@@ -16,8 +16,8 @@ export function VerbIntroStepView({
 }) {
   const { infinitive, meaning, personality, frequencyNote } = step.data;
   const personalityText =
-    looksCutOff(personality) || !mentionsVerb(personality, infinitive) ? '' : personality;
-  const noteText = looksCutOff(frequencyNote) ? '' : frequencyNote;
+    !isUsableTeachingText(personality) || !mentionsVerb(personality, infinitive) ? '' : personality;
+  const noteText = isUsableTeachingText(frequencyNote) ? frequencyNote : '';
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
