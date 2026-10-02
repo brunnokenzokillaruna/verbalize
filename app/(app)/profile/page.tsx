@@ -150,10 +150,13 @@ export default function ProfilePage() {
               onDelete={() => setShowDeleteSheet(true)}
             />
             {profile.email === ADMIN_EMAIL && (
-              <section className="rounded-2xl border border-border bg-surface p-5 flex flex-col gap-4">
-                <SectionLabel>Admin · cache de imagens</SectionLabel>
-                <ImageCacheManager />
-              </section>
+              <section className="rounded-2xl border border-border bg-surface p-5 flex flex-col gap-3">
+              <SectionLabel>Admin · revisar imagens</SectionLabel>
+              <p className="text-sm text-text-muted">
+                Percorra cada foto do vocabulário. Boa fica disponível para os alunos. Não combina tira a foto do ar e abre outras opções.
+              </p>
+              <ImageCacheManager />
+            </section>
             )}
           </div>
         )}

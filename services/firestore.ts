@@ -27,6 +27,7 @@ import type { UserDocument, UserVocabularyDocument, ImageCacheDocument, VerbDocu
 import { calculateNextReview } from '@/lib/srs';
 import { isDueForReview, isReviewedToday, formatLocalDay } from '@/utils/vocabPageHelpers';
 import { getNextLessonId, getLessonsForLanguage, getLessonById } from '@/lib/curriculum';
+import { urlsAreSamePhoto } from '@/utils/canonicalImageKey';
 import {
   buildCurriculumSyncNotice,
   buildUserCurriculumMigrationUpdates,
@@ -1064,10 +1065,17 @@ export async function getCachedImage(word: string): Promise<ImageCacheDocument |
 }
 
 export async function saveImageCache(word: string, data: Omit<ImageCacheDocument, 'word' | 'createdAt'>) {
-  await setDoc(doc(await getDb(), 'image_cache', word), stripUndefinedDeep({
+  const ref = doc(await getDb(), 'image_cache', word);
+  const existing = await getDoc(ref);
+  const previous = existing.exists() ? (existing.data() as ImageCacheDocument) : null;
+  const rejectedImageUrls = (previous?.rejectedImageUrls ?? []).filter(
+    (url) => !urlsAreSamePhoto(url, data.imageUrl),
+  );
+  await setDoc(ref, stripUndefinedDeep({
     ...data,
     word,
-    createdAt: serverTimestamp(),
+    rejectedImageUrls,
+    createdAt: previous?.createdAt ?? serverTimestamp(),
   }));
 }
 
@@ -1081,11 +1089,30 @@ export async function updateImageCache(
   imageUrl: string,
   photographer: string,
 ): Promise<void> {
-  await updateDoc(doc(await getDb(), 'image_cache', word), { imageUrl, photographer });
+  const ref = doc(await getDb(), 'image_cache', word);
+  const snap = await getDoc(ref);
+  const previous = snap.exists() ? (snap.data() as ImageCacheDocument) : null;
+  const rejected = new Set(previous?.rejectedImageUrls ?? []);
+  if (previous?.imageUrl && !urlsAreSamePhoto(previous.imageUrl, imageUrl)) {
+    rejected.add(previous.imageUrl);
+  }
+  const rejectedImageUrls = [...rejected].filter((url) => !urlsAreSamePhoto(url, imageUrl));
+  await updateDoc(ref, { imageUrl, photographer, approved: true, rejectedImageUrls });
 }
 
 export async function approveImageCache(word: string): Promise<void> {
   await updateDoc(doc(await getDb(), 'image_cache', word), { approved: true });
+}
+
+/** Marks the current photo as a bad match and keeps it out of future searches. */
+export async function rejectImageCache(word: string, imageUrl: string): Promise<void> {
+  const ref = doc(await getDb(), 'image_cache', word);
+  const snap = await getDoc(ref);
+  const previous = snap.exists() ? ((snap.data() as ImageCacheDocument).rejectedImageUrls ?? []) : [];
+  const rejectedImageUrls = previous.some((url) => urlsAreSamePhoto(url, imageUrl))
+    ? previous
+    : [...previous, imageUrl];
+  await updateDoc(ref, { approved: false, rejectedImageUrls });
 }
 
 export async function updateImageCacheTranslation(word: string, translation: string): Promise<void> {

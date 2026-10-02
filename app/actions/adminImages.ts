@@ -4,6 +4,7 @@ import {
   getAllImageCache,
   updateImageCache,
   approveImageCache,
+  rejectImageCache,
   updateImageCacheTranslation,
 } from '@/services/firestore';
 import { searchPexels } from '@/services/pexels';
@@ -175,6 +176,10 @@ export async function replaceImageCacheEntry(
 
 export async function approveImageCacheEntry(cacheKey: string): Promise<void> {
   await approveImageCache(cacheKey);
+}
+
+export async function rejectImageCacheEntry(cacheKey: string, imageUrl: string): Promise<void> {
+  await rejectImageCache(cacheKey, imageUrl);
 }
 
 /**

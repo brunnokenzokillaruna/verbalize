@@ -8,6 +8,10 @@ import {
   pickValidatedPhoto,
 } from '@/lib/vocabImageSearch';
 import { urlsAreSamePhoto } from '@/utils/canonicalImageKey';
+
+function isRejectedPhoto(url: string, rejected: string[] = []): boolean {
+  return rejected.some((blocked) => urlsAreSamePhoto(blocked, url));
+}
 import type { SupportedLanguage, VocabImageResult } from '@/types';
 
 function buildImageCachePayload(
@@ -55,12 +59,13 @@ export async function getVocabImage(
     const translation = options?.translation?.trim();
     const keywordHint = options?.precomputedKeyword ?? precomputedKeyword;
     const cached = await getCachedImage(cacheKey);
+    const blocked = [...excludeUrls, ...(cached?.rejectedImageUrls ?? [])];
 
     if (
       options?.allowCached !== false &&
       cached?.approved &&
       cached.imageUrl &&
-      !excludeUrls.some((excluded) => urlsAreSamePhoto(excluded, cached.imageUrl))
+      !isRejectedPhoto(cached.imageUrl, blocked)
     ) {
       return { imageUrl: cached.imageUrl, imageAlt: cached.photographer };
     }
@@ -80,7 +85,7 @@ export async function getVocabImage(
       language,
       keyword,
       translation,
-      excludeUrls,
+      blocked,
     );
 
     if (validated) {
@@ -106,7 +111,7 @@ export async function getVocabImage(
           language,
           fallbackKeyword,
           translation,
-          excludeUrls,
+          blocked,
         );
         if (fallbackValidated) {
           await saveImageCache(cacheKey, buildImageCachePayload(
@@ -128,7 +133,7 @@ export async function getVocabImage(
         language,
         keyword,
         translation,
-        excludeUrls,
+        blocked,
         true,
       );
       const loose = loosePrimary ?? (fallbackCandidates.length > 0
@@ -138,7 +143,7 @@ export async function getVocabImage(
             language,
             fallbackKeyword,
             translation,
-            excludeUrls,
+            blocked,
             true,
           )
         : null);

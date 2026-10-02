@@ -104,6 +104,8 @@ export interface ImageCacheDocument {
   photographer: string;
   createdAt: Timestamp;
   approved?: boolean;    // true = validated for learners
+  /** Photos an admin rejected. Later searches must not put these back. */
+  rejectedImageUrls?: string[];
   translation?: string;  // pt-BR meaning used for image search
   searchKeyword?: string;
   /** vocab = word flashcard; lesson_scene = shared cover/dialogue scene */

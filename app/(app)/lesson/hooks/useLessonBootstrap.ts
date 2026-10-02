@@ -106,7 +106,7 @@ async function buildVocabImagePool(
     missing.map(async (item) => {
       const cacheKey = `${sanitizeVocabularyToken(item.word)}_${language}`;
       const cached = await getCachedImage(cacheKey).catch(() => null);
-      if (!cached?.imageUrl) return null;
+      if (!cached?.approved || !cached.imageUrl) return null;
       return poolItemFromVocabDoc(item, cached.imageUrl);
     }),
   );

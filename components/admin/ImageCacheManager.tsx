@@ -10,18 +10,49 @@ import {
   fetchPexelsFromCustomPrompt,
   replaceImageCacheEntry,
   approveImageCacheEntry,
+  rejectImageCacheEntry,
 } from '@/app/actions/adminImages';
 import type { ImageCacheDocument } from '@/types';
 import { LanguageFlag } from '@/components/LanguageFlag';
 import type { SupportedLanguage } from '@/types';
 
+type ReviewFilter = 'pending' | 'approved' | 'all';
+
+function isSceneEntry(entry: ImageCacheDocument) {
+  return entry.kind === 'lesson_scene' || entry.word.startsWith('scene_');
+}
+
+function matchesQuery(entry: ImageCacheDocument, query: string) {
+  const needle = query.trim().toLowerCase();
+  if (!needle) return true;
+  return `${entry.word} ${entry.translation ?? ''} ${entry.photographer}`.toLowerCase().includes(needle);
+}
+
+function filterEntries(
+  all: ImageCacheDocument[],
+  scenesMode: boolean,
+  reviewFilter: ReviewFilter,
+  query: string,
+) {
+  return all.filter((entry) => {
+    if (isSceneEntry(entry) !== scenesMode) return false;
+    if (!matchesQuery(entry, query)) return false;
+    if (reviewFilter === 'pending') return !entry.approved;
+    if (reviewFilter === 'approved') return !!entry.approved;
+    return true;
+  });
+}
+
 export function ImageCacheManager() {
-  const [entries, setEntries] = useState<ImageCacheDocument[]>([]);
   const [allEntries, setAllEntries] = useState<ImageCacheDocument[]>([]);
+  const [entries, setEntries] = useState<ImageCacheDocument[]>([]);
   const [index, setIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [approving, setApproving] = useState(false);
+  const [rejecting, setRejecting] = useState(false);
   const [showScenes, setShowScenes] = useState(false);
+  const [reviewFilter, setReviewFilter] = useState<ReviewFilter>('all');
+  const [query, setQuery] = useState('');
 
   // Replacement state
   const [replacing, setReplacing] = useState(false);
@@ -32,15 +63,8 @@ export function ImageCacheManager() {
   const [customPrompt, setCustomPrompt] = useState('');
   const [loadingCustom, setLoadingCustom] = useState(false);
 
-  function isSceneEntry(e: ImageCacheDocument) {
-    return e.kind === 'lesson_scene' || e.word.startsWith('scene_');
-  }
-
-  function applyFilter(all: ImageCacheDocument[], scenesMode: boolean) {
-    const filtered = scenesMode
-      ? all.filter(isSceneEntry)
-      : all.filter((e) => !e.approved);
-    setEntries(filtered);
+  function showList(all: ImageCacheDocument[], scenesMode: boolean, filter: ReviewFilter, search: string) {
+    setEntries(filterEntries(all, scenesMode, filter, search));
     setIndex(0);
   }
 
@@ -48,7 +72,7 @@ export function ImageCacheManager() {
     fetchAllImageCache()
       .then((all) => {
         setAllEntries(all);
-        applyFilter(all, false);
+        showList(all, false, 'all', '');
 
         // Translate missing entries in a separate, non-blocking step (vocab only)
         const missingKeys = all
@@ -82,10 +106,22 @@ export function ImageCacheManager() {
       .finally(() => setLoading(false));
   }, []);
 
-  function toggleScenesMode() {
-    const next = !showScenes;
-    setShowScenes(next);
-    applyFilter(allEntries, next);
+  function setMode(scenesMode: boolean) {
+    setShowScenes(scenesMode);
+    setQuery('');
+    showList(allEntries, scenesMode, reviewFilter, '');
+    closeReplace();
+  }
+
+  function setFilter(next: ReviewFilter) {
+    setReviewFilter(next);
+    showList(allEntries, showScenes, next, query);
+    closeReplace();
+  }
+
+  function setSearch(next: string) {
+    setQuery(next);
+    showList(allEntries, showScenes, reviewFilter, next);
     closeReplace();
   }
 
@@ -110,13 +146,31 @@ export function ImageCacheManager() {
   }
 
   function prev() {
+    if (total < 1) return;
     setIndex((i) => (i > 0 ? i - 1 : total - 1));
     closeReplace();
   }
 
   function next() {
+    if (total < 1) return;
     setIndex((i) => (i < total - 1 ? i + 1 : 0));
     closeReplace();
+  }
+
+  useEffect(() => {
+    function onKey(event: KeyboardEvent) {
+      const target = event.target as HTMLElement | null;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')) return;
+      if (event.key === 'ArrowRight') next();
+      if (event.key === 'ArrowLeft') prev();
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  });
+
+  function patchEntry(word: string, patch: Partial<ImageCacheDocument>) {
+    setAllEntries((prev) => prev.map((entry) => (entry.word === word ? { ...entry, ...patch } : entry)));
+    setEntries((prev) => prev.map((entry) => (entry.word === word ? { ...entry, ...patch } : entry)));
   }
 
   async function handleApprove() {
@@ -124,9 +178,30 @@ export function ImageCacheManager() {
     setApproving(true);
     try {
       await approveImageCacheEntry(current.word);
-      removeCurrentAndAdvance();
+      if (reviewFilter === 'pending') {
+        removeCurrentAndAdvance();
+      } else {
+        patchEntry(current.word, { approved: true });
+        setIndex((i) => (i < entries.length - 1 ? i + 1 : i));
+      }
+      closeReplace();
     } finally {
       setApproving(false);
+    }
+  }
+
+  async function handleReject() {
+    if (!current || rejecting) return;
+    setRejecting(true);
+    try {
+      await rejectImageCacheEntry(current.word, current.imageUrl);
+      const rejectedImageUrls = current.rejectedImageUrls?.includes(current.imageUrl)
+        ? current.rejectedImageUrls
+        : [...(current.rejectedImageUrls ?? []), current.imageUrl];
+      patchEntry(current.word, { approved: false, rejectedImageUrls });
+      await handleStartReplace();
+    } finally {
+      setRejecting(false);
     }
   }
 
@@ -167,9 +242,11 @@ export function ImageCacheManager() {
     setSaving(imageUrl);
     try {
       await replaceImageCacheEntry(current.word, imageUrl, photographer);
-      setEntries((prev) =>
-        prev.map((e, i) => (i === index ? { ...e, imageUrl, photographer } : e)),
-      );
+      const rejectedImageUrls = [
+        ...(current.rejectedImageUrls ?? []),
+        ...(current.imageUrl === imageUrl ? [] : [current.imageUrl]),
+      ];
+      patchEntry(current.word, { imageUrl, photographer, approved: true, rejectedImageUrls });
       closeReplace();
     } finally {
       setSaving(null);
@@ -185,6 +262,78 @@ export function ImageCacheManager() {
       ? current?.word.slice(0, -(langSuffix.length + 1))
       : current?.word;
 
+  const pool = allEntries.filter((entry) => isSceneEntry(entry) === showScenes);
+  const pendingCount = pool.filter((entry) => !entry.approved).length;
+  const approvedCount = pool.filter((entry) => !!entry.approved).length;
+
+  const filters: Array<{ id: ReviewFilter; label: string; count: number }> = [
+    { id: 'all', label: 'Todas', count: pool.length },
+    { id: 'pending', label: 'Pendentes', count: pendingCount },
+    { id: 'approved', label: 'Aprovadas', count: approvedCount },
+  ];
+
+  const controls = (
+    <div className="flex flex-col gap-3">
+      <div className="flex gap-2">
+        <button
+          type="button"
+          onClick={() => setMode(false)}
+          className="rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest"
+          style={{
+            backgroundColor: showScenes ? 'var(--color-surface-raised)' : 'var(--color-primary-light)',
+            color: showScenes ? 'var(--color-text-muted)' : 'var(--color-primary)',
+            border: '1px solid var(--color-border)',
+          }}
+        >
+          Vocabulário
+        </button>
+        <button
+          type="button"
+          onClick={() => setMode(true)}
+          className="rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest"
+          style={{
+            backgroundColor: showScenes ? 'var(--color-vocab-bg)' : 'var(--color-surface-raised)',
+            color: showScenes ? 'var(--color-vocab)' : 'var(--color-text-muted)',
+            border: '1px solid var(--color-border)',
+          }}
+        >
+          Cenas
+        </button>
+      </div>
+      <div className="flex gap-1.5">
+        {filters.map((filter) => {
+          const active = reviewFilter === filter.id;
+          return (
+            <button
+              key={filter.id}
+              type="button"
+              onClick={() => setFilter(filter.id)}
+              className="rounded-full px-3 py-1 text-xs font-semibold"
+              style={{
+                backgroundColor: active ? 'var(--color-text-primary)' : 'var(--color-surface-raised)',
+                color: active ? 'var(--color-bg)' : 'var(--color-text-secondary)',
+              }}
+            >
+              {filter.label} · {filter.count}
+            </button>
+          );
+        })}
+      </div>
+      <input
+        type="search"
+        value={query}
+        onChange={(event) => setSearch(event.target.value)}
+        placeholder="Buscar palavra ou tradução"
+        className="w-full rounded-xl px-3 py-2 text-sm outline-none"
+        style={{
+          backgroundColor: 'var(--color-surface)',
+          border: '1px solid var(--color-border)',
+          color: 'var(--color-text-primary)',
+        }}
+      />
+    </div>
+  );
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -198,20 +347,13 @@ export function ImageCacheManager() {
 
   if (!current) {
     return (
-      <div className="flex flex-col gap-3 py-8">
-        <button
-          type="button"
-          onClick={toggleScenesMode}
-          className="mx-auto text-xs font-semibold underline"
-          style={{ color: 'var(--color-primary)' }}
-        >
-          {showScenes ? 'Ver vocabulário pendente' : 'Ver cenas de lição'}
-        </button>
+      <div className="flex flex-col gap-3 py-4">
+        {controls}
         <p className="text-center text-sm" style={{ color: 'var(--color-text-muted)' }}>
-          {showScenes
-            ? 'Nenhuma cena de lição em cache ainda.'
-            : total === 0
-              ? 'Todas as imagens foram revisadas.'
+          {query.trim()
+            ? 'Nenhuma imagem com essa busca.'
+            : reviewFilter === 'pending'
+              ? 'Nada pendente neste grupo.'
               : 'Nenhuma imagem em cache ainda.'}
         </p>
       </div>
@@ -220,27 +362,22 @@ export function ImageCacheManager() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between gap-2">
-        <button
-          type="button"
-          onClick={toggleScenesMode}
-          className="rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest transition-colors"
-          style={{
-            backgroundColor: showScenes ? 'var(--color-vocab-bg)' : 'var(--color-surface-raised)',
-            color: showScenes ? 'var(--color-vocab)' : 'var(--color-text-muted)',
-            border: '1px solid var(--color-border)',
-          }}
-        >
-          {showScenes ? 'Cenas de lição' : 'Vocabulário pendente'}
-        </button>
-      </div>
+      {controls}
 
-      {/* ── Counter + language badge ── */}
       <div className="flex items-center justify-between">
         <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
-          {index + 1} / {total} {showScenes ? 'cenas' : 'para revisar'}
+          {index + 1} / {total}
         </p>
         <div className="flex items-center gap-2">
+          <span
+            className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
+            style={{
+              backgroundColor: current.approved ? 'var(--color-success-bg, #f0fdf4)' : 'var(--color-surface-raised)',
+              color: current.approved ? 'var(--color-success, #16a34a)' : 'var(--color-text-muted)',
+            }}
+          >
+            {current.approved ? 'Boa' : 'Pendente'}
+          </span>
           {isScene && (
             <span
               className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
@@ -316,14 +453,13 @@ export function ImageCacheManager() {
 
       {/* ── Action buttons ── */}
       {!replacing && (
-        <div className="flex gap-2">
-          {/* Approve (checkmark) */}
+        <div className="flex flex-col gap-2">
+        <div className="grid grid-cols-2 gap-2">
           <button
             type="button"
             onClick={handleApprove}
-            disabled={approving}
-            aria-label="Aprovar para exercícios visuais"
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border transition-all active:scale-95 disabled:opacity-50"
+            disabled={approving || rejecting}
+            className="flex items-center justify-center gap-2 rounded-2xl border px-4 py-3 text-sm font-semibold transition-all active:scale-95 disabled:opacity-50"
             style={{
               backgroundColor: 'var(--color-success-bg, #f0fdf4)',
               borderColor: 'var(--color-success, #16a34a)',
@@ -338,23 +474,44 @@ export function ImageCacheManager() {
             ) : (
               <Check size={18} strokeWidth={2.5} />
             )}
+            Boa
           </button>
-
-          {/* Replace image */}
           <button
             type="button"
-            onClick={handleStartReplace}
-            className="flex flex-1 items-center justify-center gap-2 rounded-2xl border px-4 py-3 text-sm font-medium transition-all active:scale-95"
+            onClick={handleReject}
+            disabled={approving || rejecting}
+            className="flex items-center justify-center gap-2 rounded-2xl border px-4 py-3 text-sm font-semibold transition-all active:scale-95 disabled:opacity-50"
             style={{
               backgroundColor: 'var(--color-surface)',
               borderColor: 'var(--color-border)',
               color: 'var(--color-text-secondary)',
             }}
           >
-            <RefreshCw size={15} />
-            Trocar imagem
+            {rejecting ? (
+              <div
+                className="h-4 w-4 rounded-full border-2 animate-spin"
+                style={{ borderColor: 'var(--color-border)', borderTopColor: 'var(--color-text-secondary)' }}
+              />
+            ) : (
+              <X size={16} />
+            )}
+            Não combina
           </button>
         </div>
+        <button
+          type="button"
+          onClick={handleStartReplace}
+          className="flex w-full items-center justify-center gap-2 rounded-2xl border px-4 py-3 text-sm font-medium transition-all active:scale-95"
+          style={{
+            backgroundColor: 'var(--color-surface)',
+            borderColor: 'var(--color-border)',
+            color: 'var(--color-text-secondary)',
+          }}
+        >
+          <RefreshCw size={15} />
+          Trocar imagem
+        </button>
+      </div>
       )}
 
       {/* ── Alternatives grid ── */}

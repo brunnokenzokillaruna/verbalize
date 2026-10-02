@@ -4,6 +4,7 @@ import { searchPexelsPhotos } from '@/services/pexels';
 import { getCachedImage, saveImageCache } from '@/services/firestore';
 import { scorePhotoCandidate } from '@/lib/vocabImageSearch';
 import { buildLessonSceneKeyword, lessonSceneCacheKey } from '@/lib/lessonSceneKeyword';
+import { urlsAreSamePhoto } from '@/utils/canonicalImageKey';
 import type { SupportedLanguage, VocabImageResult } from '@/types';
 
 export interface GetLessonSceneImageParams {
@@ -39,18 +40,21 @@ export async function getLessonSceneImage(
     const keyword = buildLessonSceneKeyword(theme, uiTitle);
 
     const cached = await getCachedImage(cacheKey);
+    const rejected = cached?.rejectedImageUrls ?? [];
     // Reuse cache only when the keyword algorithm still matches — otherwise refetch.
     if (cached?.approved && cached.imageUrl && cached.searchKeyword === keyword) {
       return { imageUrl: cached.imageUrl, imageAlt: cached.photographer };
     }
 
-    const candidates = await searchPexelsPhotos(keyword, { perPage: 8, maxPages: 1 });
+    const candidates = (await searchPexelsPhotos(keyword, { perPage: 8, maxPages: 1 }))
+      .filter((photo) => !rejected.some((url) => urlsAreSamePhoto(url, photo.imageUrl)));
     let best = pickBestPhoto(candidates, keyword);
 
     if (!best) {
       const themeOnly = buildLessonSceneKeyword(theme);
       if (themeOnly !== keyword) {
-        const fallback = await searchPexelsPhotos(themeOnly, { perPage: 8, maxPages: 1 });
+        const fallback = (await searchPexelsPhotos(themeOnly, { perPage: 8, maxPages: 1 }))
+          .filter((photo) => !rejected.some((url) => urlsAreSamePhoto(url, photo.imageUrl)));
         best = pickBestPhoto(fallback, themeOnly);
       }
     }
