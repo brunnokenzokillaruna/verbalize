@@ -9,7 +9,10 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "uiTitle": "Chegando no Aeroporto",
     "grammarFocus": "5 Maneiras de Dizer Bonjour",
     "theme": "Tema 1: A Bordo do Avião e Aeroporto",
-    "arcCharacters": { "learner": "Lucas", "local": "Camille" },
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
     "arcSummary": "Você chega a Paris de avião; Camille, uma parisiense, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
   },
   {
@@ -20,7 +23,10 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "uiTitle": "Lendo as Placas de Voo",
     "grammarFocus": "Pronomes Sujeitos (Singular)",
     "theme": "Tema 1: A Bordo do Avião e Aeroporto",
-    "arcCharacters": { "learner": "Lucas", "local": "Camille" },
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
     "arcSummary": "Você chega a Paris de avião; Camille, uma parisiense, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
   },
   {
@@ -31,7 +37,10 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "uiTitle": "Despachando a Bagagem",
     "grammarFocus": "5 Maneiras de Dizer Merci",
     "theme": "Tema 1: A Bordo do Avião e Aeroporto",
-    "arcCharacters": { "learner": "Lucas", "local": "Camille" },
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
     "arcSummary": "Você chega a Paris de avião; Camille, uma parisiense, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
   },
   {
@@ -42,7 +51,10 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "uiTitle": "A Sala de Embarque",
     "grammarFocus": "5 Maneiras de Dizer De Rien",
     "theme": "Tema 1: A Bordo do Avião e Aeroporto",
-    "arcCharacters": { "learner": "Lucas", "local": "Camille" },
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
     "arcSummary": "Você chega a Paris de avião; Camille, uma parisiense, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
   },
   {
@@ -53,7 +65,10 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "uiTitle": "O Portão Correto",
     "grammarFocus": "Combinações de Vogais: AI, EI, OU",
     "theme": "Tema 1: A Bordo do Avião e Aeroporto",
-    "arcCharacters": { "learner": "Lucas", "local": "Camille" },
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
     "arcSummary": "Você chega a Paris de avião; Camille, uma parisiense, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
   },
   {
@@ -64,7 +79,10 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "uiTitle": "A Caminho da Aeronave",
     "grammarFocus": "5 Maneiras de Dizer Comment ça va",
     "theme": "Tema 1: A Bordo do Avião e Aeroporto",
-    "arcCharacters": { "learner": "Lucas", "local": "Camille" },
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
     "arcSummary": "Você chega a Paris de avião; Camille, uma parisiense, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
   },
   {
@@ -75,7 +93,10 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "uiTitle": "Entrada e Recepção",
     "grammarFocus": "Combinações de Vogais: AU, EAU",
     "theme": "Tema 1: A Bordo do Avião e Aeroporto",
-    "arcCharacters": { "learner": "Lucas", "local": "Camille" },
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
     "arcSummary": "Você chega a Paris de avião; Camille, uma parisiense, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
   },
   {
@@ -86,7 +107,10 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "uiTitle": "Cumprimentando os Comissários",
     "grammarFocus": "5 Maneiras de Dizer Ça va bien",
     "theme": "Tema 1: A Bordo do Avião e Aeroporto",
-    "arcCharacters": { "learner": "Lucas", "local": "Camille" },
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
     "arcSummary": "Você chega a Paris de avião; Camille, uma parisiense, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
   },
   {
@@ -97,8 +121,29 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "uiTitle": "Guardando a Bagagem de Mão",
     "grammarFocus": "Sons Nasais: AN, EN, IN",
     "theme": "Tema 1: A Bordo do Avião e Aeroporto",
-    "arcCharacters": { "learner": "Lucas", "local": "Camille" },
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
     "arcSummary": "Você chega a Paris de avião; Camille, uma parisiense, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
+  },
+  {
+    "id": "fr-a1-901",
+    "language": "fr",
+    "level": "A1",
+    "tag": "PRON",
+    "uiTitle": "Tu ou Tout",
+    "grammarFocus": "Pronúncia: u fechado versus ou (tu / tout)",
+    "theme": "Tema 1: A Bordo do Avião e Aeroporto"
+  },
+  {
+    "id": "fr-a1-902",
+    "language": "fr",
+    "level": "A1",
+    "tag": "PRON",
+    "uiTitle": "Feu, Soeur e o E que Some",
+    "grammarFocus": "Pronúncia: eu, œu e o e mudo",
+    "theme": "Tema 1: A Bordo do Avião e Aeroporto"
   },
   {
     "id": "fr-a1-010",
@@ -108,7 +153,10 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "uiTitle": "Checkpoint — lições 1–10",
     "grammarFocus": "Revisão: lições 1–10",
     "theme": "Tema 1: A Bordo do Avião e Aeroporto",
-    "arcCharacters": { "learner": "Lucas", "local": "Camille" },
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
     "arcSummary": "Você chega a Paris de avião; Camille, uma parisiense, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
   },
   {
@@ -119,7 +167,10 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "uiTitle": "Pousando em Paris",
     "grammarFocus": "Sons Nasais: ON, UN",
     "theme": "Tema 1: A Bordo do Avião e Aeroporto",
-    "arcCharacters": { "learner": "Lucas", "local": "Camille" },
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
     "arcSummary": "Você chega a Paris de avião; Camille, uma parisiense, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
   },
   {
@@ -130,7 +181,10 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "uiTitle": "Saindo da Aeronave",
     "grammarFocus": "Letras mudas e ligação entre palavras",
     "theme": "Tema 1: A Bordo do Avião e Aeroporto",
-    "arcCharacters": { "learner": "Lucas", "local": "Camille" },
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
     "arcSummary": "Você chega a Paris de avião; Camille, uma parisiense, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
   },
   {
@@ -141,7 +195,10 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "uiTitle": "O Saguão de Desembarque",
     "grammarFocus": "Conjugação: Être (ser/estar) — Presente",
     "theme": "Tema 2: Rumo ao Hostel",
-    "arcCharacters": { "learner": "Lucas", "local": "Camille" },
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
     "arcSummary": "Você chega a Paris de avião; Camille, uma parisiense, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
   },
   {
@@ -152,7 +209,10 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "uiTitle": "Puxando as Malas",
     "grammarFocus": "Pronomes Sujeitos (Plural)",
     "theme": "Tema 2: Rumo ao Hostel",
-    "arcCharacters": { "learner": "Lucas", "local": "Camille" },
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
     "arcSummary": "Você chega a Paris de avião; Camille, uma parisiense, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
   },
   {
@@ -163,7 +223,10 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "uiTitle": "Achando a Saída",
     "grammarFocus": "Números de 0 a 10",
     "theme": "Tema 2: Rumo ao Hostel",
-    "arcCharacters": { "learner": "Lucas", "local": "Camille" },
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
     "arcSummary": "Você chega a Paris de avião; Camille, uma parisiense, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
   },
   {
@@ -173,6 +236,15 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "Na Fila do Táxi",
     "grammarFocus": "Prática: Quem sou eu e o que faço?",
+    "theme": "Tema 2: Rumo ao Hostel"
+  },
+  {
+    "id": "fr-a1-903",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VOC",
+    "uiTitle": "Metrô ou Ônibus",
+    "grammarFocus": "Metrô e ônibus em Paris: linha, estação e baldeação",
     "theme": "Tema 2: Rumo ao Hostel"
   },
   {
@@ -218,6 +290,33 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Aproximando do Edifício",
     "grammarFocus": "Conjugação: Aller (ir) — Deslocamento",
+    "theme": "Tema 2: Rumo ao Hostel"
+  },
+  {
+    "id": "fr-a1-904",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VERB",
+    "uiTitle": "O que Você Vai Fazer",
+    "grammarFocus": "Futuro próximo: aller + infinitivo",
+    "theme": "Tema 2: Rumo ao Hostel"
+  },
+  {
+    "id": "fr-a1-905",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VERB",
+    "uiTitle": "Eu Posso",
+    "grammarFocus": "Pouvoir no presente: je peux e je ne peux pas",
+    "theme": "Tema 2: Rumo ao Hostel"
+  },
+  {
+    "id": "fr-a1-906",
+    "language": "fr",
+    "level": "A1",
+    "tag": "DIAL",
+    "uiTitle": "Eu Gostaria",
+    "grammarFocus": "Pedido educado: je voudrais",
     "theme": "Tema 2: Rumo ao Hostel"
   },
   {
@@ -449,6 +548,15 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "A Escolha Difícil",
     "grammarFocus": "5 Maneiras de Dizer Oui (Afirmação)",
+    "theme": "Tema 4: O Primeiro Café da Manhã"
+  },
+  {
+    "id": "fr-a1-907",
+    "language": "fr",
+    "level": "A1",
+    "tag": "GRAM",
+    "uiTitle": "Um Café ou Café",
+    "grammarFocus": "No café: un café ou du café (partitivos de uso)",
     "theme": "Tema 4: O Primeiro Café da Manhã"
   },
   {
@@ -687,13 +795,31 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 5: Compras na Galeries Lafayette"
   },
   {
+    "id": "fr-a1-908",
+    "language": "fr",
+    "level": "A1",
+    "tag": "GRAM",
+    "uiTitle": "Ao Lado e na Frente",
+    "grammarFocus": "Preposições de lugar: chez, à côté de, en face de",
+    "theme": "Tema 5: Compras na Galeries Lafayette"
+  },
+  {
+    "id": "fr-a1-909",
+    "language": "fr",
+    "level": "A1",
+    "tag": "VOC",
+    "uiTitle": "De Que País",
+    "grammarFocus": "Países e nacionalidades: en France, au Brésil, aux États-Unis",
+    "theme": "Tema 5: Compras na Galeries Lafayette"
+  },
+  {
     "id": "fr-a1-072",
     "language": "fr",
     "level": "A1",
     "tag": "GRAM",
     "uiTitle": "Analisando o Mapa da Cidade",
     "grammarFocus": "Par de Confusão: Près de VS Proche de",
-    "theme": "Tema 6: Passeando e Explorando",
+    "theme": "Tema 6: Passeio, família e o que é meu",
     "topicKey": "pres-de-vs-proche-de",
     "lessonRole": "contrast"
   },
@@ -704,7 +830,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "Onde Estamos?",
     "grammarFocus": "Prática: Localizando-se no espaço",
-    "theme": "Tema 6: Passeando e Explorando"
+    "theme": "Tema 6: Passeio, família e o que é meu"
   },
   {
     "id": "fr-a1-074",
@@ -713,7 +839,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Marcando no Relógio",
     "grammarFocus": "Família Imediata",
-    "theme": "Tema 6: Passeando e Explorando"
+    "theme": "Tema 6: Passeio, família e o que é meu"
   },
   {
     "id": "fr-a1-075",
@@ -722,7 +848,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Calculando a Distância",
     "grammarFocus": "Conjugação: Venir",
-    "theme": "Tema 6: Passeando e Explorando",
+    "theme": "Tema 6: Passeio, família e o que é meu",
     "topicKey": "conj-venir",
     "lessonRole": "introduce"
   },
@@ -733,7 +859,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Pelas Calçadas Antigas",
     "grammarFocus": "Par de Confusão: Dans VS En",
-    "theme": "Tema 6: Passeando e Explorando",
+    "theme": "Tema 6: Passeio, família e o que é meu",
     "topicKey": "dans-vs-en",
     "lessonRole": "contrast"
   },
@@ -744,7 +870,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "Qual é a Direção?",
     "grammarFocus": "Prática: Minha árvore genealógica",
-    "theme": "Tema 6: Passeando e Explorando"
+    "theme": "Tema 6: Passeio, família e o que é meu"
   },
   {
     "id": "fr-a1-078",
@@ -753,7 +879,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Andando em Círculos",
     "grammarFocus": "Parentes e Família Estendida",
-    "theme": "Tema 6: Passeando e Explorando"
+    "theme": "Tema 6: Passeio, família e o que é meu"
   },
   {
     "id": "fr-a1-079",
@@ -762,7 +888,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Paragem para um Respiro",
     "grammarFocus": "Passado Recente: Venir de",
-    "theme": "Tema 6: Passeando e Explorando"
+    "theme": "Tema 6: Passeio, família e o que é meu"
   },
   {
     "id": "fr-a1-080",
@@ -771,7 +897,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "REVIEW",
     "uiTitle": "Checkpoint — lições 71–80",
     "grammarFocus": "Revisão: lições 71–80",
-    "theme": "Tema 6: Passeando e Explorando"
+    "theme": "Tema 6: Passeio, família e o que é meu"
   },
   {
     "id": "fr-a1-081",
@@ -780,7 +906,25 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Mais Perto do Alvo",
     "grammarFocus": "Frutas e Vegetais",
-    "theme": "Tema 6: Passeando e Explorando"
+    "theme": "Tema 6: Passeio, família e o que é meu"
+  },
+  {
+    "id": "fr-a1-910",
+    "language": "fr",
+    "level": "A1",
+    "tag": "GRAM",
+    "uiTitle": "O Meu, a Minha",
+    "grammarFocus": "Possessivos da primeira pessoa: mon, ma, mes",
+    "theme": "Tema 6: Passeio, família e o que é meu"
+  },
+  {
+    "id": "fr-a1-911",
+    "language": "fr",
+    "level": "A1",
+    "tag": "GRAM",
+    "uiTitle": "Este e Esta",
+    "grammarFocus": "Demonstrativos: ce, cet, cette, ces",
+    "theme": "Tema 6: Passeio, família e o que é meu"
   },
   {
     "id": "fr-a1-082",
@@ -789,7 +933,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Observando as Visitas",
     "grammarFocus": "Posse Singular: Ton, Ta, Tes",
-    "theme": "Tema 6: Passeando e Explorando"
+    "theme": "Tema 6: Passeio, família e o que é meu"
   },
   {
     "id": "fr-a1-083",
@@ -798,7 +942,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "A Luz do Fim de Tarde",
     "grammarFocus": "Posse Singular: Son, Sa, Ses",
-    "theme": "Tema 6: Passeando e Explorando"
+    "theme": "Tema 6: Passeio, família e o que é meu"
   },
   {
     "id": "fr-a1-084",
@@ -807,7 +951,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Nas Praças de Paris",
     "grammarFocus": "Posse Plural: Notre e Nos",
-    "theme": "Tema 6: Passeando e Explorando"
+    "theme": "Tema 6: Passeio, família e o que é meu"
   },
   {
     "id": "fr-a1-085",
@@ -816,7 +960,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Retorno Marcado",
     "grammarFocus": "Posse Plural: Votre e Vos",
-    "theme": "Tema 6: Passeando e Explorando"
+    "theme": "Tema 6: Passeio, família e o que é meu"
   },
   {
     "id": "fr-a1-086",
@@ -825,7 +969,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Próximo Ponto",
     "grammarFocus": "Posse Plural: Leur e Leurs",
-    "theme": "Tema 6: Passeando e Explorando"
+    "theme": "Tema 6: Passeio, família e o que é meu"
   },
   {
     "id": "fr-a1-087",
@@ -834,7 +978,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "Uma Pausa no Parque",
     "grammarFocus": "5 Frases para Pedidos em Lojas",
-    "theme": "Tema 7: Novas Amizades e A Família"
+    "theme": "Tema 7: Pedidos, gentilezas e novos contatos"
   },
   {
     "id": "fr-a1-088",
@@ -843,7 +987,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Sentando no Banco",
     "grammarFocus": "Vocabulário: Ici e Là",
-    "theme": "Tema 7: Novas Amizades e A Família"
+    "theme": "Tema 7: Pedidos, gentilezas e novos contatos"
   },
   {
     "id": "fr-a1-089",
@@ -852,7 +996,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Mostrando Fotos no Celular",
     "grammarFocus": "Vocabulário: Là-bas",
-    "theme": "Tema 7: Novas Amizades e A Família"
+    "theme": "Tema 7: Pedidos, gentilezas e novos contatos"
   },
   {
     "id": "fr-a1-090",
@@ -861,7 +1005,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "REVIEW",
     "uiTitle": "Checkpoint — lições 81–90",
     "grammarFocus": "Revisão: lições 81–90",
-    "theme": "Tema 7: Novas Amizades e A Família"
+    "theme": "Tema 7: Pedidos, gentilezas e novos contatos"
   },
   {
     "id": "fr-a1-091",
@@ -870,7 +1014,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "De Onde Você Vem?",
     "grammarFocus": "Conjugação: Jouer",
-    "theme": "Tema 7: Novas Amizades e A Família"
+    "theme": "Tema 7: Pedidos, gentilezas e novos contatos"
   },
   {
     "id": "fr-a1-092",
@@ -879,7 +1023,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "Contando Suas Origens",
     "grammarFocus": "5 Frases para Pedidos em Cafés",
-    "theme": "Tema 7: Novas Amizades e A Família"
+    "theme": "Tema 7: Pedidos, gentilezas e novos contatos"
   },
   {
     "id": "fr-a1-093",
@@ -888,7 +1032,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "As Histórias dos Pais",
     "grammarFocus": "Par de Confusão: Tu VS Vous",
-    "theme": "Tema 7: Novas Amizades e A Família",
+    "theme": "Tema 7: Pedidos, gentilezas e novos contatos",
     "topicKey": "tu-vs-vous",
     "lessonRole": "contrast"
   },
@@ -899,7 +1043,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Fatos da Juventude",
     "grammarFocus": "Conjugação: Penser",
-    "theme": "Tema 7: Novas Amizades e A Família"
+    "theme": "Tema 7: Pedidos, gentilezas e novos contatos"
   },
   {
     "id": "fr-a1-095",
@@ -908,7 +1052,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "Curiosidade Mútua",
     "grammarFocus": "5 Frases de Recepção e Boas-Vindas",
-    "theme": "Tema 7: Novas Amizades e A Família"
+    "theme": "Tema 7: Pedidos, gentilezas e novos contatos"
   },
   {
     "id": "fr-a1-096",
@@ -917,7 +1061,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Perguntas Educadas",
     "grammarFocus": "Par de Confusão: On VS Nous",
-    "theme": "Tema 7: Novas Amizades e A Família",
+    "theme": "Tema 7: Pedidos, gentilezas e novos contatos",
     "topicKey": "on-vs-nous",
     "lessonRole": "contrast"
   },
@@ -928,7 +1072,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "Sorrisos",
     "grammarFocus": "5 Frases de Gentileza e Agradecimento",
-    "theme": "Tema 7: Novas Amizades e A Família"
+    "theme": "Tema 7: Pedidos, gentilezas e novos contatos"
   },
   {
     "id": "fr-a1-098",
@@ -937,7 +1081,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "O Tempo Passa Rápido",
     "grammarFocus": "Par de Confusão: Tard VS En retard",
-    "theme": "Tema 7: Novas Amizades e A Família",
+    "theme": "Tema 7: Pedidos, gentilezas e novos contatos",
     "topicKey": "tard-vs-en-retard",
     "lessonRole": "contrast"
   },
@@ -948,7 +1092,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "Trocando Contatos",
     "grammarFocus": "5 Maneiras de Dizer Je ne sais pas",
-    "theme": "Tema 7: Novas Amizades e A Família"
+    "theme": "Tema 7: Pedidos, gentilezas e novos contatos"
   },
   {
     "id": "fr-a1-100",
@@ -957,7 +1101,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "REVIEW",
     "uiTitle": "Checkpoint — lições 91–100",
     "grammarFocus": "Revisão: lições 91–100",
-    "theme": "Tema 7: Novas Amizades e A Família"
+    "theme": "Tema 7: Pedidos, gentilezas e novos contatos"
   },
   {
     "id": "fr-a1-101",
@@ -966,7 +1110,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "Laços Formados",
     "grammarFocus": "5 Maneiras de Dizer Félicitations",
-    "theme": "Tema 7: Novas Amizades e A Família"
+    "theme": "Tema 7: Pedidos, gentilezas e novos contatos"
   },
   {
     "id": "fr-a1-102",
@@ -1205,6 +1349,15 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
+    "id": "fr-a2-912",
+    "language": "fr",
+    "level": "A2",
+    "tag": "GRAM",
+    "uiTitle": "Já Estou Lá",
+    "grammarFocus": "Pronome y: j'y vais e il y a",
+    "theme": "Tema 9: Minha Casa, Minha Rotina"
+  },
+  {
     "id": "fr-a2-128",
     "language": "fr",
     "level": "A2",
@@ -1267,6 +1420,15 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Pesando as Porções",
     "grammarFocus": "Pronomes Tônicos: Moi, toi, lui, etc.",
+    "theme": "Tema 10: O Mercado e a Cozinha"
+  },
+  {
+    "id": "fr-a2-913",
+    "language": "fr",
+    "level": "A2",
+    "tag": "GRAM",
+    "uiTitle": "É Isso ou Ele É",
+    "grammarFocus": "C'est versus il est no uso do dia a dia",
     "theme": "Tema 10: O Mercado e a Cozinha"
   },
   {
@@ -1653,7 +1815,16 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "EXPR",
     "uiTitle": "Expressões com Aller e Faire",
     "grammarFocus": "5 expressões com Aller e Faire",
-    "theme": "Tema 13: Clima, Natureza e Passeios"
+    "theme": "Tema 13: Situações do dia a dia"
+  },
+  {
+    "id": "fr-a2-915",
+    "language": "fr",
+    "level": "A2",
+    "tag": "VOC",
+    "uiTitle": "Que Tempo Faz",
+    "grammarFocus": "Clima: quel temps fait-il e o vocabulário do tempo",
+    "theme": "Tema 13: Situações do dia a dia"
   },
   {
     "id": "fr-a2-175",
@@ -1662,7 +1833,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "Dizendo que Está Cansado",
     "grammarFocus": "5 maneiras de dizer que está cansado",
-    "theme": "Tema 13: Clima, Natureza e Passeios"
+    "theme": "Tema 13: Situações do dia a dia"
   },
   {
     "id": "fr-a2-176",
@@ -1671,9 +1842,18 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Dor ou Dificuldade",
     "grammarFocus": "Par de confusão: sentir dor VS ter dificuldade",
-    "theme": "Tema 13: Clima, Natureza e Passeios",
+    "theme": "Tema 13: Situações do dia a dia",
     "topicKey": "avoir-mal",
     "lessonRole": "contrast"
+  },
+  {
+    "id": "fr-a2-914",
+    "language": "fr",
+    "level": "A2",
+    "tag": "VERB",
+    "uiTitle": "Eu Peço",
+    "grammarFocus": "Prendre para pedir: je prends no restaurante",
+    "theme": "Tema 13: Situações do dia a dia"
   },
   {
     "id": "fr-a2-177",
@@ -1682,7 +1862,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "Reserva no Restaurante",
     "grammarFocus": "No restaurante: reservas e pedidos",
-    "theme": "Tema 13: Clima, Natureza e Passeios"
+    "theme": "Tema 13: Situações do dia a dia"
   },
   {
     "id": "fr-a2-178",
@@ -1691,7 +1871,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "Pedindo Desculpas",
     "grammarFocus": "5 maneiras de se desculpar",
-    "theme": "Tema 13: Clima, Natureza e Passeios"
+    "theme": "Tema 13: Situações do dia a dia"
   },
   {
     "id": "fr-a2-179",
@@ -1700,7 +1880,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Números Ordinais",
     "grammarFocus": "Números ordinais e rankings",
-    "theme": "Tema 13: Clima, Natureza e Passeios"
+    "theme": "Tema 13: Situações do dia a dia"
   },
   {
     "id": "fr-a2-180",
@@ -1709,7 +1889,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "REVIEW",
     "uiTitle": "Checkpoint — lições 171–180",
     "grammarFocus": "Revisão: lições 171–180",
-    "theme": "Tema 13: Clima, Natureza e Passeios"
+    "theme": "Tema 13: Situações do dia a dia"
   },
   {
     "id": "fr-a2-181",
@@ -1718,7 +1898,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "Na Estação e no Aeroporto",
     "grammarFocus": "Na estação de trem e no aeroporto",
-    "theme": "Tema 13: Clima, Natureza e Passeios"
+    "theme": "Tema 13: Situações do dia a dia"
   },
   {
     "id": "fr-a2-182",
@@ -1727,7 +1907,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Comprando o Bilhete",
     "grammarFocus": "Bilhetes de transporte e troca de linha",
-    "theme": "Tema 13: Clima, Natureza e Passeios"
+    "theme": "Tema 13: Situações do dia a dia"
   },
   {
     "id": "fr-a2-183",
@@ -1736,7 +1916,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "Expressando Afeto",
     "grammarFocus": "5 maneiras de expressar sentimentos e afeto",
-    "theme": "Tema 13: Clima, Natureza e Passeios"
+    "theme": "Tema 13: Situações do dia a dia"
   },
   {
     "id": "fr-a2-184",
@@ -1745,7 +1925,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Animais da Floresta",
     "grammarFocus": "Vocabulário de animais da floresta",
-    "theme": "Tema 13: Clima, Natureza e Passeios"
+    "theme": "Tema 13: Situações do dia a dia"
   },
   {
     "id": "fr-a2-185",
@@ -1754,7 +1934,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Instrumentos Musicais",
     "grammarFocus": "Vocabulário de instrumentos musicais",
-    "theme": "Tema 13: Clima, Natureza e Passeios"
+    "theme": "Tema 13: Situações do dia a dia"
   },
   {
     "id": "fr-a2-186",
@@ -1763,7 +1943,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Cozinha e Quarto",
     "grammarFocus": "Vocabulário de casa: cozinha e quarto",
-    "theme": "Tema 13: Casa, Trabalho e Saúde"
+    "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
     "id": "fr-a2-187",
@@ -1772,7 +1952,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Sala e Banheiro",
     "grammarFocus": "Vocabulário de casa: sala e banheiro",
-    "theme": "Tema 13: Casa, Trabalho e Saúde"
+    "theme": "Tema 9: Minha Casa, Minha Rotina"
   },
   {
     "id": "fr-a2-188",
@@ -1781,7 +1961,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Empregos e Profissões",
     "grammarFocus": "Vocabulário de empregos e profissões",
-    "theme": "Tema 13: Casa, Trabalho e Saúde"
+    "theme": "Tema 14: Rotina do Escritório e da Cidade"
   },
   {
     "id": "fr-a2-189",
@@ -1790,7 +1970,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Saúde e Corpo",
     "grammarFocus": "Saúde e corpo: dores e mal-estar",
-    "theme": "Tema 13: Casa, Trabalho e Saúde",
+    "theme": "Tema 15: Saúde e Farmácia",
     "topicKey": "avoir-mal",
     "lessonRole": "reinforce"
   },
@@ -1862,6 +2042,15 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 14: Rotina do Escritório e da Cidade"
   },
   {
+    "id": "fr-a2-916",
+    "language": "fr",
+    "level": "A2",
+    "tag": "DIAL",
+    "uiTitle": "Ligo de Volta",
+    "grammarFocus": "Telefone e mensagem curta: marcar, desmarcar e rappeler",
+    "theme": "Tema 14: Rotina do Escritório e da Cidade"
+  },
+  {
     "id": "fr-a2-197",
     "language": "fr",
     "level": "A2",
@@ -1930,7 +2119,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Abrir uma Conta",
     "grammarFocus": "Vocabulário de banco, conta e documentos administrativos",
-    "theme": "Tema 15: Saúde e Farmácia"
+    "theme": "Tema 14: Banco e documentos"
   },
   {
     "id": "fr-a2-204",
@@ -1946,8 +2135,8 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "A2",
     "tag": "VERB",
-    "uiTitle": "A Busca pelo Alívio",
-    "grammarFocus": "Conjugação: Prendre",
+    "uiTitle": "O Remédio na Dose Certa",
+    "grammarFocus": "Prendre um medicamento: dose e horário",
     "theme": "Tema 15: Saúde e Farmácia",
     "topicKey": "conj-prendre",
     "lessonRole": "introduce"
@@ -2008,7 +2197,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Ação em Andamento",
     "grammarFocus": "Gerúndio e 'estar fazendo' + infinitivo",
-    "theme": "Tema 15: Saúde e Farmácia"
+    "theme": "Ponte A2 > B1: Descrição e passado"
   },
   {
     "id": "fr-a2-212",
@@ -2017,7 +2206,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Recuperação",
     "grammarFocus": "Conjugação: Croire",
-    "theme": "Tema 15: Saúde e Farmácia",
+    "theme": "Ponte A2 > B1: Descrição e passado",
     "topicKey": "conj-croire",
     "lessonRole": "introduce"
   },
@@ -2028,7 +2217,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Força Restabelecida",
     "grammarFocus": "Formação do Imparfait",
-    "theme": "Tema 15: Saúde e Farmácia"
+    "theme": "Ponte A2 > B1: Descrição e passado"
   },
   {
     "id": "fr-b1-214",
@@ -2307,6 +2496,15 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "theme": "Tema 17: Fofocas e Histórias Indiretas"
   },
   {
+    "id": "fr-b1-917",
+    "language": "fr",
+    "level": "B1",
+    "tag": "VOC",
+    "uiTitle": "Palavras que Parecem Iguais",
+    "grammarFocus": "Falsos amigos com o português: actuellement, demander, attendre, assister, sensible",
+    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+  },
+  {
     "id": "fr-b1-244",
     "language": "fr",
     "level": "B1",
@@ -2382,7 +2580,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "Jantar Reservado",
     "grammarFocus": "No restaurante: reserva, cardápio, conta e gorjeta",
-    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
+    "theme": "Tema 18: Situações, gramática e redação"
   },
   {
     "id": "fr-b1-252",
@@ -2391,7 +2589,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "CULT",
     "uiTitle": "Saúde na França",
     "grammarFocus": "Sistema de saúde francês: cartão de saúde e plano complementar",
-    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
+    "theme": "Tema 18: Situações, gramática e redação"
   },
   {
     "id": "fr-b1-253",
@@ -2400,7 +2598,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Enfatizando Culpados",
     "grammarFocus": "Pronomes Enfáticos: Mesmo (Même)",
-    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
+    "theme": "Tema 18: Situações, gramática e redação"
   },
   {
     "id": "fr-b1-254",
@@ -2409,7 +2607,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Palavras Indefinidas",
     "grammarFocus": "Adjetivos Indefinidos: Chaque, certain, plusieurs, quelque",
-    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
+    "theme": "Tema 18: Situações, gramática e redação"
   },
   {
     "id": "fr-b1-255",
@@ -2418,7 +2616,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Antes ou Depois do Substantivo",
     "grammarFocus": "Adjetivos: Mudança de Sentido pela posição",
-    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
+    "theme": "Tema 18: Situações, gramática e redação"
   },
   {
     "id": "fr-b1-256",
@@ -2427,7 +2625,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "EXPR",
     "uiTitle": "O Horizonte Longínquo",
     "grammarFocus": "5 Expressões com o verbo Mettre",
-    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
+    "theme": "Tema 18: Situações, gramática e redação"
   },
   {
     "id": "fr-b1-257",
@@ -2436,7 +2634,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "A Promessa Abstrata",
     "grammarFocus": "Redação: Descrição de um Lugar Especial",
-    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
+    "theme": "Tema 18: Situações, gramática e redação"
   },
   {
     "id": "fr-b1-258",
@@ -2445,7 +2643,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "CULT",
     "uiTitle": "O E Se...",
     "grammarFocus": "Redação: Redes Sociais e Sociedade",
-    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
+    "theme": "Tema 18: Situações, gramática e redação"
   },
   {
     "id": "fr-b1-259",
@@ -2454,7 +2652,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Gatilhos da Imaginação",
     "grammarFocus": "Vocabulário: Lieu, Endroit e Place",
-    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
+    "theme": "Tema 18: Situações, gramática e redação"
   },
   {
     "id": "fr-b1-260",
@@ -2463,7 +2661,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "REVIEW",
     "uiTitle": "Checkpoint — lições 251–260",
     "grammarFocus": "Revisão: lições 251–260",
-    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
+    "theme": "Tema 18: Situações, gramática e redação"
   },
   {
     "id": "fr-b1-261",
@@ -2472,7 +2670,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "EXPR",
     "uiTitle": "O Fato Condicional",
     "grammarFocus": "5 Expressões de Amor e Cores",
-    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
+    "theme": "Tema 18: Situações, gramática e redação"
   },
   {
     "id": "fr-b1-262",
@@ -2481,7 +2679,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "Imaginando Impossíveis",
     "grammarFocus": "Redação: Planos para o Futuro",
-    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
+    "theme": "Tema 18: Situações, gramática e redação"
   },
   {
     "id": "fr-b1-263",
@@ -2490,7 +2688,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Possibilidades Várias",
     "grammarFocus": "Vocabulário: Sortir, Partir, Quitter e Laisser",
-    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro",
+    "theme": "Tema 18: Situações, gramática e redação",
     "topicKey": "sortir-partir-quitter-laisser",
     "lessonRole": "introduce"
   },
@@ -2501,7 +2699,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Deixando Voar",
     "grammarFocus": "Par de Confusão: Sortir VS Partir VS Quitter VS Laisser",
-    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro",
+    "theme": "Tema 18: Situações, gramática e redação",
     "topicKey": "sortir-partir-quitter-laisser",
     "lessonRole": "contrast"
   },
@@ -2512,7 +2710,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "EXPR",
     "uiTitle": "Contrato com o Futuro",
     "grammarFocus": "5 Expressões de Trabalho e Dinheiro",
-    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
+    "theme": "Tema 18: Situações, gramática e redação"
   },
   {
     "id": "fr-b1-266",
@@ -2521,7 +2719,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "As Asas Cortadas",
     "grammarFocus": "Redação: Uma Lição de Vida Importante",
-    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
+    "theme": "Tema 18: Situações, gramática e redação"
   },
   {
     "id": "fr-b1-267",
@@ -2530,7 +2728,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "O Resgate",
     "grammarFocus": "Vocabulário: Avoir mal à e Avoir du mal à",
-    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro",
+    "theme": "Tema 18: Situações, gramática e redação",
     "topicKey": "avoir-mal",
     "lessonRole": "reinforce"
   },
@@ -2541,7 +2739,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "EXPR",
     "uiTitle": "Tudo em Paz",
     "grammarFocus": "5 Expressões sobre Clima (Météo)",
-    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
+    "theme": "Tema 18: Situações, gramática e redação"
   },
   {
     "id": "fr-b1-269",
@@ -2550,7 +2748,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "Sonhar não Custa",
     "grammarFocus": "Redação: Uma Viagem Marcante",
-    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
+    "theme": "Tema 18: Situações, gramática e redação"
   },
   {
     "id": "fr-b1-270",
@@ -2559,7 +2757,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "REVIEW",
     "uiTitle": "Checkpoint — lições 261–270",
     "grammarFocus": "Revisão: lições 261–270",
-    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
+    "theme": "Tema 18: Situações, gramática e redação"
   },
   {
     "id": "fr-b1-271",
@@ -2568,7 +2766,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "Destino",
     "grammarFocus": "Redação: Desafios Pessoais",
-    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
+    "theme": "Tema 18: Situações, gramática e redação"
   },
   {
     "id": "fr-b1-272",
@@ -2577,7 +2775,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "EXPR",
     "uiTitle": "O Eco do Destino",
     "grammarFocus": "5 Expressões com Y: Ça y est, Il y a",
-    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
+    "theme": "Tema 18: Situações, gramática e redação"
   },
   {
     "id": "fr-b1-273",
@@ -2586,7 +2784,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "Destino Traçado",
     "grammarFocus": "Redação: Uma Pessoa Inspiradora",
-    "theme": "Tema 18: Sonhos, Hipóteses e O Futuro"
+    "theme": "Tema 18: Situações, gramática e redação"
   },
   {
     "id": "fr-b1-274",
@@ -2612,9 +2810,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "id": "fr-b1-276",
     "language": "fr",
     "level": "B1",
-    "tag": "VERB",
-    "uiTitle": "O Aperto de Mão",
-    "grammarFocus": "Conjugação: Dire",
+    "tag": "GRAM",
+    "uiTitle": "O que Foi Dito na Reunião",
+    "grammarFocus": "Reportar o que disseram: dire que, on m'a dit que",
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
@@ -2641,9 +2839,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "id": "fr-b1-279",
     "language": "fr",
     "level": "B1",
-    "tag": "VERB",
-    "uiTitle": "Escrevendo um E-mail de Follow-up",
-    "grammarFocus": "Conjugação: Écrire",
+    "tag": "DIAL",
+    "uiTitle": "O E-mail Profissional",
+    "grammarFocus": "E-mail profissional: assunto, pedido e fechamento",
     "theme": "Tema 19: Vida Profissional e Entrevistas",
     "topicKey": "conj-ecrire",
     "lessonRole": "reinforce"
@@ -2661,9 +2859,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "id": "fr-b1-281",
     "language": "fr",
     "level": "B1",
-    "tag": "VERB",
-    "uiTitle": "O Teste Técnico",
-    "grammarFocus": "Conjugação: Lire",
+    "tag": "DIAL",
+    "uiTitle": "Lendo o Anúncio",
+    "grammarFocus": "Ler um anúncio de emprego ou uma mensagem de trabalho",
     "theme": "Tema 19: Vida Profissional e Entrevistas",
     "topicKey": "conj-lire",
     "lessonRole": "reinforce"
@@ -2683,9 +2881,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "id": "fr-b1-283",
     "language": "fr",
     "level": "B1",
-    "tag": "VERB",
-    "uiTitle": "O Desafio Final",
-    "grammarFocus": "Conjugação: Répondre",
+    "tag": "DIAL",
+    "uiTitle": "Respondendo ao Recrutador",
+    "grammarFocus": "Responder numa entrevista: trajetória e exemplo concreto",
     "theme": "Tema 19: Vida Profissional e Entrevistas",
     "topicKey": "conj-repondre",
     "lessonRole": "reinforce"
@@ -2694,18 +2892,18 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "id": "fr-b1-284",
     "language": "fr",
     "level": "B1",
-    "tag": "VERB",
-    "uiTitle": "A Decisão do Comitê",
-    "grammarFocus": "Conjugação: Faire",
+    "tag": "DIAL",
+    "uiTitle": "O que Eu Faço no Trabalho",
+    "grammarFocus": "Falar do que você faz no trabalho",
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
     "id": "fr-b1-285",
     "language": "fr",
     "level": "B1",
-    "tag": "VERB",
-    "uiTitle": "A Segunda Rodada",
-    "grammarFocus": "Conjugação: Prendre",
+    "tag": "DIAL",
+    "uiTitle": "Marcando a Próxima Etapa",
+    "grammarFocus": "Marcar um horário e aceitar uma proposta",
     "theme": "Tema 19: Vida Profissional e Entrevistas",
     "topicKey": "conj-prendre",
     "lessonRole": "reinforce"
@@ -2714,9 +2912,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "id": "fr-b1-286",
     "language": "fr",
     "level": "B1",
-    "tag": "VERB",
-    "uiTitle": "A Oferta Chega",
-    "grammarFocus": "Conjugação: Mettre",
+    "tag": "GRAM",
+    "uiTitle": "Colocando a Tarefa de Pé",
+    "grammarFocus": "Organizar uma tarefa: mettre en place e prazo",
     "theme": "Tema 19: Vida Profissional e Entrevistas",
     "topicKey": "conj-mettre",
     "lessonRole": "reinforce"
@@ -2734,18 +2932,18 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "id": "fr-b1-288",
     "language": "fr",
     "level": "B1",
-    "tag": "VERB",
-    "uiTitle": "O Primeiro Dia",
-    "grammarFocus": "Conjugação: Vouloir",
+    "tag": "DIAL",
+    "uiTitle": "O que Eu Quero no Cargo",
+    "grammarFocus": "Dizer o que você quer no cargo",
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
     "id": "fr-b1-289",
     "language": "fr",
     "level": "B1",
-    "tag": "VERB",
-    "uiTitle": "A Reunião de Equipe",
-    "grammarFocus": "Conjugação: Pouvoir",
+    "tag": "DIAL",
+    "uiTitle": "O que Dá para Fazer",
+    "grammarFocus": "Negociar o que é possível: je peux e je ne peux pas",
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
@@ -2761,18 +2959,18 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "id": "fr-b1-291",
     "language": "fr",
     "level": "B1",
-    "tag": "VERB",
-    "uiTitle": "A Obrigação Irredutível",
-    "grammarFocus": "Conjugação: Falloir",
+    "tag": "GRAM",
+    "uiTitle": "A Obrigação do Trabalho",
+    "grammarFocus": "Obrigação no trabalho: il faut e devoir",
     "theme": "Tema 19: Vida Profissional e Entrevistas"
   },
   {
     "id": "fr-b1-292",
     "language": "fr",
     "level": "B1",
-    "tag": "VERB",
-    "uiTitle": "Abrindo o Feed",
-    "grammarFocus": "Conjugação: Savoir",
+    "tag": "DIAL",
+    "uiTitle": "O que Você Sabe Fazer",
+    "grammarFocus": "Savoir numa conversa: o que você sabe fazer",
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
@@ -2787,6 +2985,15 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "lessonRole": "contrast"
   },
   {
+    "id": "fr-b1-918",
+    "language": "fr",
+    "level": "B1",
+    "tag": "GRAM",
+    "uiTitle": "Eu Acho que",
+    "grammarFocus": "Dar opinião antes do subjuntivo: je trouve que, à mon avis, je pense que",
+    "theme": "Tema 20: Expressões e Redes Sociais"
+  },
+  {
     "id": "fr-b1-294",
     "language": "fr",
     "level": "B1",
@@ -2799,9 +3006,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "id": "fr-b1-295",
     "language": "fr",
     "level": "B1",
-    "tag": "VERB",
-    "uiTitle": "Comentários nas Stories",
-    "grammarFocus": "Conjugação: Croire",
+    "tag": "DIAL",
+    "uiTitle": "Reagindo ao Comentário",
+    "grammarFocus": "Reagir a um comentário: je crois que",
     "theme": "Tema 20: Expressões e Redes Sociais",
     "topicKey": "conj-croire",
     "lessonRole": "reinforce"
@@ -2830,9 +3037,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "id": "fr-b1-298",
     "language": "fr",
     "level": "B1",
-    "tag": "VERB",
-    "uiTitle": "Conhecendo Influencers",
-    "grammarFocus": "Conjugação: Connaître",
+    "tag": "DIAL",
+    "uiTitle": "Gente e Lugar que Você Conhece",
+    "grammarFocus": "Connaître numa conversa: pessoas e lugares",
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
@@ -2870,36 +3077,36 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "id": "fr-b1-302",
     "language": "fr",
     "level": "B1",
-    "tag": "VERB",
-    "uiTitle": "Servindo Conteúdo",
-    "grammarFocus": "Conjugação: Servir",
+    "tag": "EXPR",
+    "uiTitle": "Reações na Rede",
+    "grammarFocus": "Reagir numa rede: plaire, servir e rire",
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
     "id": "fr-b1-303",
     "language": "fr",
     "level": "B1",
-    "tag": "VERB",
-    "uiTitle": "O Que Agrada o Algoritmo",
-    "grammarFocus": "Conjugação: Plaire",
+    "tag": "GRAM",
+    "uiTitle": "Na Minha Opinião",
+    "grammarFocus": "Dar opinião: à mon avis e je trouve que",
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
     "id": "fr-b1-304",
     "language": "fr",
     "level": "B1",
-    "tag": "VERB",
-    "uiTitle": "Rindo com a Comunidade",
-    "grammarFocus": "Conjugação: Rire",
+    "tag": "GRAM",
+    "uiTitle": "Eu Acho que Não",
+    "grammarFocus": "Dar opinião: je pense que e je ne pense pas que",
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
     "id": "fr-b1-305",
     "language": "fr",
     "level": "B1",
-    "tag": "VERB",
-    "uiTitle": "De Onde Vem a Ideia",
-    "grammarFocus": "Conjugação: Venir",
+    "tag": "GRAM",
+    "uiTitle": "De Onde Veio a Notícia",
+    "grammarFocus": "Contar de onde veio a ideia ou a notícia",
     "theme": "Tema 20: Expressões e Redes Sociais",
     "topicKey": "conj-venir",
     "lessonRole": "reinforce"
@@ -2908,9 +3115,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "id": "fr-b1-306",
     "language": "fr",
     "level": "B1",
-    "tag": "VERB",
-    "uiTitle": "Partindo para a Próxima",
-    "grammarFocus": "Conjugação: Partir",
+    "tag": "GRAM",
+    "uiTitle": "Sair, Partir ou Deixar",
+    "grammarFocus": "Usar sortir, partir, quitter e laisser numa saída",
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
@@ -2918,17 +3125,17 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "B1",
     "tag": "VERB",
-    "uiTitle": "Saindo do Aplicativo",
-    "grammarFocus": "Conjugação: Sortir",
+    "uiTitle": "O Plano da Semana",
+    "grammarFocus": "Contar um plano com o futuro próximo",
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
     "id": "fr-b1-308",
     "language": "fr",
     "level": "B1",
-    "tag": "VERB",
-    "uiTitle": "Correndo Contra o Tempo",
-    "grammarFocus": "Conjugação: Courir",
+    "tag": "DIAL",
+    "uiTitle": "O Imprevisto",
+    "grammarFocus": "Contar um imprevisto no passado recente",
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
@@ -2938,6 +3145,15 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Inscrevendo-se no Subjuntivo",
     "grammarFocus": "Subjonctif Présent: Formação (Regulares)",
+    "theme": "Tema 20: Expressões e Redes Sociais"
+  },
+  {
+    "id": "fr-b1-919",
+    "language": "fr",
+    "level": "B1",
+    "tag": "VERB",
+    "uiTitle": "Vou Fazer Isso",
+    "grammarFocus": "Futuro próximo na vida real: o que você vai fazer",
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {
@@ -3227,6 +3443,15 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "REVIEW",
     "uiTitle": "Checkpoint — lições 331–340",
     "grammarFocus": "Revisão: lições 331–340",
+    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+  },
+  {
+    "id": "fr-b2-920",
+    "language": "fr",
+    "level": "B2",
+    "tag": "GRAM",
+    "uiTitle": "Por Outro Lado",
+    "grammarFocus": "Conectores de oposição: cependant, en revanche, toutefois, néanmoins",
     "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
   },
   {
@@ -3648,8 +3873,8 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "language": "fr",
     "level": "C1",
     "tag": "VERB",
-    "uiTitle": "O Subjuntivo Clássico",
-    "grammarFocus": "Imparfait du subjonctif (Reconhecimento)",
+    "uiTitle": "Formas que Só se Reconhece",
+    "grammarFocus": "Reconhecimento literário: subjuntivo imperfeito, plus-que-parfait do subjuntivo, segunda forma do condicional e verbos arcaicos",
     "theme": "Tema 26: O Francês das Ruas e o Formal"
   },
   {
@@ -3694,9 +3919,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "id": "fr-c1-392",
     "language": "fr",
     "level": "C1",
-    "tag": "VERB",
-    "uiTitle": "O Plus-que-parfait Subjuntivo",
-    "grammarFocus": "Plus-que-parfait du subjonctif",
+    "tag": "DIAL",
+    "uiTitle": "A Reunião Formal",
+    "grammarFocus": "Reunião formal: abrir, discordar e fechar",
     "theme": "Tema 26: O Francês das Ruas e o Formal"
   },
   {
@@ -3721,9 +3946,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "id": "fr-c1-395",
     "language": "fr",
     "level": "C1",
-    "tag": "VERB",
-    "uiTitle": "A Segunda Forma do Condicional",
-    "grammarFocus": "Seconde forme du conditionnel passé",
+    "tag": "CULT",
+    "uiTitle": "A Manchete do Dia",
+    "grammarFocus": "Leitura de imprensa: manchete, fato e viés",
     "theme": "Tema 26: O Francês das Ruas e o Formal"
   },
   {
@@ -3937,9 +4162,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "id": "fr-c2-419",
     "language": "fr",
     "level": "C2",
-    "tag": "VERB",
-    "uiTitle": "Verbos Literários Raros",
-    "grammarFocus": "Verbos Arcaicos e de Uso Exclusivamente Literário",
+    "tag": "CULT",
+    "uiTitle": "Comentário de uma Cena",
+    "grammarFocus": "Comentário oral de uma cena literária",
     "theme": "Tema 28: Literatura Clássica e Análise Textual"
   },
   {

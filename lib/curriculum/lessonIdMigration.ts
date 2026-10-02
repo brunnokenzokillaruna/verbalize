@@ -80,6 +80,15 @@ export function parseLegacyLessonIndex(id: string): number | null {
 
 function lessonIdAtIndex(language: SupportedLanguage, index: number): string | null {
   const lessons = getLessonsForLanguage(language);
+  // French keeps historical ids (001–430) and inserts new lessons with 9xx ids.
+  // Migration must resolve the pre-insert sequence, not the shifted array index.
+  if (language === 'fr') {
+    const match = lessons.find((lesson) => {
+      const parsed = parseLessonSequenceIndex(lesson.id);
+      return parsed?.language === 'fr' && parsed.index === index;
+    });
+    return match?.id ?? null;
+  }
   if (index < 0 || index >= lessons.length) return null;
   return lessons[index]!.id;
 }

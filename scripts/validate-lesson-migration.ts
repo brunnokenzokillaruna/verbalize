@@ -4,6 +4,7 @@
  */
 import { FRENCH_LESSONS } from '../lib/curriculum/french';
 import { ENGLISH_LESSONS } from '../lib/curriculum/english';
+import { getNextLessonId } from '../lib/curriculum';
 import {
   CURRICULUM_VERSION,
   migrateContentLessonId,
@@ -51,16 +52,40 @@ const checks: Array<{ label: string; pass: boolean }> = [];
 {
   const stableLessons = FRENCH_LESSONS.filter((l) => !isV2GapLesson(l.grammarFocus));
   checks.push({
-    label: `French stable v1 count is 418 (got ${stableLessons.length})`,
-    pass: stableLessons.length === 418,
+    label: `French stable lessons keep the v1 base plus later inserts (got ${stableLessons.length})`,
+    pass: stableLessons.length === 440,
   });
 
+  // Shift at this index is 0, so the stored id must stay the same lesson
+  // even after 9xx lessons were inserted earlier in the array.
   const oldNext = legacyId('fr', 119, 'A2');
   const migrated = migrateFrontierLessonId('fr', oldNext, 1);
-  const target = FRENCH_LESSONS.find((l) => l.grammarFocus.includes('Vogais Fechadas'))?.id;
   checks.push({
-    label: 'FR v1→v2 frontier after fr-a2-119 → EU/U gap',
-    pass: migrated === target,
+    label: 'FR v1→v2 frontier fr-a2-120 stays on that id after later inserts',
+    pass: migrated === 'fr-a2-120',
+  });
+
+  checks.push({
+    label: 'FR current id fr-b1-220 is unchanged for a v3 profile',
+    pass: migrateFrontierLessonId('fr', 'fr-b1-220', 3) === 'fr-b1-220',
+  });
+
+  checks.push({
+    label: 'Futuro próximo sits immediately after aller',
+    pass: getNextLessonId('fr', 'fr-a1-021') === 'fr-a1-904',
+  });
+
+  checks.push({
+    label: 'B1 futuro próximo sits after the last B1 lesson and before B2',
+    pass:
+      getNextLessonId('fr', 'fr-b1-309') === 'fr-b1-919' &&
+      getNextLessonId('fr', 'fr-b1-919') === 'fr-b2-310',
+  });
+
+  const reviewCount = FRENCH_LESSONS.filter((lesson) => lesson.tag === 'REVIEW').length;
+  checks.push({
+    label: `French checkpoints stay at 43 (got ${reviewCount})`,
+    pass: reviewCount === 43,
   });
 }
 
@@ -72,8 +97,8 @@ const checks: Array<{ label: string; pass: boolean }> = [];
   });
 
   checks.push({
-    label: `French catalog unchanged at 430 (got ${FRENCH_LESSONS.length})`,
-    pass: FRENCH_LESSONS.length === 430,
+    label: `French catalog has 450 lessons (got ${FRENCH_LESSONS.length})`,
+    pass: FRENCH_LESSONS.length === 450,
   });
 
   checks.push({

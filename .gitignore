@@ -33,6 +33,9 @@ Thumbs.db
 .vscode/
 .idea/
 
+# Local admin login for agents — never commit the password
+.cursor/rules/admin-login.mdc
+
 # Agent Config
 .claude/
 .agents/
