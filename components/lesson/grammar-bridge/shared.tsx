@@ -371,11 +371,13 @@ function FormulaBranchBlock({
 
   return (
     <div className="flex flex-col gap-3 items-center w-full">
-      {showLabel && branch.label && (
+      {((showLabel && branch.label) || branch.hint) && (
         <div className="flex flex-col gap-1 items-center">
-          <span className="text-[10px] font-bold text-[var(--color-primary)] uppercase tracking-wide text-center">
-            {branch.label}
-          </span>
+          {showLabel && branch.label && (
+            <span className="text-[10px] font-bold text-[var(--color-primary)] uppercase tracking-wide text-center">
+              {branch.label}
+            </span>
+          )}
           {branch.hint && (
             <p className="text-xs text-[var(--color-text-muted)] text-center max-w-sm leading-relaxed">
               {branch.hint}

@@ -1416,10 +1416,11 @@ export const ENGLISH_LESSONS: LessonDefinition[] = [
     "id": "en-a2-152",
     "language": "en",
     "level": "A2",
-    "tag": "VERB",
+    "tag": "GRAM",
     "uiTitle": "Rebobinando as Férias",
-    "grammarFocus": "Past Continuous: Was/Were + -ing",
-    "theme": "Tema 11: Contando o Final de Semana"
+    "grammarFocus": "Past Continuous: Formação e Quando Usar (was/were + -ing)",
+    "theme": "Tema 11: Contando o Final de Semana",
+    "lessonRole": "introduce"
   },
   {
     "id": "en-a2-153",

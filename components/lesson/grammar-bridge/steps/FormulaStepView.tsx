@@ -22,7 +22,7 @@ export function FormulaStepView({
 }: FormulaStepViewProps) {
   return (
     <div className="flex flex-col items-center justify-center gap-4 px-2 w-full">
-      <span className="grammar-step-label">Fórmula da Estrutura</span>
+      <span className="grammar-step-label">Como e quando usar</span>
       <FormulaRenderer
         structureFormula={step.data.structureFormula}
         structureFormulas={step.data.structureFormulas}

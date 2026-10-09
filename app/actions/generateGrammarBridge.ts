@@ -8,6 +8,11 @@ import {
 } from '@/lib/grammarBridge/ptBrLocalization';
 import { buildFocusCompletenessPromptBlock } from '@/lib/grammarBridge/focusCompleteness';
 import {
+  buildGrammarFocusGuidance,
+  buildUsageFirstPromptBlock,
+  resolveConjugationPreviewTense,
+} from '@/lib/grammarBridge/usagePedagogy';
+import {
   formatIssuesForRegen,
   gateGrammarBridge,
   salvageRejectedBridge,
@@ -22,49 +27,18 @@ const MAX_REGEN_ATTEMPTS = 2;
 function buildTagBridgeGuidance(tag: LessonTag | undefined): string {
   switch (tag) {
     case 'GRAM':
-      return 'PRIORIDADE: bridge + structureFormulas (quando houver 2+ usos/termos) + patterns (2-3) + additionalExamples (até 2) + brazilianTrap. Garanta COMPLETUDE: todo termo/uso do grammarFocus deve aparecer em insight, explanation e structureFormulas/patterns.';
+      return 'PRIORIDADE: insight de USO (quando usar na vida real) + bridge + structureFormulas com hint de "quando" (se 2+ usos) + patterns de contraste de uso + brazilianTrap. Garanta COMPLETUDE: todo termo/uso do grammarFocus deve aparecer em insight, explanation e structureFormulas/patterns. NÃO entregue só fórmula sem gatilho de uso.';
     case 'VERB':
-      return 'PRIORIDADE: verbSpotlight completo + patterns (1-2 exemplos de uso do verbo) + brazilianTrap. NÃO omita patterns.';
+      return 'PRIORIDADE: verbSpotlight (personality = QUANDO usar o verbo na vida real) + patterns de uso + brazilianTrap. NÃO omita patterns. Conjugação sem situação = conteúdo incompleto.';
     case 'EXPR':
     case 'VOC':
-      return 'PRIORIDADE: items (UM item por termo do tema — se o foco for "Amener e Emmener", items DEVE ter os dois) + dialogueExample + additionalExamples. Se o tema for par de confusão/lista, NÃO ensine só o primeiro termo. bridge/patterns podem ser null.';
+      return 'PRIORIDADE: items (UM item por termo do tema — se o foco for "Amener e Emmener", items DEVE ter os dois) + dialogueExample + additionalExamples. Em cada item.logic (se houver) diga QUANDO usar. Se o tema for par de confusão/lista, NÃO ensine só o primeiro termo. bridge/patterns podem ser null.';
     case 'DIAL':
     case 'CULT':
-      return 'PRIORIDADE: usageContext + culturalNote + additionalExamples + dialogueExample.';
+      return 'PRIORIDADE: usageContext + culturalNote + additionalExamples + dialogueExample — mostre em que situação social a fala aparece.';
     default:
-      return 'Use bridge + patterns para regras sistêmicas, ou items para listas de expressões.';
+      return 'Use bridge + patterns para regras sistêmicas, ou items para listas de expressões. Sempre diga quando usar.';
   }
-}
-
-function buildGrammarFocusGuidance(grammarFocus: string, language: SupportedLanguage): string {
-  const focus = grammarFocus.toLowerCase();
-
-  if (
-    language === 'fr' &&
-    (focus.includes('pronomes tônicos') ||
-      focus.includes('pronomes tonicos') ||
-      focus.includes('tonic') ||
-      /\bmoi\b.*\btoi\b/i.test(grammarFocus))
-  ) {
-    return `
-⚠️ PRONOMES TÔNICOS (moi, toi, lui, elle, nous, vous, eux, elles) — COMPLETUDE OBRIGATÓRIA ⚠️
-Esta regra tem DOIS usos distintos que o aluno PRECISA sair sabendo:
-1. ÊNFASE/CONTRASTE no sujeito → pronome no INÍCIO + vírgula + sujeito + verbo (ex: "Moi, je préfère le café.")
-2. DEPOIS DE PREPOSIÇÃO → pronome APÓS pour/avec/chez/sans/de (ex: "Je fais ça pour toi.", "Viens avec moi.")
-
-OBRIGATÓRIO no JSON:
-- structureFormulas: EXATAMENTE 2 itens, um por uso, cada um com label, hint, formula e example.
-  - Item 1 — label: "Ênfase no início" | hint: "Pra destacar quem fala ou contrastar, tipo 'quanto a mim...'" | formula: "[Pronome tônico] + , + [Sujeito] + [Verbo]"
-  - Item 2 — label: "Depois de preposição" | hint: "Quando fala de alguém depois de pour, avec, chez etc. — o pronome vai DEPOIS da preposição." | formula: "[Verbo] + [pour/avec/chez] + [Pronome tônico]"
-- insight: mencionar os DOIS usos em no máximo 2 frases (não só o início).
-- explanation: item 1 = uso 1; item 2 = uso 2.
-- survivalTip: cobrir os dois casos (ex: "Início com vírgula = ênfase; depois de pour/avec = outra pessoa.").
-- brazilianTrap: erro clássico do uso 1 (pronome no início sem sujeito clítico: "Moi aime" → "Moi, j'aime").
-- bridge: ilustrar preferencialmente o uso 1 (ênfase no início), pois é o erro mais comum do brasileiro.
-`;
-  }
-
-  return '';
 }
 
 const LANG_LABEL: Record<SupportedLanguage, string> = {
@@ -85,7 +59,7 @@ function buildSystemPrompt(language: SupportedLanguage): string {
 Regras de Humanidade:
 - ZERO "IA-ismos": nada de "Certamente", "Aqui está seu guia", "Entender a nuance é essencial".
 - Use gírias leves e naturais (tipo, né, olha só, a gente).
-- Seja CLARO E SUFICIENTE: frases curtas, mas explique o mecanismo com profundidade — o aluno precisa REALMENTE entender.
+- Seja CLARO E SUFICIENTE: frases curtas, mas explique o mecanismo com profundidade — o aluno precisa REALMENTE entender e saber QUANDO usar na vida real (não só decorar fórmula).
 - Use emojis SPARINGLY para dar um toque humano (ex: 😉, 🚀).
 Respond with ONLY valid JSON, no markdown, no explanation.`;
 }
@@ -93,11 +67,13 @@ Respond with ONLY valid JSON, no markdown, no explanation.`;
 function buildVerbBlocks(grammarFocus: string, language: SupportedLanguage, isVerbLesson: boolean) {
   if (!isVerbLesson) return { verbSpotlightBlock: '', verbRulesBlock: '' };
 
+  const conjugationTense = resolveConjugationPreviewTense(grammarFocus, language);
+
   const verbSpotlightBlock = `,
   "verbSpotlight": {
-    "infinitive": "o verbo-alvo em infinitivo (ex: 'être', 'avoir', 'to be'). DEVE ser extraído de '${grammarFocus}'.",
+    "infinitive": "o verbo-alvo em infinitivo (ex: 'être', 'avoir', 'to be'). DEVE ser extraído de '${grammarFocus}'. Se o foco for um TEMPO (ex: Imparfait) e não um verbo único, escolha o verbo principal do diálogo.",
     "meaning": "significado em PT-BR, curto. ex: 'ser / estar', 'ter / haver'. MAX 6 palavras.",
-    "personality": "1 frase em PT-BR SIMPLES descrevendo o 'jeito' do verbo — quando usar, que sensação passa, por que brasileiros confundem. MAX 15 palavras. Tom de amigo. Sem jargão.",
+    "personality": "1 frase em PT-BR SIMPLES: QUANDO usar este verbo/tempo na vida real. MAX 15 palavras. Tom de amigo. Sem jargão.",
     "frequencyNote": "1 frase curtinha sobre a importância/frequência dele. ex: 'É o verbo mais usado do francês' ou 'Aparece em quase toda conversa'. MAX 12 palavras.",
     "idiomaticExpressions": [
       { "target": "1 expressão FIXA real na língua-alvo usando esse verbo (ex: 'être en train de', 'avoir faim')", "portuguese": "tradução natural em PT-BR" },
@@ -106,24 +82,24 @@ function buildVerbBlocks(grammarFocus: string, language: SupportedLanguage, isVe
     "conjugationPreview": ${
       language === 'fr'
         ? `[
-      { "pronoun": "je", "form": "conjugação presente — ex: 'je donne'" },
-      { "pronoun": "tu", "form": "ex: 'tu donnes'" },
-      { "pronoun": "il", "form": "ex: 'il donne'" },
-      { "pronoun": "elle", "form": "ex: 'elle donne'" },
-      { "pronoun": "on", "form": "ex: 'on donne'" },
-      { "pronoun": "nous", "form": "ex: 'nous donnons'" },
-      { "pronoun": "vous", "form": "ex: 'vous donnez'" },
-      { "pronoun": "ils", "form": "ex: 'ils donnent'" },
-      { "pronoun": "elles", "form": "ex: 'elles donnent'" }
+      { "pronoun": "je", "form": "conjugação no tempo ${conjugationTense} — ex completo" },
+      { "pronoun": "tu", "form": "forma em ${conjugationTense}" },
+      { "pronoun": "il", "form": "forma em ${conjugationTense}" },
+      { "pronoun": "elle", "form": "forma em ${conjugationTense}" },
+      { "pronoun": "on", "form": "forma em ${conjugationTense}" },
+      { "pronoun": "nous", "form": "forma em ${conjugationTense}" },
+      { "pronoun": "vous", "form": "forma em ${conjugationTense}" },
+      { "pronoun": "ils", "form": "forma em ${conjugationTense}" },
+      { "pronoun": "elles", "form": "forma em ${conjugationTense}" }
     ]`
         : `[
-      { "pronoun": "I", "form": "present conjugation — ex: 'I give'" },
-      { "pronoun": "you", "form": "ex: 'you give'" },
-      { "pronoun": "he", "form": "ex: 'he gives'" },
-      { "pronoun": "she", "form": "ex: 'she gives'" },
-      { "pronoun": "it", "form": "ex: 'it gives'" },
-      { "pronoun": "we", "form": "ex: 'we give'" },
-      { "pronoun": "they", "form": "ex: 'they give'" }
+      { "pronoun": "I", "form": "conjugação em ${conjugationTense}" },
+      { "pronoun": "you", "form": "forma em ${conjugationTense}" },
+      { "pronoun": "he", "form": "forma em ${conjugationTense}" },
+      { "pronoun": "she", "form": "forma em ${conjugationTense}" },
+      { "pronoun": "it", "form": "forma em ${conjugationTense}" },
+      { "pronoun": "we", "form": "forma em ${conjugationTense}" },
+      { "pronoun": "they", "form": "forma em ${conjugationTense}" }
     ]`
     }
   }`;
@@ -131,14 +107,14 @@ function buildVerbBlocks(grammarFocus: string, language: SupportedLanguage, isVe
   const verbRulesBlock = `
 REGRAS EXTRA PARA LIÇÃO DE VERBO:
 - verbSpotlight.infinitive: use o pronome/marcador correto da língua (ex: em FR é 'être', não 'to be'; em EN é 'to be').
-- verbSpotlight.conjugationPreview: forneça as formas do PRESENTE na língua-alvo. ${
+- verbSpotlight.conjugationPreview: forneça as formas no tempo "${conjugationTense}" (o tempo do grammarFocus), NÃO force présent/present se o foco for outro tempo. ${
     language === 'fr'
       ? "Para francês use separadamente exatamente: 'je, tu, il, elle, on, nous, vous, ils, elles'."
       : "Para inglês use separadamente exatamente: 'I, you, he, she, it, we, they'."
   }
 - verbSpotlight.idiomaticExpressions: FORNEÇA 1-2 expressões fixas reais, não invente. Se não houver expressão canônica com esse verbo, deixe como array vazio []. NUNCA misture palavras em português nos textos da língua-alvo (ex: "jouer avec le feu", NUNCA "jouer avec o feu").
-- verbSpotlight.personality e frequencyNote: linguagem SIMPLES, uma frase COMPLETA com ponto final. A frase tem de falar DESTE verbo (cite o infinitivo). PROIBIDO truque genérico que sirva para qualquer verbo ("decorar a forma", "muda conforme a pessoa"). Se não couber em 15 palavras sem cortar, escreva menos — nunca deixe a frase pela metade.
-- insight: UMA sacada que só existe para ESTE verbo (a irregularidade dele, o jeito que a forma muda, a confusão específica com o português). Cite o infinitivo ou a forma conjugada da frase-exemplo. PROIBIDO insight que serviria para qualquer verbo, por exemplo "o presente serve para hábitos" ou "o verbo muda conforme a pessoa".
+- verbSpotlight.personality e frequencyNote: linguagem SIMPLES, uma frase COMPLETA com ponto final. A frase tem de falar DESTE verbo (cite o infinitivo) e do momento em que a gente usa. PROIBIDO truque genérico que sirva para qualquer verbo ("decorar a forma", "muda conforme a pessoa"). Se não couber em 15 palavras sem cortar, escreva menos — nunca deixe a frase pela metade.
+- insight: UMA sacada de USO que só existe para ESTE verbo/tempo (quando usar, a confusão específica com o português). Cite o infinitivo ou a forma conjugada da frase-exemplo. PROIBIDO insight genérico ("o verbo muda conforme a pessoa") e PROIBIDO insight só de morfologia sem situação de uso.
 - bridge.difference: frase completa comparando os dois exemplos. Sem ela, a tela de "A regra" só mostra o rótulo usageContext — isso é erro.
 - analogy: null, a menos que mencione ESTE verbo e termine com ponto final em até 20 palavras.
 - structureFormula: funções por extenso. Escreva [Sujeito], nunca [Suj] ou [Subj].
@@ -174,6 +150,7 @@ function buildUserPrompt(params: {
   const tagGuidance = buildTagBridgeGuidance(tag);
   const roleGuidance = buildLessonRolePromptGuidance(lessonRole);
   const focusGuidance = buildGrammarFocusGuidance(grammarFocus, language);
+  const usageFirstGuidance = buildUsageFirstPromptBlock();
   const durationGuidance = buildDurationGrammarFocusGuidance(grammarFocus, language);
   const completenessGuidance = buildFocusCompletenessPromptBlock(grammarFocus);
   const ptBrLocalizationBlock = buildPtBrLocalizationPromptBlock();
@@ -187,13 +164,14 @@ Contexto do diálogo:
 ORIENTAÇÃO POR TIPO DE LIÇÃO (tag: ${tag ?? 'GRAM'}):
 ${tagGuidance}
 ${roleGuidance ? `\nORIENTAÇÃO POR PAPEL PEDAGÓGICO:\n${roleGuidance}\n` : ''}
+${usageFirstGuidance}
 ${focusGuidance}
 ${completenessGuidance}
 ${durationGuidance}
 ${ptBrLocalizationBlock}
 ${correctionBlock ?? ''}
 
-Você está falando com um falante nativo de português brasileiro. Use isso a seu favor: compare diretamente com o português, aponte os erros clássicos que brasileiros cometem e explique POR QUÊ a estrutura funciona diferente.
+Você está falando com um falante nativo de português brasileiro. Use isso a seu favor: compare diretamente com o português, aponte os erros clássicos que brasileiros cometem e explique POR QUÊ a estrutura funciona diferente e QUANDO usar na vida real.
 
 ⚠️ CAMPO bridge — FRASES EXEMPLO, NUNCA META-EXPLICAÇÃO ⚠️
 bridge.portuguese e bridge.target são EXCLUSIVAMENTE um par de frases exemplo paralelas (PT-BR ↔ ${LANG_LABEL[language]}).
@@ -224,13 +202,14 @@ Cada campo do JSON tem uma FUNÇÃO COGNITIVA distinta. NÃO repita a mesma saca
 - survivalTip = âncora memorizável — NÃO reexplica a regra; é o mnemônico curto
 - retentionCheck = preferência: "Como você diria X?" com 2-3 opções
 
-⚠️ MISSÃO CENTRAL: ENSINO INTUITIVO E PROFUNDO ⚠️
-O objetivo é que o aluno REALMENTE ENTENDA a regra — claro e suficiente, não raso.
+⚠️ MISSÃO CENTRAL: ENTENDER PARA USAR (não decoreba) ⚠️
+O objetivo é que o aluno REALMENTE ENTENDA a regra e saiba QUANDO aplicar na conversa — claro e suficiente, não raso e não só fórmula.
 Você DEVE:
 - Explicar com calma, usando comparações diretas com o português ("No português a gente faz X, mas no ${LANG_LABEL[language]} faz Y porque...").
+- Sempre responder: "em que situação da vida real eu uso isso?"
 - Dar MÚLTIPLOS exemplos paralelos (PT-BR → ${LANG_LABEL[language]}) para que o aluno veja o padrão se repetindo.
 - Usar analogias do dia a dia quando ajudar (campo analogy).
-- Incluir equivalências explícitas: para cada conceito, mostrar COMO se diz em português e COMO se diz na língua-alvo.
+- Incluir equivalências explícitas: para cada conceito, mostrar COMO se diz em português, COMO se diz na língua-alvo, e QUANDO escolher.
 Mas NUNCA escreva como um livro acadêmico. Escreva como um amigo paciente explicando.
 
 ⚠️ PRECISÃO LINGUÍSTICA — CRÍTICO (não ensine errado; ensinar errado é pior do que não ensinar) ⚠️
@@ -276,7 +255,7 @@ EXEMPLO BOM (escreva assim):
 
 Output ONLY este JSON (sem markdown):
 {
-  "insight": "1-2 frases de impacto em PT-BR SIMPLES — a sacada central da regra.",
+  "insight": "1-2 frases em PT-BR SIMPLES — a sacada central: QUANDO usar na vida real (não só como formar).",
   "analogy": "Opcional. 1 frase tipo 'Pensa assim: ...' — analogia do dia a dia. MAX 20 palavras. null se não ajudar.",
   "explanation": [
     "Item 1 (MAX 15 palavras): como montar a frase na prática, com exemplo PT → língua-alvo.",
@@ -344,7 +323,7 @@ Regras Cruciais:
 3. brazilianTrap: FOQUE no erro clássico DESTE ponto. wrongPortuguese é o pensamento em português natural e gramatical ("Eu leio o livro"), NUNCA português quebrado ("Eu ler o livro"). wrong é a frase errada na língua-alvo ("Je lire le livre"). right DEVE estar correto na língua-alvo. SEMPRE preencha wrongPortuguese e rightPortuguese.
 4. Destaque Visual: Use ^^ em bridge.target e bridge.portuguese.
 5. explanation: array de 1-2 strings em GRAM. Nunca repita insight nem bridge.difference.
-5b. structureFormulas: use quando a regra tiver 2+ construções. Cada item com label + hint + formula + example.
+5b. structureFormulas: use quando a regra tiver 2+ construções OU 2+ gatilhos de uso. Cada item com label + hint (QUANDO usar) + formula + example. Hint nunca pode ser vazio.
 5b2. formulaExample: quando usar structureFormula única, inclua 1 frase real + tradução PT-BR.
 5c. retentionCheck: prefira "Como você diria X?". correctIndex aponta para a opção certa de verdade.
 6. dialogueExample.target: DEVE ser uma linha real do diálogo acima.

@@ -35,13 +35,13 @@ export function getTopicStage(
 export function buildLessonRolePromptGuidance(role: LessonRole | undefined): string {
   switch (role) {
     case 'introduce':
-      return `LESSON ROLE = INTRODUCE: Teach meaning and basic use of the focus terms. Prefer clear examples over discrimination drills. Do NOT spend the whole lesson on "which word is correct" traps yet.`;
+      return `LESSON ROLE = INTRODUCE: Teach meaning, WHEN to use in real life, and the basic form. Prefer clear situation triggers + examples over bare formulas or discrimination drills. Do NOT spend the whole lesson on "which word is correct" traps yet.`;
     case 'contrast':
       return `LESSON ROLE = CONTRAST: The learner already met these terms. Focus on DISCRIMINATION — when to pick each form, contrastive examples, and Brazilian mix-up traps. Avoid re-teaching basic definitions as if new.`;
     case 'reinforce':
-      return `LESSON ROLE = REINFORCE (spiral review): The learner already studied this topic earlier. Do NOT re-teach from zero. Quick recall + harder production + edge cases. Keep insight short; prioritize practice-ready patterns.`;
+      return `LESSON ROLE = REINFORCE (spiral review): The learner already studied this topic earlier. Do NOT re-teach from zero. Quick recall of WHEN to use + harder production + edge cases. Keep insight short; prioritize practice-ready patterns.`;
     case 'practice':
-      return `LESSON ROLE = PRACTICE: Assume core meaning is known. Emphasize fluent use in context over metalanguage.`;
+      return `LESSON ROLE = PRACTICE: Assume core meaning is known. Emphasize fluent use in real situations over metalanguage or formula drills.`;
     default:
       return '';
   }

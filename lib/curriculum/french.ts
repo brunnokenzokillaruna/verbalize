@@ -2214,19 +2214,23 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "id": "fr-a2-213",
     "language": "fr",
     "level": "A2",
-    "tag": "VERB",
+    "tag": "GRAM",
     "uiTitle": "Força Restabelecida",
-    "grammarFocus": "Formação do Imparfait",
-    "theme": "Ponte A2 > B1: Descrição e passado"
+    "grammarFocus": "Imparfait: Formação e Quando Usar",
+    "theme": "Ponte A2 > B1: Descrição e passado",
+    "topicKey": "imparfait",
+    "lessonRole": "introduce"
   },
   {
     "id": "fr-b1-214",
     "language": "fr",
     "level": "B1",
-    "tag": "VERB",
+    "tag": "GRAM",
     "uiTitle": "Brinquedos Antigos",
     "grammarFocus": "Imparfait para Descrições e Hábitos",
-    "theme": "Tema 16: Relembrando a Infância"
+    "theme": "Tema 16: Relembrando a Infância",
+    "topicKey": "imparfait",
+    "lessonRole": "reinforce"
   },
   {
     "id": "fr-b1-215",
@@ -3142,10 +3146,11 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "id": "fr-b1-309",
     "language": "fr",
     "level": "B1",
-    "tag": "VERB",
+    "tag": "GRAM",
     "uiTitle": "Inscrevendo-se no Subjuntivo",
-    "grammarFocus": "Subjonctif Présent: Formação (Regulares)",
-    "theme": "Tema 20: Expressões e Redes Sociais"
+    "grammarFocus": "Subjonctif Présent: Formação e Quando Usar (Regulares)",
+    "theme": "Tema 20: Expressões e Redes Sociais",
+    "lessonRole": "introduce"
   },
   {
     "id": "fr-b1-919",
@@ -3207,8 +3212,9 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "level": "B2",
     "tag": "GRAM",
     "uiTitle": "Memórias Passadas",
-    "grammarFocus": "Formação do Plus-que-parfait",
-    "theme": "Tema 21: O Mundo das Emoções"
+    "grammarFocus": "Plus-que-parfait: Formação e Quando Usar",
+    "theme": "Tema 21: O Mundo das Emoções",
+    "lessonRole": "introduce"
   },
   {
     "id": "fr-b2-316",

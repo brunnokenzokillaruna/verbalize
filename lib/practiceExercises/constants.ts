@@ -36,7 +36,8 @@ export type ExerciseTypeId =
 export const PRACTICE_EXERCISE_COUNT = 5;
 
 /** Bump when pregenerated exercise composition changes (e.g. mandatory production). */
-export const PREGEN_SCHEMA_VERSION = 24;
+/** Bumped when Grammar Bridge pedagogy requires WHEN-to-use (not formula-only) regeneration. */
+export const PREGEN_SCHEMA_VERSION = 25;
 
 /** Documents without schemaVersion are treated as version 0 (stale). */
 export function isPregenSchemaCurrent(schemaVersion?: number): boolean {

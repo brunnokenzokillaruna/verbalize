@@ -13,6 +13,10 @@ import {
 } from '@/lib/grammarBridgeValidation';
 import { findMissingFocusTerms } from '@/lib/grammarBridge/focusCompleteness';
 import { regraTeachingGap } from '@/lib/grammarBridge/regraContent';
+import {
+  insightLooksLikeMorphologyOnly,
+  isTenseOrMoodFormationFocus,
+} from '@/lib/grammarBridge/usagePedagogy';
 
 export type BridgeIssueSeverity = 'core' | 'secondary';
 
@@ -215,11 +219,32 @@ export function collectLocalBridgeIssues(
       severity: 'core',
       problem: teachingGap,
       fixHint:
-        'Escreva insight em 1-2 frases completas que expliquem ESTA regra. Em lição de verbo, cite o infinitivo ou a forma da frase. bridge.difference compara os dois exemplos. usageContext continua sendo só um rótulo de 1-3 palavras.',
+        'Escreva insight em 1-2 frases completas que expliquem ESTA regra e QUANDO usar. Em lição de verbo, cite o infinitivo ou a forma da frase. bridge.difference compara os dois exemplos. usageContext continua sendo só um rótulo de 1-3 palavras.',
+    });
+  }
+
+  if (insightLooksLikeMorphologyOnly(bridge.insight)) {
+    issues.push({
+      field: 'insight',
+      severity: 'core',
+      problem: 'insight looks like morphology-only (no real-life when-to-use cue)',
+      fixHint:
+        'Reescreva insight com o gatilho de uso na vida real (quando / hábito / descrição / pedido…). Formação fica em explanation ou na fórmula.',
     });
   }
 
   const formulas = bridge.structureFormulas ?? [];
+  const requireUsageHints = isTenseOrMoodFormationFocus(grammarFocus) || formulas.length >= 2;
+  formulas.forEach((f, i) => {
+    if (!f.hint?.trim()) {
+      issues.push({
+        field: `structureFormulas[${i}].hint`,
+        severity: requireUsageHints ? 'core' : 'secondary',
+        problem: 'structureFormulas hint missing — learner will not know when to use this option',
+        fixHint: 'Add hint answering "quando usar esta opção" in max 20 simple PT-BR words.',
+      });
+    }
+  });
   if (formulas.length >= 2 && bridge.insight) {
     const insightNorm = norm(bridge.insight);
     const uncovered = formulas.filter((f) => {
