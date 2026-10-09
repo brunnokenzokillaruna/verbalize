@@ -111,11 +111,18 @@ export default function DashboardPage() {
 
   const handleToggleModal = useCallback(
     (lesson: LessonDefinition, state: Omit<LessonModalState, 'isOpen'>) => {
-      setModalState((prev) =>
-        prev.isOpen && prev.lesson?.id === lesson.id
-          ? EMPTY_LESSON_MODAL
-          : { ...state, isOpen: true },
-      );
+      setModalState((prev) => {
+        if (prev.isOpen && prev.lesson?.id === lesson.id) {
+          return EMPTY_LESSON_MODAL;
+        }
+        // Keep the popover clear of the fixed BottomNav / sticky header.
+        requestAnimationFrame(() => {
+          document
+            .getElementById(`lesson-node-${lesson.id}`)
+            ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+        return { ...state, isOpen: true };
+      });
     },
     [],
   );
@@ -267,7 +274,10 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-dvh animate-fade-in" style={{ backgroundColor: 'var(--color-bg)' }}>
+    <div
+      className={`min-h-dvh animate-fade-in ${modalState.isOpen ? 'relative z-50' : ''}`}
+      style={{ backgroundColor: 'var(--color-bg)' }}
+    >
       <div className="relative w-full max-w-lg mx-auto md:max-w-2xl lg:max-w-4xl px-0 sm:px-4">
         <DashboardTopBar
           langName={lang.name}

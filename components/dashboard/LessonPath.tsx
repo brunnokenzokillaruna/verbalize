@@ -75,7 +75,7 @@ export function LessonPath({
   }
 
   return (
-    <div className="flex flex-col items-center pb-28 md:pb-12">
+    <div className="flex flex-col items-center pb-[calc(11rem+env(safe-area-inset-bottom,0px))] md:pb-20">
       {themes.map((themeGroup, themeIdx) => {
         const bgColors = THEME_COLORS[themeIdx % THEME_COLORS.length];
         return (
@@ -110,7 +110,7 @@ export function LessonPath({
                   <div
                     key={lesson.id}
                     ref={isCurrent ? currentLessonRef : undefined}
-                    className="relative flex flex-col items-center animate-scale-in"
+                    className="relative flex flex-col items-center animate-scale-in scroll-mt-36 scroll-mb-[calc(6rem+env(safe-area-inset-bottom,0px))] md:scroll-mb-10"
                     style={{
                       animationDelay: `${localIdx * 40}ms`,
                       animationFillMode: 'both',
