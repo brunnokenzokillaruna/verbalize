@@ -9,7 +9,11 @@ import {
   isListenAndSelectConsistent,
   isMcqAnswerConsistent,
 } from './validateChoiceConsistency';
-import { isListeningComprehensionPtBrPure, findLeakedTargetWord } from './validatePtBrText';
+import {
+  isListeningComprehensionPtBrPure,
+  findLeakedTargetWord,
+  isUnusableLearnerPrompt,
+} from './validatePtBrText';
 
 function bankWithDistractors(correctOrder: string[], words: string[] | undefined): string[] {
   const correct = correctOrder.map((word) => word.trim()).filter(Boolean);
@@ -94,6 +98,12 @@ export async function validateAndSanitizeExercises(
       };
       if (!d.portuguese_sentence?.trim() || !d.target_translation?.trim()) {
         console.warn('[generatePracticeExercises] Dropped reverse-translation with missing sentence fields');
+        return false;
+      }
+      if (isUnusableLearnerPrompt(d.portuguese_sentence)) {
+        console.warn(
+          `[generatePracticeExercises] Dropped reverse-translation — unusable learner prompt: "${d.portuguese_sentence}"`,
+        );
         return false;
       }
       Object.assign(d, sanitizeReverseTranslationExercise({
@@ -266,6 +276,12 @@ export async function validateAndSanitizeExercises(
       const d = ex.data as { words: string[]; correctOrder: string[]; portuguese_sentence?: string };
       if (!d.portuguese_sentence?.trim() || !d.words?.length || !d.correctOrder?.length) {
         console.warn('[generatePracticeExercises] Dropped malformed word-bank-translation');
+        return false;
+      }
+      if (isUnusableLearnerPrompt(d.portuguese_sentence)) {
+        console.warn(
+          `[generatePracticeExercises] Dropped word-bank-translation — unusable learner prompt: "${d.portuguese_sentence}"`,
+        );
         return false;
       }
       (ex.data as { words: string[] }).words = bankWithDistractors(d.correctOrder, d.words);

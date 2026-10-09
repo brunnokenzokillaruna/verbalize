@@ -53,17 +53,17 @@ async function injectProductionType(
 ): Promise<Exercise[]> {
   if (exercises.some((ex) => ex.type === requiredType)) return exercises;
 
-  let generated = buildFallbackProductionExercise(requiredType, ctx);
+  let generated = await generateSingleProductionExercise(
+    requiredType,
+    allowedSet,
+    ctx.language,
+    ctx.grammarFocus,
+    ctx.theme,
+    ctx.dialogue,
+    ctx.newVocabulary,
+  );
   if (!generated) {
-    generated = await generateSingleProductionExercise(
-      requiredType,
-      allowedSet,
-      ctx.language,
-      ctx.grammarFocus,
-      ctx.theme,
-      ctx.dialogue,
-      ctx.newVocabulary,
-    );
+    generated = buildFallbackProductionExercise(requiredType, ctx);
   }
   if (!generated) return exercises;
 

@@ -184,6 +184,8 @@ ${tagGuidance}${roleGuidance ? `\nPEDAGOGICAL ROLE:\n${roleGuidance}\n` : ''}${g
 
 CRITICAL RULE: Do NOT copy or reuse any sentence from the dialogue above. Every exercise sentence must be ORIGINAL — newly created by you. The sentences should be related to the lesson's theme and grammar focus, but must be completely different from the dialogue lines.
 
+CRITICAL PROMPT QUALITY: For reverse-translation and word-bank-translation, "portuguese_sentence" must be a concrete Brazilian Portuguese sentence to translate (e.g. "Você acha que vamos conseguir consertar essa bicicleta velha?"). FORBIDDEN as portuguese_sentence: curriculum labels, bridge stage names ("Ponte A2 > B1…"), theme titles ("Tema 16: …"), or vague instructions like "Diga em French algo sobre: …".
+
 LEVEL CONSTRAINTS — all sentences you write must follow these rules: ${levelDesc}
 ${vocabConstraint}${reverseTranslationHintRule}${reverseTranslationAdverbRule}${directionalVerbRule}
 ${grammarAccuracyBlock}

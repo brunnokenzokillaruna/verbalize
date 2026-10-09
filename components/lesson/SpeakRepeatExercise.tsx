@@ -163,9 +163,11 @@ export function SpeakRepeatExercise({
         <p className="font-display text-2xl font-bold leading-relaxed text-[var(--color-text-primary)]">
           {data.text}
         </p>
-        <p className="text-xs font-medium italic text-[var(--color-text-muted)] opacity-70 border-l-2 border-[var(--color-primary)]/20 pl-4">
-          {data.translation}
-        </p>
+        {data.translation?.trim() ? (
+          <p className="text-xs font-medium italic text-[var(--color-text-muted)] opacity-70 border-l-2 border-[var(--color-primary)]/20 pl-4">
+            {data.translation}
+          </p>
+        ) : null}
       </div>
 
       {/* Audio & Record Controls */}

@@ -140,6 +140,21 @@ export function findLeakedTargetWord(
   return null;
 }
 
+/**
+ * Detects learner-facing stems that are curriculum metadata or vague
+ * "say something about X" prompts — never valid reverse/word-bank prompts.
+ */
+export function isUnusableLearnerPrompt(text: string): boolean {
+  const t = text.trim();
+  if (!t) return true;
+  if (/\bPonte\s+A\d/i.test(t)) return true;
+  if (/\balgo sobre\s*:/i.test(t)) return true;
+  if (/^Diga em\b/i.test(t)) return true;
+  if (/^Traduza\s*:\s*(Ponte\b|Tema\s+\d+)/i.test(t)) return true;
+  if (/^Tema\s+\d+\s*:/i.test(t)) return true;
+  return false;
+}
+
 export function isPtBrLearnerTextPure(
   text: string,
   forbiddenWords: Iterable<string>,

@@ -80,46 +80,37 @@ export function buildFallbackProductionExercise(
   requiredType: ExerciseTypeId,
   ctx: EnsureProductionContext,
 ): Exercise | null {
-  const vocab = ctx.newVocabulary[0] ?? 'mot';
-  const theme = ctx.theme || ctx.grammarFocus || 'lição';
+  const vocab = ctx.newVocabulary[0];
   const line = firstDialogueLine(ctx.dialogue);
 
   switch (requiredType) {
     case 'word-bank-translation':
-      return {
-        type: 'word-bank-translation',
-        data: {
-          portuguese_sentence: `Traduza: ${theme}.`,
-          words: [vocab, 'c\'est', 'un', 'le'],
-          correctOrder: ['c\'est', 'un', vocab],
-          hint: vocab,
-        },
-      };
     case 'reverse-translation':
-      return {
-        type: 'reverse-translation',
-        data: {
-          portuguese_sentence: `Diga em ${LANG_LABEL[ctx.language]} algo sobre: ${theme}.`,
-          target_translation: line || vocab,
-          acceptable_variants: [vocab],
-        },
-      };
-    case 'speak-repeat':
+      // Never invent a PT prompt from curriculum theme/grammarFocus labels
+      // (e.g. "Ponte A2 > B1: …") — that produces unusable learner stems.
+      return null;
+    case 'speak-repeat': {
+      const text = line || vocab;
+      if (!text) return null;
       return {
         type: 'speak-repeat',
         data: {
-          text: line || vocab,
-          translation: theme,
+          text,
+          translation: '',
         },
       };
-    case 'audio-dictation':
+    }
+    case 'audio-dictation': {
+      const text = line || vocab;
+      if (!text) return null;
       return {
         type: 'audio-dictation',
         data: {
-          text: line || vocab,
-          translation: theme,
+          text,
+          translation: '',
         },
       };
+    }
     default:
       return null;
   }
@@ -192,18 +183,18 @@ export async function ensureMinimumProduction(
   const tagExclusive = getTagExclusiveType(ctx.tag, ctx.level);
   const result = [...exercises];
 
-  let generated = buildFallbackProductionExercise(requiredType, ctx);
+  let generated = await generateSingleProductionExercise(
+    requiredType,
+    allowedSet,
+    ctx.language,
+    ctx.grammarFocus,
+    ctx.theme,
+    ctx.dialogue,
+    ctx.newVocabulary,
+  );
 
   if (!generated) {
-    generated = await generateSingleProductionExercise(
-      requiredType,
-      allowedSet,
-      ctx.language,
-      ctx.grammarFocus,
-      ctx.theme,
-      ctx.dialogue,
-      ctx.newVocabulary,
-    );
+    generated = buildFallbackProductionExercise(requiredType, ctx);
   }
 
   if (generated) {

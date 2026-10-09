@@ -20,6 +20,7 @@ export function buildTypeDescriptions(langLabel: string): Record<ExerciseTypeId,
    - "acceptable_answers" is an array of other valid corrected sentences or replacement words, or empty.`,
     'reverse-translation': `type "reverse-translation":
    - "portuguese_sentence" (PT-BR) → "target_translation" (${langLabel}).
+   - portuguese_sentence MUST be a concrete PT-BR sentence the learner translates — NEVER a vague prompt ("Diga algo sobre…"), NEVER curriculum labels ("Ponte A2 > B1…", "Tema 16: …"), NEVER metalanguage about the lesson stage.
    - portuguese_sentence MUST be entirely Brazilian Portuguese — NEVER mix ${langLabel} lesson words into the PT prompt (express the meaning in Portuguese; the ${langLabel} word belongs only in target_translation / variants).
    - "acceptable_variants" MUST include both a spoken form and a written form when they differ (FR: "j'ai pas" and "je n'ai pas"; "t'as" and "tu as"). Either is correct if the lesson point is present.
    - "hint" (optional grammar tip in PT-BR).
@@ -27,7 +28,7 @@ export function buildTypeDescriptions(langLabel: string): Record<ExerciseTypeId,
    - If target_translation uses a French adverb like "rapidement", include "vite" (or equivalent) in acceptable_variants.
    - Optional chain fields: "linkedExerciseId" (e.g. "chain-1") and "chainAnchorPhrase" (${langLabel} phrase shared with a paired listening-comprehension exercise).`,
     'word-bank-translation': `type "word-bank-translation":
-   - "portuguese_sentence" (PT-BR sentence to translate).
+   - "portuguese_sentence" (PT-BR sentence to translate) — concrete sentence only; NEVER "Diga algo sobre…" or curriculum labels ("Ponte…", "Tema N:…").
    - "correctOrder" (array of ${langLabel} words in correct order).
    - "words" MUST contain every correctOrder word PLUS 1 or 2 extra plausible words that do NOT belong in the sentence.
    - "acceptable_variants" (0-2 alternative word orders as arrays, without the extra words).

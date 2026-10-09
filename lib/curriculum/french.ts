@@ -2197,7 +2197,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Ação em Andamento",
     "grammarFocus": "Gerúndio e 'estar fazendo' + infinitivo",
-    "theme": "Ponte A2 > B1: Descrição e passado"
+    "theme": "Tema 16: Relembrando a Infância"
   },
   {
     "id": "fr-a2-212",
@@ -2206,7 +2206,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Recuperação",
     "grammarFocus": "Conjugação: Croire",
-    "theme": "Ponte A2 > B1: Descrição e passado",
+    "theme": "Tema 16: Relembrando a Infância",
     "topicKey": "conj-croire",
     "lessonRole": "introduce"
   },
@@ -2217,7 +2217,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Força Restabelecida",
     "grammarFocus": "Imparfait: Formação e Quando Usar",
-    "theme": "Ponte A2 > B1: Descrição e passado",
+    "theme": "Tema 16: Relembrando a Infância",
     "topicKey": "imparfait",
     "lessonRole": "introduce"
   },
