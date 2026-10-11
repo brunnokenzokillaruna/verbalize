@@ -13,18 +13,18 @@ import {
 export type { GeminiTier } from '@/lib/geminiQuota';
 
 const MODEL_CHAINS: Record<GeminiTier, readonly string[]> = {
-  // Hooks / critical content: prefer 3.5 quality; lite if overloaded or soft budget out.
-  critical: ['gemini-3.5-flash', 'gemini-3.1-flash-lite'],
+  // Hooks / critical content: prefer 3.6 quality; lite if overloaded or soft budget out.
+  critical: ['gemini-3.6-flash', 'gemini-3.1-flash-lite'],
   // Grammar, exercises, bridges: lite first — cheaper, faster JSON, fewer timeouts.
-  // (Putting 3.5 on standard burned ~CA$0.20+/lesson and raised practice failure rate.)
+  // (Putting primary flash on standard burned ~CA$0.20+/lesson and raised practice failure rate.)
   standard: ['gemini-3.1-flash-lite', 'gemini-2.5-flash-lite'],
   lightweight: ['gemini-3.1-flash-lite'],
 };
 
-/** Degraded hook path when 3.5 daily budget is exhausted. */
+/** Degraded hook path when primary flash daily budget is exhausted. */
 const CRITICAL_FALLBACK_MODEL = 'gemini-3.1-flash-lite';
 
-export const PRIMARY_GEMINI_MODEL = 'gemini-3.5-flash';
+export const PRIMARY_GEMINI_MODEL = 'gemini-3.6-flash';
 
 const DEFAULT_COOLDOWN_MS = 5 * 60 * 1000;
 const OVERLOAD_COOLDOWN_MS = 60 * 1000;
@@ -37,7 +37,11 @@ const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 const ai = new GoogleGenAI({ apiKey: getGeminiKey() });
 
 function modelSupportsThinkingConfig(model: string): boolean {
-  return model.includes('flash-lite') || model.includes('3.5');
+  return (
+    model.includes('flash-lite') ||
+    model.includes('3.6') ||
+    model.includes('3.5')
+  );
 }
 
 const LARGE_OUTPUT_THRESHOLD = 1500;
@@ -46,7 +50,11 @@ const LARGE_OUTPUT_MIN_TOKENS = 8192;
 function getAdjustedMaxTokens(model: string, maxOutputTokens: number): number {
   const isLargeOutput = maxOutputTokens >= LARGE_OUTPUT_THRESHOLD;
 
-  if (model.includes('3.5') || model.includes('thinking')) {
+  if (
+    model.includes('3.6') ||
+    model.includes('3.5') ||
+    model.includes('thinking')
+  ) {
     if (isLargeOutput) {
       return Math.max(maxOutputTokens * 3, LARGE_OUTPUT_MIN_TOKENS);
     }
@@ -145,7 +153,7 @@ function getActiveModelChain(tier: GeminiTier): string[] {
 
   if (flash35Unavailable && chain.includes(PRIMARY_GEMINI_MODEL)) {
     console.warn(
-      `[Gemini SDK] gemini-3.5-flash daily budget exhausted — skipping 3.5 for tier=${tier}`,
+      `[Gemini SDK] ${PRIMARY_GEMINI_MODEL} daily budget exhausted — skipping primary flash for tier=${tier}`,
     );
     chain = chain.filter((model) => model !== PRIMARY_GEMINI_MODEL);
     if (chain.length === 0) {
@@ -196,7 +204,7 @@ async function generateWithModel(
 
 /**
  * Calls the Gemini API using tier-specific model chains.
- * critical → 3.5-flash (degrades to lite when daily budget exhausted)
+ * critical → 3.6-flash (degrades to lite when daily budget exhausted)
  * standard → 3.1-flash-lite → 2.5-flash-lite
  * lightweight → 3.1-flash-lite only
  */
@@ -234,7 +242,7 @@ export async function callGemini(
       } catch (err: unknown) {
         if (err instanceof GeminiQuotaExceededError) {
           if (model === PRIMARY_GEMINI_MODEL) {
-            console.warn('[Gemini SDK] 3.5 quota exceeded — continuing with lite models');
+            console.warn('[Gemini SDK] primary flash quota exceeded — continuing with lite models');
             // Fall through to next model in chain (or degrade critical → standard).
             if (modelChain[modelIndex + 1]) break;
             if (tier === 'critical') {

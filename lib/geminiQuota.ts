@@ -4,7 +4,7 @@
  *
  * Defaults sized for paid Tier 1 (override with env if needed):
  *   GEMINI_DAILY_BUDGET_35 / GEMINI_DAILY_BUDGET_LITE
- * In dev mode the 3.5 cap is automatically reduced.
+ * In dev mode the primary flash (flash35) cap is automatically reduced.
  */
 
 import { isGeminiDevMode } from '@/lib/geminiDevGuard';
@@ -14,7 +14,8 @@ export type GeminiTier = 'critical' | 'standard' | 'lightweight';
 export type QuotaBucket = 'flash35' | 'lite';
 
 const MODEL_TO_BUCKET: Record<string, QuotaBucket> = {
-  'gemini-3.5-flash': 'flash35',
+  'gemini-3.6-flash': 'flash35',
+  'gemini-3.5-flash': 'flash35', // deprecated alias — still budgeted if hit
   'gemini-3.1-flash-lite': 'lite',
   'gemini-2.5-flash-lite': 'lite',
   'gemini-2.5-flash': 'flash35',

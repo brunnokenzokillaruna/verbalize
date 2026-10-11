@@ -2,7 +2,7 @@
  * Rate limiter dedicated to Gemini TTS models.
  *
  * TTS models (e.g. gemini-2.5-flash-preview-tts) have their own RPM/RPD
- * quotas separate from text models (gemini-3.5-flash, etc.), but they share
+ * quotas separate from text models (gemini-3.6-flash, etc.), but they share
  * the same GCP project. We still throttle conservatively to avoid 429s during
  * lesson prefetch while content generation may be active.
  */

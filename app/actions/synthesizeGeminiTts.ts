@@ -24,7 +24,7 @@ import type { SupportedLanguage } from '@/types';
 /*  Gemini Pro TTS — multi-speaker dialogue in a single API call       */
 /*                                                                     */
 /*  Uses the Interactions API with a dedicated TTS model so quotas     */
-/*  are separate from lesson content generation (gemini-3.5-flash).    */
+/*  are separate from lesson content generation (gemini-3.6-flash).    */
 /*  Returns WAV base64 (browser-native) instead of MP3.                */
 /* ------------------------------------------------------------------ */
 
