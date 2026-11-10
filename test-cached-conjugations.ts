@@ -31,17 +31,17 @@ assert(resolveVerbTenseKey('futur proche') === 'nearFuture', 'resolveVerbTenseKe
 assert(resolveVerbTenseKey('going to future') === 'nearFuture', 'resolveVerbTenseKey going to');
 assert(resolveVerbTenseKey('present continuous') === 'presentContinuous', 'resolveVerbTenseKey present continuous');
 
-assert(mapPreviewTenseToVerbKey('imparfait', 'fr') === 'imperfect', 'map preview imparfait');
-assert(mapPreviewTenseToVerbKey('passé composé', 'fr') === 'past', 'map preview passé composé');
-assert(mapPreviewTenseToVerbKey('plus-que-parfait', 'fr') === 'pluperfect', 'map preview plus-que-parfait');
+assert(mapPreviewTenseToVerbKey('imparfait') === 'imperfect', 'map preview imparfait');
+assert(mapPreviewTenseToVerbKey('passé composé') === 'past', 'map preview passé composé');
+assert(mapPreviewTenseToVerbKey('plus-que-parfait') === 'pluperfect', 'map preview plus-que-parfait');
 assert(
-  mapPreviewTenseToVerbKey('futur proche (aller + infinitif)', 'fr') === 'nearFuture',
+  mapPreviewTenseToVerbKey('futur proche (aller + infinitif)') === 'nearFuture',
   'map futur proche',
 );
-assert(mapPreviewTenseToVerbKey('present continuous', 'en') === 'presentContinuous', 'map present continuous');
-assert(mapPreviewTenseToVerbKey('will future', 'en') === 'future', 'map will future');
+assert(mapPreviewTenseToVerbKey('present continuous') === 'presentContinuous', 'map present continuous');
+assert(mapPreviewTenseToVerbKey('will future') === 'future', 'map will future');
 assert(
-  mapPreviewTenseToVerbKey('present perfect continuous', 'en') === null,
+  mapPreviewTenseToVerbKey('present perfect continuous') === null,
   'map present perfect continuous → null',
 );
 

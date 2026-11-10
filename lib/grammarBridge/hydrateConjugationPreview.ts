@@ -20,7 +20,7 @@ export async function hydrateConjugationPreview(
   if (!verbDoc?.conjugations) return bridge;
 
   const previewTense = resolveConjugationPreviewTense(grammarFocus, language);
-  const mapped = mapPreviewTenseToVerbKey(previewTense, language);
+  const mapped = mapPreviewTenseToVerbKey(previewTense);
 
   // Rare paradigms we still do not store — leave Gemini rows (usually []).
   if (mapped === null) {

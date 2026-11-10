@@ -112,10 +112,7 @@ export function resolveVerbTenseKey(tense: string): VerbTenseKey | null {
  * Map Grammar Bridge preview tense → VerbDocument key.
  * Returns null only for rare paradigms we still do not store (e.g. perfect continuous).
  */
-export function mapPreviewTenseToVerbKey(
-  previewTense: string,
-  _language: SupportedLanguage,
-): VerbTenseKey | null {
+export function mapPreviewTenseToVerbKey(previewTense: string): VerbTenseKey | null {
   const f = normalizeTenseLabel(previewTense);
 
   if (f.includes('present perfect continuous')) return null;
