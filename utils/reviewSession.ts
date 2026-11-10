@@ -36,7 +36,7 @@ export function countPassiveOnlyInSession(items: UserVocabularyDocument[]): numb
 
 /**
  * Fills a review session with the most overdue words first.
- * Passive-only words win only when the scheduled dates match.
+ * Among equally overdue items, higher mistakeCount wins, then passive-only weight.
  * `orderSeed` reshuffles the order of that same set; it does not replace overdue words.
  */
 export function pickReviewSession(
@@ -47,6 +47,8 @@ export function pickReviewSession(
   const ranked = [...dueItems].sort((a, b) => {
     const byOverdue = overdueMillis(a) - overdueMillis(b);
     if (byOverdue !== 0) return byOverdue;
+    const byMistakes = (b.mistakeCount ?? 0) - (a.mistakeCount ?? 0);
+    if (byMistakes !== 0) return byMistakes;
     const byPassive = getReviewSelectionWeight(b) - getReviewSelectionWeight(a);
     if (byPassive !== 0) return byPassive;
     return a.word.localeCompare(b.word);

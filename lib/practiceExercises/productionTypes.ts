@@ -210,8 +210,26 @@ export function resolveRequiredProductionType(
   vocabCount: number,
   allowedTypes: ExerciseTypeId[],
   hasMic = true,
+  masteredVocabularyCount = 0,
 ): ExerciseTypeId | null {
+  // SRS ladder (Fase 2.4): mastered words → prefer free written production over word-bank.
+  if (
+    masteredVocabularyCount > 0 &&
+    allowedTypes.includes('reverse-translation') &&
+    (idealWouldBeWordBank(level, vocabCount, hasMic) || vocabCount >= 15)
+  ) {
+    return 'reverse-translation';
+  }
+
   const ideal = getRequiredProductionType(level, vocabCount, hasMic);
   if (allowedTypes.includes(ideal)) return ideal;
   return getFallbackProductionType(allowedTypes, hasMic);
+}
+
+function idealWouldBeWordBank(
+  level: ProficiencyLevel,
+  vocabCount: number,
+  hasMic: boolean,
+): boolean {
+  return getRequiredProductionType(level, vocabCount, hasMic) === 'word-bank-translation';
 }

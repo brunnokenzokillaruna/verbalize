@@ -9,6 +9,7 @@ import {
   Shuffle,
   Loader2,
   Zap,
+  AlertCircle,
 } from 'lucide-react';
 import { REVIEW_SESSION_SIZE } from '@/utils/reviewSession';
 import { isPassiveOnlyVocabulary } from '@/lib/vocabKnowledgeMode';
@@ -23,6 +24,9 @@ type VocabularyReviewHubProps = {
   contextLoading: boolean;
   onStartReview: (mode: ReviewMode) => void;
   onReshuffle: () => void;
+  /** Open grammar mistakes for this language — soft CTA to profile review. */
+  mistakeCount?: number;
+  onOpenMistakes?: () => void;
 };
 
 type ModeConfig = {
@@ -129,6 +133,8 @@ export function VocabularyReviewHub({
   contextLoading,
   onStartReview,
   onReshuffle,
+  mistakeCount = 0,
+  onOpenMistakes,
 }: VocabularyReviewHubProps) {
   const [startingMode, setStartingMode] = useState<ReviewMode | null>(null);
 
@@ -152,6 +158,35 @@ export function VocabularyReviewHub({
 
   return (
     <div className="flex flex-col gap-5 animate-slide-up-spring">
+      {mistakeCount > 0 && onOpenMistakes && (
+        <button
+          type="button"
+          onClick={onOpenMistakes}
+          className="flex items-center gap-3 rounded-2xl border px-4 py-3 text-left transition-all active:scale-[0.99] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          style={{
+            borderColor: 'color-mix(in srgb, var(--color-warning) 45%, var(--color-border))',
+            backgroundColor: 'var(--color-warning-bg)',
+          }}
+        >
+          <span
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-white"
+            style={{ backgroundColor: 'var(--color-warning)' }}
+          >
+            <AlertCircle size={16} strokeWidth={2.5} />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-sm font-bold text-text-primary">
+              {mistakeCount === 1
+                ? '1 erro de gramática pendente'
+                : `${mistakeCount} erros de gramática pendentes`}
+            </span>
+            <span className="block text-xs text-text-secondary mt-0.5">
+              Revise no perfil para reforçar o que você errou nas lições.
+            </span>
+          </span>
+        </button>
+      )}
+
       {/* Progress hero */}
       <div
         className="rounded-2xl border-2 p-5 flex items-center gap-5"

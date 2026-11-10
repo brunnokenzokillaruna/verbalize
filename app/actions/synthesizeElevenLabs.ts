@@ -10,6 +10,8 @@ import {
 } from '@/lib/speakerGender';
 import type { DialogueSpeakerVoice } from '@/lib/dialogueVoiceAvatars';
 import type { CharacterAlignment } from '@/lib/dialogueNarration';
+import { buildAudioCacheId } from '@/lib/audioCache';
+import { getCachedAudio, saveAudioCache } from '@/services/firestore';
 
 /* ------------------------------------------------------------------ */
 /*  ElevenLabs Text-to-Speech — dialogue synthesis with cache          */
@@ -21,6 +23,15 @@ import type { CharacterAlignment } from '@/lib/dialogueNarration';
 
 const ELEVENLABS_API_URL = 'https://api.elevenlabs.io/v1/text-to-speech';
 const ELEVENLABS_MODEL_ID = 'eleven_v3';
+
+/** Learner-safe delivery: clearer, less theatrical than default v3 expressiveness. */
+const LEARNER_VOICE_SETTINGS = {
+  stability: 0.68,
+  similarity_boost: 0.75,
+  style: 0.25,
+  speed: 0.88,
+  use_speaker_boost: true,
+} as const;
 
 /* ── Voice configuration ─────────────────────────────────────────────
    One female + one male voice per language. Assigned by speaker name
@@ -74,6 +85,33 @@ function cacheKey(text: string, voiceId: string, lang: string): string {
 
 /* ── Core TTS call ───────────────────────────────────────────────────*/
 
+async function persistElevenLabsLine(
+  sourceKey: string,
+  language: SupportedLanguage,
+  audioBase64: string,
+): Promise<void> {
+  const id = buildAudioCacheId('elevenlabs', ELEVENLABS_MODEL_ID, language, sourceKey);
+  await saveAudioCache(id, {
+    provider: 'elevenlabs',
+    model: ELEVENLABS_MODEL_ID,
+    language,
+    sourceKey,
+    chunks: [audioBase64],
+    mimeType: 'audio/mpeg',
+    monolithic: false,
+  });
+}
+
+async function readPersistedElevenLabsLine(
+  sourceKey: string,
+  language: SupportedLanguage,
+): Promise<string | null> {
+  const id = buildAudioCacheId('elevenlabs', ELEVENLABS_MODEL_ID, language, sourceKey);
+  const doc = await getCachedAudio(id);
+  const chunk = doc?.chunks?.[0];
+  return chunk?.length ? chunk : null;
+}
+
 async function callElevenLabs(
   text: string,
   voiceId: string,
@@ -82,7 +120,7 @@ async function callElevenLabs(
 ): Promise<string | null> {
   const key = cacheKey(text, voiceId, LANG_CODES[language]);
 
-  // 1️⃣ Cache hit → return immediately (zero credits used)
+  // 1️⃣ Memory hit
   const cached = audioCache.get(key);
   if (cached) {
     console.log(
@@ -91,7 +129,17 @@ async function callElevenLabs(
     return cached;
   }
 
-  // 2️⃣ Cache miss → call API
+  // 2️⃣ Firestore hit
+  const persisted = await readPersistedElevenLabsLine(key, language);
+  if (persisted) {
+    audioCache.set(key, persisted);
+    console.log(
+      `⚡ [ElevenLabs Firestore Cache] HIT for: "${text.substring(0, 40)}..."`,
+    );
+    return persisted;
+  }
+
+  // 3️⃣ API miss
   try {
     console.log(
       `🎙️ [ElevenLabs Server Cache] Cache MISS! Requesting premium audio from ElevenLabs API for: "${text.substring(0, 40)}..."`
@@ -107,13 +155,7 @@ async function callElevenLabs(
         text,
         model_id: ELEVENLABS_MODEL_ID,
         language_code: LANG_CODES[language],
-        voice_settings: {
-          stability: 0.55,
-          similarity_boost: 0.75,
-          style: 0.45,
-          speed: 0.92,           // slightly slower for language learners
-          use_speaker_boost: true,
-        },
+        voice_settings: LEARNER_VOICE_SETTINGS,
       }),
     });
 
@@ -123,12 +165,11 @@ async function callElevenLabs(
       return null;
     }
 
-    // Convert the binary response to a base64 string (same format Google TTS uses)
     const buffer = await res.arrayBuffer();
     const base64 = Buffer.from(buffer).toString('base64');
 
-    // 3️⃣ Store in cache for future replays
     audioCache.set(key, base64);
+    void persistElevenLabsLine(key, language, base64);
     console.log(
       `💾 [ElevenLabs Server Cache] SUCCESS: Generated & cached audio under key: "${key}" (Saved for future replays!)`
     );
@@ -150,6 +191,18 @@ async function callElevenLabsWithTimestamps(
   const cached = alignedAudioCache.get(key);
   if (cached) return cached;
 
+  // Firestore stores audio only (alignments stay in-memory / regenerated).
+  const persisted = await readPersistedElevenLabsLine(key, language);
+  if (persisted) {
+    const result = { audioBase64: persisted, alignment: null };
+    alignedAudioCache.set(key, result);
+    audioCache.set(key, persisted);
+    console.log(
+      `⚡ [ElevenLabs Firestore Cache] HIT (timestamps path) for: "${text.substring(0, 40)}..."`,
+    );
+    return result;
+  }
+
   try {
     const res = await fetch(
       `${ELEVENLABS_API_URL}/${voiceId}/with-timestamps`,
@@ -164,13 +217,7 @@ async function callElevenLabsWithTimestamps(
           text,
           model_id: ELEVENLABS_MODEL_ID,
           language_code: LANG_CODES[language],
-          voice_settings: {
-            stability: 0.55,
-            similarity_boost: 0.75,
-            style: 0.45,
-            speed: 0.92,
-            use_speaker_boost: true,
-          },
+          voice_settings: LEARNER_VOICE_SETTINGS,
         }),
       },
     );
@@ -193,6 +240,8 @@ async function callElevenLabsWithTimestamps(
       alignment: data.alignment ?? data.normalized_alignment ?? null,
     };
     alignedAudioCache.set(key, result);
+    audioCache.set(key, result.audioBase64);
+    void persistElevenLabsLine(key, language, result.audioBase64);
     return result;
   } catch (err) {
     console.error('[ElevenLabs timestamps] Fetch error:', err);

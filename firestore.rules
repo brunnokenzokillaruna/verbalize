@@ -47,6 +47,13 @@ service cloud.firestore {
       allow read, write: if true;
     }
 
+    // ── Audio Cache (TTS) ──────────────────────────────────────────────────────
+    // Shared TTS audio keyed by content hash. Server actions write without auth
+    // (same pattern as image_cache). Payload is non-PII lesson audio.
+    match /audio_cache/{audioId} {
+      allow read, write: if true;
+    }
+
     // ── Verb Conjugation Cache ────────────────────────────────────────────────
     // Public cache for Gemini-generated verb conjugations.
     // Same reasoning as image_cache: server actions write without auth.

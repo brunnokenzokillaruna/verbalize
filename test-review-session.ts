@@ -61,6 +61,13 @@ assert(
   'passive-only wins only when the due dates match',
 );
 
+const sameDayFewMistakes = { ...word('few-mistakes', 5, true), mistakeCount: 1 };
+const sameDayManyMistakes = { ...word('many-mistakes', 5, true), mistakeCount: 4 };
+assert(
+  pickReviewSession([sameDayFewMistakes, sameDayManyMistakes], 1)[0].word === 'many-mistakes',
+  'higher mistakeCount wins when due dates match',
+);
+
 const pool = Array.from({ length: 15 }, (_, i) => word(`w${i}`, i, i % 2 === 0));
 const session = pickReviewSession(pool, 12);
 assert(session.length === 12, 'session size');

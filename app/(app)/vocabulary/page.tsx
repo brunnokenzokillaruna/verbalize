@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { CheckCircle2 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
-import { getUserVocabulary, updateVocabImage } from '@/services/firestore';
+import { getUserVocabulary, getUserMistakes, updateVocabImage } from '@/services/firestore';
 import { wordsMatchCanonically } from '@/lib/vocabCanonical';
 import type { UserVocabularyDocument, SupportedLanguage } from '@/types';
 
@@ -60,6 +61,7 @@ function VocabularyReviewComplete({ onBrowseLibrary }: { onBrowseLibrary: () => 
 }
 
 export default function VocabularyPage() {
+  const router = useRouter();
   const { user, profile } = useAuthStore();
   const [items, setItems] = useState<UserVocabularyDocument[]>([]);
   const [loading, setLoading] = useState(true);
@@ -68,6 +70,7 @@ export default function VocabularyPage() {
   const [srsFilter, setSrsFilter] = useState<SrsFilter>('all');
   const [activeTab, setActiveTab] = useState<VocabularyTab>('review');
   const [tabInitialized, setTabInitialized] = useState(false);
+  const [mistakeCount, setMistakeCount] = useState(0);
 
   const language = (profile?.currentTargetLanguage ?? 'fr') as SupportedLanguage;
   const lang = LANG_LABEL[language];
@@ -84,6 +87,24 @@ export default function VocabularyPage() {
     } finally {
       if (!silent) setLoading(false);
     }
+  }, [user, language]);
+
+  useEffect(() => {
+    if (!user) {
+      setMistakeCount(0);
+      return;
+    }
+    let cancelled = false;
+    getUserMistakes(user.uid, language)
+      .then((list) => {
+        if (!cancelled) setMistakeCount(list.length);
+      })
+      .catch(() => {
+        if (!cancelled) setMistakeCount(0);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [user, language]);
 
   const refreshVocabulary = useCallback(
@@ -187,6 +208,8 @@ export default function VocabularyPage() {
                   contextLoading={contextLoading}
                   onStartReview={startReview}
                   onReshuffle={reshuffleSession}
+                  mistakeCount={mistakeCount}
+                  onOpenMistakes={() => router.push('/profile')}
                 />
               ) : (
                 <VocabularyReviewComplete onBrowseLibrary={() => setActiveTab('library')} />

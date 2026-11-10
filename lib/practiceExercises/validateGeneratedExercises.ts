@@ -1,5 +1,11 @@
 import { isValidErrorCorrectionExercise, normalizeErrorCorrectionData } from '@/utils/errorCorrection';
-import type { ConjugationSpeedData, ErrorCorrectionData, Exercise, SupportedLanguage } from '@/types';
+import type {
+  ConjugationSpeedData,
+  ErrorCorrectionData,
+  Exercise,
+  ProficiencyLevel,
+  SupportedLanguage,
+} from '@/types';
 import type { ExerciseTypeId } from './constants';
 import { fixConjugationSpeedExercise } from './fixConjugationSpeed';
 import { sanitizeReverseTranslationExercise } from '@/lib/reverseTranslationPtAdverb';
@@ -14,6 +20,13 @@ import {
   findLeakedTargetWord,
   isUnusableLearnerPrompt,
 } from './validatePtBrText';
+import {
+  isA2PlusLevel,
+  isAnchoredToLesson,
+  isSolidFreeRoleplay,
+  isSolidListenAndRespond,
+  isSolidMicroMessage,
+} from './lessonContentAnchor';
 
 function bankWithDistractors(correctOrder: string[], words: string[] | undefined): string[] {
   const correct = correctOrder.map((word) => word.trim()).filter(Boolean);
@@ -49,6 +62,7 @@ function bankWithDistractors(correctOrder: string[], words: string[] | undefined
 export interface ValidateExercisesOptions {
   lessonVocabulary?: string[];
   lessonDialogue?: string;
+  level?: ProficiencyLevel;
 }
 
 export async function validateAndSanitizeExercises(
@@ -59,6 +73,8 @@ export async function validateAndSanitizeExercises(
 ): Promise<Exercise[]> {
   const lessonVocabulary = options.lessonVocabulary ?? [];
   const lessonDialogue = options.lessonDialogue ?? '';
+  const level = options.level;
+  const requireAnchor = lessonVocabulary.length > 0 || lessonDialogue.trim().length > 0;
   const validated = exercises.filter((ex) => {
     if (!allowedSet.has(ex.type as ExerciseTypeId)) {
       console.warn(`[generatePracticeExercises] Dropped ${ex.type} — not allowed at this level/progress`);
@@ -87,6 +103,14 @@ export async function validateAndSanitizeExercises(
         console.warn(`[generatePracticeExercises] Dropped ${ex.type} with empty translation`);
         return false;
       }
+      if (
+        (ex.type === 'audio-dictation' || ex.type === 'speak-repeat') &&
+        requireAnchor &&
+        !isAnchoredToLesson(ex, lessonVocabulary, lessonDialogue)
+      ) {
+        console.warn(`[generatePracticeExercises] Dropped ${ex.type} — not anchored to lesson content`);
+        return false;
+      }
       return true;
     }
     if (ex.type === 'reverse-translation') {
@@ -112,6 +136,9 @@ export async function validateAndSanitizeExercises(
         acceptable_variants: Array.isArray(d.acceptable_variants) ? d.acceptable_variants : [],
         hint: d.hint,
       }));
+      if (isA2PlusLevel(level)) {
+        delete d.hint;
+      }
       if (!Array.isArray(d.acceptable_variants) || d.acceptable_variants.length === 0) {
         console.warn('[generatePracticeExercises] Dropped reverse-translation with empty acceptable_variants');
         return false;
@@ -125,6 +152,10 @@ export async function validateAndSanitizeExercises(
         );
         return false;
       }
+      if (requireAnchor && !isAnchoredToLesson(ex, lessonVocabulary, lessonDialogue)) {
+        console.warn('[generatePracticeExercises] Dropped reverse-translation — not anchored to lesson content');
+        return false;
+      }
       return true;
     }
     if (ex.type === 'sentence-builder') {
@@ -136,6 +167,10 @@ export async function validateAndSanitizeExercises(
 
       data.words = bankWithDistractors(data.correctOrder, data.words);
 
+      if (requireAnchor && !isAnchoredToLesson(ex, lessonVocabulary, lessonDialogue)) {
+        console.warn('[generatePracticeExercises] Dropped sentence-builder — not anchored to lesson content');
+        return false;
+      }
       return true;
     }
     if (ex.type === 'context-choice') {
@@ -170,6 +205,10 @@ export async function validateAndSanitizeExercises(
       const blankNorm = blankWord.toLowerCase().trim();
       if (!options.some((o) => o.toLowerCase().trim() === blankNorm)) {
         console.warn('[generatePracticeExercises] Dropped context-choice — blankWord missing from options');
+        return false;
+      }
+      if (requireAnchor && !isAnchoredToLesson(ex, lessonVocabulary, lessonDialogue)) {
+        console.warn('[generatePracticeExercises] Dropped context-choice — not anchored to lesson content');
         return false;
       }
       return true;
@@ -285,6 +324,10 @@ export async function validateAndSanitizeExercises(
         return false;
       }
       (ex.data as { words: string[] }).words = bankWithDistractors(d.correctOrder, d.words);
+      if (requireAnchor && !isAnchoredToLesson(ex, lessonVocabulary, lessonDialogue)) {
+        console.warn('[generatePracticeExercises] Dropped word-bank-translation — not anchored to lesson content');
+        return false;
+      }
       return true;
     }
     if (ex.type === 'bridge-choice') {
@@ -368,6 +411,10 @@ export async function validateAndSanitizeExercises(
       });
       d.dialogueAudio = sanitized.dialogueAudio;
       d.promptLine = sanitized.promptLine;
+      if (!isSolidListenAndRespond(d)) {
+        console.warn('[generatePracticeExercises] Dropped listen-and-respond — trivial evaluation/example fields');
+        return false;
+      }
       return true;
     }
     if (ex.type === 'free-roleplay') {
@@ -391,6 +438,10 @@ export async function validateAndSanitizeExercises(
         console.warn('[generatePracticeExercises] Dropped malformed free-roleplay');
         return false;
       }
+      if (!isSolidFreeRoleplay(d)) {
+        console.warn('[generatePracticeExercises] Dropped free-roleplay — trivial evaluation/example fields');
+        return false;
+      }
       return true;
     }
     if (ex.type === 'micro-message') {
@@ -411,6 +462,10 @@ export async function validateAndSanitizeExercises(
         console.warn('[generatePracticeExercises] Dropped malformed micro-message');
         return false;
       }
+      if (!isSolidMicroMessage(d)) {
+        console.warn('[generatePracticeExercises] Dropped micro-message — trivial evaluation/example fields');
+        return false;
+      }
       return true;
     }
     if (ex.type === 'paraphrase') {
@@ -428,6 +483,10 @@ export async function validateAndSanitizeExercises(
         d.acceptable_variants.length === 0
       ) {
         console.warn('[generatePracticeExercises] Dropped malformed paraphrase');
+        return false;
+      }
+      if (requireAnchor && !isAnchoredToLesson(ex, lessonVocabulary, lessonDialogue)) {
+        console.warn('[generatePracticeExercises] Dropped paraphrase — not anchored to lesson content');
         return false;
       }
       return true;
@@ -454,6 +513,10 @@ export async function validateAndSanitizeExercises(
           sentence: d.sentence,
           acceptable_variants: d.acceptable_variants,
         }));
+      }
+      if (requireAnchor && !isAnchoredToLesson(ex, lessonVocabulary, lessonDialogue)) {
+        console.warn('[generatePracticeExercises] Dropped fill-gap-production — not anchored to lesson content');
+        return false;
       }
       return true;
     }

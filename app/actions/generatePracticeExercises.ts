@@ -88,6 +88,7 @@ async function topUpPracticeExercises(
     let extras = await validateAndSanitizeExercises(candidates, allowedSet, params.language, {
       lessonVocabulary: params.newVocabulary,
       lessonDialogue: params.dialogue,
+      level: params.level,
     });
     extras = await gateExerciseAnswerKeys(extras, params.language);
 
@@ -145,6 +146,8 @@ export async function generatePracticeExercises(
     level,
     knownVocabulary.length,
     [...allowedSet],
+    true,
+    params.masteredVocabulary?.length ?? 0,
   );
   const { systemPrompt, prompt: basePrompt } = buildPracticeExercisePrompt(params);
 

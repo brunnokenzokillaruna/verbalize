@@ -4,7 +4,7 @@ Documento de referência sobre **todos os formatos de exercício** implementados
 
 **Seções:** [Inventário atual](#exercícios-da-prática-de-lições-32-tipos) · [Roadmap de evolução](#roadmap-de-evolução-plano-de-implementação) (ordem de implementação das melhorias)
 
-> **Schema de lições cacheadas:** `PREGEN_SCHEMA_VERSION = 19` (jun/2026)
+> **Schema de lições cacheadas:** `PREGEN_SCHEMA_VERSION = 26` (nov/2026)
 
 ---
 
@@ -648,12 +648,12 @@ flowchart LR
 
 **Mecânica:** contexto estilo WhatsApp/e-mail informal; aluno escreve 1–2 frases; validação local + Gemini para registro informal.
 
-| # | Entrega | Tier sugerido |
-|---|---------|---------------|
-| 2.1 | `free-roleplay` completo | Tier 2 · tags DIAL, MISS, EXPR |
-| 2.2 | `micro-message` | Tier 2 · tags DIAL, MISS |
-| 2.3 | Remover dica em `reverse-translation` | A2+ (`hint` omitido no prompt quando `level >= A2`) |
-| 2.4 | Escada de produção escrita | SRS domínio alto → forçar `reverse-translation` em vez de `word-bank` em `resolveRequiredProductionType` |
+| # | Entrega | Tier sugerido | Status |
+|---|---------|---------------|--------|
+| 2.1 | `free-roleplay` completo | Tier 2 · tags DIAL, MISS, EXPR | ✅ |
+| 2.2 | `micro-message` | Tier 2 · tags DIAL, MISS | ✅ |
+| 2.3 | Remover dica em `reverse-translation` | A2+ (`hint` omitido no prompt + strip na validação) | ✅ |
+| 2.4 | Escada de produção escrita | SRS domínio alto → preferir `reverse-translation` a `word-bank` em `resolveRequiredProductionType` | ✅ |
 
 **Critério de pronto:** sessão pode ter roleplay livre digitado; micro-mensagem validada por registro.
 
@@ -794,7 +794,7 @@ Sprint 17   → Fase 8.1–8.2 (revisão SRS prioriza passive-only + produção)
 | Latência Gemini na avaliação oral | Feedback imediato "analisando…"; cache de critérios; fallback local |
 | Microfone indisponível | Fallback escrito (`free-roleplay` modo texto) — padrão já usado em mission-roleplay |
 | Custo API | Gemini Flash only; avaliar só produção, não receptivos |
-| Lições cacheadas no Firestore | `PREGEN_SCHEMA_VERSION` (19); `isPregenSchemaCurrent()` trata `schemaVersion` ausente como stale; `useLessonBootstrap` regenera exercícios; `useDashboardPregen` refaz pregen em background |
+| Lições cacheadas no Firestore | `PREGEN_SCHEMA_VERSION` (26); `isPregenSchemaCurrent()` trata `schemaVersion` ausente como stale; `useLessonBootstrap` regenera exercícios; `useDashboardPregen` refaz pregen em background |
 | Qualidade da avaliação semântica | `exampleResponse` + `acceptableThemes` no JSON; testes com 20 respostas reais |
 
 ### Checklist por novo tipo de exercício

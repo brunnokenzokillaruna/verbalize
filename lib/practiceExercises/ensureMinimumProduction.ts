@@ -159,6 +159,7 @@ export interface EnsureProductionContext {
   newVocabulary: string[];
   allowedTypes: ExerciseTypeId[];
   hasMic?: boolean;
+  masteredVocabularyCount?: number;
 }
 
 export async function ensureMinimumProduction(
@@ -173,6 +174,7 @@ export async function ensureMinimumProduction(
     ctx.vocabCount,
     ctx.allowedTypes,
     ctx.hasMic ?? true,
+    ctx.masteredVocabularyCount ?? 0,
   );
 
   if (!requiredType) return exercises;

@@ -235,6 +235,7 @@ Rules:
       rawProduction.map(({ type, data }) => ({ type, data })) as unknown as Exercise[],
       allowedSet,
       params.language,
+      { level: params.level },
     );
     sanitized = await gateExerciseAnswerKeys(sanitized, params.language);
 

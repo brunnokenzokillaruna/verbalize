@@ -23,7 +23,8 @@ import {
   PREGEN_SCHEMA_VERSION,
   SEPARATE_PASSIVE_SRS,
 } from '@/lib/practiceExercises/constants';
-import type { UserDocument, UserVocabularyDocument, ImageCacheDocument, VerbDocument, LessonMistakeDocument, PregeneratedLessonDocument, SupportedLanguage, ProficiencyLevel, LessonLogDocument } from '@/types';
+import type { UserDocument, UserVocabularyDocument, ImageCacheDocument, AudioCacheDocument, VerbDocument, LessonMistakeDocument, PregeneratedLessonDocument, SupportedLanguage, ProficiencyLevel, LessonLogDocument } from '@/types';
+import { canPersistAudioCache, toAudioCacheWriteData, type AudioCachePayload } from '@/lib/audioCache';
 import { calculateNextReview } from '@/lib/srs';
 import { isDueForReview, isReviewedToday, formatLocalDay } from '@/utils/vocabPageHelpers';
 import { getNextLessonId, getLessonsForLanguage, getLessonById } from '@/lib/curriculum';
@@ -1130,6 +1131,47 @@ export async function upsertImageCacheTranslation(
     language,
     translation,
   }, { merge: true });
+}
+
+// ─── Audio Cache (TTS) ────────────────────────────────────────────────────────
+
+export async function getCachedAudio(id: string): Promise<AudioCacheDocument | null> {
+  try {
+    const snap = await getDoc(doc(await getDb(), 'audio_cache', id));
+    if (!snap.exists()) return null;
+    return snap.data() as AudioCacheDocument;
+  } catch (err) {
+    console.warn('[audio_cache] read failed:', err);
+    return null;
+  }
+}
+
+/** Best-effort write. Skips oversized payloads; never throws to callers. */
+export async function saveAudioCache(id: string, payload: AudioCachePayload): Promise<boolean> {
+  try {
+    if (!canPersistAudioCache(payload.chunks)) {
+      console.warn(
+        `[audio_cache] skip write ${id.slice(0, 12)}… — payload too large or empty`,
+      );
+      return false;
+    }
+    const data = toAudioCacheWriteData(id, payload);
+    const ref = doc(await getDb(), 'audio_cache', id);
+    const existing = await getDoc(ref);
+    await setDoc(
+      ref,
+      stripUndefinedDeep({
+        ...data,
+        createdAt: existing.exists()
+          ? (existing.data() as AudioCacheDocument).createdAt
+          : serverTimestamp(),
+      }),
+    );
+    return true;
+  } catch (err) {
+    console.warn('[audio_cache] write failed:', err);
+    return false;
+  }
 }
 
 // ─── Lesson Mistakes ──────────────────────────────────────────────────────────

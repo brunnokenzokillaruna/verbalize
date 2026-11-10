@@ -112,6 +112,24 @@ export interface ImageCacheDocument {
   kind?: 'vocab' | 'lesson_scene';
 }
 
+// ─── Audio Cache (TTS) ────────────────────────────────────────────────────────
+
+export type AudioCacheProvider = 'elevenlabs' | 'gemini' | 'google';
+
+export interface AudioCacheDocument {
+  id: string;
+  provider: AudioCacheProvider;
+  model: string;
+  language: SupportedLanguage;
+  sourceKey: string;
+  chunks: string[];
+  mimeType: 'audio/mpeg' | 'audio/wav';
+  monolithic?: boolean;
+  speakerVoices?: Array<{ speaker: string; voiceName: string }>;
+  byteSize: number;
+  createdAt: Timestamp;
+}
+
 // ─── Lesson Mistakes ──────────────────────────────────────────────────────────
 
 export interface LessonMistakeDocument {

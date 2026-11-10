@@ -19,6 +19,8 @@ import { prepareLearnerLineAudio } from '@/lib/geminiTtsAudioTags';
 import { pickGeminiTtsVoice } from '@/lib/geminiTtsVoices';
 import type { DialogueSpeakerVoice } from '@/lib/dialogueVoiceAvatars';
 import type { SupportedLanguage } from '@/types';
+import { buildAudioCacheId } from '@/lib/audioCache';
+import { getCachedAudio, saveAudioCache } from '@/services/firestore';
 
 /* ------------------------------------------------------------------ */
 /*  Gemini 3.8 TTS — multi-speaker dialogue in a single API call       */
@@ -32,6 +34,8 @@ const TTS_MODEL_CHAIN = [
   'gemini-3.8-flash-tts',
   'gemini-3.8-flash-lite-tts',
 ] as const;
+
+const PRIMARY_TTS_MODEL = TTS_MODEL_CHAIN[0];
 
 export type GeminiDialogueResult = {
   chunks: string[];
@@ -209,6 +213,22 @@ export async function synthesizeDialogueGemini(
     return cached;
   }
 
+  const firestoreId = buildAudioCacheId('gemini', PRIMARY_TTS_MODEL, language, key);
+  const persisted = await getCachedAudio(firestoreId);
+  if (persisted?.chunks?.length) {
+    const result: GeminiDialogueResult = {
+      chunks: persisted.chunks,
+      mimeType: 'audio/wav',
+      monolithic: persisted.monolithic ?? true,
+      speakerVoices: persisted.speakerVoices ?? [],
+    };
+    dialogueCache.set(key, result);
+    console.log(
+      `⚡ [Gemini TTS Firestore Cache] HIT — reusing dialogue audio (${nonEmpty.length} lines)`,
+    );
+    return result;
+  }
+
   if (!process.env.GEMINI_API_KEY) {
     console.warn('[Gemini TTS] GEMINI_API_KEY not set — skipping.');
     return null;
@@ -247,6 +267,16 @@ export async function synthesizeDialogueGemini(
   };
 
   dialogueCache.set(key, result);
+  void saveAudioCache(firestoreId, {
+    provider: 'gemini',
+    model: PRIMARY_TTS_MODEL,
+    language,
+    sourceKey: key,
+    chunks: result.chunks,
+    mimeType: 'audio/wav',
+    monolithic: true,
+    speakerVoices: result.speakerVoices,
+  });
   console.log(`💾 [Gemini TTS] Cached dialogue audio under key: "${key.slice(0, 60)}..."`);
 
   return result;

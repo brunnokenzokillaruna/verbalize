@@ -24,4 +24,6 @@ export interface GeneratePracticeParams {
   maxAttempts?: number;
   /** Words with SRS level ≥4 — used for adaptive tier-down (recognition → production). */
   masteredVocabulary?: string[];
+  /** Up to 3 open grammar mistakes for this learner/language — soft prompt bias. */
+  openMistakes?: Array<{ grammarFocus: string; mistakeContext: string }>;
 }

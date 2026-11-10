@@ -35,6 +35,7 @@ export async function composePracticeSession(
   result = await validateAndSanitizeExercises(result, allowedSet, params.language, {
     lessonVocabulary: params.newVocabulary,
     lessonDialogue: params.dialogue,
+    level: params.level,
   });
 
   result = applyAdaptiveTier(result, params.masteredVocabulary ?? []);
@@ -43,6 +44,8 @@ export async function composePracticeSession(
     params.level,
     params.knownVocabulary.length,
     [...allowedSet],
+    true,
+    params.masteredVocabulary?.length ?? 0,
   );
 
   result = pinTagExclusiveFirst(result, tagExclusive);
@@ -64,6 +67,7 @@ export async function composePracticeSession(
     dialogue: params.dialogue,
     newVocabulary: params.newVocabulary,
     allowedTypes: [...allowedSet],
+    masteredVocabularyCount: params.masteredVocabulary?.length ?? 0,
   };
 
   result = await ensureMinimumProduction(result, ctx);

@@ -27,7 +27,7 @@ import { translateWord, translateWordsBatch } from '@/app/actions/translateWord'
 import { prefetchVocabImages } from '@/lib/vocabImagePrefetch';
 import { getLessonSceneImage } from '@/app/actions/getLessonSceneImage';
 import { fetchPregeneratedLessonWithWait } from '@/lib/waitForPregeneratedLesson';
-import { deletePregeneratedLesson, getUserVocabulary, upsertVocabularyItem, tryStartPregeneratingLesson, abortPregeneratedLesson, getCachedImage, upsertImageCacheTranslation } from '@/services/firestore';
+import { deletePregeneratedLesson, getUserVocabulary, getUserMistakes, upsertVocabularyItem, tryStartPregeneratingLesson, abortPregeneratedLesson, getCachedImage, upsertImageCacheTranslation } from '@/services/firestore';
 import { sanitizeVocabularyToken } from '@/lib/hookSanitize';
 import { timestampToMillis } from '@/utils/vocabPageHelpers';
 import { MIN_VISUAL_REVIEW_ITEMS } from '@/utils/imageMatchBuilder';
@@ -187,6 +187,7 @@ export function useLessonBootstrap({
   const prefetchFiredRef = useRef(false);
   const pregenFiredRef = useRef(false);
   const vocabImagesFiredRef = useRef(false);
+  const openMistakesRef = useRef<Array<{ grammarFocus: string; mistakeContext: string }>>([]);
 
   useEffect(() => {
     if (!profile) return;
@@ -264,8 +265,27 @@ export function useLessonBootstrap({
         store.setMasteredVocabulary(masteredVocabulary);
         const imagePool = await buildVocabImagePool(vocabDocs, lesson.language);
         store.setVocabImagePool(imagePool);
+
+        try {
+          if (user?.uid) {
+            const mistakes = await getUserMistakes(user.uid, lesson.language);
+            openMistakesRef.current = mistakes
+              .slice()
+              .reverse() // oldest first for soft drill priority
+              .slice(0, 3)
+              .map((m) => ({
+                grammarFocus: m.grammarFocus,
+                mistakeContext: m.mistakeContext,
+              }));
+          } else {
+            openMistakesRef.current = [];
+          }
+        } catch {
+          openMistakesRef.current = [];
+        }
+
         devLog(
-          `[Timing] Vocabulário do usuário: ${(performance.now() - tVocab).toFixed(0)}ms (${knownVocabulary.length} conhecidas, ${masteredVocabulary.length} dominadas, ${imagePool.length} com imagem p/ visual)`,
+          `[Timing] Vocabulário do usuário: ${(performance.now() - tVocab).toFixed(0)}ms (${knownVocabulary.length} conhecidas, ${masteredVocabulary.length} dominadas, ${imagePool.length} com imagem p/ visual${openMistakesRef.current.length ? `, ${openMistakesRef.current.length} mistakes` : ''})`,
         );
 
         if (lesson.tag === 'REVIEW') {
@@ -504,6 +524,23 @@ export function useLessonBootstrap({
     const dialogue = hook.dialogue;
     const language = lesson.language;
 
+    const refreshOpenMistakes = async () => {
+      if (!user?.uid) return;
+      try {
+        const mistakes = await getUserMistakes(user.uid, language);
+        openMistakesRef.current = mistakes
+          .slice()
+          .reverse()
+          .slice(0, 3)
+          .map((m) => ({
+            grammarFocus: m.grammarFocus,
+            mistakeContext: m.mistakeContext,
+          }));
+      } catch {
+        /* keep previous ref value */
+      }
+    };
+
     // Grammar bridge prefetch — fires immediately so it's ready when the
     // user advances from 'hook' to 'grammar'. Only for tags that have a
     // 'grammar' phase in their LESSON_FLOW (GRAM / VERB / CULT).
@@ -542,6 +579,7 @@ export function useLessonBootstrap({
           grammarBridgePrefetchRef.current!.then(async (bridge) => {
             // Wait 500ms cooling period to avoid rapid subsequent requests
             await new Promise((resolve) => setTimeout(resolve, 500));
+            await refreshOpenMistakes();
             const tEx = performance.now();
             devLog(`[Timing] 🚀 Prefetch exercícios Gemini iniciado`);
             const result = await generatePracticeExercises({
@@ -559,6 +597,7 @@ export function useLessonBootstrap({
               masteredVocabulary: store.masteredVocabulary,
               previousTopics: getPreviousTopics(language, lesson.id),
               grammarBridge: bridge ?? hook.grammarBridge ?? null,
+              openMistakes: openMistakesRef.current,
             });
             const chosen = preferRicherExerciseSet(result, exercisesFallbackRef.current);
             devLog(
@@ -576,21 +615,24 @@ export function useLessonBootstrap({
         const tEx = performance.now();
         devLog(`[Timing] 🚀 Prefetch exercícios Gemini iniciado`);
         exercisesPrefetchRef.current = trackExercisesPrefetch(
-          generatePracticeExercises({
-            dialogue,
-            newVocabulary: words,
-            verbWord: hook.verbWord ?? '',
-            grammarFocus: lesson.grammarFocus,
-            theme: lesson.theme,
-            uiTitle: lesson.uiTitle,
-            tag: lesson.tag,
-            lessonRole: lesson.lessonRole,
-            language,
-            level: lesson.level,
-            knownVocabulary: store.knownVocabulary,
-            masteredVocabulary: store.masteredVocabulary,
-            previousTopics: getPreviousTopics(language, lesson.id),
-          }).then((result) => {
+          refreshOpenMistakes().then(() =>
+            generatePracticeExercises({
+              dialogue,
+              newVocabulary: words,
+              verbWord: hook.verbWord ?? '',
+              grammarFocus: lesson.grammarFocus,
+              theme: lesson.theme,
+              uiTitle: lesson.uiTitle,
+              tag: lesson.tag,
+              lessonRole: lesson.lessonRole,
+              language,
+              level: lesson.level,
+              knownVocabulary: store.knownVocabulary,
+              masteredVocabulary: store.masteredVocabulary,
+              previousTopics: getPreviousTopics(language, lesson.id),
+              openMistakes: openMistakesRef.current,
+            }),
+          ).then((result) => {
             const chosen = preferRicherExerciseSet(result, exercisesFallbackRef.current);
             devLog(
               `[Timing] ✅ Prefetch exercícios Gemini terminou: ${(performance.now() - tEx).toFixed(0)}ms (${chosen?.length ?? 0} exercícios)`,

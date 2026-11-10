@@ -26,6 +26,21 @@ export function buildDialogueAnchorBlock(): string {
 DIALOGUE ANCHOR (mandatory): Every exercise scenario must connect to the lesson theme and reuse vocabulary or situational context from the dialogue above — but NEVER copy dialogue sentences verbatim. Invent new sentences that feel like the same situation.`;
 }
 
+export function buildOpenMistakesBlock(
+  mistakes: Array<{ grammarFocus: string; mistakeContext: string }> | undefined,
+): string {
+  if (!mistakes || mistakes.length === 0) return '';
+  const lines = mistakes.slice(0, 3).map((m, i) => {
+    const focus = m.grammarFocus.trim();
+    const ctx = m.mistakeContext.trim().slice(0, 220);
+    return `${i + 1}. Focus: "${focus}"${ctx ? ` — context: ${ctx}` : ''}`;
+  });
+  return `
+OPEN LEARNER MISTAKES (soft priority — do NOT invent invalid exercise types):
+When the pool allows, prefer at least one exercise that drills these recent weak spots. Stay within the allowed type pool and still obey dialogue/theme anchoring.
+${lines.join('\n')}`;
+}
+
 export function buildGrammarBridgeExerciseBlock(bridge: GrammarBridgeResult | null | undefined): string {
   if (!bridge) return '';
 
@@ -64,6 +79,7 @@ export function buildPracticeExercisePrompt(params: GeneratePracticeParams): {
     knownVocabulary,
     previousTopics,
     grammarBridge,
+    openMistakes,
   } = params;
 
   const levelDesc = LEVEL_EXERCISE_DESCRIPTORS[level];
@@ -89,6 +105,8 @@ export function buildPracticeExercisePrompt(params: GeneratePracticeParams): {
     level,
     knownVocabulary.length,
     allowedTypes,
+    true,
+    params.masteredVocabulary?.length ?? 0,
   );
 
   const poolTypes: ExerciseTypeId[] = tagExclusive
@@ -187,6 +205,7 @@ DIALOGUE (for vocabulary and tone reference only — do NOT copy sentences):
 Key vocabulary words from this lesson: ${newVocabulary.join(', ')}
 ${previousTopicsBlock}
 ${grammarBridgeBlock}
+${buildOpenMistakesBlock(openMistakes)}
 
 TAG-SPECIFIC EXERCISE BALANCE (follow this strictly):
 ${tagGuidance}${roleGuidance ? `\nPEDAGOGICAL ROLE:\n${roleGuidance}\n` : ''}${grammarFocusGuidance}${nativePhraseGuidance}${productionRuleBlock}${interleavingBlock}${chainBlock}${dialogueAnchorBlock}${constraintBlock}
