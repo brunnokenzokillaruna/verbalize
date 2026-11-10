@@ -16,6 +16,10 @@ import {
   normalizeToEverydayPtBr,
   normalizeToEverydayPtBrOptional,
 } from '@/lib/naturalPtBr';
+import {
+  buildNativePhraseHookGuidance,
+  enrichHookWithNativeChunks,
+} from '@/lib/pedagogy/nativePhrases';
 import type { SupportedLanguage, ProficiencyLevel, HookResult, LessonTag } from '@/types';
 
 const LANG_LABEL: Record<SupportedLanguage, string> = {
@@ -254,7 +258,9 @@ function finalizeHookResult(
 ): HookResult {
   const hook = normalizeHookResult(result, nameA, nameB);
   // Always run: strips known words AND proper nouns / speaker labels.
-  return filterHookVocabularyForKnownWords(hook, knownVocabulary, [nameA, nameB]);
+  const filtered = filterHookVocabularyForKnownWords(hook, knownVocabulary, [nameA, nameB]);
+  // Promote spoken bank phrases that already appeared into SRS chunks.
+  return enrichHookWithNativeChunks(filtered);
 }
 
 async function resolveHookCoherence(
@@ -460,6 +466,7 @@ Format:
 - Strictly 2-party dialogue — never address an invisible waiter/cashier/receptionist
 
 ${spokenDialogueGuidance(language, level, tag)}
+${buildNativePhraseHookGuidance({ language, level, tag, theme, grammarFocus, uiTitle })}
 
 ACTION AND SEMANTICS:
 - ACTION PLAN STABILITY: When line N assigns roles (A waits, B goes to get something), lines N+1 onward MUST keep those roles unless someone explicitly changes the plan. BAD: "I wait while you search" → next line "let's wait together".

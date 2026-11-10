@@ -16,6 +16,7 @@ interface GrammarBridgeFlowProps {
   bridge: GrammarBridgeResult;
   language: SupportedLanguage;
   tag?: LessonTag;
+  grammarFocus?: string;
   newVocabulary?: string[];
   newVerbs?: string[];
   onWordClick?: (payload: WordClickPayload) => void;
@@ -36,6 +37,7 @@ export function GrammarBridgeFlow({
   bridge,
   language,
   tag,
+  grammarFocus,
   newVocabulary = [],
   newVerbs = [],
   onWordClick,
@@ -50,9 +52,14 @@ export function GrammarBridgeFlow({
 }: GrammarBridgeFlowProps) {
   const { play } = useSoundEffects();
 
+  const dialogueHints = useMemo(
+    () => [...newVerbs, ...newVocabulary],
+    [newVerbs, newVocabulary],
+  );
+
   const steps = useMemo(
-    () => buildGrammarSteps(bridge, language, tag),
-    [bridge, language, tag],
+    () => buildGrammarSteps(bridge, language, tag, grammarFocus, dialogueHints),
+    [bridge, language, tag, grammarFocus, dialogueHints],
   );
 
   const [currentIndex, setCurrentIndex] = useState(0);

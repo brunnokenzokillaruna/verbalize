@@ -12,6 +12,8 @@ export const SPRINT_TENSE_KEYS = ['present', 'past', 'imperfect', 'future', 'con
 
 export type GenerateLocalDrillOptions = {
   allowedTenses?: readonly string[];
+  /** When present and available on the verb, always use this tense. */
+  preferredTense?: string;
 };
 
 /**
@@ -90,8 +92,18 @@ export function generateLocalDrill(
     allowed.includes(t),
   );
   const tenses = availableTenses.length > 0 ? availableTenses : Object.keys(verbDoc.conjugations);
-  const randomTense = tenses[Math.floor(Math.random() * tenses.length)];
+  const preferred =
+    config.preferredTense && tenses.includes(config.preferredTense)
+      ? config.preferredTense
+      : config.preferredTense && Object.keys(verbDoc.conjugations).includes(config.preferredTense)
+        ? config.preferredTense
+        : null;
+  const randomTense =
+    preferred ?? tenses[Math.floor(Math.random() * tenses.length)];
   const rawForms = (verbDoc.conjugations as Record<string, Record<string, string>>)[randomTense];
+  if (!rawForms || Object.keys(rawForms).length === 0) {
+    throw new Error(`No conjugations for tense "${randomTense}" on "${verbDoc.infinitive}"`);
+  }
 
   const forms: Record<string, string> = {};
   for (const [pronoun, rawForm] of Object.entries(rawForms)) {

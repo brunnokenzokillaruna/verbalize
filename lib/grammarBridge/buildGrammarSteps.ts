@@ -9,6 +9,7 @@ import {
   pushFormulaStep,
   pushRegraStep,
 } from '@/lib/grammarBridge/stepBuilders';
+import { enrichBridgeWithVandertramp } from '@/lib/pedagogy/vandertramp';
 import type { GrammarStep, StepDraft } from '@/lib/grammarBridge/types';
 
 /**
@@ -20,9 +21,18 @@ export function buildGrammarSteps(
   raw: GrammarBridgeResult,
   language: SupportedLanguage,
   tag?: LessonTag,
+  grammarFocus?: string,
+  dialogueHints?: string[],
 ): GrammarStep[] {
-  const bridge = normalizeGrammarBridgeResult(raw, language);
-  if (!bridge) return [];
+  const normalized = normalizeGrammarBridgeResult(raw, language, grammarFocus);
+  if (!normalized) return [];
+
+  const bridge = enrichBridgeWithVandertramp(
+    normalized,
+    grammarFocus ?? '',
+    language,
+    dialogueHints,
+  );
 
   const drafts: StepDraft[] = [];
   const sacadaHasCulture = tag === 'DIAL' || tag === 'CULT';

@@ -64,48 +64,11 @@ Output JSON in exactly this format:
       "they": "conjugated form"`
       }
     },
-    "past": {
-      ${
-        language === 'fr'
-          ? `"je": "conjugated form",
-      "tu": "conjugated form",
-      "il": "conjugated form",
-      "elle": "conjugated form",
-      "on": "conjugated form",
-      "nous": "conjugated form",
-      "vous": "conjugated form",
-      "ils": "conjugated form",
-      "elles": "conjugated form"`
-          : `"I": "conjugated form",
-      "you": "conjugated form",
-      "he": "conjugated form",
-      "she": "conjugated form",
-      "it": "conjugated form",
-      "we": "conjugated form",
-      "they": "conjugated form"`
-      }
-    },
-    "future": {
-      ${
-        language === 'fr'
-          ? `"je": "conjugated form",
-      "tu": "conjugated form",
-      "il": "conjugated form",
-      "elle": "conjugated form",
-      "on": "conjugated form",
-      "nous": "conjugated form",
-      "vous": "conjugated form",
-      "ils": "conjugated form",
-      "elles": "conjugated form"`
-          : `"I": "conjugated form",
-      "you": "conjugated form",
-      "he": "conjugated form",
-      "she": "conjugated form",
-      "it": "conjugated form",
-      "we": "conjugated form",
-      "they": "conjugated form"`
-      }
-    }
+    "past": { /* same pronoun keys as present — French: passé composé forms; English: simple past */ },
+    "future": { /* same pronoun keys */ },
+    "imperfect": { /* French imparfait / English past continuous-ish habit forms when common at A1-B1; omit if rare */ },
+    "conditional": { /* French conditionnel présent / English would+verb when common; omit if rare */ },
+    "subjunctive": { /* French subjonctif présent when common at A2-B1; omit for English unless essential */ }
   },
   "exampleSentences": [
     { "target": "Example sentence in ${LANG_LABEL[language]}", "portuguese": "Translation in Brazilian Portuguese" },
@@ -116,15 +79,20 @@ Output JSON in exactly this format:
 Rules:
 ${
   language === 'fr'
-    ? `- For French: use exactly the separate pronouns je, tu, il, elle, on, nous, vous, ils, elles. Do NOT group them (e.g. do NOT use il/elle or ils/elles).`
-    : `- For English: use exactly the separate pronouns I, you, he, she, it, we, they. Do NOT group them (e.g. do NOT use he/she).`
+    ? `- For French: use exactly the separate pronouns je, tu, il, elle, on, nous, vous, ils, elles. Do NOT group them (e.g. do NOT use il/elle or ils/elles).
+- For "past", use passé composé forms (e.g. "je suis allé", "j'ai parlé").
+- For "imperfect", use imparfait forms.`
+    : `- For English: use exactly the separate pronouns I, you, he, she, it, we, they. Do NOT group them (e.g. do NOT use he/she).
+- For "past", use simple past forms.`
 }
-- Include present tense always. Include past and future if commonly used at A1-B1 level.
+- Include present always. Include past and future when commonly used at A1-B1.
+- Include imperfect and conditional when commonly taught by B1; include subjunctive for French when common by B1. Omit a tense key entirely if not useful.
+- Each included tense MUST list ALL required pronouns with correct forms.
 - Include 2-3 example sentences showing common usage.
 - Keep examples simple (A1-B1 level vocabulary).
 - "translation" must be the Brazilian Portuguese infinitive (e.g., "ser/estar" for "être").`;
 
-    const data = await callGeminiJSON<VerbDocument>(prompt, systemPrompt, 900, undefined, 'lightweight');
+    const data = await callGeminiJSON<VerbDocument>(prompt, systemPrompt, 1400, undefined, 'lightweight');
 
     if (!data || !data.infinitive || !data.conjugations?.present) {
       console.error('[getVerbConjugation] Invalid response from Gemini');

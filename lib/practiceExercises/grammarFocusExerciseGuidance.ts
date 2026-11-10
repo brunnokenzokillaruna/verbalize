@@ -1,4 +1,9 @@
 import type { SupportedLanguage } from '@/types';
+import {
+  isVandertrampFocus,
+  VANDERTRAMP_ACRONYM,
+  VANDERTRAMP_TRAP_HINT,
+} from '@/lib/pedagogy/vandertramp';
 
 /**
  * Extra prompt rules when the grammar focus needs exercise types that avoid
@@ -11,6 +16,20 @@ export function buildGrammarFocusExerciseGuidance(
   const focus = grammarFocus.toLowerCase();
 
   if (language === 'fr') {
+    if (isVandertrampFocus(grammarFocus)) {
+      return `
+⚠️ AUXILIAR ÊTRE / ${VANDERTRAMP_ACRONYM} — EXERCÍCIO OBRIGATÓRIO ⚠️
+- Pelo menos 1 exercício (além do conjugation-speed, se houver) DEVE testar AVOIR vs ÊTRE no passé composé.
+- Prefira nesta ordem:
+  1. "grammar-trap" ou "bridge-choice" — 3–4 frases; só uma com o auxiliar correto (être com verbo de movimento).
+  2. "context-choice" — lacuna no auxiliar: "Je ___ allé au marché." blankWord: "suis" (distratores: "ai", "étais").
+  3. "error-correction" — apenas se a correção for TROCAR o auxiliar (ai→suis), sem reordenar palavras.
+- Armadilha brasileira: "j'ai allé", "j'ai venu", "j'ai arrivé".
+- No campo explanation (feedback pós-erro): cite o mnemônico em 1 linha (ex: "${VANDERTRAMP_TRAP_HINT}").
+- Use 2–3 verbos do diálogo/história da lição — NÃO peça para memorizar os 16 de uma vez.
+- NÃO use conjugation-speed só no présent: se for conjugação, priorize passé composé (être + particípio).`;
+    }
+
     const isCoi =
       focus.includes('coi') ||
       focus.includes('objeto indireto') ||

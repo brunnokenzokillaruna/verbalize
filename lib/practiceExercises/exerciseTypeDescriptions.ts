@@ -113,14 +113,14 @@ export function buildTypeDescriptions(langLabel: string): Record<ExerciseTypeId,
    - The learner will SPEAK the correct word aloud (not multiple choice).
    - Choose pairs where oral production clearly distinguishes the sounds.`,
     'conjugation-speed': `type "conjugation-speed":
-   - This exercise tests quick verb conjugation.
-   - "verb" (infinitive form in target language).
+   - This exercise tests quick verb conjugation. The server overwrites forms from the conjugation database — prioritize a lesson-relevant verb + tense.
+   - "verb" (infinitive in target language — prefer the lesson verb).
    - "pronoun" (subject pronoun, e.g. "je", "il", "nous", "vous").
-   - "tense" (PT-BR tense name, e.g. "presente", "passe compose").
-   - "correctForm" (correctly conjugated form).
-   - "options" (array of EXACTLY 4 UNIQUE strings: 1 correct + 3 highly plausible but wrong conjugations of the SAME verb. No duplicates allowed.).
-   - "exampleSentence" (target language): a complete sentence using the correct form.
-   - "translation" (PT-BR): translation of the example sentence.`,
+   - "tense" (PT-BR tense name matching the grammar focus, e.g. "presente", "passe compose", "imperfeito").
+   - "correctForm" (may be a placeholder; server replaces from cache).
+   - "options" (array of EXACTLY 4 strings; server replaces from cache — placeholders OK).
+   - "exampleSentence" (target language, optional theme hint).
+   - "translation" (PT-BR of the example).`,
     'listen-and-respond': `type "listen-and-respond":
    - "dialogueAudio" (1–3 lines in ${langLabel}, Speaker: line format): ONLY the interlocutor speaking to the learner (e.g. recruiter, waiter, friend). ONE speaker name for all lines. NEVER include the learner's lines ("Você:", "Client:", etc.). NEVER copy or paraphrase the lesson hook dialogue — invent a NEW short prompt that fits the situation.
    - "promptLine" (${langLabel}): the final interlocutor line the learner must answer (must match the last line of dialogueAudio).

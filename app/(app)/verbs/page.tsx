@@ -9,6 +9,7 @@ import type { VerbDocument, SupportedLanguage, UserVocabularyDocument } from '@/
 import { LANG_META } from './data';
 import { VerbTenseList } from '@/components/verbs/VerbTenseList';
 import { VerbResultHero } from '@/components/verbs/VerbResultHero';
+import { VerbAuxiliaryHint } from '@/components/verbs/VerbAuxiliaryHint';
 import { VerbExamplesSection } from '@/components/verbs/VerbExamplesSection';
 import { VerbDrillSession } from '@/components/verbs/VerbDrillSession';
 import { VerbChallengeCard } from '@/components/verbs/VerbChallengeCard';
@@ -333,6 +334,7 @@ export default function VerbsPage() {
                 query={input}
                 placeholder={langMeta.placeholder}
                 conjugating={loading}
+                language={language}
                 onQueryChange={setInput}
                 onConjugate={handleSearch}
               />
@@ -397,6 +399,8 @@ export default function VerbsPage() {
               langLabel={langMeta.label}
               onClear={clearVerbResult}
             />
+
+            <VerbAuxiliaryHint infinitive={verb.infinitive} language={language} />
 
             <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:items-start lg:gap-8">
               <VerbTenseList

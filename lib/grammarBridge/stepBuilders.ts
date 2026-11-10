@@ -67,7 +67,11 @@ export function pushCuidadoStep(drafts: StepDraft[], bridge: GrammarBridgeResult
       type: 'cuidado',
       label: 'Radar de erro',
       phase: 'evitar_erro',
-      data: { trap },
+      data: {
+        trap,
+        // Piggyback mnemonic / survival tip at the moment of the classic mistake
+        survivalTip: bridge.survivalTip,
+      },
     });
   }
 }

@@ -267,18 +267,8 @@ export function collectLocalBridgeIssues(
     }
   }
 
-  bridge.verbSpotlight?.conjugationPreview?.forEach((c, i) => {
-    if (c.form) {
-      issues.push(
-        ...targetFieldIssues(
-          `verbSpotlight.conjugationPreview[${i}].form`,
-          c.form,
-          language,
-          'core',
-        ),
-      );
-    }
-  });
+  // conjugationPreview is filled from the verb cache (Firestore) — skip local/Gemini
+  // accuracy claims on those forms to avoid re-spending API tokens and false rejects.
 
   bridge.verbSpotlight?.idiomaticExpressions?.forEach((ex, i) => {
     issues.push(
@@ -481,15 +471,7 @@ export function extractBridgeClaims(
     });
   }
 
-  const conj = bridge.verbSpotlight?.conjugationPreview;
-  if (conj?.length) {
-    claims.push({
-      id: 'conjugationPreview',
-      field: 'verbSpotlight.conjugationPreview',
-      severity: 'core',
-      claim: `PRESENT conjugations of "${bridge.verbSpotlight?.infinitive ?? '?'}" must be correct: ${conj.map((c) => `${c.pronoun}=${c.form}`).join(', ')}`,
-    });
-  }
+  // conjugationPreview comes from the shared verb cache — do not re-verify with Gemini.
 
   return claims;
 }
@@ -514,9 +496,8 @@ Mark ok=false when ANY of these apply:
 2. PT-BR translation invents meaning absent from the target (e.g. adding "por sua vez", "já", "então" when the target has no equivalent) OR mismatches subject/verb/negation/complements.
 3. brazilianTrap.right is wrong OR brazilianTrap.wrong is actually correct.
 4. Quiz correctIndex points to a wrong option, or the marked option teaches bad ${lang}.
-5. Conjugation forms are incorrect for present tense.
-6. insight asserts a false rule about ${lang}.
-7. An additionalExamples pair is clearly about a different grammar topic than the stated focus (when focus is provided).
+5. insight asserts a false rule about ${lang}.
+6. An additionalExamples pair is clearly about a different grammar topic than the stated focus (when focus is provided).
 8. Focus completeness: when grammarFocus names multiple terms (e.g. "Amener e Emmener", "X VS Y"), teaching content that only covers a subset is FAIL — all named terms must appear.
 
 Be conservative on soft pedagogy wording: if unsure about insight style, ok=true. If clearly wrong grammar OR clearly unfaithful PT translation OR missing a required focus term, ok=false.

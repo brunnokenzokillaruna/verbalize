@@ -58,6 +58,7 @@ export function LessonGrammarScreen({
         bridge={bridge}
         language={language}
         tag={tag}
+        grammarFocus={grammarFocus}
         newVocabulary={newVocabulary}
         newVerbs={newVerbs}
         onWordClick={onWordClick}

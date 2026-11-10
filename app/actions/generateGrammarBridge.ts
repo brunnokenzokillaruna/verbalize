@@ -12,6 +12,7 @@ import {
   buildUsageFirstPromptBlock,
   resolveConjugationPreviewTense,
 } from '@/lib/grammarBridge/usagePedagogy';
+import { hydrateConjugationPreview } from '@/lib/grammarBridge/hydrateConjugationPreview';
 import {
   formatIssuesForRegen,
   gateGrammarBridge,
@@ -19,6 +20,7 @@ import {
   type BridgeIssue,
 } from '@/lib/grammarBridge/verifyGrammarBridge';
 import { filterUniqueSurvivalTip } from '@/lib/grammarBridgeDedup';
+import { enrichBridgeWithVandertramp } from '@/lib/pedagogy/vandertramp';
 import type { SupportedLanguage, GrammarBridgeResult, LessonTag, LessonRole } from '@/types';
 import { buildLessonRolePromptGuidance } from '@/lib/curriculum/lessonTopic';
 
@@ -79,39 +81,13 @@ function buildVerbBlocks(grammarFocus: string, language: SupportedLanguage, isVe
       { "target": "1 expressão FIXA real na língua-alvo usando esse verbo (ex: 'être en train de', 'avoir faim')", "portuguese": "tradução natural em PT-BR" },
       { "target": "outra expressão comum", "portuguese": "tradução" }
     ],
-    "conjugationPreview": ${
-      language === 'fr'
-        ? `[
-      { "pronoun": "je", "form": "conjugação no tempo ${conjugationTense} — ex completo" },
-      { "pronoun": "tu", "form": "forma em ${conjugationTense}" },
-      { "pronoun": "il", "form": "forma em ${conjugationTense}" },
-      { "pronoun": "elle", "form": "forma em ${conjugationTense}" },
-      { "pronoun": "on", "form": "forma em ${conjugationTense}" },
-      { "pronoun": "nous", "form": "forma em ${conjugationTense}" },
-      { "pronoun": "vous", "form": "forma em ${conjugationTense}" },
-      { "pronoun": "ils", "form": "forma em ${conjugationTense}" },
-      { "pronoun": "elles", "form": "forma em ${conjugationTense}" }
-    ]`
-        : `[
-      { "pronoun": "I", "form": "conjugação em ${conjugationTense}" },
-      { "pronoun": "you", "form": "forma em ${conjugationTense}" },
-      { "pronoun": "he", "form": "forma em ${conjugationTense}" },
-      { "pronoun": "she", "form": "forma em ${conjugationTense}" },
-      { "pronoun": "it", "form": "forma em ${conjugationTense}" },
-      { "pronoun": "we", "form": "forma em ${conjugationTense}" },
-      { "pronoun": "they", "form": "forma em ${conjugationTense}" }
-    ]`
-    }
+    "conjugationPreview": []
   }`;
 
   const verbRulesBlock = `
 REGRAS EXTRA PARA LIÇÃO DE VERBO:
 - verbSpotlight.infinitive: use o pronome/marcador correto da língua (ex: em FR é 'être', não 'to be'; em EN é 'to be').
-- verbSpotlight.conjugationPreview: forneça as formas no tempo "${conjugationTense}" (o tempo do grammarFocus), NÃO force présent/present se o foco for outro tempo. ${
-    language === 'fr'
-      ? "Para francês use separadamente exatamente: 'je, tu, il, elle, on, nous, vous, ils, elles'."
-      : "Para inglês use separadamente exatamente: 'I, you, he, she, it, we, they'."
-  }
+- verbSpotlight.conjugationPreview: SEMPRE envie []. O servidor preenche as formas do tempo "${conjugationTense}" a partir do banco de conjugações — NÃO invente conjugações (economiza tokens e evita erro).
 - verbSpotlight.idiomaticExpressions: FORNEÇA 1-2 expressões fixas reais, não invente. Se não houver expressão canônica com esse verbo, deixe como array vazio []. NUNCA misture palavras em português nos textos da língua-alvo (ex: "jouer avec le feu", NUNCA "jouer avec o feu").
 - verbSpotlight.personality e frequencyNote: linguagem SIMPLES, uma frase COMPLETA com ponto final. A frase tem de falar DESTE verbo (cite o infinitivo) e do momento em que a gente usa. PROIBIDO truque genérico que sirva para qualquer verbo ("decorar a forma", "muda conforme a pessoa"). Se não couber em 15 palavras sem cortar, escreva menos — nunca deixe a frase pela metade.
 - insight: UMA sacada de USO que só existe para ESTE verbo/tempo (quando usar, a confusão específica com o português). Cite o infinitivo ou a forma conjugada da frase-exemplo. PROIBIDO insight genérico ("o verbo muda conforme a pessoa") e PROIBIDO insight só de morfologia sem situação de uso.
@@ -342,19 +318,23 @@ Regras Cruciais:
 13. COMPLETUDE EM REGRAS COM MÚLTIPLOS USOS/TERMOS: se o grammarFocus nomeia 2+ itens (ex: "Amener e Emmener", "X VS Y"), ensine TODOS — structureFormulas/items/patterns + insight. Omitir um termo = conteúdo inválido.`;
 }
 
-function finalizeBridge(
+async function finalizeBridge(
   bridge: GrammarBridgeResult,
   language: SupportedLanguage,
   grammarFocus: string,
-): GrammarBridgeResult {
+): Promise<GrammarBridgeResult> {
   const normalized = normalizeGrammarBridgeResult(bridge, language, grammarFocus);
   if (!normalized) return bridge;
 
-  const tip = filterUniqueSurvivalTip(normalized.survivalTip, normalized);
-  if (tip !== normalized.survivalTip) {
-    normalized.survivalTip = tip;
+  const enriched = enrichBridgeWithVandertramp(normalized, grammarFocus, language);
+
+  const tip = filterUniqueSurvivalTip(enriched.survivalTip, enriched);
+  if (tip !== enriched.survivalTip) {
+    enriched.survivalTip = tip;
   }
-  return normalized;
+
+  // Fill conjugationPreview from Firestore/Gemini verb cache (generate-once).
+  return hydrateConjugationPreview(enriched, language, grammarFocus);
 }
 
 /**
@@ -402,14 +382,15 @@ export async function generateGrammarBridge(
       );
       lastRaw = raw;
 
-      const normalized = finalizeBridge(raw, language, grammarFocus);
+      const normalized = await finalizeBridge(raw, language, grammarFocus);
       if (!normalized) continue;
       lastNormalized = normalized;
 
       const gate = await gateGrammarBridge(normalized, language, grammarFocus);
 
       if (gate.ok) {
-        return gate.sanitized ?? normalized;
+        // Re-hydrate after sanitize in case salvage stripped preview mid-gate.
+        return hydrateConjugationPreview(gate.sanitized ?? normalized, language, grammarFocus);
       }
 
       lastIssues = gate.issues;

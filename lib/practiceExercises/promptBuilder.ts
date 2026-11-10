@@ -19,6 +19,7 @@ import { resolveRequiredProductionType } from './productionTypes';
 import type { GeneratePracticeParams } from './types';
 import { buildPtBrVocabRule } from './validatePtBrText';
 import { buildLessonRolePromptGuidance } from '@/lib/curriculum/lessonTopic';
+import { buildNativePhraseExerciseGuidance } from '@/lib/pedagogy/nativePhrases';
 
 export function buildDialogueAnchorBlock(): string {
   return `
@@ -109,6 +110,14 @@ export function buildPracticeExercisePrompt(params: GeneratePracticeParams): {
   const tagGuidance = buildTagGuidance(tag, allowedSet, level, knownVocabulary.length);
   const roleGuidance = buildLessonRolePromptGuidance(lessonRole);
   const grammarFocusGuidance = buildGrammarFocusExerciseGuidance(grammarFocus, language);
+  const nativePhraseGuidance = buildNativePhraseExerciseGuidance({
+    language,
+    level,
+    tag,
+    theme,
+    grammarFocus,
+    uiTitle,
+  });
 
   const vocabConstraint = isEarlyLearner
     ? `\nVOCABULARY CONSTRAINT: The learner is a beginner with very limited vocabulary. All exercise sentences must use ONLY: the key vocabulary words listed above, the words that appeared in the dialogue above, the words involved in the grammar focus ("${grammarFocus}"), basic function words (articles, prepositions, pronouns, conjunctions, auxiliary verbs), and simple A1-level everyday words. Do NOT use any advanced or uncommon content words.`
@@ -180,7 +189,7 @@ ${previousTopicsBlock}
 ${grammarBridgeBlock}
 
 TAG-SPECIFIC EXERCISE BALANCE (follow this strictly):
-${tagGuidance}${roleGuidance ? `\nPEDAGOGICAL ROLE:\n${roleGuidance}\n` : ''}${grammarFocusGuidance}${productionRuleBlock}${interleavingBlock}${chainBlock}${dialogueAnchorBlock}${constraintBlock}
+${tagGuidance}${roleGuidance ? `\nPEDAGOGICAL ROLE:\n${roleGuidance}\n` : ''}${grammarFocusGuidance}${nativePhraseGuidance}${productionRuleBlock}${interleavingBlock}${chainBlock}${dialogueAnchorBlock}${constraintBlock}
 
 CRITICAL RULE: Do NOT copy or reuse any sentence from the dialogue above. Every exercise sentence must be ORIGINAL — newly created by you. The sentences should be related to the lesson's theme and grammar focus, but must be completely different from the dialogue lines.
 

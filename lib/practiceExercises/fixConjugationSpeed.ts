@@ -1,36 +1,8 @@
 import { getVerbConjugation } from '@/app/actions/getVerbConjugation';
+import { resolveVerbTenseKey } from '@/lib/verbs/tenseKeys';
 import { extractVerbOnlyForm, stripPronounPrefix } from '@/utils/conjugationHelper';
 import { sanitizeConjugationOptions } from '@/utils/verbDrillGenerator';
 import type { ConjugationSpeedData, SupportedLanguage, VerbDocument } from '@/types';
-
-/** Map PT-BR / informal tense labels → VerbDocument keys. */
-const TENSE_KEY_ALIASES: Record<string, keyof VerbDocument['conjugations']> = {
-  present: 'present',
-  presente: 'present',
-  past: 'past',
-  passado: 'past',
-  'passe compose': 'past',
-  'passé composé': 'past',
-  future: 'future',
-  futuro: 'future',
-  conditional: 'conditional',
-  condicional: 'conditional',
-  imperfect: 'imperfect',
-  imperfeito: 'imperfect',
-  imparfait: 'imperfect',
-  subjunctive: 'subjunctive',
-  subjuntivo: 'subjunctive',
-  subjonctif: 'subjunctive',
-};
-
-function resolveTenseKey(tense: string): keyof VerbDocument['conjugations'] | null {
-  const key = tense
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .trim();
-  return TENSE_KEY_ALIASES[key] ?? null;
-}
 
 function lookupTableForm(
   conjugations: VerbDocument['conjugations'],
@@ -52,6 +24,10 @@ function lookupTableForm(
   return null;
 }
 
+/**
+ * Surgical fix against the cached conjugation table.
+ * Prefer ensureTableBackedConjugationSpeed for a full rebuild before validation.
+ */
 export async function fixConjugationSpeedExercise(
   data: ConjugationSpeedData,
   language: SupportedLanguage,
@@ -59,9 +35,8 @@ export async function fixConjugationSpeedExercise(
   let correctForm = stripPronounPrefix(data.correctForm, language, data.pronoun);
   let options = data.options.map((opt) => stripPronounPrefix(opt, language, data.pronoun));
 
-  // Prefer authoritative table form when available — never teach a wrong conjugation.
   const verbDoc = await getVerbConjugation(data.verb, language);
-  const tenseKey = resolveTenseKey(data.tense);
+  const tenseKey = resolveVerbTenseKey(data.tense);
   if (verbDoc?.conjugations && tenseKey) {
     const tableForm = lookupTableForm(verbDoc.conjugations, tenseKey, data.pronoun, language);
     if (tableForm) {
@@ -73,7 +48,10 @@ export async function fixConjugationSpeedExercise(
         );
         correctForm = tableForm;
         if (!options.some((o) => o.toLowerCase() === tableNorm)) {
-          options = [tableForm, ...options.filter((o) => o.toLowerCase() !== claimedNorm)].slice(0, 4);
+          options = [tableForm, ...options.filter((o) => o.toLowerCase() !== claimedNorm)].slice(
+            0,
+            4,
+          );
         } else {
           options = options.map((o) => (o.toLowerCase() === claimedNorm ? tableForm : o));
         }

@@ -167,7 +167,7 @@ export function buildTagGuidance(
   if (tag === 'VERB') {
     const types = pick(['error-correction', 'sentence-builder', 'context-choice']);
     return [
-      `- The FIRST exercise (index 0) MUST be of type 'conjugation-speed'. This is mandatory for VERB lessons.`,
+      `- Include exactly one 'conjugation-speed' as exercise index 0 (forms are overwritten from the conjugation database — still provide verb/pronoun/tense; correctForm/options may be placeholders).`,
       types.length ? `- The remaining 4 exercises should focus on ${list(types)} to reinforce the verb conjugation patterns.` : '',
       productionLine,
     ].filter(Boolean).join('\n');

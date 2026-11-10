@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from 'react';
 import { ArrowLeft, Loader2, Search, Sparkles, X } from 'lucide-react';
+import { isVandertrampVerb } from '@/lib/pedagogy/vandertramp';
+import type { SupportedLanguage } from '@/types';
 
 const PREVIEW_COUNT = 6;
 const ALPHABET = 'abcdefghijklmnopqrstuvwxyz'.split('');
@@ -18,11 +20,20 @@ type LearnedVerbsSectionProps = {
   query: string;
   placeholder: string;
   conjugating: boolean;
+  language?: SupportedLanguage;
   onQueryChange: (query: string) => void;
   onConjugate: (word: string) => void;
 };
 
-function VerbRow({ verb, onClick }: { verb: LearnedVerb; onClick: () => void }) {
+function VerbRow({
+  verb,
+  showEtreBadge,
+  onClick,
+}: {
+  verb: LearnedVerb;
+  showEtreBadge: boolean;
+  onClick: () => void;
+}) {
   return (
     <button
       type="button"
@@ -30,7 +41,23 @@ function VerbRow({ verb, onClick }: { verb: LearnedVerb; onClick: () => void }) 
       className="flex w-full items-center justify-between gap-3 rounded-xl border border-border bg-surface px-4 py-3 text-left transition-all active:scale-[0.99] cursor-pointer hover:border-verb/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-verb"
     >
       <span className="min-w-0">
-        <span className="block font-display text-base font-bold text-text-primary truncate">{verb.word}</span>
+        <span className="flex items-center gap-2 min-w-0">
+          <span className="block font-display text-base font-bold text-text-primary truncate">
+            {verb.word}
+          </span>
+          {showEtreBadge && (
+            <span
+              className="shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wide"
+              style={{
+                color: 'var(--color-verb)',
+                backgroundColor: 'var(--color-verb-bg)',
+              }}
+              title="Usa être no passé composé (DR MRS VANDERTRAMP)"
+            >
+              être
+            </span>
+          )}
+        </span>
         <span
           className={`mt-0.5 block truncate text-xs ${
             verb.translation?.trim() ? 'text-text-secondary' : 'italic text-text-muted'
@@ -51,6 +78,7 @@ export function LearnedVerbsSection({
   query,
   placeholder,
   conjugating,
+  language,
   onQueryChange,
   onConjugate,
 }: LearnedVerbsSectionProps) {
@@ -190,7 +218,12 @@ export function LearnedVerbsSection({
             </p>
             <div className="flex flex-col gap-2">
               {previewVerbs.map((verb) => (
-                <VerbRow key={verb.id} verb={verb} onClick={() => onConjugate(verb.word)} />
+                <VerbRow
+                  key={verb.id}
+                  verb={verb}
+                  showEtreBadge={language === 'fr' && isVandertrampVerb(verb.word)}
+                  onClick={() => onConjugate(verb.word)}
+                />
               ))}
             </div>
           </div>
@@ -232,7 +265,12 @@ export function LearnedVerbsSection({
             {resultWords.length > 0 ? (
               <div className="flex flex-col gap-2">
                 {resultWords.map((verb) => (
-                  <VerbRow key={verb.id} verb={verb} onClick={() => onConjugate(verb.word)} />
+                  <VerbRow
+                  key={verb.id}
+                  verb={verb}
+                  showEtreBadge={language === 'fr' && isVandertrampVerb(verb.word)}
+                  onClick={() => onConjugate(verb.word)}
+                />
                 ))}
               </div>
             ) : (

@@ -96,14 +96,9 @@ export function extractAnswerClaim(ex: Exercise, index: number): AnswerClaim | n
         claim: `Q: "${d.question}" | explanation: "${d.explanation}" | markedCorrect(index ${d.correctIndex}): "${marked}" | options: ${d.options.map((o, i) => `[${i}] ${o}`).join(' | ')}`,
       };
     }
-    case 'conjugation-speed': {
-      const d = ex.data as ConjugationSpeedData;
-      return {
-        index,
-        type: ex.type,
-        claim: `conjugate ${d.verb} for "${d.pronoun}" in tense "${d.tense}" | marked correctForm: "${d.correctForm}" | options: [${d.options.join(', ')}] | example: "${d.exampleSentence}"`,
-      };
-    }
+    case 'conjugation-speed':
+      // Forms come from the shared verb cache — skip Gemini re-verification.
+      return null;
     case 'translation-with-constraint': {
       const d = ex.data as TranslationWithConstraintData;
       return {

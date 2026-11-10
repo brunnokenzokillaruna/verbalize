@@ -15,6 +15,7 @@ import {
 import { resolveRequiredProductionType, sessionHasProduction } from './productionTypes';
 import { dropOverlappingExercises, stripRetiredExercises } from './sessionBalance';
 import type { GeneratePracticeParams } from './types';
+import { ensureTableBackedConjugationSpeed } from './buildCachedConjugationSpeed';
 import { validateAndSanitizeExercises } from './validateGeneratedExercises';
 import { gateExerciseAnswerKeys } from './verifyAnswerKeys';
 
@@ -29,6 +30,8 @@ export async function composePracticeSession(
 ): Promise<Exercise[]> {
   let result = stripRetiredExercises(exercises);
   result = dropOverlappingExercises(result);
+  // Replace Gemini-invented conjugations with the shared verb-cache table.
+  result = await ensureTableBackedConjugationSpeed(result, params);
   result = await validateAndSanitizeExercises(result, allowedSet, params.language, {
     lessonVocabulary: params.newVocabulary,
     lessonDialogue: params.dialogue,

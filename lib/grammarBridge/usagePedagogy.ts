@@ -1,4 +1,11 @@
 import type { SupportedLanguage } from '@/types';
+import {
+  isVandertrampFocus,
+  VANDERTRAMP_ACRONYM,
+  VANDERTRAMP_ANALOGY,
+  VANDERTRAMP_SURVIVAL_TIP,
+  VANDERTRAMP_TRAP_HINT,
+} from '@/lib/pedagogy/vandertramp';
 
 /**
  * Universal + focus-specific prompt blocks so Grammar Bridge teaches
@@ -46,7 +53,11 @@ export function resolveConjugationPreviewTense(
     }
     if (f.includes('conditionnel passé')) return 'conditionnel passé';
     if (f.includes('conditionnel')) return 'conditionnel présent';
-    if (f.includes('passé composé') || f.includes('passe compose')) {
+    if (
+      f.includes('passé composé') ||
+      f.includes('passe compose') ||
+      isVandertrampFocus(grammarFocus)
+    ) {
       return 'passé composé';
     }
     if (f.includes('futur simple') || (f.includes('futur') && !f.includes('proche'))) {
@@ -155,6 +166,26 @@ Mesmo com foco em was/were + -ing, ensine QUANDO usar:
 `;
 }
 
+function buildVandertrampGuidance(): string {
+  return `
+⚠️ AUXILIAR ÊTRE / ${VANDERTRAMP_ACRONYM} — MNEMÔNICO OBRIGATÓRIO ⚠️
+Esta lição ensina QUANDO usar être (não avoir) no passé composé.
+NÃO liste os 16 verbos de uma vez na primeira tela — mostre o acrônimo + 2–3 verbos do diálogo.
+
+OBRIGATÓRIO no JSON:
+- analogy: EXATAMENTE algo próximo de "${VANDERTRAMP_ANALOGY}" (cite ${VANDERTRAMP_ACRONYM}).
+- survivalTip: "${VANDERTRAMP_SURVIVAL_TIP}" (mnemônico curto, ≤12 palavras).
+- insight: gatilho = movimento / mudança de estado / "ir-vir-chegar-ficar" → être.
+- structureFormula: "[Sujeito] + [être conjugado] + [particípio] (+ acordo de gênero/número)".
+- explanation[0]: como montar (être + particípio); explanation[1]: contraste rápido com avoir (maioria dos verbos).
+- brazilianTrap: calque clássico "j'ai allé / j'ai venu" → "je suis allé / je suis venu".
+  brazilianTrap.explanation DEVE citar o mnemônico (ex: "${VANDERTRAMP_TRAP_HINT}").
+- retentionCheck: preferir "Qual auxiliar?" ou "Avoir ou être nesta frase?" com 1 verbo do diálogo.
+- items/patterns: no máximo 3 verbos do diálogo (não dump da lista completa).
+- A lista completa fica para consulta no Verb Explorer — aqui é pigmento, não tabela.
+`;
+}
+
 /**
  * Focus-specific blocks (imparfait, subjonctif, etc.) + legacy special cases.
  * Empty string when no dedicated block applies (universal block still applies).
@@ -164,6 +195,10 @@ export function buildGrammarFocusGuidance(
   language: SupportedLanguage,
 ): string {
   const focus = grammarFocus.toLowerCase();
+
+  if (language === 'fr' && isVandertrampFocus(grammarFocus)) {
+    return buildVandertrampGuidance();
+  }
 
   if (
     language === 'fr' &&
