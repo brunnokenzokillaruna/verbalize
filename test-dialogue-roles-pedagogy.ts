@@ -90,6 +90,7 @@ assert(
 const { prompt } = buildPracticeExercisePrompt({
   dialogue: 'Serveur: Bonjour ! Qu\'est-ce que vous prenez ?\nVous: Un café allongé.',
   newVocabulary: ['café', 'prendre', 's\'il vous plaît'],
+  verbWord: '',
   grammarFocus: '5 Frases para Pedidos em Cafés',
   theme: 'Tema 7: Pedidos, gentilezas e novos contatos',
   uiTitle: 'Contando Suas Origens',
