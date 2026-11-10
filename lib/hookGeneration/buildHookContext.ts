@@ -60,14 +60,14 @@ Do not turn friends into waiter-talk mid-scene.`;
 - Use "t'as", "t'es", "j'sais pas", "y a", and "on" for "nous".
 - Questions by intonation ("t'as faim ?"), not "est-ce que" or inversion.
 - Prefer "ouais" / "nan" over "oui" / "non".
-- At least one turn is ONLY a short reaction (1–3 words). Prefer: ${nativeReactionExamples(level, 5).map((p) => `"${p}"`).join(', ')}.
+- At least one turn is ONLY a short reaction (1–3 words). Prefer rotating set: ${nativeReactionExamples(level, 6, `${tag}|${level}|adv`).map((p) => `"${p}"`).join(', ')} — do not default to the same one every lesson.
 - Do not start lines with "Alors".
 - Do not open with "Ça va ?" and do not close with "Parfait, merci !" or a bare "Merci".
 - Close on a decision or next step.`
       : `Spoken French for beginners:
 - Simple everyday words. Present tense, or "aller" + infinitive.
 - Fragments are real lines: "Sur la table.", "J'arrive.", "Le bus ?"
-- At least one turn is a short reaction (1–3 words). Prefer: ${nativeReactionExamples(level, 4).map((p) => `"${p}"`).join(', ')}.
+- At least one turn is a short reaction (1–3 words). Prefer rotating set: ${nativeReactionExamples(level, 5, `${tag}|${level}|beg`).map((p) => `"${p}"`).join(', ')}.
 - Questions by intonation. "y a" and "on" are fine. Keep "ne" when dropping it would hide the grammar point.
 - Do not open with "Ça va ?" and do not close with "Parfait, merci !".`
     : advanced

@@ -412,9 +412,11 @@ export function useLessonBootstrap({
           const focus = lesson.grammarFocus;
           const dialogue = hook.dialogue;
 
+          const wantsSpokenChunks =
+            tag === 'EXPR' || tag === 'CULT' || tag === 'DIAL' || tag === 'MISS';
           const needsHookEnrichment =
             !hook.dialogueVerbs?.length ||
-            ((tag === 'EXPR' || tag === 'CULT') && !hook.newChunks?.length) ||
+            (wantsSpokenChunks && !hook.newChunks?.length) ||
             (tag === 'MISS' && !hook.rolePlayConsequences?.length);
 
           if (needsHookEnrichment) {

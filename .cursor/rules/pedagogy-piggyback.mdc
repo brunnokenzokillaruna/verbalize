@@ -1,0 +1,22 @@
+---
+description: Filtro para ideias pedagógicas (Instagram/Facebook) — encaixar no fluxo diário existente, sem criar rotinas extras
+alwaysApply: true
+---
+
+# Pedagogy piggyback (sem rotina extra)
+
+Antes de desenhar UI ou feature nova a partir de ideia de conteúdo (mnemônico, dica, tabela, “do dia”), aplicar estas 3 perguntas:
+
+1. **Em qual fase da lição isso cabe em &lt;15s?** (Hook / Grammar Bridge / Practice / feedback de erro)
+2. **O aluno já vai passar por esse momento hoje?** Se não, não é feature diária.
+3. **Dá para reaparecer via REVIEW / SRS / Verb Explorer depois?** Se sim, retenção sem módulo novo.
+
+## Regras
+
+- Preferir **pigmento no fluxo existente** (lição → vocabulary → hook → grammar → practice; revisão; Meus Verbos).
+- **Não** criar aba “Dicas”, “Mnemônicos”, “Gramática do dia”, nem streak separado de regra.
+- Infográfico / lista longa = **referência sob demanda** (ex.: Verb Explorer), nunca checklist diário.
+- Just-in-time no erro (Radar de Erro / explanation do exercício) vale mais que tela própria.
+- Pilotos de referência:
+  - Vandertramp em `lib/pedagogy/vandertramp.ts` + lição `fr-a2-155`
+  - Frases nativas em `lib/pedagogy/nativePhrases.ts` (Hook/Practice/SRS chunks — sem “frase do dia”)

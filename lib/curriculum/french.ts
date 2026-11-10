@@ -105,7 +105,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "level": "A1",
     "tag": "DIAL",
     "uiTitle": "Cumprimentando os Comissários",
-    "grammarFocus": "5 Maneiras de Dizer Ça va bien",
+    "grammarFocus": "5 reações positivas: Ça va bien, Ça marche, D'accord, Pas de souci, C'est gentil",
     "theme": "Tema 1: A Bordo do Avião e Aeroporto",
     "arcCharacters": {
       "learner": "Lucas",
@@ -3083,7 +3083,7 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "level": "B1",
     "tag": "EXPR",
     "uiTitle": "Reações na Rede",
-    "grammarFocus": "Reagir numa rede: plaire, servir e rire",
+    "grammarFocus": "5 reações nativas: Carrément, Ah bon ?, C'est nickel, Tant pis, Du coup",
     "theme": "Tema 20: Expressões e Redes Sociais"
   },
   {

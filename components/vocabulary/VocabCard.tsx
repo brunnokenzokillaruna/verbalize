@@ -4,6 +4,7 @@ import { AudioPlayerButton } from '@/components/lesson/AudioPlayerButton';
 import { Book } from 'lucide-react';
 import { SrsBar, SRS_BAR_COLOR, SRS_LABELS, formatNextReview } from './SrsBar';
 import { VocabEnrichButton } from './VocabEnrichButton';
+import { NativePhraseBadge } from './NativePhraseBadge';
 import type { UserVocabularyDocument, SupportedLanguage } from '@/types';
 import { getVocabImage } from '@/app/actions/getVocabImage';
 import { isMissingImage, isMissingTranslation } from '@/utils/vocabHelpers';
@@ -171,6 +172,7 @@ export function VocabCard({
 
       {/* Content */}
       <div className="flex flex-col gap-2 p-3">
+        <NativePhraseBadge phrase={item.word} language={language} className="self-start" />
         <div className="flex items-start justify-between gap-2">
           <p
             className="text-sm leading-tight flex-1"

@@ -5,6 +5,7 @@ import {
   normalizeToEverydayPtBr,
   normalizeToEverydayPtBrOptional,
 } from '@/lib/naturalPtBr';
+import { enrichHookWithNativeChunks } from '@/lib/pedagogy/nativePhrases';
 import { callGeminiJSON } from '@/services/gemini';
 import type { HookResult, LessonTag, ProficiencyLevel, SupportedLanguage } from '@/types';
 
@@ -33,7 +34,7 @@ export async function enrichHookMetadata(
   const lang = LANG_LABEL[language];
 
   const optionalFields: string[] = ['"dialogueVerbs": ["infinitive1", "infinitive2", ...]'];
-  if (tag === 'EXPR' || tag === 'CULT') {
+  if (tag === 'EXPR' || tag === 'CULT' || tag === 'DIAL' || tag === 'MISS') {
     optionalFields.push(
       '"newChunks": [{"phrase":"...","translation":"PT-BR","entryType":"expression"}]',
     );
@@ -98,9 +99,19 @@ Rules:
         }));
     }
 
+    const withNative = enrichHookWithNativeChunks({
+      dialogue,
+      newChunks: partial.newChunks,
+    });
+    if (withNative.newChunks?.length) {
+      partial.newChunks = withNative.newChunks;
+    }
+
     return partial;
   } catch (err) {
     console.error('[enrichHookMetadata] Error:', err);
-    return {};
+    // Still seed SRS chunks from the dialogue even if Gemini failed.
+    const fallback = enrichHookWithNativeChunks({ dialogue, newChunks: [] });
+    return fallback.newChunks?.length ? { newChunks: fallback.newChunks } : {};
   }
 }

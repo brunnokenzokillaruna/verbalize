@@ -1,6 +1,7 @@
 import { AudioPlayerButton } from '@/components/lesson/AudioPlayerButton';
 import { SrsBar, SRS_BAR_COLOR, SRS_LABELS, formatNextReview } from '@/components/vocabulary/SrsBar';
 import { VocabEnrichButton } from '@/components/vocabulary/VocabEnrichButton';
+import { NativePhraseBadge } from '@/components/vocabulary/NativePhraseBadge';
 import { isMissingImage, isMissingTranslation } from '@/utils/vocabHelpers';
 import type { UserVocabularyDocument, SupportedLanguage } from '@/types';
 
@@ -38,10 +39,11 @@ export function VocabListRow({
       <div className="flex items-center gap-3.5 min-w-0 flex-1">
         <AudioPlayerButton text={item.word} language={language} size="sm" />
         <div className="min-w-0">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 min-w-0">
             <span className="font-display text-base font-bold text-text-primary tracking-tight truncate">
               {item.word}
             </span>
+            <NativePhraseBadge phrase={item.word} language={language} />
             {urgent && (
               <span className="flex h-1.5 w-1.5 rounded-full bg-error shrink-0 animate-pulse" />
             )}
