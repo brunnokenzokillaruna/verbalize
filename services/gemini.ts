@@ -13,18 +13,18 @@ import {
 export type { GeminiTier } from '@/lib/geminiQuota';
 
 const MODEL_CHAINS: Record<GeminiTier, readonly string[]> = {
-  // Hooks / critical content: prefer 3.6 quality; lite if overloaded or soft budget out.
-  critical: ['gemini-3.6-flash', 'gemini-3.1-flash-lite'],
+  // Hooks / critical content: prefer 3.8 quality; lite if overloaded or soft budget out.
+  critical: ['gemini-3.8-flash', 'gemini-3.5-flash-lite'],
   // Grammar, exercises, bridges: lite first — cheaper, faster JSON, fewer timeouts.
   // (Putting primary flash on standard burned ~CA$0.20+/lesson and raised practice failure rate.)
-  standard: ['gemini-3.1-flash-lite', 'gemini-2.5-flash-lite'],
-  lightweight: ['gemini-3.1-flash-lite'],
+  standard: ['gemini-3.5-flash-lite', 'gemini-2.5-flash-lite'],
+  lightweight: ['gemini-3.5-flash-lite'],
 };
 
 /** Degraded hook path when primary flash daily budget is exhausted. */
-const CRITICAL_FALLBACK_MODEL = 'gemini-3.1-flash-lite';
+const CRITICAL_FALLBACK_MODEL = 'gemini-3.5-flash-lite';
 
-export const PRIMARY_GEMINI_MODEL = 'gemini-3.6-flash';
+export const PRIMARY_GEMINI_MODEL = 'gemini-3.8-flash';
 
 const DEFAULT_COOLDOWN_MS = 5 * 60 * 1000;
 const OVERLOAD_COOLDOWN_MS = 60 * 1000;
@@ -39,6 +39,7 @@ const ai = new GoogleGenAI({ apiKey: getGeminiKey() });
 function modelSupportsThinkingConfig(model: string): boolean {
   return (
     model.includes('flash-lite') ||
+    model.includes('3.8') ||
     model.includes('3.6') ||
     model.includes('3.5')
   );
@@ -47,14 +48,21 @@ function modelSupportsThinkingConfig(model: string): boolean {
 const LARGE_OUTPUT_THRESHOLD = 1500;
 const LARGE_OUTPUT_MIN_TOKENS = 8192;
 
-function getAdjustedMaxTokens(model: string, maxOutputTokens: number): number {
-  const isLargeOutput = maxOutputTokens >= LARGE_OUTPUT_THRESHOLD;
-
-  if (
+/** Primary Flash models use thinking tokens; Flash-Lite should not get this headroom. */
+function needsThinkingTokenHeadroom(model: string): boolean {
+  if (model.includes('flash-lite')) return false;
+  return (
+    model.includes('3.8') ||
     model.includes('3.6') ||
     model.includes('3.5') ||
     model.includes('thinking')
-  ) {
+  );
+}
+
+function getAdjustedMaxTokens(model: string, maxOutputTokens: number): number {
+  const isLargeOutput = maxOutputTokens >= LARGE_OUTPUT_THRESHOLD;
+
+  if (needsThinkingTokenHeadroom(model)) {
     if (isLargeOutput) {
       return Math.max(maxOutputTokens * 3, LARGE_OUTPUT_MIN_TOKENS);
     }
@@ -204,9 +212,9 @@ async function generateWithModel(
 
 /**
  * Calls the Gemini API using tier-specific model chains.
- * critical → 3.6-flash (degrades to lite when daily budget exhausted)
- * standard → 3.1-flash-lite → 2.5-flash-lite
- * lightweight → 3.1-flash-lite only
+ * critical → 3.8-flash (degrades to lite when daily budget exhausted)
+ * standard → 3.5-flash-lite → 2.5-flash-lite
+ * lightweight → 3.5-flash-lite only
  */
 export async function callGemini(
   prompt: string,

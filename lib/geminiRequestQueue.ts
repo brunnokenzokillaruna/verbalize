@@ -13,7 +13,7 @@ import {
 } from '@/lib/geminiQuota';
 
 const GAP_MS: Record<GeminiTier, number> = {
-  critical: 1_500, // ~40 RPM serialized for gemini-3.6-flash
+  critical: 1_500, // ~40 RPM serialized for gemini-3.8-flash
   standard: 400, // lite / mixed content
   lightweight: 300, // translations, tooltips, grading
 };

@@ -14,8 +14,10 @@ export type GeminiTier = 'critical' | 'standard' | 'lightweight';
 export type QuotaBucket = 'flash35' | 'lite';
 
 const MODEL_TO_BUCKET: Record<string, QuotaBucket> = {
-  'gemini-3.6-flash': 'flash35',
+  'gemini-3.8-flash': 'flash35',
+  'gemini-3.6-flash': 'flash35', // previous primary — still budgeted if hit
   'gemini-3.5-flash': 'flash35', // deprecated alias — still budgeted if hit
+  'gemini-3.5-flash-lite': 'lite',
   'gemini-3.1-flash-lite': 'lite',
   'gemini-2.5-flash-lite': 'lite',
   'gemini-2.5-flash': 'flash35',

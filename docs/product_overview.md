@@ -213,7 +213,7 @@ The project uses a stack that allows operation with zero cost.
 
 - **Frontend:** Next.js, React, Tailwind CSS
 - **Backend:** Firebase (Spark Plan), Firestore, Firebase Authentication
-- **AI services:** Gemini 3.6 Flash
+- **AI services:** Gemini 3.8 Flash (+ 3.5 Flash-Lite for volume)
 - **Images:** Pexels API
 - **Hosting:** Vercel free tier
 
