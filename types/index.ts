@@ -154,7 +154,21 @@ export interface VerbDocument {
     conditional?: Record<string, string>;
     subjunctive?: Record<string, string>;
     imperfect?: Record<string, string>;
+    /** French plus-que-parfait / English past perfect */
+    pluperfect?: Record<string, string>;
+    /** French conditionnel passé / English would have + PP */
+    conditionalPast?: Record<string, string>;
+    /** French futur proche (aller + inf) / English going to */
+    nearFuture?: Record<string, string>;
+    /** English present continuous (also usable for progressive focus) */
+    presentContinuous?: Record<string, string>;
+    /** English past continuous */
+    pastContinuous?: Record<string, string>;
+    /** French futur antérieur / English future perfect — optional */
+    futurePerfect?: Record<string, string>;
   };
+  /** Bumped when the cached tense set is expanded (lazy upgrades). */
+  tableVersion?: number;
 
   exampleSentences: Array<{
     target: string;

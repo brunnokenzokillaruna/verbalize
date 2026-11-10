@@ -7,6 +7,12 @@ export const TENSE_LABELS: Record<string, string> = {
   conditional: 'Condicional',
   imperfect: 'Imperfeito',
   subjunctive: 'Subjuntivo',
+  pluperfect: 'Mais-que-perfeito',
+  conditionalPast: 'Condicional passado',
+  nearFuture: 'Futuro próximo',
+  presentContinuous: 'Presente contínuo',
+  pastContinuous: 'Passado contínuo',
+  futurePerfect: 'Futuro perfeito',
 };
 
 export function inferLanguageFromPronoun(pronoun: string): SupportedLanguage {

@@ -26,7 +26,10 @@ export async function buildLessonConjugationSpeed(
   const preferred = grammarFocus
     ? mapPreviewTenseToVerbKey(resolveConjugationPreviewTense(grammarFocus, language), language)
     : null;
-  const tenseKey = pickAvailableTense(verbDoc.conjugations, preferred);
+  // Prefer the lesson tense; if still missing after cache upgrade, fall back for the drill.
+  const tenseKey =
+    pickAvailableTense(verbDoc.conjugations, preferred, { allowFallback: false }) ??
+    pickAvailableTense(verbDoc.conjugations, null);
 
   try {
     return generateLocalDrill(verbDoc, {

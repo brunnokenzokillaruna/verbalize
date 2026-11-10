@@ -5,9 +5,8 @@ import { mapPreviewTenseToVerbKey, pickAvailableTense } from '@/lib/verbs/tenseK
 import type { GrammarBridgeResult, SupportedLanguage } from '@/types';
 
 /**
- * Overwrite verbSpotlight.conjugationPreview from Firestore/Gemini verb cache.
- * Leaves Gemini preview only when the requested tense is not stored as a table
- * (compound/periphrastic).
+ * Overwrite verbSpotlight.conjugationPreview from the Firestore verb cache.
+ * Uses the grammar-focus tense when present; never substitutes présent for another tense.
  */
 export async function hydrateConjugationPreview(
   bridge: GrammarBridgeResult,
@@ -23,13 +22,12 @@ export async function hydrateConjugationPreview(
   const previewTense = resolveConjugationPreviewTense(grammarFocus, language);
   const mapped = mapPreviewTenseToVerbKey(previewTense, language);
 
-  // Compound/periphrastic tenses are not stored as full tables — keep whatever Gemini sent
-  // (usually [] after the prompt change; conjugation steps simply won't appear).
+  // Rare paradigms we still do not store — leave Gemini rows (usually []).
   if (mapped === null) {
     return bridge;
   }
 
-  const tenseKey = pickAvailableTense(verbDoc.conjugations, mapped);
+  const tenseKey = pickAvailableTense(verbDoc.conjugations, mapped, { allowFallback: false });
   if (!tenseKey) return bridge;
 
   const preview = buildConjugationPreviewFromVerbDoc(verbDoc, tenseKey, language);
