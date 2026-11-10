@@ -15,31 +15,23 @@ import {
   resolveSpeakerGenders,
   stripSpeakerPrefix,
 } from '@/lib/speakerGender';
-import { applyLearnerAudioTag } from '@/lib/geminiTtsAudioTags';
+import { prepareLearnerLineAudio } from '@/lib/geminiTtsAudioTags';
 import { pickGeminiTtsVoice } from '@/lib/geminiTtsVoices';
 import type { DialogueSpeakerVoice } from '@/lib/dialogueVoiceAvatars';
 import type { SupportedLanguage } from '@/types';
 
 /* ------------------------------------------------------------------ */
-/*  Gemini Pro TTS — multi-speaker dialogue in a single API call       */
+/*  Gemini 3.8 TTS — multi-speaker dialogue in a single API call       */
 /*                                                                     */
-/*  Uses the Interactions API with a dedicated TTS model so quotas     */
+/*  Uses the Interactions API with dedicated TTS models so quotas      */
 /*  are separate from lesson content generation (gemini-3.8-flash).    */
 /*  Returns WAV base64 (browser-native) instead of MP3.                */
 /* ------------------------------------------------------------------ */
 
 const TTS_MODEL_CHAIN = [
-  'gemini-2.5-pro-preview-tts',
-  'gemini-2.5-flash-preview-tts',
-  'gemini-3.1-flash-tts-preview',
+  'gemini-3.8-flash-tts',
+  'gemini-3.8-flash-lite-tts',
 ] as const;
-
-const STYLE_PROMPT =
-  'Director notes for language learners: speak clearly at a slightly slower pace, ' +
-  'warm conversational tone, crisp pronunciation. ' +
-  'Honor English audio tags in square brackets (e.g. [curious], [sighs], [excited], [laughs]) — ' +
-  'they control delivery or add a brief non-speech sound; never read the brackets aloud. ' +
-  'Do not rush, shout, or whisper unless a tag asks for it.';
 
 export type GeminiDialogueResult = {
   chunks: string[];
@@ -49,11 +41,23 @@ export type GeminiDialogueResult = {
   speakerVoices: DialogueSpeakerVoice[];
 };
 
+type SpeakerVoice = { speaker: string; voice: string };
+
+type TurnContent = {
+  type: 'text';
+  text: string;
+  annotations: Array<{
+    type: 'speech_metadata';
+    speaker: string;
+    style: string;
+  }>;
+};
+
 const dialogueCache = new Map<string, GeminiDialogueResult>();
 
 function cacheKey(lines: string[], language: SupportedLanguage): string {
-  // v4: learner-safe English audio tags in the TTS transcript.
-  return `v4:${language}:${lines.map((l) => l.trim().toLowerCase()).join('|')}`;
+  // v5: Gemini 3.8 TTS speech_metadata + angle-bracket vocal tags.
+  return `v5:${language}:${lines.map((l) => l.trim().toLowerCase()).join('|')}`;
 }
 
 /** Gemini multi-speaker TTS supports at most 2 distinct speakers. */
@@ -66,9 +70,9 @@ function countUniqueSpeakers(lines: string[]): number {
   return speakers.size;
 }
 
-function buildMultiSpeakerPrompt(lines: string[]): {
-  input: string;
-  speechConfig: { speaker: string; voice: string }[];
+function buildMultiSpeakerRequest(lines: string[]): {
+  content: TurnContent[];
+  speakers: SpeakerVoice[];
 } {
   const nonEmpty = lines.filter((l) => l.trim().length > 0);
   const uniqueSpeakers = listSpeakersInOrder(nonEmpty);
@@ -78,35 +82,47 @@ function buildMultiSpeakerPrompt(lines: string[]): {
   const speakerB = uniqueSpeakers[1] ?? 'Speaker2';
 
   const usedVoices = new Set<string>();
-  const speechConfig = [speakerA, speakerB].map((speaker) => {
+  const speakers = [speakerA, speakerB].map((speaker) => {
     const gender = genders.get(speaker) ?? (speaker === speakerA ? 'female' : 'male');
     return { speaker, voice: pickGeminiTtsVoice(gender, usedVoices) };
   });
 
-  const formattedLines = nonEmpty.map((line, i) => {
+  const content: TurnContent[] = nonEmpty.map((line, i) => {
     const name = parseSpeakerName(line);
     const speaker = name ?? (i % 2 === 0 ? speakerA : speakerB);
-    const spoken = applyLearnerAudioTag(stripSpeakerPrefix(line));
-    return `${speaker}: ${spoken}`;
+    const { text, style } = prepareLearnerLineAudio(stripSpeakerPrefix(line));
+    return {
+      type: 'text',
+      text,
+      annotations: [
+        {
+          type: 'speech_metadata',
+          speaker,
+          style,
+        },
+      ],
+    };
   });
 
-  // Prompt must lead with the multi-speaker instruction so voice mapping sticks.
-  const input =
-    `TTS the following conversation between ${speakerA} and ${speakerB}.\n` +
-    `${STYLE_PROMPT}\n\n` +
-    `### TRANSCRIPT\n` +
-    formattedLines.join('\n');
-
-  return { input, speechConfig };
+  return { content, speakers };
 }
 
 function getGeminiClient(): GoogleGenAI {
   return new GoogleGenAI({ apiKey: getGeminiKey() });
 }
 
+/** 3.8 unary TTS returns WAV by default; older models returned raw PCM. */
+function audioDataToWavBase64(audioData: string): string {
+  const buf = Buffer.from(audioData, 'base64');
+  if (buf.length >= 4 && buf.toString('ascii', 0, 4) === 'RIFF') {
+    return audioData;
+  }
+  return pcmToWavBase64(buf);
+}
+
 async function callGeminiTts(
-  input: string,
-  speechConfig: { speaker: string; voice: string }[],
+  content: TurnContent[],
+  speakers: SpeakerVoice[],
 ): Promise<string | null> {
   if (isGeminiTtsInCooldown()) return null;
 
@@ -121,15 +137,20 @@ async function callGeminiTts(
 
   for (const model of TTS_MODEL_CHAIN) {
     try {
-      // Interactions TTS API expects response_format + speech_config speaker/voice pairs.
-      // (response_modalities is generateContent-era and can ignore multi-speaker mapping.)
       const interaction = await client.interactions.create({
         model,
-        input,
+        input: [
+          {
+            type: 'user_input',
+            content,
+          },
+        ],
         response_format: { type: 'audio' },
         store: false,
         generation_config: {
-          speech_config: speechConfig,
+          speech_config: {
+            speakers,
+          },
         },
       });
 
@@ -142,13 +163,12 @@ async function callGeminiTts(
       }
 
       console.log(
-        `[Gemini TTS] ${model} multi-speaker ok — voices: ${speechConfig
+        `[Gemini TTS] ${model} multi-speaker ok — voices: ${speakers
           .map((s) => `${s.speaker}=${s.voice}`)
           .join(', ')}`,
       );
 
-      const pcm = Buffer.from(audioData, 'base64');
-      return pcmToWavBase64(pcm);
+      return audioDataToWavBase64(audioData);
     } catch (err) {
       lastError = err;
       if (isGeminiTtsRateLimitError(err)) {
@@ -207,20 +227,20 @@ export async function synthesizeDialogueGemini(
     return null;
   }
 
-  const { input, speechConfig } = buildMultiSpeakerPrompt(nonEmpty);
+  const { content, speakers } = buildMultiSpeakerRequest(nonEmpty);
 
   console.log(
     `🎙️ [Gemini TTS] Cache MISS — generating multi-speaker dialogue (${nonEmpty.length} lines, 1 API call)`,
   );
 
-  const wavBase64 = await callGeminiTts(input, speechConfig);
+  const wavBase64 = await callGeminiTts(content, speakers);
   if (!wavBase64) return null;
 
   const result: GeminiDialogueResult = {
     chunks: [wavBase64],
     mimeType: 'audio/wav',
     monolithic: true,
-    speakerVoices: speechConfig.map(({ speaker, voice }) => ({
+    speakerVoices: speakers.map(({ speaker, voice }) => ({
       speaker,
       voiceName: voice,
     })),

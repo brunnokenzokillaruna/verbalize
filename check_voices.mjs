@@ -17,7 +17,7 @@ async function findWorkingVoices() {
     try {
       await client.textToSpeech.convert(v.voiceId, {
         text: "test",
-        model_id: "eleven_multilingual_v2"
+        model_id: "eleven_v3"
       });
       console.log(`[SUCCESS] ${v.name} (${v.voiceId}) works!`);
       working.push({ name: v.name, id: v.voiceId, labels: v.labels });

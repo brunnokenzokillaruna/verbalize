@@ -20,6 +20,7 @@ import type { CharacterAlignment } from '@/lib/dialogueNarration';
 /* ------------------------------------------------------------------ */
 
 const ELEVENLABS_API_URL = 'https://api.elevenlabs.io/v1/text-to-speech';
+const ELEVENLABS_MODEL_ID = 'eleven_v3';
 
 /* ── Voice configuration ─────────────────────────────────────────────
    One female + one male voice per language. Assigned by speaker name
@@ -66,9 +67,9 @@ const alignedAudioCache = new Map<
 >();
 
 function cacheKey(text: string, voiceId: string, lang: string): string {
-  // Simple but deterministic key — good enough for an in-memory Map.
+  // Include model so switching TTS models does not reuse stale audio.
   // We lowercase + trim to normalise minor whitespace differences.
-  return `${lang}:${voiceId}:${text.trim().toLowerCase()}`;
+  return `${ELEVENLABS_MODEL_ID}:${lang}:${voiceId}:${text.trim().toLowerCase()}`;
 }
 
 /* ── Core TTS call ───────────────────────────────────────────────────*/
@@ -104,7 +105,7 @@ async function callElevenLabs(
       },
       body: JSON.stringify({
         text,
-        model_id: 'eleven_multilingual_v2',
+        model_id: ELEVENLABS_MODEL_ID,
         language_code: LANG_CODES[language],
         voice_settings: {
           stability: 0.55,
@@ -161,7 +162,7 @@ async function callElevenLabsWithTimestamps(
         },
         body: JSON.stringify({
           text,
-          model_id: 'eleven_multilingual_v2',
+          model_id: ELEVENLABS_MODEL_ID,
           language_code: LANG_CODES[language],
           voice_settings: {
             stability: 0.55,
