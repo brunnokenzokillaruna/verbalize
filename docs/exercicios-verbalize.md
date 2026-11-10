@@ -356,6 +356,8 @@ Checkpoint / Mistake Review
 
 **Onde aparece:** Tier 2 · DIAL, MISS, EXPR
 
+**Papéis dupla face (piloto):** em cenas situacionais (café, hotel, farmácia…), sessões DIAL/MISS pedem um turno `roleSide: "visitor"` (ex. `listen-and-respond`) **e** um turno `roleSide: "professional"` (ex. `free-roleplay`) no mesmo mini-story — ver `lib/pedagogy/dialogueRoles.ts` + lição `fr-a1-092`. Em MISS scripted, após o round como visitante o app oferece um segundo beat opcional invertendo o papel (mesmo diálogo). Sem aba/módulo novo.
+
 ---
 
 ### 21. Mensagem rápida (`micro-message`) · Fase 2 ✅

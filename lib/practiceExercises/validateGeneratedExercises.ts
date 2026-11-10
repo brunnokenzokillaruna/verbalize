@@ -27,6 +27,7 @@ import {
   isSolidListenAndRespond,
   isSolidMicroMessage,
 } from './lessonContentAnchor';
+import { sanitizeDualRoleFields } from '@/lib/pedagogy/dialogueRoles';
 
 function bankWithDistractors(correctOrder: string[], words: string[] | undefined): string[] {
   const correct = correctOrder.map((word) => word.trim()).filter(Boolean);
@@ -415,6 +416,7 @@ export async function validateAndSanitizeExercises(
         console.warn('[generatePracticeExercises] Dropped listen-and-respond — trivial evaluation/example fields');
         return false;
       }
+      Object.assign(d, sanitizeDualRoleFields(d as Record<string, unknown>));
       return true;
     }
     if (ex.type === 'free-roleplay') {
@@ -442,6 +444,29 @@ export async function validateAndSanitizeExercises(
         console.warn('[generatePracticeExercises] Dropped free-roleplay — trivial evaluation/example fields');
         return false;
       }
+      Object.assign(d, sanitizeDualRoleFields(d as Record<string, unknown>));
+      return true;
+    }
+    if (ex.type === 'social-roleplay') {
+      const d = ex.data as {
+        context?: string;
+        promptLine?: string;
+        options?: string[];
+        correctIndex?: number;
+        explanation?: string;
+      };
+      if (
+        !d.context?.trim() ||
+        !d.promptLine?.trim() ||
+        !Array.isArray(d.options) ||
+        d.options.length < 2 ||
+        typeof d.correctIndex !== 'number' ||
+        !d.explanation?.trim()
+      ) {
+        console.warn('[generatePracticeExercises] Dropped malformed social-roleplay');
+        return false;
+      }
+      Object.assign(d, sanitizeDualRoleFields(d as Record<string, unknown>));
       return true;
     }
     if (ex.type === 'micro-message') {

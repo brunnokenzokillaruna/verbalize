@@ -80,16 +80,29 @@ export function buildTagGuidance(
       'prompted-monologue',
     ]);
     const hasListenRespond = allowed.has('listen-and-respond');
-    const hasFreeProduction = allowed.has('free-roleplay') || allowed.has('micro-message');
+    const hasFreeRoleplay = allowed.has('free-roleplay');
+    const hasSocialRoleplay = allowed.has('social-roleplay');
+    const hasFreeProduction = hasFreeRoleplay || allowed.has('micro-message');
+    const professionalType = hasFreeRoleplay
+      ? 'free-roleplay'
+      : hasSocialRoleplay
+        ? 'social-roleplay'
+        : null;
     return [
       hasListenRespond
-        ? `- At least 1 exercise MUST be 'listen-and-respond'. Do NOT also include 'speak-repeat', 'social-roleplay', or 'free-roleplay' — those repeat the same reply.`
+        ? `- At least 1 exercise MUST be 'listen-and-respond' as roleSide "visitor" (cliente / hóspede / passageiro).`
         : '',
-      hasListenRespond
+      hasListenRespond && professionalType
+        ? `- Also include 1 '${professionalType}' as roleSide "professional" (garçom / recepcionista / atendente) — DIFFERENT pragmatic moves, not the same reply rewritten.`
+        : '',
+      hasListenRespond && !professionalType
         ? `- Written production must be 'micro-message' or 'reverse-translation', not another reply to the same prompt.`
-        : hasFreeProduction
-          ? `- At least 1 exercise MUST be 'free-roleplay' OR 'micro-message' — the learner writes their own response (not MCQ).`
+        : !hasListenRespond && hasFreeProduction
+          ? `- At least 1 exercise MUST be 'free-roleplay' OR 'micro-message' — the learner writes their own response (not MCQ). Prefer flipping visitor vs professional roles across two situational items when the scene supports it.`
           : '',
+      !hasListenRespond && hasSocialRoleplay
+        ? `- Include 1 'social-roleplay' (or a second situational item) with the OPPOSITE roleSide so the learner practices both sides of the scene.`
+        : '',
       types.length
         ? `- Focus on ${list(types)} to simulate real-world usage. Use scenarios a Brazilian would realistically encounter: at a French restaurant, at a hotel in Lyon, on the Paris metro, at a French pharmacy, at an airport, in a Parisian shop.`
         : '',
@@ -112,14 +125,24 @@ export function buildTagGuidance(
       'prompted-monologue',
     ]);
     const hasListenRespond = allowed.has('listen-and-respond');
-    const hasFreeProduction = allowed.has('free-roleplay') || allowed.has('micro-message');
+    const hasFreeRoleplay = allowed.has('free-roleplay');
+    const hasSocialRoleplay = allowed.has('social-roleplay');
+    const hasFreeProduction = hasFreeRoleplay || allowed.has('micro-message');
+    const professionalType = hasFreeRoleplay
+      ? 'free-roleplay'
+      : hasSocialRoleplay
+        ? 'social-roleplay'
+        : null;
     return [
       hasListenRespond
-        ? `- At least 1 exercise MUST be 'listen-and-respond'. Do NOT also include 'social-roleplay' or 'free-roleplay'.`
+        ? `- At least 1 exercise MUST be 'listen-and-respond' as roleSide "visitor".`
         : '',
-      hasListenRespond
+      hasListenRespond && professionalType
+        ? `- Also include 1 '${professionalType}' as roleSide "professional" — inverted role from the mission (e.g. after playing the customer, answer as staff).`
+        : '',
+      hasListenRespond && !professionalType
         ? `- Written production must be 'micro-message' or 'reverse-translation'.`
-        : hasFreeProduction
+        : !hasListenRespond && hasFreeProduction
           ? `- At least 1 exercise MUST be 'free-roleplay' OR 'micro-message' for written production in the mission context.`
           : '',
       types.length

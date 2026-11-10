@@ -51,7 +51,13 @@ export function FreeRoleplayExercise({
 
   return (
     <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <RoleplayScenarioCard context={data.context} promptLine={data.promptLine} />
+      <RoleplayScenarioCard
+        context={data.context}
+        promptLine={data.promptLine}
+        learnerRolePt={data.learnerRolePt}
+        interlocutorRolePt={data.interlocutorRolePt}
+        roleSide={data.roleSide}
+      />
 
       <FreeWrittenProductionField
         input={production.input}
@@ -61,8 +67,14 @@ export function FreeRoleplayExercise({
         suggested={production.suggested}
         isBusy={production.isBusy}
         isLocked={production.isLocked}
-        placeholder="Escreva como você responderia…"
-        helperLabel="Escreva sua resposta"
+        placeholder={
+          data.learnerRolePt
+            ? `Escreva como ${data.learnerRolePt}…`
+            : 'Escreva como você responderia…'
+        }
+        helperLabel={
+          data.learnerRolePt ? `Responda como ${data.learnerRolePt}` : 'Escreva sua resposta'
+        }
         onSubmit={() => void production.submit()}
         onContinueAnyway={production.continueAnyway}
         onRetry={production.retry}

@@ -58,14 +58,22 @@ export function SocialRoleplay({ data, onAnswer, answered, setIsExerciseReady, s
 
   return (
     <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <RoleplayScenarioCard context={data.context} promptLine={data.promptLine} />
+      <RoleplayScenarioCard
+        context={data.context}
+        promptLine={data.promptLine}
+        learnerRolePt={data.learnerRolePt}
+        interlocutorRolePt={data.interlocutorRolePt}
+        roleSide={data.roleSide}
+      />
 
       <div className="relative my-2 flex items-center justify-center">
         <div className="absolute inset-0 flex items-center" aria-hidden="true">
           <div className="w-full border-t border-[var(--color-border)] opacity-30" />
         </div>
         <span className="relative rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)] bg-[var(--color-bg)] border border-[var(--color-border)] opacity-85">
-          Escolha como responder
+          {data.learnerRolePt
+            ? `Escolha como ${data.learnerRolePt}`
+            : 'Escolha como responder'}
         </span>
       </div>
 

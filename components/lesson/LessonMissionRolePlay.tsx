@@ -26,6 +26,7 @@ export function LessonMissionRolePlay({
   intentMode = false,
   briefing,
   rolePlayConsequences,
+  sceneHints,
   onComplete,
 }: Props) {
   const { user } = useAuthStore();
@@ -44,22 +45,34 @@ export function LessonMissionRolePlay({
     hasSpeechAPI,
     score,
     pastLineCount,
+    round,
+    flipCopy,
+    awaitingFlip,
     setShowHint,
     advance,
     startRecording,
     stopRecording,
     playCurrentLine,
+    startRoleFlip,
+    skipRoleFlip,
   } = useMissionRolePlay({
     dialogue,
     dialogueTranslations,
     language,
     intentMode,
     rolePlayConsequences,
+    sceneHints,
     onComplete,
   });
 
   const pastStart = Math.max(0, pastLineCount - MAX_PAST_LINES);
   const visiblePastLines = lines.slice(pastStart, pastLineCount);
+  const roleBanner =
+    round === 'inverted' && flipCopy
+      ? `Você é: ${flipCopy.professionalRolePt}`
+      : flipCopy
+        ? `Você é: ${flipCopy.visitorRolePt}`
+        : null;
 
   return (
     <div className="flex flex-col gap-5 sm:gap-6 animate-fade-in">
@@ -70,12 +83,31 @@ export function LessonMissionRolePlay({
         totalSpeakable={totalSpeakable}
       />
 
-      {briefing && recState !== 'done' && (
+      {roleBanner && recState !== 'done' && (
+        <p className="text-center text-xs font-bold uppercase tracking-wider text-text-muted">
+          {roleBanner}
+          {round === 'inverted' ? ' · segundo lado' : ''}
+        </p>
+      )}
+
+      {briefing && recState !== 'done' && round === 'primary' && (
         <MissionContextBar
           briefing={briefing}
           spokenCount={spokenCount}
           totalSpeakable={totalSpeakable}
         />
+      )}
+
+      {round === 'inverted' && flipCopy && recState !== 'done' && (
+        <div className="rounded-xl border border-primary/20 bg-primary/5 px-3.5 py-3">
+          <p className="text-xs font-bold uppercase tracking-wide text-primary">
+            Papel invertido
+          </p>
+          <p className="grammar-secondary text-text-primary mt-0.5 leading-snug">
+            Responda como {flipCopy.professionalRolePt}. O cliente fala primeiro nas falas do
+            outro lado.
+          </p>
+        </div>
       )}
 
       {visiblePastLines.length > 0 && (
@@ -86,7 +118,7 @@ export function LessonMissionRolePlay({
             </p>
           )}
           {visiblePastLines.map((line) => (
-            <PastLineBubble key={line.rawIndex} line={line} />
+            <PastLineBubble key={`${round}-${line.rawIndex}`} line={line} />
           ))}
         </div>
       )}
@@ -131,7 +163,14 @@ export function LessonMissionRolePlay({
       )}
 
       {recState === 'done' && (
-        <MissionRolePlayDone spokenCount={spokenCount} totalSpeakable={totalSpeakable} />
+        <MissionRolePlayDone
+          spokenCount={spokenCount}
+          totalSpeakable={totalSpeakable}
+          flipOffer={awaitingFlip ? flipCopy : null}
+          onStartFlip={awaitingFlip ? startRoleFlip : undefined}
+          onSkipFlip={awaitingFlip ? skipRoleFlip : undefined}
+          invertedRoundComplete={round === 'inverted'}
+        />
       )}
     </div>
   );

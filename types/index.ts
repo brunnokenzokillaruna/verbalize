@@ -493,6 +493,10 @@ export interface SocialRoleplayData {
   options: string[];    // 3 possible responses
   correctIndex: number;
   explanation: string;  // Why this is the best response
+  /** Dual-role piggyback — who the learner plays in this turn. */
+  learnerRolePt?: string;
+  interlocutorRolePt?: string;
+  roleSide?: 'visitor' | 'professional';
 }
 
 export interface ScrambledConversationData {
@@ -696,6 +700,10 @@ export interface ListenAndRespondData {
   exampleResponse: string;
   linkedExerciseId?: string;
   chainAnchorPhrase?: string;
+  /** Dual-role piggyback — who the learner plays in this turn. */
+  learnerRolePt?: string;
+  interlocutorRolePt?: string;
+  roleSide?: 'visitor' | 'professional';
 }
 
 /** Phase 2 — situational roleplay with free written/spoken response. */
@@ -706,6 +714,10 @@ export interface FreeRoleplayData {
   acceptableThemes: string[];
   exampleResponse: string;
   explanation: string;
+  /** Dual-role piggyback — who the learner plays in this turn. */
+  learnerRolePt?: string;
+  interlocutorRolePt?: string;
+  roleSide?: 'visitor' | 'professional';
 }
 
 /** Phase 2 — informal written reply (chat/message). */

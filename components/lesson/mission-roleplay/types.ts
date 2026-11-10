@@ -25,5 +25,11 @@ export interface LessonMissionRolePlayProps {
   language: SupportedLanguage;
   intentMode?: boolean;
   rolePlayConsequences?: import('@/types').RolePlayConsequence[];
+  /** Used to detect café/hotel/etc. scenes for the professional flip beat. */
+  sceneHints?: {
+    theme?: string;
+    uiTitle?: string;
+    grammarFocus?: string;
+  };
   onComplete: (spoken: number, totalSpeakable: number) => void;
 }

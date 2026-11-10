@@ -14,7 +14,14 @@ import {
   similarity,
 } from '@/components/lesson/mission-roleplay/utils';
 import type { RecState } from '@/components/lesson/mission-roleplay/types';
+import {
+  buildMissionRoleFlipCopy,
+  invertMissionSpeakableLines,
+  type MissionRoleFlipCopy,
+} from '@/lib/pedagogy/dialogueRoles';
 import type { RolePlayConsequence, SupportedLanguage } from '@/types';
+
+export type MissionRolePlayRound = 'primary' | 'inverted';
 
 type UseMissionRolePlayOptions = {
   dialogue: string;
@@ -22,6 +29,12 @@ type UseMissionRolePlayOptions = {
   language: SupportedLanguage;
   intentMode: boolean;
   rolePlayConsequences?: RolePlayConsequence[];
+  /** Theme / title / grammar used to detect dual-role scenes for the flip beat. */
+  sceneHints?: {
+    theme?: string;
+    uiTitle?: string;
+    grammarFocus?: string;
+  };
   onComplete: (spoken: number, totalSpeakable: number) => void;
 };
 
@@ -41,22 +54,31 @@ export function useMissionRolePlay({
   language,
   intentMode,
   rolePlayConsequences,
+  sceneHints,
   onComplete,
 }: UseMissionRolePlayOptions) {
   const { user } = useAuthStore();
   const statsLoggedRef = useRef(false);
-  const baseLines = useMemo(
+  const parsedLines = useMemo(
     () => parseDialogueLines(dialogue, dialogueTranslations),
     [dialogue, dialogueTranslations],
   );
-  const consequenceMap = useMemo(
-    () => buildConsequenceMap(rolePlayConsequences),
-    [rolePlayConsequences],
+  const flipCopy = useMemo(
+    () =>
+      buildMissionRoleFlipCopy(
+        sceneHints?.theme,
+        sceneHints?.uiTitle,
+        sceneHints?.grammarFocus,
+        dialogue,
+      ),
+    [sceneHints?.theme, sceneHints?.uiTitle, sceneHints?.grammarFocus, dialogue],
   );
-  const totalSpeakable = useMemo(() => baseLines.filter((l) => l.isUserLine).length, [baseLines]);
 
+  const [round, setRound] = useState<MissionRolePlayRound>('primary');
   const [currentIdx, setCurrentIdx] = useState(0);
   const [spokenCount, setSpokenCount] = useState(0);
+  const [primarySpoken, setPrimarySpoken] = useState(0);
+  const [primaryTotal, setPrimaryTotal] = useState(0);
   const [showHint, setShowHint] = useState(true);
   const [recState, setRecState] = useState<RecState>('idle');
   const [transcript, setTranscript] = useState('');
@@ -64,6 +86,18 @@ export function useMissionRolePlay({
   const [evalFeedback, setEvalFeedback] = useState('');
   const [evalCorrected, setEvalCorrected] = useState('');
   const [consequenceIndices, setConsequenceIndices] = useState<Set<number>>(() => new Set());
+  const [flipOffered, setFlipOffered] = useState(false);
+
+  const baseLines = useMemo(() => {
+    if (round === 'inverted') return invertMissionSpeakableLines(parsedLines);
+    return parsedLines;
+  }, [parsedLines, round]);
+
+  const consequenceMap = useMemo(
+    () => (round === 'primary' ? buildConsequenceMap(rolePlayConsequences) : new Map()),
+    [rolePlayConsequences, round],
+  );
+  const totalSpeakable = useMemo(() => baseLines.filter((l) => l.isUserLine).length, [baseLines]);
 
   const lines = useMemo(() => {
     return baseLines.map((line) => {
@@ -92,6 +126,7 @@ export function useMissionRolePlay({
   const score = transcript && current ? similarity(current.text, transcript) : 0;
 
   const pastLineCount = recState === 'done' ? lines.length : currentIdx;
+  const awaitingFlip = recState === 'done' && flipOffered && round === 'primary' && !!flipCopy;
 
   useEffect(() => {
     if (!current || current.isUserLine) return;
@@ -120,8 +155,20 @@ export function useMissionRolePlay({
     statsLoggedRef.current = false;
   }, [currentIdx]);
 
+  const finishMission = useCallback(
+    (spoken: number, total: number) => {
+      if (completedRef.current) return;
+      completedRef.current = true;
+      onComplete(spoken, total);
+      setRecState('done');
+      setFlipOffered(false);
+    },
+    [onComplete],
+  );
+
   const scheduleConsequenceForFailedTurn = useCallback(
     (userLineIndex: number) => {
+      if (round !== 'primary') return;
       const nextNpcIdx = baseLines.findIndex(
         (l, i) => i > userLineIndex && !l.isUserLine && consequenceMap.has(i),
       );
@@ -133,7 +180,7 @@ export function useMissionRolePlay({
         return next;
       });
     },
-    [baseLines, consequenceMap],
+    [baseLines, consequenceMap, round],
   );
 
   const advance = useCallback(
@@ -141,13 +188,21 @@ export function useMissionRolePlay({
       if (current?.isUserLine && !accepted) {
         scheduleConsequenceForFailedTurn(currentIdx);
       }
-      if (accepted) setSpokenCount((c) => c + 1);
+      const nextSpoken = accepted ? spokenCount + 1 : spokenCount;
+      if (accepted) setSpokenCount(nextSpoken);
       if (isLast) {
-        if (!completedRef.current) {
-          completedRef.current = true;
-          onComplete(accepted ? spokenCount + 1 : spokenCount, totalSpeakable);
+        if (round === 'primary' && flipCopy) {
+          setPrimarySpoken(nextSpoken);
+          setPrimaryTotal(totalSpeakable);
+          setFlipOffered(true);
+          setRecState('done');
+          return;
         }
-        setRecState('done');
+        if (round === 'inverted') {
+          finishMission(primarySpoken + nextSpoken, primaryTotal + totalSpeakable);
+          return;
+        }
+        finishMission(nextSpoken, totalSpeakable);
         return;
       }
       setCurrentIdx((i) => i + 1);
@@ -156,12 +211,38 @@ export function useMissionRolePlay({
       current,
       currentIdx,
       isLast,
-      onComplete,
       scheduleConsequenceForFailedTurn,
       spokenCount,
       totalSpeakable,
+      round,
+      flipCopy,
+      finishMission,
+      primarySpoken,
+      primaryTotal,
     ],
   );
+
+  const startRoleFlip = useCallback(() => {
+    if (!flipCopy || round !== 'primary') return;
+    stopAudio();
+    setRound('inverted');
+    setCurrentIdx(0);
+    setSpokenCount(0);
+    setConsequenceIndices(new Set());
+    setFlipOffered(false);
+    setTranscript('');
+    setRecordError('');
+    setEvalFeedback('');
+    setEvalCorrected('');
+    setShowHint(true);
+    setRecState('idle');
+    statsLoggedRef.current = false;
+  }, [flipCopy, round, stopAudio]);
+
+  const skipRoleFlip = useCallback(() => {
+    if (!awaitingFlip) return;
+    finishMission(primarySpoken || spokenCount, primaryTotal || totalSpeakable);
+  }, [awaitingFlip, finishMission, primarySpoken, spokenCount, primaryTotal, totalSpeakable]);
 
   const startRecording = useCallback(async () => {
     if (!current || !current.isUserLine) return;
@@ -274,10 +355,15 @@ export function useMissionRolePlay({
     hasSpeechAPI,
     score,
     pastLineCount,
+    round,
+    flipCopy: flipCopy as MissionRoleFlipCopy | null,
+    awaitingFlip,
     setShowHint,
     advance,
     startRecording,
     stopRecording,
     playCurrentLine,
+    startRoleFlip,
+    skipRoleFlip,
   };
 }

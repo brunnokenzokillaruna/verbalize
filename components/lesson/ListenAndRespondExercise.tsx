@@ -121,6 +121,12 @@ export function ListenAndRespondExercise({
         <p className="text-sm font-medium text-[var(--color-text-primary)] leading-relaxed">
           {data.contextPt}
         </p>
+        {data.learnerRolePt && (
+          <p className="text-xs font-bold text-[var(--color-text-secondary)]">
+            Você é: {data.learnerRolePt}
+            {data.interlocutorRolePt ? ` · Fala com: ${data.interlocutorRolePt}` : ''}
+          </p>
+        )}
       </div>
 
       <button
@@ -160,7 +166,9 @@ export function ListenAndRespondExercise({
             }}
           >
             <p className="text-xs font-medium text-[var(--color-text-muted)] mb-1">
-              Responda em voz alta como você falaria nesta situação.
+              {data.learnerRolePt
+                ? `Responda em voz alta como ${data.learnerRolePt}.`
+                : 'Responda em voz alta como você falaria nesta situação.'}
             </p>
           </OralProductionShell>
         </div>

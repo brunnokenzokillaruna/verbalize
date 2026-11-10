@@ -4,6 +4,7 @@ import {
   buildNativePhraseHookGuidance,
   nativeReactionExamples,
 } from '@/lib/pedagogy/nativePhrases';
+import { buildDualRoleHookGuidance } from '@/lib/pedagogy/dialogueRoles';
 import type { SupportedLanguage, ProficiencyLevel, LessonTag } from '@/types';
 
 /**
@@ -286,6 +287,7 @@ ${antiReuse}
 
 ${spokenDialogueGuidance(language, level, tag)}
 ${buildNativePhraseHookGuidance({ language, level, tag, theme, grammarFocus, uiTitle })}
+${buildDualRoleHookGuidance({ tag, theme, uiTitle, grammarFocus })}
 
 Rules:
 - ${minLines}–${maxLines} lines; each line starts with "Name: "

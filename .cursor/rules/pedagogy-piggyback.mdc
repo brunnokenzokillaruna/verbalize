@@ -20,3 +20,4 @@ Antes de desenhar UI ou feature nova a partir de ideia de conteúdo (mnemônico,
 - Pilotos de referência:
   - Vandertramp em `lib/pedagogy/vandertramp.ts` + lição `fr-a2-155`
   - Frases nativas em `lib/pedagogy/nativePhrases.ts` (Hook/Practice/SRS chunks — sem “frase do dia”)
+  - Papéis dupla face (cliente ↔ profissional) em `lib/pedagogy/dialogueRoles.ts` + DIAL `fr-a1-092` (Practice) + segundo beat nas MISS scripted (sem aba Roleplay)

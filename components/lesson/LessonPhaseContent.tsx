@@ -242,6 +242,11 @@ export function LessonPhaseContent({
           briefing={store.missionBriefing}
           intentMode={['B1', 'B2', 'C1', 'C2'].includes(store.lesson.level)}
           rolePlayConsequences={store.hook.rolePlayConsequences}
+          sceneHints={{
+            theme: store.lesson.theme,
+            uiTitle: store.lesson.uiTitle,
+            grammarFocus: store.lesson.grammarFocus,
+          }}
           onComplete={(spoken, total) => store.completeRolePlay(spoken, total)}
         />
       )}

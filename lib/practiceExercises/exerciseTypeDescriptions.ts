@@ -68,10 +68,11 @@ export function buildTypeDescriptions(langLabel: string): Record<ExerciseTypeId,
    - "translation" (PT-BR).
    - "explanation" (PT-BR): 1-2 short sentences explaining the word order — especially adverb placement vs Portuguese when relevant.`,
     'social-roleplay': `type "social-roleplay":
-   - "context" (PT-BR) describing the situation.
+   - "context" (PT-BR) describing the situation — state who the learner is (cliente, garçom, etc.).
    - "promptLine" (${langLabel}) what the NPC says.
    - "options" (3 responses in target language). The correct option must use the target expression naturally. The other 2 options MUST be highly plausible, grammatically correct responses in target language that are contextually inappropriate or slightly incorrect (e.g. wrong pronoun, incorrect politeness level, or a subtle mismatch in context). DO NOT generate silly, obviously wrong, or unrelated distractors. The options should make the student think.
-   - "correctIndex" (0-2), "explanation" (PT-BR). In "explanation", NEVER refer to "primeira opção", "segunda opção", etc. — quote key phrases from each response or describe the grammatical difference directly, because options are shuffled on screen.`,
+   - "correctIndex" (0-2), "explanation" (PT-BR). In "explanation", NEVER refer to "primeira opção", "segunda opção", etc. — quote key phrases from each response or describe the grammatical difference directly, because options are shuffled on screen.
+   - Optional dual-role fields: "learnerRolePt", "interlocutorRolePt", "roleSide" ("visitor" | "professional").`,
     'scrambled-conversation': `type "scrambled-conversation":
    - 3 or 4 spoken dialogue lines. "lines" is the only sensible order. "shuffledLines" is the same lines in another order.
    - Every line starts with a speaker name. Speakers alternate.
@@ -124,17 +125,19 @@ export function buildTypeDescriptions(langLabel: string): Record<ExerciseTypeId,
     'listen-and-respond': `type "listen-and-respond":
    - "dialogueAudio" (1–3 lines in ${langLabel}, Speaker: line format): ONLY the interlocutor speaking to the learner (e.g. recruiter, waiter, friend). ONE speaker name for all lines. NEVER include the learner's lines ("Você:", "Client:", etc.). NEVER copy or paraphrase the lesson hook dialogue — invent a NEW short prompt that fits the situation.
    - "promptLine" (${langLabel}): the final interlocutor line the learner must answer (must match the last line of dialogueAudio).
-   - "contextPt" (PT-BR): situation setup for the learner (who is speaking to them).
+   - "contextPt" (PT-BR): situation setup for the learner (who THEY are + who is speaking to them).
    - "evaluationCriteria" (PT-BR): rubric for acceptable responses (intent, register). FORBIDDEN: requiring extra actions the interlocutor did not ask for.
    - "acceptableThemes" (array of 2-4 PT-BR phrases describing ALTERNATIVE valid response ideas — any one is enough).
-   - "exampleResponse" (${langLabel}): one natural example answer (not the only valid answer).`,
+   - "exampleResponse" (${langLabel}): one natural example answer (not the only valid answer).
+   - Dual-role (when scene supports it): "learnerRolePt", "interlocutorRolePt", "roleSide" ("visitor" | "professional").`,
     'free-roleplay': `type "free-roleplay":
-   - "context" (PT-BR): situational setup.
+   - "context" (PT-BR): situational setup — explicitly say who the learner is playing.
    - "promptLine" (${langLabel}): what the interlocutor says.
    - "evaluationCriteria" (PT-BR): communicative goal only (react, answer the question, keep the register). FORBIDDEN: requiring extra plot beats, objects, or actions that context + promptLine do not ask for (e.g. do NOT require "limpar o chapéu" if nobody asked the learner to clean anything).
    - "acceptableThemes" (2-4 PT-BR ALTERNATIVE valid reactions — any ONE is enough; not a checklist of required ingredients).
    - "exampleResponse" (${langLabel}): model answer.
-   - "explanation" (PT-BR): why the example works pragmatically.`,
+   - "explanation" (PT-BR): why the example works pragmatically.
+   - Dual-role (when scene supports it): "learnerRolePt", "interlocutorRolePt", "roleSide" ("visitor" | "professional").`,
     'micro-message': `type "micro-message":
    - "context" (PT-BR): chat/email scenario (informal register).
    - "incomingMessage" (${langLabel}): message received.

@@ -20,6 +20,7 @@ import type { GeneratePracticeParams } from './types';
 import { buildPtBrVocabRule } from './validatePtBrText';
 import { buildLessonRolePromptGuidance } from '@/lib/curriculum/lessonTopic';
 import { buildNativePhraseExerciseGuidance } from '@/lib/pedagogy/nativePhrases';
+import { buildDualRolePracticeGuidance } from '@/lib/pedagogy/dialogueRoles';
 
 export function buildDialogueAnchorBlock(): string {
   return `
@@ -136,6 +137,13 @@ export function buildPracticeExercisePrompt(params: GeneratePracticeParams): {
     grammarFocus,
     uiTitle,
   });
+  const dualRoleGuidance = buildDualRolePracticeGuidance({
+    tag,
+    theme,
+    uiTitle,
+    grammarFocus,
+    dialogue,
+  });
 
   const vocabConstraint = isEarlyLearner
     ? `\nVOCABULARY CONSTRAINT: The learner is a beginner with very limited vocabulary. All exercise sentences must use ONLY: the key vocabulary words listed above, the words that appeared in the dialogue above, the words involved in the grammar focus ("${grammarFocus}"), basic function words (articles, prepositions, pronouns, conjunctions, auxiliary verbs), and simple A1-level everyday words. Do NOT use any advanced or uncommon content words.`
@@ -208,7 +216,7 @@ ${grammarBridgeBlock}
 ${buildOpenMistakesBlock(openMistakes)}
 
 TAG-SPECIFIC EXERCISE BALANCE (follow this strictly):
-${tagGuidance}${roleGuidance ? `\nPEDAGOGICAL ROLE:\n${roleGuidance}\n` : ''}${grammarFocusGuidance}${nativePhraseGuidance}${productionRuleBlock}${interleavingBlock}${chainBlock}${dialogueAnchorBlock}${constraintBlock}
+${tagGuidance}${roleGuidance ? `\nPEDAGOGICAL ROLE:\n${roleGuidance}\n` : ''}${grammarFocusGuidance}${nativePhraseGuidance}${dualRoleGuidance}${productionRuleBlock}${interleavingBlock}${chainBlock}${dialogueAnchorBlock}${constraintBlock}
 
 CRITICAL RULE: Do NOT copy or reuse any sentence from the dialogue above. Every exercise sentence must be ORIGINAL — newly created by you. The sentences should be related to the lesson's theme and grammar focus, but must be completely different from the dialogue lines.
 
@@ -226,7 +234,8 @@ SESSION SHAPE (mandatory, 5 exercises):
 - 1 listening item where the answer is NOT written on screen before the learner hears it (listening-comprehension, listen-and-select, or audio-dictation)
 - 2 production items when the pool allows: one spoken (listen-and-respond, or speak-repeat only if listen-and-respond is unavailable) and one written (reverse-translation, micro-message, fill-gap-production, or word-bank-translation)
 - NEVER use type "shadowing"
-- Do NOT pair exercises that test the same skill: listen-and-respond with speak-repeat, social-roleplay, or free-roleplay; grammar-trap with bridge-choice; fill-gap-production with context-choice; audio-dictation with listen-and-select.
+- Do NOT pair exercises that test the same skill: listen-and-respond with speak-repeat; grammar-trap with bridge-choice; fill-gap-production with context-choice; audio-dictation with listen-and-select.
+- Do NOT pair listen-and-respond with social-roleplay or free-roleplay UNLESS they use opposite roleSide ("visitor" vs "professional") in the same mini-story — then the pair is required.
 
 --- POOL OF EXERCISE TYPES (the ONLY types you may use) ---
 
@@ -238,28 +247,34 @@ acceptableThemes are ALTERNATIVE valid replies — matching any one is enough. T
 
 --- OUTPUT FORMAT ---
 Return a JSON array of ${PRACTICE_EXERCISE_COUNT} objects, each with "type" and "data".
-Example for listen-and-respond:
+Example for listen-and-respond (visitor side):
 {
   "type": "listen-and-respond",
   "data": {
-    "dialogueAudio": "Recruteur: Merci d'être venu.\\nRecruteur: Que pouvez-vous nous apporter malgré votre manque d'expérience ?",
-    "promptLine": "Que pouvez-vous nous apporter malgré votre manque d'expérience ?",
-    "contextPt": "Você está em uma entrevista de emprego e o recrutador questiona sua falta de experiência.",
-    "evaluationCriteria": "Destacar motivação, aprendizado rápido ou experiências relacionadas com tom profissional.",
-    "acceptableThemes": ["motivação para aprender", "experiências transferíveis", "tom profissional"],
-    "exampleResponse": "Je suis motivé et j'apprends vite. J'ai déjà travaillé en équipe sur des projets concrets."
+    "dialogueAudio": "Serveur: Bonjour ! Vous avez choisi ?",
+    "promptLine": "Vous avez choisi ?",
+    "contextPt": "Você é o cliente em um café em Lyon e o garçom pergunta se você já escolheu.",
+    "learnerRolePt": "cliente",
+    "interlocutorRolePt": "garçom / atendente",
+    "roleSide": "visitor",
+    "evaluationCriteria": "Fazer um pedido educado de bebida ou comida.",
+    "acceptableThemes": ["pedir café", "pedir recomendação", "tom educado"],
+    "exampleResponse": "Oui, je voudrais un café, s'il vous plaît."
   }
 }
-Example for free-roleplay:
+Example for free-roleplay (professional / inverted side):
 {
   "type": "free-roleplay",
   "data": {
-    "context": "Você está no balcão de uma padaria em Paris.",
-    "promptLine": "Bonjour ! Qu'est-ce que je vous mets ?",
-    "evaluationCriteria": "Pedir um item do cardápio de forma educada e natural.",
-    "acceptableThemes": ["pedir pão ou doce", "tom educado"],
-    "exampleResponse": "Bonjour ! Je voudrais une baguette, s'il vous plaît.",
-    "explanation": "Je voudrais + item é a forma natural de pedir; Bonjour mantém o registro educado."
+    "context": "Você é o garçom no mesmo café. Um cliente acabou de sentar.",
+    "promptLine": "Bonjour, une table pour deux, s'il vous plaît.",
+    "learnerRolePt": "garçom / atendente",
+    "interlocutorRolePt": "cliente",
+    "roleSide": "professional",
+    "evaluationCriteria": "Confirmar a mesa e oferecer a carta de forma natural.",
+    "acceptableThemes": ["oferecer mesa", "oferecer a carta", "tom profissional educado"],
+    "exampleResponse": "Bien sûr ! Par ici. Voici la carte.",
+    "explanation": "O profissional confirma o pedido e guia o cliente; 'Voici la carte' é o movimento típico do atendente."
   }
 }
 Example for micro-message:
