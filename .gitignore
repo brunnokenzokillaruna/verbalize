@@ -56,3 +56,8 @@ pedagogical_framework_v2.md
 implementation_plan.md
 task.md
 walkthrough.md
+docs/superpowers/
+
+# Local build / smoke logs
+build-*.log
+*.log
