@@ -212,7 +212,7 @@ async function callTTS(
         voice,
         audioConfig: {
           audioEncoding: 'MP3',
-          speakingRate: 0.92,
+          speakingRate: 1.0,
           sampleRateHertz: 24000,
         },
       }),

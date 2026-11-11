@@ -35,6 +35,9 @@ interface LessonHookScreenProps {
   onWordClick: (payload: WordClickPayload) => void;
   listenFirstEnabled?: boolean;
   sceneImage?: VocabImageResult | null;
+  /** Lesson scenario shown on the scene banner (replaces generic “Diálogo Contextual”). */
+  scenarioTitle?: string;
+  scenarioSubtitle?: string;
 }
 
 const SPEAKER_COLORS = {
@@ -116,10 +119,17 @@ export function LessonHookScreen({
   onWordClick,
   listenFirstEnabled = false,
   sceneImage = null,
+  scenarioTitle,
+  scenarioSubtitle,
 }: LessonHookScreenProps) {
   const lineRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [textRevealed, setTextRevealed] = useState(!listenFirstEnabled);
   const [hasListenedOnce, setHasListenedOnce] = useState(false);
+  const bannerTitle = scenarioTitle?.trim() || 'Diálogo';
+  const bannerSubtitle =
+    scenarioSubtitle?.trim() && scenarioSubtitle.trim() !== bannerTitle
+      ? scenarioSubtitle.trim()
+      : undefined;
 
   useEffect(() => {
     if (isPlaying) setHasListenedOnce(true);
@@ -159,8 +169,8 @@ export function LessonHookScreen({
       {sceneImage?.imageUrl && (
         <LessonSceneBanner
           sceneImage={sceneImage}
-          title="Diálogo Contextual"
-          subtitle="Ouça e aprenda na prática"
+          title={bannerTitle}
+          subtitle={bannerSubtitle}
         />
       )}
 
@@ -172,11 +182,13 @@ export function LessonHookScreen({
             </div>
             <div className="flex flex-col min-w-0">
               <h2 className="font-display text-xl sm:text-2xl font-black italic tracking-tight text-text-primary">
-                Diálogo Contextual
+                {bannerTitle}
               </h2>
-              <p className="text-xs font-semibold text-text-muted mt-0.5">
-                Ouça e aprenda na prática
-              </p>
+              {bannerSubtitle && (
+                <p className="text-xs font-semibold text-text-muted mt-0.5">
+                  {bannerSubtitle}
+                </p>
+              )}
             </div>
           </div>
         )}

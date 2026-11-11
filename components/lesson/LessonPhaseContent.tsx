@@ -132,6 +132,10 @@ export function LessonPhaseContent({
           onWordClick={onWordClick}
           listenFirstEnabled={HOOK_LISTEN_FIRST}
           sceneImage={store.sceneImage}
+          scenarioTitle={store.lesson.uiTitle ?? store.lesson.theme}
+          scenarioSubtitle={
+            store.lesson.uiTitle ? store.lesson.theme : store.lesson.grammarFocus
+          }
         />
       )}
 

@@ -29,7 +29,7 @@ const LEARNER_VOICE_SETTINGS = {
   stability: 0.68,
   similarity_boost: 0.75,
   style: 0.25,
-  speed: 0.88,
+  speed: 1.0,
   use_speaker_boost: true,
 } as const;
 
@@ -78,9 +78,9 @@ const alignedAudioCache = new Map<
 >();
 
 function cacheKey(text: string, voiceId: string, lang: string): string {
-  // Include model so switching TTS models does not reuse stale audio.
+  // Include model + speed so switching TTS settings does not reuse stale audio.
   // We lowercase + trim to normalise minor whitespace differences.
-  return `${ELEVENLABS_MODEL_ID}:${lang}:${voiceId}:${text.trim().toLowerCase()}`;
+  return `${ELEVENLABS_MODEL_ID}:spd${LEARNER_VOICE_SETTINGS.speed}:${lang}:${voiceId}:${text.trim().toLowerCase()}`;
 }
 
 /* ── Core TTS call ───────────────────────────────────────────────────*/

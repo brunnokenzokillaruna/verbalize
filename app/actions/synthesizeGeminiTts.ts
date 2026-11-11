@@ -60,8 +60,8 @@ type TurnContent = {
 const dialogueCache = new Map<string, GeminiDialogueResult>();
 
 function cacheKey(lines: string[], language: SupportedLanguage): string {
-  // v5: Gemini 3.8 TTS speech_metadata + angle-bracket vocal tags.
-  return `v5:${language}:${lines.map((l) => l.trim().toLowerCase()).join('|')}`;
+  // v6: natural pace (no “slightly slower”) in LEARNER_BASE_STYLE.
+  return `v6:${language}:${lines.map((l) => l.trim().toLowerCase()).join('|')}`;
 }
 
 /** Gemini multi-speaker TTS supports at most 2 distinct speakers. */

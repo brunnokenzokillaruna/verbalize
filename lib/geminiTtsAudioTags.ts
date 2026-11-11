@@ -9,7 +9,7 @@
  */
 
 export const LEARNER_BASE_STYLE =
-  'clear slightly slower pace for language learners, warm conversational tone, ' +
+  'clear natural pace, warm conversational tone, ' +
   'crisp pronunciation, natural but not theatrical — avoid dramatic acting';
 
 /** Vocal-event tags allowed inline in the transcript. */
