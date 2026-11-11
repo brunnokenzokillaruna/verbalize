@@ -1,6 +1,7 @@
 import { devLog } from '@/lib/devLog';
 import { getVocabImage } from '@/app/actions/getVocabImage';
 import { sanitizeVocabularyToken } from '@/lib/hookSanitize';
+import { lookupStoredTranslation } from '@/lib/vocabTranslation';
 import { urlsAreSamePhoto } from '@/utils/canonicalImageKey';
 import type { HookResult, LessonDefinition, VocabImageResult } from '@/types';
 
@@ -8,16 +9,31 @@ type PrefetchVocabImagesParams = {
   hook: HookResult;
   lesson: LessonDefinition;
   setVocabImage: (word: string, image: VocabImageResult | null) => void;
+  /** Live PT-BR glosses — preferred over hook.vocabTranslations (usually empty on live hooks). */
+  translations?: Record<string, string>;
 };
+
+function resolvePrefetchTranslation(
+  word: string,
+  hook: HookResult,
+  translations?: Record<string, string>,
+): string | undefined {
+  return (
+    lookupStoredTranslation(translations ?? {}, word) ??
+    hook.vocabTranslations?.[word]?.translation
+  );
+}
 
 /**
  * Fetches vocabulary images in parallel (lessons have at most 2 words).
- * Uses precomputed imageKeywords from the hook to skip extra Gemini calls.
+ * Prefer calling after the vocab-card translations land so Pexels search/validation
+ * have a PT-BR meaning. acceptBestEffort keeps a closest photo instead of an empty card.
  */
 export async function prefetchVocabImages({
   hook,
   lesson,
   setVocabImage,
+  translations,
 }: PrefetchVocabImagesParams): Promise<void> {
   const words = hook.newVocabulary.map(sanitizeVocabularyToken);
   const dialogue = hook.dialogue;
@@ -32,10 +48,11 @@ export async function prefetchVocabImages({
     words.map(async (word) => {
       const t = performance.now();
       const precomputedKeyword = hook.imageKeywords?.[word];
-      const translation = hook.vocabTranslations?.[word]?.translation;
+      const translation = resolvePrefetchTranslation(word, hook, translations);
       const result = await getVocabImage(word, dialogue, language, [], precomputedKeyword, {
         translation,
         precomputedKeyword,
+        acceptBestEffort: true,
       });
       setVocabImage(word, result);
       devLog(`[Timing] Imagem '${word}': ${(performance.now() - t).toFixed(0)}ms`);
@@ -61,8 +78,9 @@ export async function prefetchVocabImages({
   for (const { word, fallback } of refetchWords) {
     const precomputedKeyword = hook.imageKeywords?.[word];
     const result = await getVocabImage(word, dialogue, language, [...usedUrls], precomputedKeyword, {
-      translation: hook.vocabTranslations?.[word]?.translation,
+      translation: resolvePrefetchTranslation(word, hook, translations),
       precomputedKeyword,
+      acceptBestEffort: true,
     });
 
     if (result?.imageUrl && !usedUrls.some((u) => urlsAreSamePhoto(u, result.imageUrl))) {

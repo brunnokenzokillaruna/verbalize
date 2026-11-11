@@ -11,30 +11,29 @@ const LANG_LABEL: Record<SupportedLanguage, string> = {
 };
 
 /**
- * Translates a single word in context using Gemini (Prompt #5).
- * Returns null on any error so callers can show a graceful fallback.
+ * Cached Gemini path only. Errors must throw so Next.js does not cache a null
+ * failure for weeks (that left Vocabulário Novo stuck on "traduzindo…").
  */
-export async function translateWord(
+async function translateWordCached(
   word: string,
   sentence: string,
   language: SupportedLanguage,
   isNewVerb?: boolean,
-): Promise<TranslateWordResult | null> {
+): Promise<TranslateWordResult> {
   'use cache';
   cacheLife('weeks');
-  try {
-    const systemPrompt = `You are a language assistant for Brazilian Portuguese speakers learning ${LANG_LABEL[language]}. Respond with ONLY valid JSON, no markdown, no explanation.`;
+  const systemPrompt = `You are a language assistant for Brazilian Portuguese speakers learning ${LANG_LABEL[language]}. Respond with ONLY valid JSON, no markdown, no explanation.`;
 
-    let verbInstruction = '';
-    if (isNewVerb) {
-      verbInstruction = `
+  let verbInstruction = '';
+  if (isNewVerb) {
+    verbInstruction = `
 - The clicked word is flagged as a NEW VERB in the lesson.
 - You MUST identify its INFINITIVE form in ${LANG_LABEL[language]} (e.g. "plaire" for "plaît", "coûter" for "coûte", "payer" for "paye").
 - You MUST return "partOfSpeech": "Verbo" and "infinitive": "<infinitive_form_in_lowercase>".
 - Ensure the explanation in Portuguese mentions the infinitive verb and explains why it is conjugated this way.`;
-    }
+  }
 
-    const prompt = `A user clicked on the word "${word}" in: "${sentence}".
+  const prompt = `A user clicked on the word "${word}" in: "${sentence}".
 ${verbInstruction}
 
 Respond with ONLY this JSON (no markdown):
@@ -44,38 +43,48 @@ Rules: example must be ${LANG_LABEL[language]} only; beginner vocabulary.
 ${PT_BR_WORD_TRANSLATION_RULE}
 ${NATURAL_PT_BR_RULE}`;
 
-    const result = await callGeminiJSON<TranslateWordResult>(prompt, systemPrompt, 256, 0, 'lightweight');
-    return {
-      ...result,
-      translation: normalizeToEverydayPtBr(result.translation ?? ''),
-      explanation: normalizeToEverydayPtBr(result.explanation ?? ''),
-    };
+  const result = await callGeminiJSON<TranslateWordResult>(prompt, systemPrompt, 256, 0, 'lightweight');
+  return {
+    ...result,
+    translation: normalizeToEverydayPtBr(result.translation ?? ''),
+    explanation: normalizeToEverydayPtBr(result.explanation ?? ''),
+  };
+}
+
+/**
+ * Translates a single word in context using Gemini (Prompt #5).
+ * Returns null on any error so callers can show a graceful fallback.
+ */
+export async function translateWord(
+  word: string,
+  sentence: string,
+  language: SupportedLanguage,
+  isNewVerb?: boolean,
+): Promise<TranslateWordResult | null> {
+  try {
+    return await translateWordCached(word, sentence, language, isNewVerb);
   } catch (err) {
     console.error('[translateWord] Error:', err);
     return null;
   }
 }
 
-/**
- * Translates multiple words at once to Brazilian Portuguese.
- * This prevents hitting Gemini rate limits when loading a large vocabulary list.
- */
-export async function translateWordsBatch(
+async function translateWordsBatchCached(
   words: string[],
   language: SupportedLanguage,
-  context?: string,
-  pass: 'initial' | 'strict' = 'initial',
-): Promise<{ word: string; translation: string }[] | null> {
+  context: string | undefined,
+  pass: 'initial' | 'strict',
+): Promise<{ word: string; translation: string }[]> {
   'use cache';
   cacheLife('weeks');
   if (words.length === 0) return [];
-  try {
-    const systemPrompt = `You are a language assistant for Brazilian Portuguese speakers learning ${LANG_LABEL[language]}. Respond with ONLY a valid JSON array of objects, with no markdown formatting, no explanations.`;
 
-    const contextBlock = context?.trim()
-      ? `\nDialogue context (use it to resolve the meaning of each item):\n${context.trim().slice(0, 2000)}\n`
-      : '';
-    const prompt = `Translate the following list of ${LANG_LABEL[language]} words or expressions into Brazilian Portuguese:
+  const systemPrompt = `You are a language assistant for Brazilian Portuguese speakers learning ${LANG_LABEL[language]}. Respond with ONLY a valid JSON array of objects, with no markdown formatting, no explanations.`;
+
+  const contextBlock = context?.trim()
+    ? `\nDialogue context (use it to resolve the meaning of each item):\n${context.trim().slice(0, 2000)}\n`
+    : '';
+  const prompt = `Translate the following list of ${LANG_LABEL[language]} words or expressions into Brazilian Portuguese:
 ${JSON.stringify(words)}
 ${contextBlock}
 
@@ -95,11 +104,25 @@ ${PT_BR_WORD_TRANSLATION_RULE}
 ${pass === 'strict' ? '- Previous answer copied or repaired the source word instead of translating it. "s\'installer" is wrong; "instalar-se" is right.\n' : ''}- Respond ONLY with the JSON array, no markdown fences, no extra text.
 ${NATURAL_PT_BR_RULE}`;
 
-    const items = await callGeminiJSON<{ word: string; translation: string }[]>(prompt, systemPrompt, 4096, 0, 'lightweight');
-    return items.map((item) => ({
-      ...item,
-      translation: normalizeToEverydayPtBr(item.translation ?? ''),
-    }));
+  const items = await callGeminiJSON<{ word: string; translation: string }[]>(prompt, systemPrompt, 4096, 0, 'lightweight');
+  return items.map((item) => ({
+    ...item,
+    translation: normalizeToEverydayPtBr(item.translation ?? ''),
+  }));
+}
+
+/**
+ * Translates multiple words at once to Brazilian Portuguese.
+ * This prevents hitting Gemini rate limits when loading a large vocabulary list.
+ */
+export async function translateWordsBatch(
+  words: string[],
+  language: SupportedLanguage,
+  context?: string,
+  pass: 'initial' | 'strict' = 'initial',
+): Promise<{ word: string; translation: string }[] | null> {
+  try {
+    return await translateWordsBatchCached(words, language, context, pass);
   } catch (err) {
     console.error('[translateWordsBatch] Error:', err);
     return null;

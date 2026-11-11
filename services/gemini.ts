@@ -18,7 +18,9 @@ const MODEL_CHAINS: Record<GeminiTier, readonly string[]> = {
   // Grammar, exercises, bridges: lite first — cheaper, faster JSON, fewer timeouts.
   // (Putting primary flash on standard burned ~CA$0.20+/lesson and raised practice failure rate.)
   standard: ['gemini-3.5-flash-lite', 'gemini-2.5-flash-lite'],
-  lightweight: ['gemini-3.5-flash-lite'],
+  // Vocab translate / image keyword: keep a second lite so one overloaded model
+  // does not leave Vocabulário Novo stuck on "traduzindo…" / empty photos.
+  lightweight: ['gemini-3.5-flash-lite', 'gemini-2.5-flash-lite'],
 };
 
 /** Degraded hook path when primary flash daily budget is exhausted. */
@@ -91,7 +93,13 @@ function buildGenerationConfig(
     config.systemInstruction = systemPrompt;
   }
 
-  if (thinkingBudget !== undefined && modelSupportsThinkingConfig(model)) {
+  // Omit thinkingConfig when budget is 0 — some lite models return 400 for
+  // `{ thinkingBudget: 0 }` even though the docs allow disabling thinking that way.
+  if (
+    thinkingBudget !== undefined &&
+    thinkingBudget > 0 &&
+    modelSupportsThinkingConfig(model)
+  ) {
     config.thinkingConfig = { thinkingBudget };
   }
 
@@ -214,7 +222,7 @@ async function generateWithModel(
  * Calls the Gemini API using tier-specific model chains.
  * critical → 3.8-flash (degrades to lite when daily budget exhausted)
  * standard → 3.5-flash-lite → 2.5-flash-lite
- * lightweight → 3.5-flash-lite only
+ * lightweight → 3.5-flash-lite → 2.5-flash-lite
  */
 export async function callGemini(
   prompt: string,
@@ -263,11 +271,26 @@ export async function callGemini(
         lastError = err instanceof Error ? err : new Error(String(err));
         maxRetries = getMaxRetries(err);
 
+        const nextModel = modelChain[modelIndex + 1];
+        const status = (err as { status?: number })?.status;
+
+        // 401/403: auth — no point trying another model.
+        // 400: this model often rejects the request shape (thinking config,
+        // preview id, etc.); fall through to the next model in the chain
+        // instead of aborting lightweight translate/image calls entirely.
         if (isNonRetryable(err)) {
+          if (status === 401 || status === 403) {
+            throw lastError;
+          }
+          if (nextModel) {
+            console.warn(
+              `[Gemini SDK] ${model} rejected request (${status ?? 'non-retryable'}). Falling back to ${nextModel}...`,
+            );
+            break;
+          }
           throw lastError;
         }
 
-        const nextModel = modelChain[modelIndex + 1];
         const immediateFallback = shouldFallbackImmediately(err);
 
         if (immediateFallback) {

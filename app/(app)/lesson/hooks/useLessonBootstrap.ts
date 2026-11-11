@@ -36,6 +36,7 @@ import {
   isFrenchElisionCopy,
   isUntranslatedCopy,
   lookupStoredTranslation,
+  pickBatchTranslation,
   trackVocabTranslationFill,
 } from '@/lib/vocabTranslation';
 import { filterHookVocabularyForKnownWords, filterKnownFromNewChunks } from '@/lib/hookVocabulary';
@@ -408,14 +409,8 @@ export function useLessonBootstrap({
             }
           }
 
-          if (!vocabImagesFiredRef.current) {
-            vocabImagesFiredRef.current = true;
-            prefetchVocabImages({
-              hook,
-              lesson,
-              setVocabImage: store.setVocabImage,
-            }).catch((err) => console.error('[Prefetch] vocab images error:', err));
-          }
+          // Vocab images wait for the priority PT-BR glosses in the prefetch
+          // effect below — searching Pexels without meaning often yields empty cards.
 
           // Open the first real phase. REVIEW already jumped to briefing above.
           // Skip if the learner left while this was still generating.
@@ -691,35 +686,73 @@ export function useLessonBootstrap({
       hook.newChunks,
     );
     const tTrans = performance.now();
+    const startVocabImages = () => {
+      if (vocabImagesFiredRef.current) return;
+      vocabImagesFiredRef.current = true;
+      const tImages = performance.now();
+      prefetchVocabImages({
+        hook,
+        lesson,
+        setVocabImage: store.setVocabImage,
+        translations: useLessonStore.getState().vocabTranslations,
+      })
+        .then(() => {
+          devLog(`[Timing] ✅ Prefetch imagens terminou: ${(performance.now() - tImages).toFixed(0)}ms`);
+        })
+        .catch((err) => console.error('[Prefetch] vocab images error:', err));
+    };
+
     trackVocabTranslationFill((async () => {
-      for (const word of missingTranslations(lessonItems)) {
-        const cached = await getCachedImage(`${sanitizeVocabularyToken(word)}_${language}`);
-        rememberTranslation(word, cached?.translation, false);
-      }
-
-      const firstWave = [...new Set([
-        ...missingTranslations(dialogueTranslationTargets),
-        ...missingTranslations(lessonItems),
-      ])];
-      if (firstWave.length > 0) {
-        const batch = await translateWordsBatch(firstWave, language, dialogue, 'initial');
-        for (const item of batch ?? []) {
-          rememberTranslation(item.word, item.translation, false);
+      // Priority: the 2 Vocabulário Novo cards (and chunks) before the full dialogue
+      // token list — a huge firstWave used to block or fail the screen the learner sees.
+      const applyBatch = (
+        targets: string[],
+        batch: { word: string; translation: string }[] | null,
+        allowCopy: boolean,
+      ) => {
+        for (const word of targets) {
+          rememberTranslation(word, pickBatchTranslation(word, batch, allowCopy), allowCopy);
         }
-      }
+      };
 
-      let unresolved = missingTranslations(lessonItems);
-      if (unresolved.length > 0) {
-        const strictBatch = await translateWordsBatch(unresolved, language, dialogue, 'strict');
-        for (const item of strictBatch ?? []) {
-          rememberTranslation(item.word, item.translation, true);
+      try {
+        for (const word of missingTranslations(lessonItems)) {
+          const cached = await getCachedImage(`${sanitizeVocabularyToken(word)}_${language}`);
+          rememberTranslation(word, cached?.translation, false);
         }
+
+        let unresolvedLesson = missingTranslations(lessonItems);
+        if (unresolvedLesson.length > 0) {
+          const batch = await translateWordsBatch(unresolvedLesson, language, dialogue, 'initial');
+          applyBatch(unresolvedLesson, batch, false);
+        }
+
+        unresolvedLesson = missingTranslations(lessonItems);
+        if (unresolvedLesson.length > 0) {
+          const strictBatch = await translateWordsBatch(unresolvedLesson, language, dialogue, 'strict');
+          applyBatch(unresolvedLesson, strictBatch, true);
+        }
+
+        unresolvedLesson = missingTranslations(lessonItems);
+        for (const word of unresolvedLesson) {
+          const result = await translateWord(word, dialogue, language);
+          rememberTranslation(word, result?.translation, true);
+        }
+      } finally {
+        // Always start images after the priority gloss attempt (even on failure).
+        startVocabImages();
       }
 
-      unresolved = missingTranslations(lessonItems);
-      for (const word of unresolved) {
-        const result = await translateWord(word, dialogue, language);
-        rememberTranslation(word, result?.translation, true);
+      const dialogueOnly = missingTranslations(dialogueTranslationTargets);
+      if (dialogueOnly.length > 0) {
+        const batch = await translateWordsBatch(dialogueOnly, language, dialogue, 'initial');
+        applyBatch(dialogueOnly, batch, false);
+      }
+
+      const unresolvedDialogue = missingTranslations(dialogueTranslationTargets);
+      if (unresolvedDialogue.length > 0) {
+        const strictBatch = await translateWordsBatch(unresolvedDialogue, language, dialogue, 'strict');
+        applyBatch(unresolvedDialogue, strictBatch, true);
       }
 
       const stored = useLessonStore.getState().vocabTranslations;
@@ -749,26 +782,11 @@ export function useLessonBootstrap({
       );
     })().catch((err) => {
       console.error('[Prefetch] vocabulary translations error:', err);
+      startVocabImages();
     }));
     devLog(
       `[Timing] Traduções sincronizadas iniciadas (${lessonItems.length} palavras/expressões)`,
     );
-
-    const tImages = performance.now();
-    if (!vocabImagesFiredRef.current) {
-      vocabImagesFiredRef.current = true;
-      prefetchVocabImages({
-        hook,
-        lesson,
-        setVocabImage: store.setVocabImage,
-      })
-        .then(() => {
-          devLog(`[Timing] ✅ Prefetch imagens terminou: ${(performance.now() - tImages).toFixed(0)}ms`);
-        })
-        .catch((err) => console.error('[Prefetch] vocab images error:', err));
-    } else {
-      devLog(`[Timing] Imagens: já iniciadas no bootstrap (0ms)`);
-    }
   // store.hook added so prefetch starts as soon as the hook arrives during loading
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [store.phase, store.hook]);
