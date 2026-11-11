@@ -17,7 +17,6 @@ interface ListeningComprehensionExerciseProps {
 export function ListeningComprehensionExercise({
   data,
   language,
-  level = 'A1',
   onAnswer,
   answered,
   setIsExerciseReady,
@@ -25,7 +24,6 @@ export function ListeningComprehensionExercise({
   const dialogue = useDialoguePlayback({
     dialogueAudio: data.dialogueAudio,
     language,
-    level,
   });
 
   useEffect(() => {

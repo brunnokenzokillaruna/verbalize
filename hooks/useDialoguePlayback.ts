@@ -3,18 +3,16 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { fetchDialogueAudioChunks, parseDialogueLines } from '@/lib/dialogueAudio';
 import { getPlaybackRateForLevel } from '@/lib/immersion';
-import type { ProficiencyLevel, SupportedLanguage } from '@/types';
+import type { SupportedLanguage } from '@/types';
 
 interface UseDialoguePlaybackOptions {
   dialogueAudio: string;
   language: SupportedLanguage;
-  level?: ProficiencyLevel;
 }
 
 export function useDialoguePlayback({
   dialogueAudio,
   language,
-  level = 'A1',
 }: UseDialoguePlaybackOptions) {
   const lines = parseDialogueLines(dialogueAudio);
   const [hasListened, setHasListened] = useState(false);
@@ -59,7 +57,7 @@ export function useDialoguePlayback({
           if (session === playSessionRef.current) setIsPlaying(false);
         };
         audio.src = `data:audio/mpeg;base64,${chunks[i]}`;
-        audio.playbackRate = getPlaybackRateForLevel(level);
+        audio.playbackRate = getPlaybackRateForLevel();
         audio.play().catch(() => {
           if (session === playSessionRef.current) setIsPlaying(false);
         });
@@ -67,7 +65,7 @@ export function useDialoguePlayback({
 
       playIndex(0);
     },
-    [level, stopAudio],
+    [stopAudio],
   );
 
   useEffect(() => {

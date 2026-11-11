@@ -159,7 +159,7 @@ export function useLessonAudio(
         }
       };
       audio.src = `data:${audioMimeRef.current};base64,${chunks[i]}`;
-      if (lesson) audio.playbackRate = getPlaybackRateForLevel(lesson.level);
+      audio.playbackRate = getPlaybackRateForLevel();
       audio
         .play()
         .then(() => updateNarration(i))

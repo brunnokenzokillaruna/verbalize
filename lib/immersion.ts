@@ -12,8 +12,8 @@ export function shouldUseTargetLanguageInstructions(
   return level === 'B2' || level === 'C1' || level === 'C2';
 }
 
-export function getPlaybackRateForLevel(_level: ProficiencyLevel): number {
-  // Keep client playback at normal speed; learner pacing lives in TTS settings if needed.
+/** Client HTMLAudio playback rate (normal speed). Level-based pacing is handled in TTS if needed. */
+export function getPlaybackRateForLevel(): number {
   return 1.0;
 }
 

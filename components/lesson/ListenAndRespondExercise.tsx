@@ -26,7 +26,6 @@ interface ListenAndRespondExerciseProps {
 export function ListenAndRespondExercise({
   data,
   language,
-  level = 'A1',
   onAnswer,
   answered,
   setIsExerciseReady,
@@ -48,7 +47,6 @@ export function ListenAndRespondExercise({
   const dialogue = useDialoguePlayback({
     dialogueAudio: playbackAudio,
     language,
-    level,
   });
 
   const evaluate = useCallback(
