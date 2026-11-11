@@ -1,0 +1,51 @@
+{
+  "form": {
+    "old": 202,
+    "neu": 162,
+    "GRAM": 108,
+    "VERB": 54,
+    "retentionPct": 76.7,
+    "lost": 47,
+    "conjugationsLostAsForm": 3
+  },
+  "formByLevel": {
+    "old": {
+      "A1": 45,
+      "A2": 55,
+      "B1": 51,
+      "B2": 34,
+      "C1": 10,
+      "C2": 7
+    },
+    "neu": {
+      "A1": 41,
+      "A2": 44,
+      "B1": 38,
+      "B2": 21,
+      "C1": 10,
+      "C2": 8
+    }
+  },
+  "monotony": {
+    "maxFormRunOld": 9,
+    "maxFormRunNew": 2
+  },
+  "lostSample": [
+    "fr-a1-041 GRAM→DIAL · Posição dos Adjetivos: A Regra BANGS",
+    "fr-a1-053 VERB→DIAL · Conjugação: Parler",
+    "fr-a1-054 GRAM→DIAL · Par de Confusão: Manger VS Cuisiner",
+    "fr-a1-910 GRAM→REVIEW · Possessivos da primeira pessoa: mon, ma, mes",
+    "fr-a1-082 GRAM→DIAL · Posse Singular: Ton, Ta, Tes",
+    "fr-a1-084 GRAM→DIAL · Posse Plural: Notre e Nos",
+    "fr-a2-124 VERB→DIAL · Conjugação: Vendre (Grupo -re)",
+    "fr-a2-125 GRAM→DIAL · Partitivos Plurais e Negativa (Pas de)",
+    "fr-a2-131 VERB→DIAL · Verbos Reflexivos: Rotina Diária",
+    "fr-a2-913 GRAM→DIAL · C'est versus il est no uso do dia a dia",
+    "fr-a2-136 GRAM→DIAL · COD: Os pronomes La e Les",
+    "fr-a2-139 GRAM→DIAL · Comparativo de Superioridade e Inferioridade",
+    "fr-a2-141 GRAM→MISS · Superlativo: O mais e o menos",
+    "fr-a2-143 GRAM→DIAL · Par de Confusão: Vite VS Rapide",
+    "fr-a2-152 GRAM→DIAL · Par de Confusão: Pendant VS Depuis"
+  ],
+  "verdict": "ACEITÁVEL"
+}

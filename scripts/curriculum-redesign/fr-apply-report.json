@@ -1,0 +1,30 @@
+{
+  "lessons": 450,
+  "themes": 75,
+  "tagCounts": {
+    "DIAL": 118,
+    "GRAM": 101,
+    "MISS": 57,
+    "PRON": 13,
+    "REVIEW": 37,
+    "VERB": 50,
+    "VOC": 42,
+    "CULT": 16,
+    "EXPR": 16
+  },
+  "errors": [],
+  "sample": [
+    "fr-a1-001 [DIAL] Tema 1: Chegada ao aeroporto · Chegando no Aeroporto",
+    "fr-a1-002 [GRAM] Tema 1: Chegada ao aeroporto · Lendo as Placas de Voo",
+    "fr-a1-003 [DIAL] Tema 1: Chegada ao aeroporto · Despachando a Bagagem",
+    "fr-a1-004 [MISS] Tema 1: Chegada ao aeroporto · A Sala de Embarque",
+    "fr-a1-005 [PRON] Tema 1: Chegada ao aeroporto · O Portão Correto",
+    "fr-a1-006 [DIAL] Tema 1: Chegada ao aeroporto · A Caminho da Aeronave",
+    "fr-a1-007 [PRON] Tema 2: Controles e bagagem · Entrada e Recepção",
+    "fr-a1-008 [DIAL] Tema 2: Controles e bagagem · Cumprimentando os Comissários",
+    "fr-a1-009 [PRON] Tema 2: Controles e bagagem · Guardando a Bagagem de Mão",
+    "fr-a1-901 [DIAL] Tema 2: Controles e bagagem · Tu ou Tout",
+    "fr-a1-902 [PRON] Tema 2: Controles e bagagem · Feu, Soeur e o E que Some",
+    "fr-a1-010 [REVIEW] Tema 2: Controles e bagagem · Checkpoint — lições 1–12"
+  ]
+}

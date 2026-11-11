@@ -3,8 +3,11 @@ import type { CurriculumSyncNotice, CurriculumSyncReport } from '@/types/curricu
 import { getLessonsForLanguage } from '@/lib/curriculum';
 import { INITIAL_LESSON_PROGRESS } from '@/lib/curriculum/lessonProgress';
 
-/** Bump when lesson IDs or order change in a breaking way. */
-export const CURRICULUM_VERSION = 3;
+/**
+ * Bump when lesson IDs or order change in a breaking way.
+ * v4: French catalog retagged/rethemed (IDs preserved; local REVIEW swaps only).
+ */
+export const CURRICULUM_VERSION = 4;
 
 const V1_LESSON_COUNT = 418;
 const V2_LESSON_COUNT = 430;

@@ -1,0 +1,318 @@
+{
+  "totals": {
+    "lessons": 450,
+    "themes": 75,
+    "issues": 15,
+    "P0": 8,
+    "P1": 0,
+    "P2": 7
+  },
+  "P0": [
+    {
+      "severity": "P0",
+      "type": "level_regression",
+      "at": "fr-a1-111",
+      "detail": "A2 → A1 (fr-a2-114 → fr-a1-111)"
+    },
+    {
+      "severity": "P0",
+      "type": "level_regression",
+      "at": "fr-a1-112",
+      "detail": "A2 → A1 (fr-a2-115 → fr-a1-112)"
+    },
+    {
+      "severity": "P0",
+      "type": "level_regression",
+      "at": "fr-a2-213",
+      "detail": "B1 → A2 (fr-b1-215 → fr-a2-213)"
+    },
+    {
+      "severity": "P0",
+      "type": "level_regression",
+      "at": "fr-b1-309",
+      "detail": "B2 → B1 (fr-b2-310 → fr-b1-309)"
+    },
+    {
+      "severity": "P0",
+      "type": "level_regression",
+      "at": "fr-b2-366",
+      "detail": "C1 → B2 (fr-c1-369 → fr-b2-366)"
+    },
+    {
+      "severity": "P0",
+      "type": "level_regression",
+      "at": "fr-b2-367",
+      "detail": "C1 → B2 (fr-c1-370 → fr-b2-367)"
+    },
+    {
+      "severity": "P0",
+      "type": "level_regression",
+      "at": "fr-c1-396",
+      "detail": "C2 → C1 (fr-c2-398 → fr-c1-396)"
+    },
+    {
+      "severity": "P0",
+      "type": "level_regression",
+      "at": "fr-c1-395",
+      "detail": "C2 → C1 (fr-c2-400 → fr-c1-395)"
+    }
+  ],
+  "P1": [],
+  "P2": [
+    {
+      "severity": "P2",
+      "type": "theme_content_mismatch",
+      "at": "fr-a2-205",
+      "detail": "\"Prendre um medicamento: dose e horário\" / \"O Remédio na Dose Certa\" inside theme \"Tema 37: Discurso indireto no cotidiano\""
+    },
+    {
+      "severity": "P2",
+      "type": "theme_content_mismatch",
+      "at": "fr-a2-206",
+      "detail": "\"Planejando uma viagem inesquecível (Síntese)\" / \"Medicamentos Genéricos\" inside theme \"Tema 37: Discurso indireto no cotidiano\""
+    },
+    {
+      "severity": "P2",
+      "type": "theme_content_mismatch",
+      "at": "fr-b1-237",
+      "detail": "\"Conjunções: Mais, ou, et, donc, or, ni, car\" / \"Trocando Recados no Portão\" inside theme \"Tema 43: Expressões da internet\""
+    },
+    {
+      "severity": "P2",
+      "type": "theme_content_mismatch",
+      "at": "fr-b1-252",
+      "detail": "\"Sistema de saúde francês: cartão de saúde e plano complementar\" / \"Saúde na França\" inside theme \"Tema 45: Dar feedback educado\""
+    },
+    {
+      "severity": "P2",
+      "type": "cluster_large_gap",
+      "detail": "cod_coi: large gaps fr-a2-138 → fr-b1-234 (gap 96) (total span 99)"
+    },
+    {
+      "severity": "P2",
+      "type": "cluster_large_gap",
+      "detail": "passado: large gaps fr-a2-146 → fr-a2-190 (gap 47); fr-b1-218 → fr-b2-315 (gap 101); fr-b2-315 → fr-c1-387 (gap 68) (total span 244)"
+    },
+    {
+      "severity": "P2",
+      "type": "cluster_large_gap",
+      "detail": "subjuntivo: large gaps fr-b2-319 → fr-c1-371 (gap 52) (total span 93)"
+    }
+  ],
+  "firstBlocks": [
+    {
+      "block": 1,
+      "theme": "Tema 1: Chegada ao aeroporto",
+      "level": "A1",
+      "tags": "GRAM→DIAL→MISS→DIAL→PRON→DIAL",
+      "lessons": [
+        "GRAM:Lendo as Placas de Voo [Pronomes Sujeitos (Singular)]",
+        "DIAL:Chegando no Aeroporto [5 Maneiras de Dizer Bonjour]",
+        "MISS:Despachando a Bagagem [5 Maneiras de Dizer Merci]",
+        "DIAL:A Sala de Embarque [5 Maneiras de Dizer De Rien]",
+        "PRON:O Portão Correto [Combinações de Vogais: AI, EI, OU]",
+        "DIAL:A Caminho da Aeronave [5 Maneiras de Dizer Comment ça va]"
+      ]
+    },
+    {
+      "block": 2,
+      "theme": "Tema 2: Controles e bagagem",
+      "level": "A1",
+      "tags": "DIAL→PRON→DIAL→PRON→DIAL→REVIEW",
+      "lessons": [
+        "DIAL:Cumprimentando os Comissários [5 reações positivas: Ça va bien, Ça marche, D'accord, Pas de souci, C'est gentil]",
+        "PRON:Guardando a Bagagem de Mão [Sons Nasais: AN, EN, IN]",
+        "DIAL:Tu ou Tout [Pronúncia: u fechado versus ou (tu / tout)]",
+        "PRON:Feu, Soeur e o E que Some [Pronúncia: eu, œu e o e mudo]",
+        "DIAL:Missão: passar o controle [Produção: pedir e confirmar documentos]",
+        "REVIEW:Checkpoint — lições 1–12 [Revisão: lições 1–12]"
+      ]
+    },
+    {
+      "block": 3,
+      "theme": "Tema 3: Do desembarque ao transporte",
+      "level": "A1",
+      "tags": "VERB→PRON→GRAM→PRON→VOC→MISS",
+      "lessons": [
+        "VERB:O Saguão de Desembarque [Conjugação: Être (ser/estar) — Presente]",
+        "PRON:Pousando em Paris [Sons Nasais: ON, UN]",
+        "GRAM:Puxando as Malas [Pronomes Sujeitos (Plural)]",
+        "PRON:Saindo da Aeronave [Letras mudas e ligação entre palavras]",
+        "VOC:Achando a Saída [Números de 0 a 10]",
+        "MISS:Na Fila do Táxi [Prática: Quem sou eu e o que faço?]"
+      ]
+    },
+    {
+      "block": 4,
+      "theme": "Tema 4: Taxi e GPS até o bairro",
+      "level": "A1",
+      "tags": "VERB→PRON→VERB→VOC→DIAL→REVIEW",
+      "lessons": [
+        "VERB:Dando a Direção do Bairro [Conjugação: Avoir (ter) — Presente]",
+        "PRON:Conversando com o Motorista [Est-ce que e Entonação]",
+        "VERB:Aproximando do Edifício [Conjugação: Aller (ir) — Deslocamento]",
+        "VOC:Cortando as Avenidas [Números de 11 a 20]",
+        "DIAL:Missão: chegar ao ponto certo [Produção: dar e confirmar endereço]",
+        "REVIEW:Checkpoint — lições 13–24 [Revisão: lições 13–24]"
+      ]
+    },
+    {
+      "block": 5,
+      "theme": "Tema 5: Check-in no hostel",
+      "level": "A1",
+      "tags": "VERB→DIAL→VERB→DIAL→VERB→DIAL",
+      "lessons": [
+        "VERB:O que Você Vai Fazer [Futuro próximo: aller + infinitivo]",
+        "DIAL:Eu Gostaria [Pedido educado: je voudrais]",
+        "VERB:Eu Posso [Pouvoir no presente: je peux e je ne peux pas]",
+        "DIAL:A Corrida Chegou ao Fim [Interrogativa de Tempo: Quand]",
+        "VERB:Pagando a Tarifa [Conjugação: Faire (fazer) — Atividades]",
+        "DIAL:Tirando as Malas do Porta-Malas [Interrogativa de Modo: Comment]"
+      ]
+    },
+    {
+      "block": 6,
+      "theme": "Tema 6: Apresentações e quarto",
+      "level": "A1",
+      "tags": "GRAM→DIAL→MISS→CULT→DIAL→REVIEW",
+      "lessons": [
+        "GRAM:Entrando no Lobby [Gênero dos Substantivos: Masculino vs Feminino]",
+        "DIAL:Suspirando Fundo [Interrogativas de Identidade: Qui e Que]",
+        "MISS:Em Frente [Interrogativa de Quantidade: Combien]",
+        "CULT:Admirando a Fachada do Hostel [Prática: A Arte da Pergunta Básica]",
+        "DIAL:Missão: ice-breaker [Produção: small talk com outro hóspede]",
+        "REVIEW:Checkpoint — lições 25–36 [Revisão: lições 25–36]"
+      ]
+    },
+    {
+      "block": 7,
+      "theme": "Tema 7: Primeiro café da manhã",
+      "level": "A1",
+      "tags": "GRAM→MISS→GRAM→VOC→DIAL→VOC",
+      "lessons": [
+        "GRAM:Apresentando seu Documento [Artigos Definidos Singulares: le, la, l']",
+        "MISS:Aguardando sua Vez [Prática: Descrevendo seu estilo]",
+        "GRAM:Confirmando Identidade [Artigo Definido Plural: les]",
+        "VOC:O Cumprimento Formal [Cores e Tons Avançados]",
+        "DIAL:Detalhes da Reserva [Vocabulário: Roupas de Cima]",
+        "VOC:Recebendo Orientações [Vocabulário: Roupas de Baixo e Acessórios]"
+      ]
+    },
+    {
+      "block": 8,
+      "theme": "Tema 8: Pedir e pagar no café",
+      "level": "A1",
+      "tags": "GRAM→DIAL→GRAM→DIAL→GRAM→REVIEW",
+      "lessons": [
+        "GRAM:A Arte da Boa Vizinhança [Artigos Indefinidos: un, une, des]",
+        "DIAL:Preços e moedas [Números e euros]",
+        "GRAM:Procurando o Número do Quarto [Concordância dos Adjetivos]",
+        "DIAL:Conhecendo o Colega de Quarto [Posição dos Adjetivos: A Regra BANGS]",
+        "GRAM:Uma Manhã de Sol [Par de Confusão: Bon VS Bien]",
+        "REVIEW:Checkpoint — lições 37–48 [Revisão: lições 37–48]"
+      ]
+    }
+  ],
+  "midBlocks": [
+    {
+      "block": 21,
+      "theme": "Tema 21: Fechamento A1 — meu primeiro mês",
+      "level": "A1",
+      "tags": "VERB→DIAL→VERB→DIAL→GRAM→DIAL",
+      "lessons": [
+        "VERB:Solicitação Simples [Conjugação: Payer]",
+        "DIAL:Mapa do bairro [Vocabulário de lugares do cotidiano]",
+        "VERB:O Despertador Toca [Conjugação: Finir (Grupo -ir)]",
+        "DIAL:Na Farmácia Noturna [5 Frases para Relatar Sintomas Básicos]",
+        "GRAM:Levantando da Cama [Obrigação Geral: Il faut]",
+        "DIAL:Uma Dúvida Persistente [Revisão Geral A1]"
+      ]
+    },
+    {
+      "block": 22,
+      "theme": "Tema 22: Contando o fim de semana",
+      "level": "A2",
+      "tags": "VERB→DIAL→VERB→PRON→GRAM→REVIEW",
+      "lessons": [
+        "VERB:Indo à Luta [Conjugação: Devoir (Dever)]",
+        "DIAL:Lazer do weekend [Vocabulário de lazer]",
+        "VERB:Preparativos no Banheiro [Conjugação: Choisir]",
+        "PRON:O R Francês [O som vibrante do R e a ligação entre palavras]",
+        "GRAM:Organizando as Coisas [Par de Confusão: Devoir VS Falloir]",
+        "REVIEW:Checkpoint — lições 121–132 [Revisão: lições 121–132]"
+      ]
+    },
+    {
+      "block": 23,
+      "theme": "Tema 23: Ontem vs hoje",
+      "level": "A2",
+      "tags": "VERB→DIAL→VERB→GRAM→DIAL→GRAM",
+      "lessons": [
+        "VERB:Passando pela Sala [Conjugação: Réussir]",
+        "DIAL:Cuidados Matinais [Conjugação: Vendre (Grupo -re)]",
+        "VERB:A Chave na Porta [Conjugação: Attendre]",
+        "GRAM:Hábitos Intocáveis [Partitivos Singulares: Du e De la]",
+        "DIAL:Vestiário e Prontidão [Partitivos Plurais e Negativa (Pas de)]",
+        "GRAM:Começando a Rotina [O pronome En (Substituição de Coisas)]"
+      ]
+    },
+    {
+      "block": 24,
+      "theme": "Tema 24: Comparações no dia a dia",
+      "level": "A2",
+      "tags": "VERB→MISS→VERB→DIAL→GRAM→REVIEW",
+      "lessons": [
+        "VERB:Responder no Presente [Conjugação: Répondre]",
+        "MISS:Buscando Nutrientes [Prática: Narrando a história de um objeto]",
+        "VERB:O Tempo Voa [Conjugação: Vouloir (Desejo)]",
+        "DIAL:A Necessidade Bate [Verbos Reflexivos: Rotina Diária]",
+        "GRAM:Já Estou Lá [Pronome y: j'y vais e il y a]",
+        "REVIEW:Checkpoint — lições 133–144 [Revisão: lições 133–144]"
+      ]
+    }
+  ],
+  "lateBlocks": [
+    {
+      "block": 56,
+      "theme": "Tema 56: Oratória — estruturar um ponto",
+      "level": "B2",
+      "tags": "VERB→DIAL→VERB→DIAL→GRAM→REVIEW",
+      "lessons": [
+        "VERB:A Surpresa no Olhar [Subjonctif Présent: Verbos Irregulares (Faire, Aller, Savoir)]",
+        "DIAL:Vontades Profundas [Subjonctif: Necessidade e Vontade]",
+        "VERB:Dúvidas Corrosivas [Subjonctif: Dúvida e Incerteza]",
+        "DIAL:Alegrias Compartilhadas [Subjonctif: Emoção e Julgamento]",
+        "GRAM:Memórias Passadas [Plus-que-parfait: Formação e Quando Usar]",
+        "REVIEW:Checkpoint — lições 325–336 [Revisão: lições 325–336]"
+      ]
+    },
+    {
+      "block": 57,
+      "theme": "Tema 57: Expressões elevadas",
+      "level": "B2",
+      "tags": "VERB→DIAL→VERB→DIAL→VERB→DIAL",
+      "lessons": [
+        "VERB:Aceitando Concessões [Subjonctif: Orações Concessivas]",
+        "DIAL:Fórmulas de reunião [Vocabulário formal B2]",
+        "VERB:Propósitos Secretos [Subjonctif: Finalidade e Negativa (Sans que)]",
+        "DIAL:E Se a História Fosse Outra [Hipóteses sobre o Passado (3ª Condicional)]",
+        "VERB:O Futuro Já Terminou [Futur Antérieur: Formação e Uso]",
+        "DIAL:Contando o que Disseram [Discurso Indireto no Passado (B2)]"
+      ]
+    },
+    {
+      "block": 58,
+      "theme": "Tema 58: Francês da rua vs formal",
+      "level": "B2",
+      "tags": "VERB→DIAL→GRAM→DIAL→GRAM→REVIEW",
+      "lessons": [
+        "VERB:Fazendo Outro Fazer [Construções Causativas: Faire e infinitivo]",
+        "DIAL:Delegando com Clareza [O uso do Infinitivo Passado]",
+        "GRAM:Ordens Firmes [Imperativo com Pronomes Duplos]",
+        "DIAL:Estruturando a Fala [Marcadores Discursivos: Adição e Estruturação]",
+        "GRAM:Qual Documento? [Relativos Compostos: Auquel e Duquel]",
+        "REVIEW:Checkpoint — lições 337–348 [Revisão: lições 337–348]"
+      ]
+    }
+  ]
+}

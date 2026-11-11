@@ -29,6 +29,23 @@ export function getCheckpointWindow(
 }
 
 export function formatCheckpointRange(lesson: LessonDefinition): string {
+  // Prefer explicit range from catalog copy (IDs can be non-sequential, e.g. fr-a1-903).
+  const fromCopy = `${lesson.uiTitle ?? ''} ${lesson.grammarFocus ?? ''}`.match(
+    /lições?\s+(\d+)\s*[–-]\s*(\d+)/i,
+  );
+  if (fromCopy) {
+    return `lições ${fromCopy[1]}–${fromCopy[2]}`;
+  }
+
+  // Fallback: position in the live catalog, not the numeric id suffix.
+  const lessons = getLessonsForLanguage(lesson.language);
+  const idx = lessons.findIndex((l) => l.id === lesson.id);
+  if (idx >= 0) {
+    const end = idx + 1;
+    const start = Math.max(1, end - 11);
+    return `lições ${start}–${end}`;
+  }
+
   const match = lesson.id.match(/-(\d{3})$/);
   const end = match ? Number.parseInt(match[1]!, 10) : 0;
   const start = Math.max(1, end - 9);

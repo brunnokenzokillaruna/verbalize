@@ -8,12 +8,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "Chegando no Aeroporto",
     "grammarFocus": "5 Maneiras de Dizer Bonjour",
-    "theme": "Tema 1: A Bordo do Avião e Aeroporto",
+    "theme": "Tema 1: Chegada ao aeroporto",
     "arcCharacters": {
       "learner": "Lucas",
       "local": "Camille"
     },
-    "arcSummary": "Você chega a Paris de avião; Camille, uma parisiense, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
+    "arcSummary": "Você pousa em Paris; Camille te ajuda a se orientar no aeroporto."
   },
   {
     "id": "fr-a1-002",
@@ -22,12 +22,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Lendo as Placas de Voo",
     "grammarFocus": "Pronomes Sujeitos (Singular)",
-    "theme": "Tema 1: A Bordo do Avião e Aeroporto",
+    "theme": "Tema 1: Chegada ao aeroporto",
     "arcCharacters": {
       "learner": "Lucas",
       "local": "Camille"
     },
-    "arcSummary": "Você chega a Paris de avião; Camille, uma parisiense, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
+    "arcSummary": "Você pousa em Paris; Camille te ajuda a se orientar no aeroporto."
   },
   {
     "id": "fr-a1-003",
@@ -36,26 +36,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "Despachando a Bagagem",
     "grammarFocus": "5 Maneiras de Dizer Merci",
-    "theme": "Tema 1: A Bordo do Avião e Aeroporto",
+    "theme": "Tema 1: Chegada ao aeroporto",
     "arcCharacters": {
       "learner": "Lucas",
       "local": "Camille"
     },
-    "arcSummary": "Você chega a Paris de avião; Camille, uma parisiense, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
+    "arcSummary": "Você pousa em Paris; Camille te ajuda a se orientar no aeroporto."
   },
   {
     "id": "fr-a1-004",
     "language": "fr",
     "level": "A1",
-    "tag": "DIAL",
+    "tag": "MISS",
     "uiTitle": "A Sala de Embarque",
     "grammarFocus": "5 Maneiras de Dizer De Rien",
-    "theme": "Tema 1: A Bordo do Avião e Aeroporto",
+    "theme": "Tema 1: Chegada ao aeroporto",
     "arcCharacters": {
       "learner": "Lucas",
       "local": "Camille"
     },
-    "arcSummary": "Você chega a Paris de avião; Camille, uma parisiense, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
+    "arcSummary": "Você pousa em Paris; Camille te ajuda a se orientar no aeroporto."
   },
   {
     "id": "fr-a1-005",
@@ -64,12 +64,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "PRON",
     "uiTitle": "O Portão Correto",
     "grammarFocus": "Combinações de Vogais: AI, EI, OU",
-    "theme": "Tema 1: A Bordo do Avião e Aeroporto",
+    "theme": "Tema 1: Chegada ao aeroporto",
     "arcCharacters": {
       "learner": "Lucas",
       "local": "Camille"
     },
-    "arcSummary": "Você chega a Paris de avião; Camille, uma parisiense, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
+    "arcSummary": "Você pousa em Paris; Camille te ajuda a se orientar no aeroporto."
   },
   {
     "id": "fr-a1-006",
@@ -78,12 +78,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "A Caminho da Aeronave",
     "grammarFocus": "5 Maneiras de Dizer Comment ça va",
-    "theme": "Tema 1: A Bordo do Avião e Aeroporto",
+    "theme": "Tema 1: Chegada ao aeroporto",
     "arcCharacters": {
       "learner": "Lucas",
       "local": "Camille"
     },
-    "arcSummary": "Você chega a Paris de avião; Camille, uma parisiense, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
+    "arcSummary": "Você pousa em Paris; Camille te ajuda a se orientar no aeroporto."
   },
   {
     "id": "fr-a1-007",
@@ -92,12 +92,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "PRON",
     "uiTitle": "Entrada e Recepção",
     "grammarFocus": "Combinações de Vogais: AU, EAU",
-    "theme": "Tema 1: A Bordo do Avião e Aeroporto",
+    "theme": "Tema 2: Controles e bagagem",
     "arcCharacters": {
       "learner": "Lucas",
       "local": "Camille"
     },
-    "arcSummary": "Você chega a Paris de avião; Camille, uma parisiense, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
+    "arcSummary": "Você passa pelo controle e recupera a bagagem com Camille por perto."
   },
   {
     "id": "fr-a1-008",
@@ -106,12 +106,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "Cumprimentando os Comissários",
     "grammarFocus": "5 reações positivas: Ça va bien, Ça marche, D'accord, Pas de souci, C'est gentil",
-    "theme": "Tema 1: A Bordo do Avião e Aeroporto",
+    "theme": "Tema 2: Controles e bagagem",
     "arcCharacters": {
       "learner": "Lucas",
       "local": "Camille"
     },
-    "arcSummary": "Você chega a Paris de avião; Camille, uma parisiense, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
+    "arcSummary": "Você passa pelo controle e recupera a bagagem com Camille por perto."
   },
   {
     "id": "fr-a1-009",
@@ -120,21 +120,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "PRON",
     "uiTitle": "Guardando a Bagagem de Mão",
     "grammarFocus": "Sons Nasais: AN, EN, IN",
-    "theme": "Tema 1: A Bordo do Avião e Aeroporto",
+    "theme": "Tema 2: Controles e bagagem",
     "arcCharacters": {
       "learner": "Lucas",
       "local": "Camille"
     },
-    "arcSummary": "Você chega a Paris de avião; Camille, uma parisiense, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
+    "arcSummary": "Você passa pelo controle e recupera a bagagem com Camille por perto."
   },
   {
     "id": "fr-a1-901",
     "language": "fr",
     "level": "A1",
-    "tag": "PRON",
+    "tag": "DIAL",
     "uiTitle": "Tu ou Tout",
     "grammarFocus": "Pronúncia: u fechado versus ou (tu / tout)",
-    "theme": "Tema 1: A Bordo do Avião e Aeroporto"
+    "theme": "Tema 2: Controles e bagagem",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você passa pelo controle e recupera a bagagem com Camille por perto."
   },
   {
     "id": "fr-a1-902",
@@ -143,21 +148,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "PRON",
     "uiTitle": "Feu, Soeur e o E que Some",
     "grammarFocus": "Pronúncia: eu, œu e o e mudo",
-    "theme": "Tema 1: A Bordo do Avião e Aeroporto"
+    "theme": "Tema 2: Controles e bagagem",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você passa pelo controle e recupera a bagagem com Camille por perto."
   },
   {
     "id": "fr-a1-010",
     "language": "fr",
     "level": "A1",
     "tag": "REVIEW",
-    "uiTitle": "Checkpoint — lições 1–10",
-    "grammarFocus": "Revisão: lições 1–10",
-    "theme": "Tema 1: A Bordo do Avião e Aeroporto",
+    "uiTitle": "Checkpoint — lições 1–12",
+    "grammarFocus": "Revisão: lições 1–12",
+    "theme": "Tema 2: Controles e bagagem",
     "arcCharacters": {
       "learner": "Lucas",
       "local": "Camille"
     },
-    "arcSummary": "Você chega a Paris de avião; Camille, uma parisiense, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
+    "arcSummary": "Você passa pelo controle e recupera a bagagem com Camille por perto."
   },
   {
     "id": "fr-a1-011",
@@ -166,26 +176,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "PRON",
     "uiTitle": "Pousando em Paris",
     "grammarFocus": "Sons Nasais: ON, UN",
-    "theme": "Tema 1: A Bordo do Avião e Aeroporto",
+    "theme": "Tema 3: Do desembarque ao transporte",
     "arcCharacters": {
       "learner": "Lucas",
       "local": "Camille"
     },
-    "arcSummary": "Você chega a Paris de avião; Camille, uma parisiense, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
+    "arcSummary": "Você sai do saguão e escolhe como chegar ao bairro."
   },
   {
     "id": "fr-a1-012",
     "language": "fr",
     "level": "A1",
-    "tag": "PRON",
+    "tag": "DIAL",
     "uiTitle": "Saindo da Aeronave",
     "grammarFocus": "Letras mudas e ligação entre palavras",
-    "theme": "Tema 1: A Bordo do Avião e Aeroporto",
+    "theme": "Tema 3: Do desembarque ao transporte",
     "arcCharacters": {
       "learner": "Lucas",
       "local": "Camille"
     },
-    "arcSummary": "Você chega a Paris de avião; Camille, uma parisiense, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
+    "arcSummary": "Você sai do saguão e escolhe como chegar ao bairro."
   },
   {
     "id": "fr-a1-013",
@@ -194,12 +204,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "O Saguão de Desembarque",
     "grammarFocus": "Conjugação: Être (ser/estar) — Presente",
-    "theme": "Tema 2: Rumo ao Hostel",
+    "theme": "Tema 3: Do desembarque ao transporte",
     "arcCharacters": {
       "learner": "Lucas",
       "local": "Camille"
     },
-    "arcSummary": "Você chega a Paris de avião; Camille, uma parisiense, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
+    "arcSummary": "Você sai do saguão e escolhe como chegar ao bairro."
   },
   {
     "id": "fr-a1-014",
@@ -208,12 +218,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Puxando as Malas",
     "grammarFocus": "Pronomes Sujeitos (Plural)",
-    "theme": "Tema 2: Rumo ao Hostel",
+    "theme": "Tema 3: Do desembarque ao transporte",
     "arcCharacters": {
       "learner": "Lucas",
       "local": "Camille"
     },
-    "arcSummary": "Você chega a Paris de avião; Camille, uma parisiense, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
+    "arcSummary": "Você sai do saguão e escolhe como chegar ao bairro."
   },
   {
     "id": "fr-a1-015",
@@ -222,12 +232,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Achando a Saída",
     "grammarFocus": "Números de 0 a 10",
-    "theme": "Tema 2: Rumo ao Hostel",
+    "theme": "Tema 3: Do desembarque ao transporte",
     "arcCharacters": {
       "learner": "Lucas",
       "local": "Camille"
     },
-    "arcSummary": "Você chega a Paris de avião; Camille, uma parisiense, aparece ao longo do tema para te ajudar no aeroporto e na cidade."
+    "arcSummary": "Você sai do saguão e escolhe como chegar ao bairro."
   },
   {
     "id": "fr-a1-016",
@@ -236,25 +246,40 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "Na Fila do Táxi",
     "grammarFocus": "Prática: Quem sou eu e o que faço?",
-    "theme": "Tema 2: Rumo ao Hostel"
+    "theme": "Tema 3: Do desembarque ao transporte",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você sai do saguão e escolhe como chegar ao bairro."
   },
   {
     "id": "fr-a1-903",
     "language": "fr",
     "level": "A1",
-    "tag": "VOC",
+    "tag": "MISS",
     "uiTitle": "Metrô ou Ônibus",
     "grammarFocus": "Metrô e ônibus em Paris: linha, estação e baldeação",
-    "theme": "Tema 2: Rumo ao Hostel"
+    "theme": "Tema 4: Taxi e GPS até o bairro",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "No carro ou no app, você confirma o endereço do hostel."
   },
   {
     "id": "fr-a1-017",
     "language": "fr",
     "level": "A1",
-    "tag": "DIAL",
+    "tag": "PRON",
     "uiTitle": "Conversando com o Motorista",
     "grammarFocus": "Est-ce que e Entonação",
-    "theme": "Tema 2: Rumo ao Hostel"
+    "theme": "Tema 4: Taxi e GPS até o bairro",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "No carro ou no app, você confirma o endereço do hostel."
   },
   {
     "id": "fr-a1-018",
@@ -263,7 +288,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Dando a Direção do Bairro",
     "grammarFocus": "Conjugação: Avoir (ter) — Presente",
-    "theme": "Tema 2: Rumo ao Hostel"
+    "theme": "Tema 4: Taxi e GPS até o bairro",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "No carro ou no app, você confirma o endereço do hostel."
   },
   {
     "id": "fr-a1-019",
@@ -272,16 +302,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Cortando as Avenidas",
     "grammarFocus": "Números de 11 a 20",
-    "theme": "Tema 2: Rumo ao Hostel"
+    "theme": "Tema 4: Taxi e GPS até o bairro",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "No carro ou no app, você confirma o endereço do hostel."
   },
   {
     "id": "fr-a1-020",
     "language": "fr",
     "level": "A1",
     "tag": "REVIEW",
-    "uiTitle": "Checkpoint — lições 11–20",
-    "grammarFocus": "Revisão: lições 11–20",
-    "theme": "Tema 2: Rumo ao Hostel"
+    "uiTitle": "Checkpoint — lições 13–24",
+    "grammarFocus": "Revisão: lições 13–24",
+    "theme": "Tema 4: Taxi e GPS até o bairro",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "No carro ou no app, você confirma o endereço do hostel."
   },
   {
     "id": "fr-a1-021",
@@ -290,7 +330,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Aproximando do Edifício",
     "grammarFocus": "Conjugação: Aller (ir) — Deslocamento",
-    "theme": "Tema 2: Rumo ao Hostel"
+    "theme": "Tema 4: Taxi e GPS até o bairro",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "No carro ou no app, você confirma o endereço do hostel."
   },
   {
     "id": "fr-a1-904",
@@ -299,16 +344,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "O que Você Vai Fazer",
     "grammarFocus": "Futuro próximo: aller + infinitivo",
-    "theme": "Tema 2: Rumo ao Hostel"
+    "theme": "Tema 5: Check-in no hostel",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você chega à recepção e resolve a reserva."
   },
   {
     "id": "fr-a1-905",
     "language": "fr",
     "level": "A1",
-    "tag": "VERB",
+    "tag": "MISS",
     "uiTitle": "Eu Posso",
     "grammarFocus": "Pouvoir no presente: je peux e je ne peux pas",
-    "theme": "Tema 2: Rumo ao Hostel"
+    "theme": "Tema 5: Check-in no hostel",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você chega à recepção e resolve a reserva."
   },
   {
     "id": "fr-a1-906",
@@ -317,16 +372,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "Eu Gostaria",
     "grammarFocus": "Pedido educado: je voudrais",
-    "theme": "Tema 2: Rumo ao Hostel"
+    "theme": "Tema 5: Check-in no hostel",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você chega à recepção e resolve a reserva."
   },
   {
     "id": "fr-a1-022",
     "language": "fr",
     "level": "A1",
-    "tag": "DIAL",
+    "tag": "MISS",
     "uiTitle": "A Corrida Chegou ao Fim",
     "grammarFocus": "Interrogativa de Tempo: Quand",
-    "theme": "Tema 2: Rumo ao Hostel"
+    "theme": "Tema 5: Check-in no hostel",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você chega à recepção e resolve a reserva."
   },
   {
     "id": "fr-a1-023",
@@ -335,7 +400,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Pagando a Tarifa",
     "grammarFocus": "Conjugação: Faire (fazer) — Atividades",
-    "theme": "Tema 2: Rumo ao Hostel"
+    "theme": "Tema 5: Check-in no hostel",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você chega à recepção e resolve a reserva."
   },
   {
     "id": "fr-a1-024",
@@ -344,7 +414,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "Tirando as Malas do Porta-Malas",
     "grammarFocus": "Interrogativa de Modo: Comment",
-    "theme": "Tema 2: Rumo ao Hostel"
+    "theme": "Tema 5: Check-in no hostel",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você chega à recepção e resolve a reserva."
   },
   {
     "id": "fr-a1-025",
@@ -353,16 +428,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "Parado na Calçada",
     "grammarFocus": "Interrogativa de Causa: Pourquoi",
-    "theme": "Tema 2: Rumo ao Hostel"
+    "theme": "Tema 6: Apresentações e quarto",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você conhece outros hóspedes e se instala no quarto."
   },
   {
     "id": "fr-a1-026",
     "language": "fr",
     "level": "A1",
-    "tag": "DIAL",
+    "tag": "MISS",
     "uiTitle": "Suspirando Fundo",
     "grammarFocus": "Interrogativas de Identidade: Qui e Que",
-    "theme": "Tema 2: Rumo ao Hostel"
+    "theme": "Tema 6: Apresentações e quarto",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você conhece outros hóspedes e se instala no quarto."
   },
   {
     "id": "fr-a1-027",
@@ -371,7 +456,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "Em Frente",
     "grammarFocus": "Interrogativa de Quantidade: Combien",
-    "theme": "Tema 2: Rumo ao Hostel"
+    "theme": "Tema 6: Apresentações e quarto",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você conhece outros hóspedes e se instala no quarto."
   },
   {
     "id": "fr-a1-028",
@@ -380,7 +470,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "CULT",
     "uiTitle": "Admirando a Fachada do Hostel",
     "grammarFocus": "Prática: A Arte da Pergunta Básica",
-    "theme": "Tema 3: Check-in e Apresentações"
+    "theme": "Tema 6: Apresentações e quarto",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você conhece outros hóspedes e se instala no quarto."
   },
   {
     "id": "fr-a1-029",
@@ -389,16 +484,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Entrando no Lobby",
     "grammarFocus": "Gênero dos Substantivos: Masculino vs Feminino",
-    "theme": "Tema 3: Check-in e Apresentações"
+    "theme": "Tema 6: Apresentações e quarto",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você conhece outros hóspedes e se instala no quarto."
   },
   {
     "id": "fr-a1-030",
     "language": "fr",
     "level": "A1",
     "tag": "REVIEW",
-    "uiTitle": "Checkpoint — lições 21–30",
-    "grammarFocus": "Revisão: lições 21–30",
-    "theme": "Tema 3: Check-in e Apresentações"
+    "uiTitle": "Checkpoint — lições 25–36",
+    "grammarFocus": "Revisão: lições 25–36",
+    "theme": "Tema 6: Apresentações e quarto",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você conhece outros hóspedes e se instala no quarto."
   },
   {
     "id": "fr-a1-031",
@@ -407,7 +512,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "Aguardando sua Vez",
     "grammarFocus": "Prática: Descrevendo seu estilo",
-    "theme": "Tema 3: Check-in e Apresentações"
+    "theme": "Tema 7: Primeiro café da manhã",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "No café da esquina, você pede o café da manhã com Camille."
   },
   {
     "id": "fr-a1-032",
@@ -416,7 +526,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "O Cumprimento Formal",
     "grammarFocus": "Cores e Tons Avançados",
-    "theme": "Tema 3: Check-in e Apresentações"
+    "theme": "Tema 7: Primeiro café da manhã",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "No café da esquina, você pede o café da manhã com Camille."
   },
   {
     "id": "fr-a1-033",
@@ -425,7 +540,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Apresentando seu Documento",
     "grammarFocus": "Artigos Definidos Singulares: le, la, l'",
-    "theme": "Tema 3: Check-in e Apresentações"
+    "theme": "Tema 7: Primeiro café da manhã",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "No café da esquina, você pede o café da manhã com Camille."
   },
   {
     "id": "fr-a1-034",
@@ -434,7 +554,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Detalhes da Reserva",
     "grammarFocus": "Vocabulário: Roupas de Cima",
-    "theme": "Tema 3: Check-in e Apresentações"
+    "theme": "Tema 7: Primeiro café da manhã",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "No café da esquina, você pede o café da manhã com Camille."
   },
   {
     "id": "fr-a1-035",
@@ -443,7 +568,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Confirmando Identidade",
     "grammarFocus": "Artigo Definido Plural: les",
-    "theme": "Tema 3: Check-in e Apresentações"
+    "theme": "Tema 7: Primeiro café da manhã",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "No café da esquina, você pede o café da manhã com Camille."
   },
   {
     "id": "fr-a1-036",
@@ -452,7 +582,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Recebendo Orientações",
     "grammarFocus": "Vocabulário: Roupas de Baixo e Acessórios",
-    "theme": "Tema 3: Check-in e Apresentações"
+    "theme": "Tema 7: Primeiro café da manhã",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "No café da esquina, você pede o café da manhã com Camille."
   },
   {
     "id": "fr-a1-037",
@@ -461,7 +596,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "A Arte da Boa Vizinhança",
     "grammarFocus": "Artigos Indefinidos: un, une, des",
-    "theme": "Tema 3: Check-in e Apresentações"
+    "theme": "Tema 8: Pedir e pagar no café",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você fecha a conta e entende o ticket."
   },
   {
     "id": "fr-a1-038",
@@ -470,9 +610,14 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Pegando a Chave",
     "grammarFocus": "Vocabulário: Bon",
-    "theme": "Tema 3: Check-in e Apresentações",
+    "theme": "Tema 8: Pedir e pagar no café",
     "topicKey": "bon-bien",
-    "lessonRole": "introduce"
+    "lessonRole": "introduce",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você fecha a conta e entende o ticket."
   },
   {
     "id": "fr-a1-039",
@@ -481,16 +626,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Procurando o Número do Quarto",
     "grammarFocus": "Concordância dos Adjetivos",
-    "theme": "Tema 3: Check-in e Apresentações"
+    "theme": "Tema 8: Pedir e pagar no café",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você fecha a conta e entende o ticket."
   },
   {
     "id": "fr-a1-040",
     "language": "fr",
     "level": "A1",
     "tag": "REVIEW",
-    "uiTitle": "Checkpoint — lições 31–40",
-    "grammarFocus": "Revisão: lições 31–40",
-    "theme": "Tema 3: Check-in e Apresentações"
+    "uiTitle": "Checkpoint — lições 37–48",
+    "grammarFocus": "Revisão: lições 37–48",
+    "theme": "Tema 8: Pedir e pagar no café",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você fecha a conta e entende o ticket."
   },
   {
     "id": "fr-a1-041",
@@ -499,18 +654,28 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Conhecendo o Colega de Quarto",
     "grammarFocus": "Posição dos Adjetivos: A Regra BANGS",
-    "theme": "Tema 3: Check-in e Apresentações"
+    "theme": "Tema 8: Pedir e pagar no café",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você fecha a conta e entende o ticket."
   },
   {
     "id": "fr-a1-042",
     "language": "fr",
     "level": "A1",
-    "tag": "GRAM",
+    "tag": "DIAL",
     "uiTitle": "Uma Manhã de Sol",
     "grammarFocus": "Par de Confusão: Bon VS Bien",
-    "theme": "Tema 4: O Primeiro Café da Manhã",
+    "theme": "Tema 8: Pedir e pagar no café",
     "topicKey": "bon-bien",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você fecha a conta e entende o ticket."
   },
   {
     "id": "fr-a1-043",
@@ -519,9 +684,14 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Passeando pela Calçada",
     "grammarFocus": "Vocabulário: Muito (Très)",
-    "theme": "Tema 4: O Primeiro Café da Manhã",
+    "theme": "Tema 9: Galeries Lafayette — achar o que precisa",
     "topicKey": "tres-trop",
-    "lessonRole": "introduce"
+    "lessonRole": "introduce",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Vocês entram nas Galeries para achar um presente."
   },
   {
     "id": "fr-a1-044",
@@ -530,7 +700,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Sentindo o Cheiro de Pão",
     "grammarFocus": "Conjugação: Aimer",
-    "theme": "Tema 4: O Primeiro Café da Manhã"
+    "theme": "Tema 9: Galeries Lafayette — achar o que precisa",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Vocês entram nas Galeries para achar um presente."
   },
   {
     "id": "fr-a1-045",
@@ -539,7 +714,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "A Vitrine da Padaria",
     "grammarFocus": "Prática: Minha vida em casa e no trabalho",
-    "theme": "Tema 4: O Primeiro Café da Manhã"
+    "theme": "Tema 9: Galeries Lafayette — achar o que precisa",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Vocês entram nas Galeries para achar um presente."
   },
   {
     "id": "fr-a1-046",
@@ -548,7 +728,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "A Escolha Difícil",
     "grammarFocus": "5 Maneiras de Dizer Oui (Afirmação)",
-    "theme": "Tema 4: O Primeiro Café da Manhã"
+    "theme": "Tema 9: Galeries Lafayette — achar o que precisa",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Vocês entram nas Galeries para achar um presente."
   },
   {
     "id": "fr-a1-907",
@@ -557,7 +742,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Um Café ou Café",
     "grammarFocus": "No café: un café ou du café (partitivos de uso)",
-    "theme": "Tema 4: O Primeiro Café da Manhã"
+    "theme": "Tema 9: Galeries Lafayette — achar o que precisa",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Vocês entram nas Galeries para achar um presente."
   },
   {
     "id": "fr-a1-047",
@@ -566,9 +756,14 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Sentando na Mesa",
     "grammarFocus": "Vocabulário: Excesso (Trop)",
-    "theme": "Tema 4: O Primeiro Café da Manhã",
+    "theme": "Tema 9: Galeries Lafayette — achar o que precisa",
     "topicKey": "tres-trop",
-    "lessonRole": "introduce"
+    "lessonRole": "introduce",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Vocês entram nas Galeries para achar um presente."
   },
   {
     "id": "fr-a1-048",
@@ -577,9 +772,14 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Entrando no Bistrôzinho",
     "grammarFocus": "Par de Confusão: Très VS Trop",
-    "theme": "Tema 4: O Primeiro Café da Manhã",
+    "theme": "Tema 10: Provar, tamanho e preço",
     "topicKey": "tres-trop",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Na cabine e no caixa, você negocia tamanho e preço."
   },
   {
     "id": "fr-a1-049",
@@ -588,16 +788,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Lendo as Opções Matinais",
     "grammarFocus": "Conjugação: Habiter",
-    "theme": "Tema 4: O Primeiro Café da Manhã"
+    "theme": "Tema 10: Provar, tamanho e preço",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Na cabine e no caixa, você negocia tamanho e preço."
   },
   {
     "id": "fr-a1-050",
     "language": "fr",
     "level": "A1",
     "tag": "REVIEW",
-    "uiTitle": "Checkpoint — lições 41–50",
-    "grammarFocus": "Revisão: lições 41–50",
-    "theme": "Tema 4: O Primeiro Café da Manhã"
+    "uiTitle": "Checkpoint — lições 49–60",
+    "grammarFocus": "Revisão: lições 49–60",
+    "theme": "Tema 10: Provar, tamanho e preço",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Na cabine e no caixa, você negocia tamanho e preço."
   },
   {
     "id": "fr-a1-051",
@@ -606,9 +816,14 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "A Bebida Quente e o Suco",
     "grammarFocus": "Vocabulário: Cuisiner",
-    "theme": "Tema 4: O Primeiro Café da Manhã",
+    "theme": "Tema 10: Provar, tamanho e preço",
     "topicKey": "manger-cuisiner",
-    "lessonRole": "introduce"
+    "lessonRole": "introduce",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Na cabine e no caixa, você negocia tamanho e preço."
   },
   {
     "id": "fr-a1-052",
@@ -617,29 +832,44 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Começo Forte",
     "grammarFocus": "Conjugação: Manger",
-    "theme": "Tema 4: O Primeiro Café da Manhã",
+    "theme": "Tema 10: Provar, tamanho e preço",
     "topicKey": "manger-cuisiner",
-    "lessonRole": "practice"
+    "lessonRole": "practice",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Na cabine e no caixa, você negocia tamanho e preço."
   },
   {
     "id": "fr-a1-053",
     "language": "fr",
     "level": "A1",
-    "tag": "VERB",
+    "tag": "DIAL",
     "uiTitle": "A Primeira Mordida",
     "grammarFocus": "Conjugação: Parler",
-    "theme": "Tema 4: O Primeiro Café da Manhã"
+    "theme": "Tema 10: Provar, tamanho e preço",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Na cabine e no caixa, você negocia tamanho e preço."
   },
   {
     "id": "fr-a1-054",
     "language": "fr",
     "level": "A1",
-    "tag": "GRAM",
+    "tag": "DIAL",
     "uiTitle": "Elogiando a Qualidade",
     "grammarFocus": "Par de Confusão: Manger VS Cuisiner",
-    "theme": "Tema 4: O Primeiro Café da Manhã",
+    "theme": "Tema 11: Passeio em família",
     "topicKey": "manger-cuisiner",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Camille apresenta a família num passeio pelo parque."
   },
   {
     "id": "fr-a1-055",
@@ -648,7 +878,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Mais Açúcar",
     "grammarFocus": "Conjugação: Travailler",
-    "theme": "Tema 4: O Primeiro Café da Manhã"
+    "theme": "Tema 11: Passeio em família",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Camille apresenta a família num passeio pelo parque."
   },
   {
     "id": "fr-a1-056",
@@ -657,7 +892,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "A Conta por Favor",
     "grammarFocus": "Negação Básica: Ne... pas",
-    "theme": "Tema 4: O Primeiro Café da Manhã"
+    "theme": "Tema 11: Passeio em família",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Camille apresenta a família num passeio pelo parque."
   },
   {
     "id": "fr-a1-057",
@@ -666,7 +906,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "A Grande Vitrine",
     "grammarFocus": "5 Maneiras de Dizer Non (Negação)",
-    "theme": "Tema 5: Compras na Galeries Lafayette"
+    "theme": "Tema 11: Passeio em família",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Camille apresenta a família num passeio pelo parque."
   },
   {
     "id": "fr-a1-058",
@@ -675,7 +920,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Atravessando as Portas Giratórias",
     "grammarFocus": "Números de 21 a 50",
-    "theme": "Tema 5: Compras na Galeries Lafayette"
+    "theme": "Tema 11: Passeio em família",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Camille apresenta a família num passeio pelo parque."
   },
   {
     "id": "fr-a1-059",
@@ -684,16 +934,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "O Setor de Descontos",
     "grammarFocus": "Il y a: Expressando Existência",
-    "theme": "Tema 5: Compras na Galeries Lafayette"
+    "theme": "Tema 11: Passeio em família",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Camille apresenta a família num passeio pelo parque."
   },
   {
     "id": "fr-a1-060",
     "language": "fr",
     "level": "A1",
     "tag": "REVIEW",
-    "uiTitle": "Checkpoint — lições 51–60",
-    "grammarFocus": "Revisão: lições 51–60",
-    "theme": "Tema 5: Compras na Galeries Lafayette"
+    "uiTitle": "Checkpoint — lições 61–72",
+    "grammarFocus": "Revisão: lições 61–72",
+    "theme": "Tema 12: Possessivos e o que é meu",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Vocês separam pertences e evitam confusão de “meu/seu”."
   },
   {
     "id": "fr-a1-061",
@@ -702,7 +962,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Buscando as Peças Clássicas",
     "grammarFocus": "Números de 51 a 100",
-    "theme": "Tema 5: Compras na Galeries Lafayette"
+    "theme": "Tema 12: Possessivos e o que é meu",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Vocês separam pertences e evitam confusão de “meu/seu”."
   },
   {
     "id": "fr-a1-062",
@@ -711,7 +976,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "Os Provadores",
     "grammarFocus": "5 Maneiras de Dizer Pardon e Excusez-moi",
-    "theme": "Tema 5: Compras na Galeries Lafayette"
+    "theme": "Tema 12: Possessivos e o que é meu",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Vocês separam pertences e evitam confusão de “meu/seu”."
   },
   {
     "id": "fr-a1-063",
@@ -720,16 +990,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Avaliando o Ajuste",
     "grammarFocus": "Conectores de Tempo: Hoje, amanhã, ontem",
-    "theme": "Tema 5: Compras na Galeries Lafayette"
+    "theme": "Tema 12: Possessivos e o que é meu",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Vocês separam pertences e evitam confusão de “meu/seu”."
   },
   {
     "id": "fr-a1-064",
     "language": "fr",
     "level": "A1",
-    "tag": "VOC",
+    "tag": "DIAL",
     "uiTitle": "Qual o Tamanho?",
     "grammarFocus": "Dias da Semana",
-    "theme": "Tema 5: Compras na Galeries Lafayette"
+    "theme": "Tema 12: Possessivos e o que é meu",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Vocês separam pertences e evitam confusão de “meu/seu”."
   },
   {
     "id": "fr-a1-065",
@@ -738,7 +1018,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Trocando de Manequim",
     "grammarFocus": "Meses do Ano",
-    "theme": "Tema 5: Compras na Galeries Lafayette"
+    "theme": "Tema 12: Possessivos e o que é meu",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Vocês separam pertences e evitam confusão de “meu/seu”."
   },
   {
     "id": "fr-a1-066",
@@ -747,16 +1032,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Verificando os Valores",
     "grammarFocus": "Estações do Ano",
-    "theme": "Tema 5: Compras na Galeries Lafayette"
+    "theme": "Tema 13: Pedidos educados",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Situações do dia a dia em que a educação muda o tom."
   },
   {
     "id": "fr-a1-067",
     "language": "fr",
     "level": "A1",
-    "tag": "VOC",
+    "tag": "DIAL",
     "uiTitle": "Comparando os Preços",
     "grammarFocus": "Horas: Pergunta Principal e Horas Cheias",
-    "theme": "Tema 5: Compras na Galeries Lafayette"
+    "theme": "Tema 13: Pedidos educados",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Situações do dia a dia em que a educação muda o tom."
   },
   {
     "id": "fr-a1-068",
@@ -765,34 +1060,54 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Indo Direto ao Caixa",
     "grammarFocus": "Horas: Minutos e Frações de Tempo",
-    "theme": "Tema 5: Compras na Galeries Lafayette"
+    "theme": "Tema 13: Pedidos educados",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Situações do dia a dia em que a educação muda o tom."
   },
   {
     "id": "fr-a1-069",
     "language": "fr",
     "level": "A1",
-    "tag": "VOC",
+    "tag": "GRAM",
     "uiTitle": "A Arte de Pagar",
     "grammarFocus": "Preposições: Dans, Sur e Sous",
-    "theme": "Tema 5: Compras na Galeries Lafayette"
+    "theme": "Tema 13: Pedidos educados",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Situações do dia a dia em que a educação muda o tom."
   },
   {
     "id": "fr-a1-070",
     "language": "fr",
     "level": "A1",
-    "tag": "REVIEW",
-    "uiTitle": "Checkpoint — lições 61–70",
-    "grammarFocus": "Revisão: lições 61–70",
-    "theme": "Tema 5: Compras na Galeries Lafayette"
+    "tag": "DIAL",
+    "uiTitle": "Missão: pedir um favor",
+    "grammarFocus": "Produção: pedido educado completo",
+    "theme": "Tema 13: Pedidos educados",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Situações do dia a dia em que a educação muda o tom."
   },
   {
     "id": "fr-a1-071",
     "language": "fr",
     "level": "A1",
-    "tag": "VOC",
+    "tag": "GRAM",
     "uiTitle": "Missão Cumprida",
     "grammarFocus": "Preposições: Près de e Loin de",
-    "theme": "Tema 5: Compras na Galeries Lafayette"
+    "theme": "Tema 13: Pedidos educados",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Situações do dia a dia em que a educação muda o tom."
   },
   {
     "id": "fr-a1-908",
@@ -801,16 +1116,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Ao Lado e na Frente",
     "grammarFocus": "Preposições de lugar: chez, à côté de, en face de",
-    "theme": "Tema 5: Compras na Galeries Lafayette"
+    "theme": "Tema 14: Novos contatos e small talk",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você troca contato e mantém uma conversa leve."
   },
   {
     "id": "fr-a1-909",
     "language": "fr",
     "level": "A1",
-    "tag": "VOC",
-    "uiTitle": "De Que País",
-    "grammarFocus": "Países e nacionalidades: en France, au Brésil, aux États-Unis",
-    "theme": "Tema 5: Compras na Galeries Lafayette"
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 73–84",
+    "grammarFocus": "Revisão: lições 73–84",
+    "theme": "Tema 14: Novos contatos e small talk",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você troca contato e mantém uma conversa leve."
   },
   {
     "id": "fr-a1-072",
@@ -819,9 +1144,14 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Analisando o Mapa da Cidade",
     "grammarFocus": "Par de Confusão: Près de VS Proche de",
-    "theme": "Tema 6: Passeio, família e o que é meu",
+    "theme": "Tema 14: Novos contatos e small talk",
     "topicKey": "pres-de-vs-proche-de",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você troca contato e mantém uma conversa leve."
   },
   {
     "id": "fr-a1-073",
@@ -830,7 +1160,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "Onde Estamos?",
     "grammarFocus": "Prática: Localizando-se no espaço",
-    "theme": "Tema 6: Passeio, família e o que é meu"
+    "theme": "Tema 14: Novos contatos e small talk",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você troca contato e mantém uma conversa leve."
   },
   {
     "id": "fr-a1-074",
@@ -839,7 +1174,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Marcando no Relógio",
     "grammarFocus": "Família Imediata",
-    "theme": "Tema 6: Passeio, família e o que é meu"
+    "theme": "Tema 14: Novos contatos e small talk",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você troca contato e mantém uma conversa leve."
   },
   {
     "id": "fr-a1-075",
@@ -848,9 +1188,14 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Calculando a Distância",
     "grammarFocus": "Conjugação: Venir",
-    "theme": "Tema 6: Passeio, família e o que é meu",
+    "theme": "Tema 14: Novos contatos e small talk",
     "topicKey": "conj-venir",
-    "lessonRole": "introduce"
+    "lessonRole": "introduce",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você troca contato e mantém uma conversa leve."
   },
   {
     "id": "fr-a1-076",
@@ -859,9 +1204,14 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Pelas Calçadas Antigas",
     "grammarFocus": "Par de Confusão: Dans VS En",
-    "theme": "Tema 6: Passeio, família e o que é meu",
+    "theme": "Tema 15: Emergência pequena",
     "topicKey": "dans-vs-en",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você perde algo ou atrasa — e precisa resolver na hora."
   },
   {
     "id": "fr-a1-077",
@@ -870,7 +1220,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "Qual é a Direção?",
     "grammarFocus": "Prática: Minha árvore genealógica",
-    "theme": "Tema 6: Passeio, família e o que é meu"
+    "theme": "Tema 15: Emergência pequena",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você perde algo ou atrasa — e precisa resolver na hora."
   },
   {
     "id": "fr-a1-078",
@@ -879,7 +1234,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Andando em Círculos",
     "grammarFocus": "Parentes e Família Estendida",
-    "theme": "Tema 6: Passeio, família e o que é meu"
+    "theme": "Tema 15: Emergência pequena",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você perde algo ou atrasa — e precisa resolver na hora."
   },
   {
     "id": "fr-a1-079",
@@ -888,16 +1248,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Paragem para um Respiro",
     "grammarFocus": "Passado Recente: Venir de",
-    "theme": "Tema 6: Passeio, família e o que é meu"
+    "theme": "Tema 15: Emergência pequena",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você perde algo ou atrasa — e precisa resolver na hora."
   },
   {
     "id": "fr-a1-080",
     "language": "fr",
     "level": "A1",
-    "tag": "REVIEW",
-    "uiTitle": "Checkpoint — lições 71–80",
-    "grammarFocus": "Revisão: lições 71–80",
-    "theme": "Tema 6: Passeio, família e o que é meu"
+    "tag": "DIAL",
+    "uiTitle": "Missão: reportar a perda",
+    "grammarFocus": "Produção: explicar o problema",
+    "theme": "Tema 15: Emergência pequena",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você perde algo ou atrasa — e precisa resolver na hora."
   },
   {
     "id": "fr-a1-081",
@@ -906,7 +1276,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Mais Perto do Alvo",
     "grammarFocus": "Frutas e Vegetais",
-    "theme": "Tema 6: Passeio, família e o que é meu"
+    "theme": "Tema 15: Emergência pequena",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você perde algo ou atrasa — e precisa resolver na hora."
   },
   {
     "id": "fr-a1-910",
@@ -915,16 +1290,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "O Meu, a Minha",
     "grammarFocus": "Possessivos da primeira pessoa: mon, ma, mes",
-    "theme": "Tema 6: Passeio, família e o que é meu"
+    "theme": "Tema 16: Pedir ajuda e resolver",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Do balcão de informações à solução final."
   },
   {
     "id": "fr-a1-911",
     "language": "fr",
     "level": "A1",
-    "tag": "GRAM",
+    "tag": "DIAL",
     "uiTitle": "Este e Esta",
     "grammarFocus": "Demonstrativos: ce, cet, cette, ces",
-    "theme": "Tema 6: Passeio, família e o que é meu"
+    "theme": "Tema 16: Pedir ajuda e resolver",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Do balcão de informações à solução final."
   },
   {
     "id": "fr-a1-082",
@@ -933,16 +1318,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Observando as Visitas",
     "grammarFocus": "Posse Singular: Ton, Ta, Tes",
-    "theme": "Tema 6: Passeio, família e o que é meu"
+    "theme": "Tema 16: Pedir ajuda e resolver",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Do balcão de informações à solução final."
   },
   {
     "id": "fr-a1-083",
     "language": "fr",
     "level": "A1",
-    "tag": "GRAM",
+    "tag": "DIAL",
     "uiTitle": "A Luz do Fim de Tarde",
     "grammarFocus": "Posse Singular: Son, Sa, Ses",
-    "theme": "Tema 6: Passeio, família e o que é meu"
+    "theme": "Tema 16: Pedir ajuda e resolver",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Do balcão de informações à solução final."
   },
   {
     "id": "fr-a1-084",
@@ -951,16 +1346,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Nas Praças de Paris",
     "grammarFocus": "Posse Plural: Notre e Nos",
-    "theme": "Tema 6: Passeio, família e o que é meu"
+    "theme": "Tema 16: Pedir ajuda e resolver",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Do balcão de informações à solução final."
   },
   {
     "id": "fr-a1-085",
     "language": "fr",
     "level": "A1",
-    "tag": "GRAM",
-    "uiTitle": "Retorno Marcado",
-    "grammarFocus": "Posse Plural: Votre e Vos",
-    "theme": "Tema 6: Passeio, família e o que é meu"
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 85–96",
+    "grammarFocus": "Revisão: lições 85–96",
+    "theme": "Tema 16: Pedir ajuda e resolver",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Do balcão de informações à solução final."
   },
   {
     "id": "fr-a1-086",
@@ -969,7 +1374,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Próximo Ponto",
     "grammarFocus": "Posse Plural: Leur e Leurs",
-    "theme": "Tema 6: Passeio, família e o que é meu"
+    "theme": "Tema 17: Minha casa — cômodos",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Camille te mostra o apartamento e cada cômodo."
   },
   {
     "id": "fr-a1-087",
@@ -978,7 +1388,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "Uma Pausa no Parque",
     "grammarFocus": "5 Frases para Pedidos em Lojas",
-    "theme": "Tema 7: Pedidos, gentilezas e novos contatos"
+    "theme": "Tema 17: Minha casa — cômodos",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Camille te mostra o apartamento e cada cômodo."
   },
   {
     "id": "fr-a1-088",
@@ -987,25 +1402,40 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Sentando no Banco",
     "grammarFocus": "Vocabulário: Ici e Là",
-    "theme": "Tema 7: Pedidos, gentilezas e novos contatos"
+    "theme": "Tema 17: Minha casa — cômodos",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Camille te mostra o apartamento e cada cômodo."
   },
   {
     "id": "fr-a1-089",
     "language": "fr",
     "level": "A1",
-    "tag": "VOC",
+    "tag": "MISS",
     "uiTitle": "Mostrando Fotos no Celular",
     "grammarFocus": "Vocabulário: Là-bas",
-    "theme": "Tema 7: Pedidos, gentilezas e novos contatos"
+    "theme": "Tema 17: Minha casa — cômodos",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Camille te mostra o apartamento e cada cômodo."
   },
   {
     "id": "fr-a1-090",
     "language": "fr",
     "level": "A1",
-    "tag": "REVIEW",
-    "uiTitle": "Checkpoint — lições 81–90",
-    "grammarFocus": "Revisão: lições 81–90",
-    "theme": "Tema 7: Pedidos, gentilezas e novos contatos"
+    "tag": "DIAL",
+    "uiTitle": "Missão: descrever o apê",
+    "grammarFocus": "Produção: descrever sua casa",
+    "theme": "Tema 17: Minha casa — cômodos",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Camille te mostra o apartamento e cada cômodo."
   },
   {
     "id": "fr-a1-091",
@@ -1014,16 +1444,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "De Onde Você Vem?",
     "grammarFocus": "Conjugação: Jouer",
-    "theme": "Tema 7: Pedidos, gentilezas e novos contatos"
+    "theme": "Tema 17: Minha casa — cômodos",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Camille te mostra o apartamento e cada cômodo."
   },
   {
     "id": "fr-a1-092",
     "language": "fr",
     "level": "A1",
-    "tag": "DIAL",
-    "uiTitle": "Contando Suas Origens",
-    "grammarFocus": "5 Frases para Pedidos em Cafés",
-    "theme": "Tema 7: Pedidos, gentilezas e novos contatos"
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 97–108",
+    "grammarFocus": "Revisão: lições 97–108",
+    "theme": "Tema 18: Rotina da manhã",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Vocês comparam a rotina matinal — horários e hábitos."
   },
   {
     "id": "fr-a1-093",
@@ -1032,9 +1472,14 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "As Histórias dos Pais",
     "grammarFocus": "Par de Confusão: Tu VS Vous",
-    "theme": "Tema 7: Pedidos, gentilezas e novos contatos",
+    "theme": "Tema 18: Rotina da manhã",
     "topicKey": "tu-vs-vous",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Vocês comparam a rotina matinal — horários e hábitos."
   },
   {
     "id": "fr-a1-094",
@@ -1043,7 +1488,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Fatos da Juventude",
     "grammarFocus": "Conjugação: Penser",
-    "theme": "Tema 7: Pedidos, gentilezas e novos contatos"
+    "theme": "Tema 18: Rotina da manhã",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Vocês comparam a rotina matinal — horários e hábitos."
   },
   {
     "id": "fr-a1-095",
@@ -1052,7 +1502,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "Curiosidade Mútua",
     "grammarFocus": "5 Frases de Recepção e Boas-Vindas",
-    "theme": "Tema 7: Pedidos, gentilezas e novos contatos"
+    "theme": "Tema 18: Rotina da manhã",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Vocês comparam a rotina matinal — horários e hábitos."
   },
   {
     "id": "fr-a1-096",
@@ -1061,9 +1516,14 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Perguntas Educadas",
     "grammarFocus": "Par de Confusão: On VS Nous",
-    "theme": "Tema 7: Pedidos, gentilezas e novos contatos",
+    "theme": "Tema 18: Rotina da manhã",
     "topicKey": "on-vs-nous",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Vocês comparam a rotina matinal — horários e hábitos."
   },
   {
     "id": "fr-a1-097",
@@ -1072,7 +1532,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "Sorrisos",
     "grammarFocus": "5 Frases de Gentileza e Agradecimento",
-    "theme": "Tema 7: Pedidos, gentilezas e novos contatos"
+    "theme": "Tema 18: Rotina da manhã",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Vocês comparam a rotina matinal — horários e hábitos."
   },
   {
     "id": "fr-a1-098",
@@ -1081,9 +1546,14 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "O Tempo Passa Rápido",
     "grammarFocus": "Par de Confusão: Tard VS En retard",
-    "theme": "Tema 7: Pedidos, gentilezas e novos contatos",
+    "theme": "Tema 19: Mercado e lista",
     "topicKey": "tard-vs-en-retard",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "No marché, vocês montam a lista e perguntam preços."
   },
   {
     "id": "fr-a1-099",
@@ -1092,16 +1562,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "Trocando Contatos",
     "grammarFocus": "5 Maneiras de Dizer Je ne sais pas",
-    "theme": "Tema 7: Pedidos, gentilezas e novos contatos"
+    "theme": "Tema 19: Mercado e lista",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "No marché, vocês montam a lista e perguntam preços."
   },
   {
     "id": "fr-a1-100",
     "language": "fr",
     "level": "A1",
-    "tag": "REVIEW",
-    "uiTitle": "Checkpoint — lições 91–100",
-    "grammarFocus": "Revisão: lições 91–100",
-    "theme": "Tema 7: Pedidos, gentilezas e novos contatos"
+    "tag": "MISS",
+    "uiTitle": "Na banca de queijos",
+    "grammarFocus": "Diálogo no mercado",
+    "theme": "Tema 19: Mercado e lista",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "No marché, vocês montam a lista e perguntam preços."
   },
   {
     "id": "fr-a1-101",
@@ -1110,7 +1590,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "Laços Formados",
     "grammarFocus": "5 Maneiras de Dizer Félicitations",
-    "theme": "Tema 7: Pedidos, gentilezas e novos contatos"
+    "theme": "Tema 19: Mercado e lista",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "No marché, vocês montam a lista e perguntam preços."
   },
   {
     "id": "fr-a1-102",
@@ -1119,7 +1604,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Um Mal Estar Súbito",
     "grammarFocus": "Vocabulário: Corpo Humano Essencial",
-    "theme": "Tema 8: Emergências e Resolução de Problemas"
+    "theme": "Tema 19: Mercado e lista",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "No marché, vocês montam a lista e perguntam preços."
   },
   {
     "id": "fr-a1-103",
@@ -1128,7 +1618,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "Chamando por Ajuda",
     "grammarFocus": "5 Frases de Emergência: Au secours!",
-    "theme": "Tema 8: Emergências e Resolução de Problemas"
+    "theme": "Tema 19: Mercado e lista",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "No marché, vocês montam a lista e perguntam preços."
   },
   {
     "id": "fr-a1-104",
@@ -1137,16 +1632,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Um Erro de Orientação",
     "grammarFocus": "Conjugação: Donner",
-    "theme": "Tema 8: Emergências e Resolução de Problemas"
+    "theme": "Tema 20: Cozinha e preparo simples",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Na cozinha, vocês preparam uma refeição simples juntos."
   },
   {
     "id": "fr-a1-105",
     "language": "fr",
     "level": "A1",
-    "tag": "DIAL",
-    "uiTitle": "A Carteira Perdida",
-    "grammarFocus": "Na Delegacia: Reportando Objetos Perdidos",
-    "theme": "Tema 8: Emergências e Resolução de Problemas"
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 109–120",
+    "grammarFocus": "Revisão: lições 109–120",
+    "theme": "Tema 20: Cozinha e preparo simples",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Na cozinha, vocês preparam uma refeição simples juntos."
   },
   {
     "id": "fr-a1-106",
@@ -1155,7 +1660,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "O Pedido de Desculpas",
     "grammarFocus": "Ponte A1 > A2: Preparando o Infinitivo",
-    "theme": "Tema 8: Emergências e Resolução de Problemas"
+    "theme": "Tema 20: Cozinha e preparo simples",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Na cozinha, vocês preparam uma refeição simples juntos."
   },
   {
     "id": "fr-a1-107",
@@ -1164,7 +1674,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Retomando o Rumo",
     "grammarFocus": "Conjugação: Montrer",
-    "theme": "Tema 8: Emergências e Resolução de Problemas"
+    "theme": "Tema 20: Cozinha e preparo simples",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Na cozinha, vocês preparam uma refeição simples juntos."
   },
   {
     "id": "fr-a1-108",
@@ -1173,7 +1688,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Documentos e Alfândega",
     "grammarFocus": "Vocabulário: Passaporte, Visto e Aduana",
-    "theme": "Tema 8: Emergências e Resolução de Problemas"
+    "theme": "Tema 20: Cozinha e preparo simples",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Na cozinha, vocês preparam uma refeição simples juntos."
   },
   {
     "id": "fr-a1-109",
@@ -1182,34 +1702,54 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "Explicando o Mal Entendido",
     "grammarFocus": "O Grande Evento de Apresentação Final",
-    "theme": "Tema 8: Emergências e Resolução de Problemas"
+    "theme": "Tema 20: Cozinha e preparo simples",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Na cozinha, vocês preparam uma refeição simples juntos."
   },
   {
     "id": "fr-a1-110",
     "language": "fr",
     "level": "A1",
-    "tag": "REVIEW",
-    "uiTitle": "Checkpoint — lições 101–110",
-    "grammarFocus": "Revisão: lições 101–110",
-    "theme": "Tema 8: Emergências e Resolução de Problemas"
+    "tag": "DIAL",
+    "uiTitle": "O que eu já consigo",
+    "grammarFocus": "Can-do A1 em primeira pessoa",
+    "theme": "Tema 21: Fechamento A1 — meu primeiro mês",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você revisita o mês em Paris e conta o que já sabe fazer."
   },
   {
     "id": "fr-a1-111",
     "language": "fr",
     "level": "A1",
-    "tag": "DIAL",
+    "tag": "MISS",
     "uiTitle": "Na Farmácia Noturna",
     "grammarFocus": "5 Frases para Relatar Sintomas Básicos",
-    "theme": "Tema 8: Emergências e Resolução de Problemas"
+    "theme": "Tema 21: Fechamento A1 — meu primeiro mês",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você revisita o mês em Paris e conta o que já sabe fazer."
   },
   {
     "id": "fr-a1-112",
     "language": "fr",
     "level": "A1",
-    "tag": "MISS",
+    "tag": "DIAL",
     "uiTitle": "Uma Dúvida Persistente",
     "grammarFocus": "Revisão Geral A1",
-    "theme": "Tema 8: Emergências e Resolução de Problemas"
+    "theme": "Tema 21: Fechamento A1 — meu primeiro mês",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você revisita o mês em Paris e conta o que já sabe fazer."
   },
   {
     "id": "fr-a1-113",
@@ -1218,16 +1758,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Solicitação Simples",
     "grammarFocus": "Conjugação: Payer",
-    "theme": "Tema 8: Emergências e Resolução de Problemas"
+    "theme": "Tema 21: Fechamento A1 — meu primeiro mês",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você revisita o mês em Paris e conta o que já sabe fazer."
   },
   {
     "id": "fr-a2-114",
     "language": "fr",
     "level": "A2",
-    "tag": "VERB",
+    "tag": "DIAL",
     "uiTitle": "O Despertador Toca",
     "grammarFocus": "Conjugação: Finir (Grupo -ir)",
-    "theme": "Tema 9: Minha Casa, Minha Rotina"
+    "theme": "Tema 21: Fechamento A1 — meu primeiro mês",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você revisita o mês em Paris e conta o que já sabe fazer."
   },
   {
     "id": "fr-a2-115",
@@ -1236,7 +1786,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Levantando da Cama",
     "grammarFocus": "Obrigação Geral: Il faut",
-    "theme": "Tema 9: Minha Casa, Minha Rotina"
+    "theme": "Tema 21: Fechamento A1 — meu primeiro mês",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você revisita o mês em Paris e conta o que já sabe fazer."
   },
   {
     "id": "fr-a2-116",
@@ -1245,7 +1800,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "A Janela da Manhã",
     "grammarFocus": "Prática: Na Cozinha e no Supermercado",
-    "theme": "Tema 9: Minha Casa, Minha Rotina"
+    "theme": "Tema 22: Contando o fim de semana",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Segunda-feira: vocês recontam o weekend."
   },
   {
     "id": "fr-a2-117",
@@ -1254,16 +1814,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Indo à Luta",
     "grammarFocus": "Conjugação: Devoir (Dever)",
-    "theme": "Tema 9: Minha Casa, Minha Rotina"
+    "theme": "Tema 22: Contando o fim de semana",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Segunda-feira: vocês recontam o weekend."
   },
   {
     "id": "fr-a2-118",
     "language": "fr",
     "level": "A2",
-    "tag": "VERB",
+    "tag": "DIAL",
     "uiTitle": "Preparativos no Banheiro",
     "grammarFocus": "Conjugação: Choisir",
-    "theme": "Tema 9: Minha Casa, Minha Rotina"
+    "theme": "Tema 22: Contando o fim de semana",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Segunda-feira: vocês recontam o weekend."
   },
   {
     "id": "fr-a2-119",
@@ -1272,18 +1842,28 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Organizando as Coisas",
     "grammarFocus": "Par de Confusão: Devoir VS Falloir",
-    "theme": "Tema 9: Minha Casa, Minha Rotina",
+    "theme": "Tema 22: Contando o fim de semana",
     "topicKey": "devoir-vs-falloir",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Segunda-feira: vocês recontam o weekend."
   },
   {
     "id": "fr-a2-120",
     "language": "fr",
     "level": "A2",
     "tag": "REVIEW",
-    "uiTitle": "Checkpoint — lições 111–120",
-    "grammarFocus": "Revisão: lições 111–120",
-    "theme": "Tema 9: Minha Casa, Minha Rotina"
+    "uiTitle": "Checkpoint — lições 121–132",
+    "grammarFocus": "Revisão: lições 121–132",
+    "theme": "Tema 22: Contando o fim de semana",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Segunda-feira: vocês recontam o weekend."
   },
   {
     "id": "fr-a2-121",
@@ -1292,7 +1872,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "PRON",
     "uiTitle": "O R Francês",
     "grammarFocus": "O som vibrante do R e a ligação entre palavras",
-    "theme": "Tema 9: Minha Casa, Minha Rotina"
+    "theme": "Tema 22: Contando o fim de semana",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Segunda-feira: vocês recontam o weekend."
   },
   {
     "id": "fr-a2-122",
@@ -1301,16 +1886,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Passando pela Sala",
     "grammarFocus": "Conjugação: Réussir",
-    "theme": "Tema 9: Minha Casa, Minha Rotina"
+    "theme": "Tema 23: Ontem vs hoje",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Contrastando rotina atual e o que aconteceu ontem."
   },
   {
     "id": "fr-a2-123",
     "language": "fr",
     "level": "A2",
-    "tag": "GRAM",
+    "tag": "DIAL",
     "uiTitle": "Hábitos Intocáveis",
     "grammarFocus": "Partitivos Singulares: Du e De la",
-    "theme": "Tema 9: Minha Casa, Minha Rotina"
+    "theme": "Tema 23: Ontem vs hoje",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Contrastando rotina atual e o que aconteceu ontem."
   },
   {
     "id": "fr-a2-124",
@@ -1319,34 +1914,54 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Cuidados Matinais",
     "grammarFocus": "Conjugação: Vendre (Grupo -re)",
-    "theme": "Tema 9: Minha Casa, Minha Rotina"
+    "theme": "Tema 23: Ontem vs hoje",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Contrastando rotina atual e o que aconteceu ontem."
   },
   {
     "id": "fr-a2-125",
     "language": "fr",
     "level": "A2",
-    "tag": "GRAM",
+    "tag": "DIAL",
     "uiTitle": "Vestiário e Prontidão",
     "grammarFocus": "Partitivos Plurais e Negativa (Pas de)",
-    "theme": "Tema 9: Minha Casa, Minha Rotina"
+    "theme": "Tema 23: Ontem vs hoje",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Contrastando rotina atual e o que aconteceu ontem."
   },
   {
     "id": "fr-a2-126",
     "language": "fr",
     "level": "A2",
-    "tag": "VERB",
+    "tag": "MISS",
     "uiTitle": "A Chave na Porta",
     "grammarFocus": "Conjugação: Attendre",
-    "theme": "Tema 9: Minha Casa, Minha Rotina"
+    "theme": "Tema 23: Ontem vs hoje",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Contrastando rotina atual e o que aconteceu ontem."
   },
   {
     "id": "fr-a2-127",
     "language": "fr",
     "level": "A2",
-    "tag": "GRAM",
+    "tag": "DIAL",
     "uiTitle": "Começando a Rotina",
     "grammarFocus": "O pronome En (Substituição de Coisas)",
-    "theme": "Tema 9: Minha Casa, Minha Rotina"
+    "theme": "Tema 23: Ontem vs hoje",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Contrastando rotina atual e o que aconteceu ontem."
   },
   {
     "id": "fr-a2-912",
@@ -1355,7 +1970,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Já Estou Lá",
     "grammarFocus": "Pronome y: j'y vais e il y a",
-    "theme": "Tema 9: Minha Casa, Minha Rotina"
+    "theme": "Tema 24: Comparações no dia a dia",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Comparando bairros, preços e hábitos."
   },
   {
     "id": "fr-a2-128",
@@ -1364,27 +1984,42 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Responder no Presente",
     "grammarFocus": "Conjugação: Répondre",
-    "theme": "Tema 9: Minha Casa, Minha Rotina",
+    "theme": "Tema 24: Comparações no dia a dia",
     "topicKey": "conj-repondre",
-    "lessonRole": "introduce"
+    "lessonRole": "introduce",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Comparando bairros, preços e hábitos."
   },
   {
     "id": "fr-a2-129",
     "language": "fr",
     "level": "A2",
-    "tag": "VERB",
+    "tag": "DIAL",
     "uiTitle": "O Tempo Voa",
     "grammarFocus": "Conjugação: Vouloir (Desejo)",
-    "theme": "Tema 9: Minha Casa, Minha Rotina"
+    "theme": "Tema 24: Comparações no dia a dia",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Comparando bairros, preços e hábitos."
   },
   {
     "id": "fr-a2-130",
     "language": "fr",
     "level": "A2",
     "tag": "REVIEW",
-    "uiTitle": "Checkpoint — lições 121–130",
-    "grammarFocus": "Revisão: lições 121–130",
-    "theme": "Tema 9: Minha Casa, Minha Rotina"
+    "uiTitle": "Checkpoint — lições 133–144",
+    "grammarFocus": "Revisão: lições 133–144",
+    "theme": "Tema 24: Comparações no dia a dia",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Comparando bairros, preços e hábitos."
   },
   {
     "id": "fr-a2-131",
@@ -1393,7 +2028,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "A Necessidade Bate",
     "grammarFocus": "Verbos Reflexivos: Rotina Diária",
-    "theme": "Tema 10: O Mercado e a Cozinha"
+    "theme": "Tema 24: Comparações no dia a dia",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Comparando bairros, preços e hábitos."
   },
   {
     "id": "fr-a2-132",
@@ -1402,7 +2042,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "Buscando Nutrientes",
     "grammarFocus": "Prática: Narrando a história de um objeto",
-    "theme": "Tema 10: O Mercado e a Cozinha"
+    "theme": "Tema 24: Comparações no dia a dia",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Comparando bairros, preços e hábitos."
   },
   {
     "id": "fr-a2-133",
@@ -1411,7 +2056,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "O Corredor de Frescos",
     "grammarFocus": "Verbos Reflexivos: Higiene Pessoal",
-    "theme": "Tema 10: O Mercado e a Cozinha"
+    "theme": "Tema 25: Pares que confundem",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Camille corrige confusões clássicas de brasileiros."
   },
   {
     "id": "fr-a2-134",
@@ -1420,16 +2070,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Pesando as Porções",
     "grammarFocus": "Pronomes Tônicos: Moi, toi, lui, etc.",
-    "theme": "Tema 10: O Mercado e a Cozinha"
+    "theme": "Tema 25: Pares que confundem",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Camille corrige confusões clássicas de brasileiros."
   },
   {
     "id": "fr-a2-913",
     "language": "fr",
     "level": "A2",
-    "tag": "GRAM",
+    "tag": "DIAL",
     "uiTitle": "É Isso ou Ele É",
     "grammarFocus": "C'est versus il est no uso do dia a dia",
-    "theme": "Tema 10: O Mercado e a Cozinha"
+    "theme": "Tema 25: Pares que confundem",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Camille corrige confusões clássicas de brasileiros."
   },
   {
     "id": "fr-a2-135",
@@ -1438,16 +2098,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Lendo Rótulos",
     "grammarFocus": "COD: O pronome Le (Objeto Direto)",
-    "theme": "Tema 10: O Mercado e a Cozinha"
+    "theme": "Tema 25: Pares que confundem",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Camille corrige confusões clássicas de brasileiros."
   },
   {
     "id": "fr-a2-136",
     "language": "fr",
     "level": "A2",
-    "tag": "GRAM",
+    "tag": "DIAL",
     "uiTitle": "Buscando Medidas",
     "grammarFocus": "COD: Os pronomes La e Les",
-    "theme": "Tema 10: O Mercado e a Cozinha"
+    "theme": "Tema 25: Pares que confundem",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Camille corrige confusões clássicas de brasileiros."
   },
   {
     "id": "fr-a2-137",
@@ -1456,7 +2126,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Estoque Semanal",
     "grammarFocus": "COI: O pronome Lui (Objeto Indireto)",
-    "theme": "Tema 10: O Mercado e a Cozinha"
+    "theme": "Tema 25: Pares que confundem",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Camille corrige confusões clássicas de brasileiros."
   },
   {
     "id": "fr-a2-138",
@@ -1465,34 +2140,54 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "A Passagem do Caixa",
     "grammarFocus": "COI: O pronome Leur (Objeto Indireto Plural)",
-    "theme": "Tema 10: O Mercado e a Cozinha"
+    "theme": "Tema 26: Correio, encomendas e horários",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você resolve uma encomenda e entende horários de funcionamento."
   },
   {
     "id": "fr-a2-139",
     "language": "fr",
     "level": "A2",
-    "tag": "GRAM",
+    "tag": "DIAL",
     "uiTitle": "Sacos Cheios",
     "grammarFocus": "Comparativo de Superioridade e Inferioridade",
-    "theme": "Tema 10: O Mercado e a Cozinha"
+    "theme": "Tema 26: Correio, encomendas e horários",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você resolve uma encomenda e entende horários de funcionamento."
   },
   {
     "id": "fr-a2-140",
     "language": "fr",
     "level": "A2",
     "tag": "REVIEW",
-    "uiTitle": "Checkpoint — lições 131–140",
-    "grammarFocus": "Revisão: lições 131–140",
-    "theme": "Tema 10: O Mercado e a Cozinha"
+    "uiTitle": "Checkpoint — lições 145–156",
+    "grammarFocus": "Revisão: lições 145–156",
+    "theme": "Tema 26: Correio, encomendas e horários",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você resolve uma encomenda e entende horários de funcionamento."
   },
   {
     "id": "fr-a2-141",
     "language": "fr",
     "level": "A2",
-    "tag": "GRAM",
+    "tag": "DIAL",
     "uiTitle": "Guardando na Dispensa",
     "grammarFocus": "Superlativo: O mais e o menos",
-    "theme": "Tema 10: O Mercado e a Cozinha"
+    "theme": "Tema 26: Correio, encomendas e horários",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você resolve uma encomenda e entende horários de funcionamento."
   },
   {
     "id": "fr-a2-142",
@@ -1501,18 +2196,28 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "A Arte de Escolher",
     "grammarFocus": "Modo Imperativo: Ordens e Instruções",
-    "theme": "Tema 10: O Mercado e a Cozinha"
+    "theme": "Tema 26: Correio, encomendas e horários",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você resolve uma encomenda e entende horários de funcionamento."
   },
   {
     "id": "fr-a2-143",
     "language": "fr",
     "level": "A2",
-    "tag": "GRAM",
+    "tag": "DIAL",
     "uiTitle": "Organização",
     "grammarFocus": "Par de Confusão: Vite VS Rapide",
-    "theme": "Tema 10: O Mercado e a Cozinha",
+    "theme": "Tema 26: Correio, encomendas e horários",
     "topicKey": "vite-vs-rapide",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você resolve uma encomenda e entende horários de funcionamento."
   },
   {
     "id": "fr-a2-144",
@@ -1521,7 +2226,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "A Pergunta da Segunda",
     "grammarFocus": "Prática: Criando um ranking de favoritos",
-    "theme": "Tema 11: Contando o Final de Semana"
+    "theme": "Tema 27: Escritório e cidade",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Um dia de trabalho remoto misturado com recados na cidade."
   },
   {
     "id": "fr-a2-145",
@@ -1530,7 +2240,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Rebobinando as Férias",
     "grammarFocus": "O Auxiliar Avoir no Passado",
-    "theme": "Tema 11: Contando o Final de Semana"
+    "theme": "Tema 27: Escritório e cidade",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Um dia de trabalho remoto misturado com recados na cidade."
   },
   {
     "id": "fr-a2-146",
@@ -1539,9 +2254,14 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Sábado à Noite",
     "grammarFocus": "Par de Confusão: Passé Composé VS Passé Récent",
-    "theme": "Tema 11: Contando o Final de Semana",
+    "theme": "Tema 27: Escritório e cidade",
     "topicKey": "passe-compose-vs-passe-recent",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Um dia de trabalho remoto misturado com recados na cidade."
   },
   {
     "id": "fr-a2-147",
@@ -1550,7 +2270,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Eventos Recentes",
     "grammarFocus": "Vocabulário de Tempo: Pendant",
-    "theme": "Tema 11: Contando o Final de Semana"
+    "theme": "Tema 27: Escritório e cidade",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Um dia de trabalho remoto misturado com recados na cidade."
   },
   {
     "id": "fr-a2-148",
@@ -1559,7 +2284,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "Histórias do Chuveiro",
     "grammarFocus": "Respondendo com Si a Perguntas Negativas",
-    "theme": "Tema 11: Contando o Final de Semana"
+    "theme": "Tema 27: Escritório e cidade",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Um dia de trabalho remoto misturado com recados na cidade."
   },
   {
     "id": "fr-a2-149",
@@ -1568,16 +2298,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "Fatos Divertidos",
     "grammarFocus": "Prática: Contando o que aconteceu no final de semana",
-    "theme": "Tema 11: Contando o Final de Semana"
+    "theme": "Tema 27: Escritório e cidade",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Um dia de trabalho remoto misturado com recados na cidade."
   },
   {
     "id": "fr-a2-150",
     "language": "fr",
     "level": "A2",
     "tag": "REVIEW",
-    "uiTitle": "Checkpoint — lições 141–150",
-    "grammarFocus": "Revisão: lições 141–150",
-    "theme": "Tema 11: Contando o Final de Semana"
+    "uiTitle": "Checkpoint — lições 157–168",
+    "grammarFocus": "Revisão: lições 157–168",
+    "theme": "Tema 28: Reunião curta / status",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Stand-up de 5 minutos: status, bloqueios, próximos passos."
   },
   {
     "id": "fr-a2-151",
@@ -1586,18 +2326,28 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "As Risadas Mútuas",
     "grammarFocus": "Vocabulário de Tempo: Depuis",
-    "theme": "Tema 11: Contando o Final de Semana"
+    "theme": "Tema 28: Reunião curta / status",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Stand-up de 5 minutos: status, bloqueios, próximos passos."
   },
   {
     "id": "fr-a2-152",
     "language": "fr",
     "level": "A2",
-    "tag": "GRAM",
+    "tag": "DIAL",
     "uiTitle": "Reações do Amigo",
     "grammarFocus": "Par de Confusão: Pendant VS Depuis",
-    "theme": "Tema 11: Contando o Final de Semana",
+    "theme": "Tema 28: Reunião curta / status",
     "topicKey": "pendant-vs-depuis",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Stand-up de 5 minutos: status, bloqueios, próximos passos."
   },
   {
     "id": "fr-a2-153",
@@ -1606,7 +2356,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Detalhes Escondidos",
     "grammarFocus": "Particípios Passados Irregulares",
-    "theme": "Tema 11: Contando o Final de Semana"
+    "theme": "Tema 28: Reunião curta / status",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Stand-up de 5 minutos: status, bloqueios, próximos passos."
   },
   {
     "id": "fr-a2-154",
@@ -1615,25 +2370,40 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "O Clímax do Domingo",
     "grammarFocus": "Negações: Jamais e Plus",
-    "theme": "Tema 11: Contando o Final de Semana"
+    "theme": "Tema 28: Reunião curta / status",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Stand-up de 5 minutos: status, bloqueios, próximos passos."
   },
   {
     "id": "fr-a2-155",
     "language": "fr",
     "level": "A2",
-    "tag": "VERB",
+    "tag": "DIAL",
     "uiTitle": "Memória Fresca",
     "grammarFocus": "O Auxiliar Être no Passado (Vandertramp)",
-    "theme": "Tema 11: Contando o Final de Semana"
+    "theme": "Tema 28: Reunião curta / status",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Stand-up de 5 minutos: status, bloqueios, próximos passos."
   },
   {
     "id": "fr-a2-156",
     "language": "fr",
     "level": "A2",
-    "tag": "GRAM",
+    "tag": "DIAL",
     "uiTitle": "Fatos",
     "grammarFocus": "Inversão Formal em Perguntas (A2)",
-    "theme": "Tema 11: Contando o Final de Semana"
+    "theme": "Tema 29: Saúde — sintomas",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você não está bem e descreve sintomas a Camille."
   },
   {
     "id": "fr-a2-157",
@@ -1642,7 +2412,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Lembranças",
     "grammarFocus": "Verbos Reflexivos no passado",
-    "theme": "Tema 11: Contando o Final de Semana"
+    "theme": "Tema 29: Saúde — sintomas",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você não está bem e descreve sintomas a Camille."
   },
   {
     "id": "fr-a2-158",
@@ -1651,7 +2426,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Fim da História",
     "grammarFocus": "Negação Restritiva: Ne... que (Somente)",
-    "theme": "Tema 11: Contando o Final de Semana"
+    "theme": "Tema 29: Saúde — sintomas",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você não está bem e descreve sintomas a Camille."
   },
   {
     "id": "fr-a2-159",
@@ -1660,16 +2440,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "A Diferença é Clara",
     "grammarFocus": "Prática: Entrevista de Trajetória Pessoal",
-    "theme": "Tema 12: Comparações e Pares de Confusão"
+    "theme": "Tema 29: Saúde — sintomas",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você não está bem e descreve sintomas a Camille."
   },
   {
     "id": "fr-a2-160",
     "language": "fr",
     "level": "A2",
-    "tag": "REVIEW",
-    "uiTitle": "Checkpoint — lições 151–160",
-    "grammarFocus": "Revisão: lições 151–160",
-    "theme": "Tema 12: Comparações e Pares de Confusão"
+    "tag": "DIAL",
+    "uiTitle": "Missão: explicar ao médico",
+    "grammarFocus": "Produção: relato de sintomas",
+    "theme": "Tema 29: Saúde — sintomas",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você não está bem e descreve sintomas a Camille."
   },
   {
     "id": "fr-a2-161",
@@ -1678,9 +2468,14 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Não Tão Bom Assim",
     "grammarFocus": "Vocabulário: Connaître",
-    "theme": "Tema 12: Comparações e Pares de Confusão",
+    "theme": "Tema 29: Saúde — sintomas",
     "topicKey": "savoir-connaitre",
-    "lessonRole": "introduce"
+    "lessonRole": "introduce",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você não está bem e descreve sintomas a Camille."
   },
   {
     "id": "fr-a2-162",
@@ -1689,29 +2484,44 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Avaliando o Custo",
     "grammarFocus": "Par de Confusão: Savoir VS Connaître",
-    "theme": "Tema 12: Comparações e Pares de Confusão",
+    "theme": "Tema 30: Farmácia e posologia",
     "topicKey": "savoir-connaitre",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Na farmácia, você entende a posologia e compra o remédio."
   },
   {
     "id": "fr-a2-163",
     "language": "fr",
     "level": "A2",
-    "tag": "EXPR",
-    "uiTitle": "O Critério Principal",
-    "grammarFocus": "5 Expressões com o verbo Être",
-    "theme": "Tema 12: Comparações e Pares de Confusão"
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 169–180",
+    "grammarFocus": "Revisão: lições 169–180",
+    "theme": "Tema 30: Farmácia e posologia",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Na farmácia, você entende a posologia e compra o remédio."
   },
   {
     "id": "fr-a2-164",
     "language": "fr",
     "level": "A2",
-    "tag": "VOC",
+    "tag": "MISS",
     "uiTitle": "O Crítico de Plantão",
     "grammarFocus": "Vocabulário: Apporter e Emporter",
-    "theme": "Tema 12: Comparações e Pares de Confusão",
+    "theme": "Tema 30: Farmácia e posologia",
     "topicKey": "apporter-emporter",
-    "lessonRole": "introduce"
+    "lessonRole": "introduce",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Na farmácia, você entende a posologia e compra o remédio."
   },
   {
     "id": "fr-a2-165",
@@ -1720,9 +2530,14 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "O Degrau Acima",
     "grammarFocus": "Par de Confusão: Apporter VS Emporter",
-    "theme": "Tema 12: Comparações e Pares de Confusão",
+    "theme": "Tema 30: Farmácia e posologia",
     "topicKey": "apporter-emporter",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Na farmácia, você entende a posologia e compra o remédio."
   },
   {
     "id": "fr-a2-166",
@@ -1731,7 +2546,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "EXPR",
     "uiTitle": "Veredito Pessoal",
     "grammarFocus": "5 Expressões com o verbo Avoir",
-    "theme": "Tema 12: Comparações e Pares de Confusão"
+    "theme": "Tema 30: Farmácia e posologia",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Na farmácia, você entende a posologia e compra o remédio."
   },
   {
     "id": "fr-a2-167",
@@ -1740,9 +2560,14 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "O Fim do Jogo",
     "grammarFocus": "Vocabulário: Amener e Emmener",
-    "theme": "Tema 12: Comparações e Pares de Confusão",
+    "theme": "Tema 30: Farmácia e posologia",
     "topicKey": "amener-emmener",
-    "lessonRole": "introduce"
+    "lessonRole": "introduce",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Na farmácia, você entende a posologia e compra o remédio."
   },
   {
     "id": "fr-a2-168",
@@ -1751,9 +2576,14 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Notas do Avaliador",
     "grammarFocus": "Par de Confusão: Amener VS Emmener",
-    "theme": "Tema 12: Comparações e Pares de Confusão",
+    "theme": "Tema 31: Banco e documentos",
     "topicKey": "amener-emmener",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você leva documentos para resolver algo no banco."
   },
   {
     "id": "fr-a2-169",
@@ -1762,18 +2592,28 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Perspectiva",
     "grammarFocus": "Vocabulário: Rentrer e Revenir",
-    "theme": "Tema 12: Comparações e Pares de Confusão",
+    "theme": "Tema 31: Banco e documentos",
     "topicKey": "rentrer-revenir-retourner",
-    "lessonRole": "introduce"
+    "lessonRole": "introduce",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você leva documentos para resolver algo no banco."
   },
   {
     "id": "fr-a2-170",
     "language": "fr",
     "level": "A2",
-    "tag": "REVIEW",
-    "uiTitle": "Checkpoint — lições 161–170",
-    "grammarFocus": "Revisão: lições 161–170",
-    "theme": "Tema 12: Comparações e Pares de Confusão"
+    "tag": "DIAL",
+    "uiTitle": "Pronomes relativos qui/que",
+    "grammarFocus": "Qui / que em descrições",
+    "theme": "Tema 31: Banco e documentos",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você leva documentos para resolver algo no banco."
   },
   {
     "id": "fr-a2-171",
@@ -1782,20 +2622,30 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Bancando o Juiz",
     "grammarFocus": "Par de Confusão: Rentrer VS Revenir VS Retourner",
-    "theme": "Tema 12: Comparações e Pares de Confusão",
+    "theme": "Tema 31: Banco e documentos",
     "topicKey": "rentrer-revenir-retourner",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você leva documentos para resolver algo no banco."
   },
   {
     "id": "fr-a2-172",
     "language": "fr",
     "level": "A2",
-    "tag": "GRAM",
+    "tag": "DIAL",
     "uiTitle": "Fechamento",
     "grammarFocus": "Par de Confusão: Entendre VS Écouter",
-    "theme": "Tema 12: Comparações e Pares de Confusão",
+    "theme": "Tema 31: Banco e documentos",
     "topicKey": "entendre-vs-ecouter",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você leva documentos para resolver algo no banco."
   },
   {
     "id": "fr-a2-173",
@@ -1804,18 +2654,28 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Tudo Certo",
     "grammarFocus": "Par de Confusão: Voir VS Regarder",
-    "theme": "Tema 12: Comparações e Pares de Confusão",
+    "theme": "Tema 31: Banco e documentos",
     "topicKey": "voir-vs-regarder",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você leva documentos para resolver algo no banco."
   },
   {
     "id": "fr-a2-174",
     "language": "fr",
     "level": "A2",
-    "tag": "EXPR",
-    "uiTitle": "Expressões com Aller e Faire",
-    "grammarFocus": "5 expressões com Aller e Faire",
-    "theme": "Tema 13: Situações do dia a dia"
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 181–192",
+    "grammarFocus": "Revisão: lições 181–192",
+    "theme": "Tema 32: Abrir conta / reclamar cobrança",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Abrir conta ou contestar uma cobrança indevida."
   },
   {
     "id": "fr-a2-915",
@@ -1824,7 +2684,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Que Tempo Faz",
     "grammarFocus": "Clima: quel temps fait-il e o vocabulário do tempo",
-    "theme": "Tema 13: Situações do dia a dia"
+    "theme": "Tema 32: Abrir conta / reclamar cobrança",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Abrir conta ou contestar uma cobrança indevida."
   },
   {
     "id": "fr-a2-175",
@@ -1833,7 +2698,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "Dizendo que Está Cansado",
     "grammarFocus": "5 maneiras de dizer que está cansado",
-    "theme": "Tema 13: Situações do dia a dia"
+    "theme": "Tema 32: Abrir conta / reclamar cobrança",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Abrir conta ou contestar uma cobrança indevida."
   },
   {
     "id": "fr-a2-176",
@@ -1842,9 +2712,14 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Dor ou Dificuldade",
     "grammarFocus": "Par de confusão: sentir dor VS ter dificuldade",
-    "theme": "Tema 13: Situações do dia a dia",
+    "theme": "Tema 32: Abrir conta / reclamar cobrança",
     "topicKey": "avoir-mal",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Abrir conta ou contestar uma cobrança indevida."
   },
   {
     "id": "fr-a2-914",
@@ -1853,7 +2728,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Eu Peço",
     "grammarFocus": "Prendre para pedir: je prends no restaurante",
-    "theme": "Tema 13: Situações do dia a dia"
+    "theme": "Tema 32: Abrir conta / reclamar cobrança",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Abrir conta ou contestar uma cobrança indevida."
   },
   {
     "id": "fr-a2-177",
@@ -1862,7 +2742,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "Reserva no Restaurante",
     "grammarFocus": "No restaurante: reservas e pedidos",
-    "theme": "Tema 13: Situações do dia a dia"
+    "theme": "Tema 32: Abrir conta / reclamar cobrança",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Abrir conta ou contestar uma cobrança indevida."
   },
   {
     "id": "fr-a2-178",
@@ -1871,7 +2756,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "Pedindo Desculpas",
     "grammarFocus": "5 maneiras de se desculpar",
-    "theme": "Tema 13: Situações do dia a dia"
+    "theme": "Tema 33: Infância — lugares e brincadeiras",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Vocês relembram onde brincavam e o que faziam."
   },
   {
     "id": "fr-a2-179",
@@ -1880,16 +2770,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Números Ordinais",
     "grammarFocus": "Números ordinais e rankings",
-    "theme": "Tema 13: Situações do dia a dia"
+    "theme": "Tema 33: Infância — lugares e brincadeiras",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Vocês relembram onde brincavam e o que faziam."
   },
   {
     "id": "fr-a2-180",
     "language": "fr",
     "level": "A2",
-    "tag": "REVIEW",
-    "uiTitle": "Checkpoint — lições 171–180",
-    "grammarFocus": "Revisão: lições 171–180",
-    "theme": "Tema 13: Situações do dia a dia"
+    "tag": "DIAL",
+    "uiTitle": "Contar uma cena",
+    "grammarFocus": "Diálogo nostálgico",
+    "theme": "Tema 33: Infância — lugares e brincadeiras",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Vocês relembram onde brincavam e o que faziam."
   },
   {
     "id": "fr-a2-181",
@@ -1898,7 +2798,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "Na Estação e no Aeroporto",
     "grammarFocus": "Na estação de trem e no aeroporto",
-    "theme": "Tema 13: Situações do dia a dia"
+    "theme": "Tema 33: Infância — lugares e brincadeiras",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Vocês relembram onde brincavam e o que faziam."
   },
   {
     "id": "fr-a2-182",
@@ -1907,7 +2812,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Comprando o Bilhete",
     "grammarFocus": "Bilhetes de transporte e troca de linha",
-    "theme": "Tema 13: Situações do dia a dia"
+    "theme": "Tema 33: Infância — lugares e brincadeiras",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Vocês relembram onde brincavam e o que faziam."
   },
   {
     "id": "fr-a2-183",
@@ -1916,16 +2826,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "Expressando Afeto",
     "grammarFocus": "5 maneiras de expressar sentimentos e afeto",
-    "theme": "Tema 13: Situações do dia a dia"
+    "theme": "Tema 33: Infância — lugares e brincadeiras",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Vocês relembram onde brincavam e o que faziam."
   },
   {
     "id": "fr-a2-184",
     "language": "fr",
     "level": "A2",
-    "tag": "VOC",
-    "uiTitle": "Animais da Floresta",
-    "grammarFocus": "Vocabulário de animais da floresta",
-    "theme": "Tema 13: Situações do dia a dia"
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 193–204",
+    "grammarFocus": "Revisão: lições 193–204",
+    "theme": "Tema 34: Infância — escola e hábitos",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Escola, professores e hábitos de criança."
   },
   {
     "id": "fr-a2-185",
@@ -1934,16 +2854,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Instrumentos Musicais",
     "grammarFocus": "Vocabulário de instrumentos musicais",
-    "theme": "Tema 13: Situações do dia a dia"
+    "theme": "Tema 34: Infância — escola e hábitos",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Escola, professores e hábitos de criança."
   },
   {
     "id": "fr-a2-186",
     "language": "fr",
     "level": "A2",
-    "tag": "VOC",
+    "tag": "DIAL",
     "uiTitle": "Cozinha e Quarto",
     "grammarFocus": "Vocabulário de casa: cozinha e quarto",
-    "theme": "Tema 9: Minha Casa, Minha Rotina"
+    "theme": "Tema 34: Infância — escola e hábitos",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Escola, professores e hábitos de criança."
   },
   {
     "id": "fr-a2-187",
@@ -1952,16 +2882,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Sala e Banheiro",
     "grammarFocus": "Vocabulário de casa: sala e banheiro",
-    "theme": "Tema 9: Minha Casa, Minha Rotina"
+    "theme": "Tema 34: Infância — escola e hábitos",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Escola, professores e hábitos de criança."
   },
   {
     "id": "fr-a2-188",
     "language": "fr",
     "level": "A2",
-    "tag": "VOC",
+    "tag": "DIAL",
     "uiTitle": "Empregos e Profissões",
     "grammarFocus": "Vocabulário de empregos e profissões",
-    "theme": "Tema 14: Rotina do Escritório e da Cidade"
+    "theme": "Tema 34: Infância — escola e hábitos",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Escola, professores e hábitos de criança."
   },
   {
     "id": "fr-a2-189",
@@ -1970,18 +2910,28 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Saúde e Corpo",
     "grammarFocus": "Saúde e corpo: dores e mal-estar",
-    "theme": "Tema 15: Saúde e Farmácia",
+    "theme": "Tema 34: Infância — escola e hábitos",
     "topicKey": "avoir-mal",
-    "lessonRole": "reinforce"
+    "lessonRole": "reinforce",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Escola, professores e hábitos de criança."
   },
   {
     "id": "fr-a2-190",
     "language": "fr",
     "level": "A2",
-    "tag": "REVIEW",
-    "uiTitle": "Checkpoint — lições 181–190",
-    "grammarFocus": "Revisão: lições 181–190",
-    "theme": "Tema 14: Rotina do Escritório e da Cidade"
+    "tag": "DIAL",
+    "uiTitle": "Abrir a história",
+    "grammarFocus": "Estrutura: cenário (imparfait)",
+    "theme": "Tema 35: Contar uma memória",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Uma história completa: cenário + evento + desfecho."
   },
   {
     "id": "fr-a2-191",
@@ -1990,9 +2940,14 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "O Refúgio do Café",
     "grammarFocus": "Par de Confusão: Encore VS Toujours",
-    "theme": "Tema 14: Rotina do Escritório e da Cidade",
+    "theme": "Tema 35: Contar uma memória",
     "topicKey": "encore-vs-toujours",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Uma história completa: cenário + evento + desfecho."
   },
   {
     "id": "fr-a2-192",
@@ -2001,16 +2956,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "PRON",
     "uiTitle": "As Metas do Dia",
     "grammarFocus": "Homófonos: Accro/accroc e Amande/amende",
-    "theme": "Tema 14: Rotina do Escritório e da Cidade"
+    "theme": "Tema 35: Contar uma memória",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Uma história completa: cenário + evento + desfecho."
   },
   {
     "id": "fr-a2-193",
     "language": "fr",
     "level": "A2",
-    "tag": "PRON",
+    "tag": "DIAL",
     "uiTitle": "Ligação entre Palavras",
     "grammarFocus": "Ligação fonética: quando é obrigatória ou proibida",
-    "theme": "Tema 14: Rotina do Escritório e da Cidade"
+    "theme": "Tema 35: Contar uma memória",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Uma história completa: cenário + evento + desfecho."
   },
   {
     "id": "fr-a2-194",
@@ -2019,7 +2984,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "A Tarefa Essencial",
     "grammarFocus": "Farmácia e Emergência Médica",
-    "theme": "Tema 14: Rotina do Escritório e da Cidade"
+    "theme": "Tema 35: Contar uma memória",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Uma história completa: cenário + evento + desfecho."
   },
   {
     "id": "fr-a2-195",
@@ -2028,9 +2998,14 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Conversa no Corredor",
     "grammarFocus": "Par de Confusão: Déjà VS Jamais",
-    "theme": "Tema 14: Rotina do Escritório e da Cidade",
+    "theme": "Tema 35: Contar uma memória",
     "topicKey": "deja-vs-jamais",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Uma história completa: cenário + evento + desfecho."
   },
   {
     "id": "fr-a2-196",
@@ -2039,7 +3014,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "PRON",
     "uiTitle": "O E-mail Atrasado",
     "grammarFocus": "Homófonos: Autel/hôtel e Auteur/hauteur",
-    "theme": "Tema 14: Rotina do Escritório e da Cidade"
+    "theme": "Tema 36: Fofoca leve / disseram que",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Uma fofoca inocente no café — quem disse o quê."
   },
   {
     "id": "fr-a2-916",
@@ -2048,7 +3028,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "Ligo de Volta",
     "grammarFocus": "Telefone e mensagem curta: marcar, desmarcar e rappeler",
-    "theme": "Tema 14: Rotina do Escritório e da Cidade"
+    "theme": "Tema 36: Fofoca leve / disseram que",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Uma fofoca inocente no café — quem disse o quê."
   },
   {
     "id": "fr-a2-197",
@@ -2057,20 +3042,30 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "A Reunião do Projeto",
     "grammarFocus": "Par de Confusão: Tant pis VS Tant mieux",
-    "theme": "Tema 14: Rotina do Escritório e da Cidade",
+    "theme": "Tema 36: Fofoca leve / disseram que",
     "topicKey": "tant-pis-vs-tant-mieux",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Uma fofoca inocente no café — quem disse o quê."
   },
   {
     "id": "fr-a2-198",
     "language": "fr",
     "level": "A2",
-    "tag": "GRAM",
+    "tag": "DIAL",
     "uiTitle": "Responsabilidade Diária",
     "grammarFocus": "Par de Confusão: Visiter VS Rendre visite à",
-    "theme": "Tema 14: Rotina do Escritório e da Cidade",
+    "theme": "Tema 36: Fofoca leve / disseram que",
     "topicKey": "visiter-vs-rendre-visite-a",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Uma fofoca inocente no café — quem disse o quê."
   },
   {
     "id": "fr-a2-199",
@@ -2079,18 +3074,28 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "O Ponto Final",
     "grammarFocus": "Par de Confusão: Leur VS Leurs",
-    "theme": "Tema 14: Rotina do Escritório e da Cidade",
+    "theme": "Tema 36: Fofoca leve / disseram que",
     "topicKey": "leur-vs-leurs",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Uma fofoca inocente no café — quem disse o quê."
   },
   {
     "id": "fr-a2-200",
     "language": "fr",
     "level": "A2",
     "tag": "REVIEW",
-    "uiTitle": "Checkpoint — lições 191–200",
-    "grammarFocus": "Revisão: lições 191–200",
-    "theme": "Tema 14: Rotina do Escritório e da Cidade"
+    "uiTitle": "Checkpoint — lições 205–216",
+    "grammarFocus": "Revisão: lições 205–216",
+    "theme": "Tema 36: Fofoca leve / disseram que",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Uma fofoca inocente no café — quem disse o quê."
   },
   {
     "id": "fr-a2-201",
@@ -2099,9 +3104,14 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "A Dor Oculta",
     "grammarFocus": "Conjugação: Mettre",
-    "theme": "Tema 15: Saúde e Farmácia",
+    "theme": "Tema 37: Discurso indireto no cotidiano",
     "topicKey": "conj-mettre",
-    "lessonRole": "introduce"
+    "lessonRole": "introduce",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Mensagens, avisos e o que o chefe pediu."
   },
   {
     "id": "fr-a2-202",
@@ -2110,7 +3120,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "Na Consulta Médica",
     "grammarFocus": "5 frases para consulta: marcar horário, sintomas e receita",
-    "theme": "Tema 15: Saúde e Farmácia"
+    "theme": "Tema 37: Discurso indireto no cotidiano",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Mensagens, avisos e o que o chefe pediu."
   },
   {
     "id": "fr-a2-203",
@@ -2119,7 +3134,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Abrir uma Conta",
     "grammarFocus": "Vocabulário de banco, conta e documentos administrativos",
-    "theme": "Tema 14: Banco e documentos"
+    "theme": "Tema 37: Discurso indireto no cotidiano",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Mensagens, avisos e o que o chefe pediu."
   },
   {
     "id": "fr-a2-204",
@@ -2128,7 +3148,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "Um Mal Estar Repentino",
     "grammarFocus": "Ponte A2 > B1: O tempo das descrições",
-    "theme": "Tema 15: Saúde e Farmácia"
+    "theme": "Tema 37: Discurso indireto no cotidiano",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Mensagens, avisos e o que o chefe pediu."
   },
   {
     "id": "fr-a2-205",
@@ -2137,9 +3162,14 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "O Remédio na Dose Certa",
     "grammarFocus": "Prendre um medicamento: dose e horário",
-    "theme": "Tema 15: Saúde e Farmácia",
+    "theme": "Tema 37: Discurso indireto no cotidiano",
     "topicKey": "conj-prendre",
-    "lessonRole": "introduce"
+    "lessonRole": "introduce",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Mensagens, avisos e o que o chefe pediu."
   },
   {
     "id": "fr-a2-206",
@@ -2148,7 +3178,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "Medicamentos Genéricos",
     "grammarFocus": "Planejando uma viagem inesquecível (Síntese)",
-    "theme": "Tema 15: Saúde e Farmácia"
+    "theme": "Tema 37: Discurso indireto no cotidiano",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Mensagens, avisos e o que o chefe pediu."
   },
   {
     "id": "fr-a2-207",
@@ -2157,18 +3192,28 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "O Remédio Necessário",
     "grammarFocus": "Conjugação: Lire",
-    "theme": "Tema 15: Saúde e Farmácia",
+    "theme": "Tema 38: Planos e hipóteses leves",
     "topicKey": "conj-lire",
-    "lessonRole": "introduce"
+    "lessonRole": "introduce",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Se chover, se der tempo — planos com condição."
   },
   {
     "id": "fr-a2-208",
     "language": "fr",
     "level": "A2",
-    "tag": "MISS",
-    "uiTitle": "A Prescrição",
-    "grammarFocus": "Revisão Geral A2",
-    "theme": "Tema 15: Saúde e Farmácia"
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 217–228",
+    "grammarFocus": "Revisão: lições 217–228",
+    "theme": "Tema 38: Planos e hipóteses leves",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Se chover, se der tempo — planos com condição."
   },
   {
     "id": "fr-a2-209",
@@ -2177,18 +3222,28 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "A Cura Gradual",
     "grammarFocus": "Conjugação: Écrire",
-    "theme": "Tema 15: Saúde e Farmácia",
+    "theme": "Tema 38: Planos e hipóteses leves",
     "topicKey": "conj-ecrire",
-    "lessonRole": "introduce"
+    "lessonRole": "introduce",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Se chover, se der tempo — planos com condição."
   },
   {
     "id": "fr-a2-210",
     "language": "fr",
     "level": "A2",
-    "tag": "REVIEW",
-    "uiTitle": "Checkpoint — lições 201–210",
-    "grammarFocus": "Revisão: lições 201–210",
-    "theme": "Tema 15: Saúde e Farmácia"
+    "tag": "DIAL",
+    "uiTitle": "Vouloir / pouvoir no conditionnel",
+    "grammarFocus": "Je voudrais / je pourrais",
+    "theme": "Tema 38: Planos e hipóteses leves",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Se chover, se der tempo — planos com condição."
   },
   {
     "id": "fr-a2-211",
@@ -2197,7 +3252,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Ação em Andamento",
     "grammarFocus": "Gerúndio e 'estar fazendo' + infinitivo",
-    "theme": "Tema 16: Relembrando a Infância"
+    "theme": "Tema 38: Planos e hipóteses leves",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Se chover, se der tempo — planos com condição."
   },
   {
     "id": "fr-a2-212",
@@ -2206,9 +3266,14 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Recuperação",
     "grammarFocus": "Conjugação: Croire",
-    "theme": "Tema 16: Relembrando a Infância",
+    "theme": "Tema 38: Planos e hipóteses leves",
     "topicKey": "conj-croire",
-    "lessonRole": "introduce"
+    "lessonRole": "introduce",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Se chover, se der tempo — planos com condição."
   },
   {
     "id": "fr-a2-213",
@@ -2217,20 +3282,30 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Força Restabelecida",
     "grammarFocus": "Imparfait: Formação e Quando Usar",
-    "theme": "Tema 16: Relembrando a Infância",
+    "theme": "Tema 39: Fechamento A2 — já me viro na cidade",
     "topicKey": "imparfait",
-    "lessonRole": "introduce"
+    "lessonRole": "introduce",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você prova que resolve situações reais sozinho."
   },
   {
     "id": "fr-b1-214",
     "language": "fr",
     "level": "B1",
-    "tag": "GRAM",
+    "tag": "DIAL",
     "uiTitle": "Brinquedos Antigos",
     "grammarFocus": "Imparfait para Descrições e Hábitos",
-    "theme": "Tema 16: Relembrando a Infância",
+    "theme": "Tema 39: Fechamento A2 — já me viro na cidade",
     "topicKey": "imparfait",
-    "lessonRole": "reinforce"
+    "lessonRole": "reinforce",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você prova que resolve situações reais sozinho."
   },
   {
     "id": "fr-b1-215",
@@ -2239,7 +3314,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "PRON",
     "uiTitle": "Entonação e Ritmo",
     "grammarFocus": "Intonação em Perguntas, Negação e Ênfase",
-    "theme": "Tema 16: Relembrando a Infância"
+    "theme": "Tema 39: Fechamento A2 — já me viro na cidade",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você prova que resolve situações reais sozinho."
   },
   {
     "id": "fr-b1-216",
@@ -2248,7 +3328,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Aquele Ano Longe",
     "grammarFocus": "Narrativa: Imparfait VS Passé Composé (Gatilhos)",
-    "theme": "Tema 16: Relembrando a Infância"
+    "theme": "Tema 39: Fechamento A2 — já me viro na cidade",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você prova que resolve situações reais sozinho."
   },
   {
     "id": "fr-b1-217",
@@ -2257,16 +3342,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "No Tempo da Escola",
     "grammarFocus": "Futur Simple: Conjugação Regular",
-    "theme": "Tema 16: Relembrando a Infância"
+    "theme": "Tema 39: Fechamento A2 — já me viro na cidade",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você prova que resolve situações reais sozinho."
   },
   {
     "id": "fr-b1-218",
     "language": "fr",
     "level": "B1",
-    "tag": "GRAM",
+    "tag": "DIAL",
     "uiTitle": "As Regras de Ouro",
     "grammarFocus": "Narrativa: Imparfait VS Passé Composé (Contextos)",
-    "theme": "Tema 16: Relembrando a Infância"
+    "theme": "Tema 39: Fechamento A2 — já me viro na cidade",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você prova que resolve situações reais sozinho."
   },
   {
     "id": "fr-b1-219",
@@ -2275,25 +3370,40 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Como as Coisas Funcionavam",
     "grammarFocus": "Futur Simple: Conjugação Irregular",
-    "theme": "Tema 16: Relembrando a Infância"
+    "theme": "Tema 40: Entrevista — se apresentar",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você se prepara para uma entrevista de emprego."
   },
   {
     "id": "fr-b1-220",
     "language": "fr",
     "level": "B1",
     "tag": "REVIEW",
-    "uiTitle": "Checkpoint — lições 211–220",
-    "grammarFocus": "Revisão: lições 211–220",
-    "theme": "Tema 16: Relembrando a Infância"
+    "uiTitle": "Checkpoint — lições 229–240",
+    "grammarFocus": "Revisão: lições 229–240",
+    "theme": "Tema 40: Entrevista — se apresentar",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você se prepara para uma entrevista de emprego."
   },
   {
     "id": "fr-b1-221",
     "language": "fr",
     "level": "B1",
-    "tag": "VERB",
+    "tag": "DIAL",
     "uiTitle": "Cores do Passado",
     "grammarFocus": "Conditionnel Présent: Conjugação e Uso",
-    "theme": "Tema 16: Relembrando a Infância"
+    "theme": "Tema 40: Entrevista — se apresentar",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você se prepara para uma entrevista de emprego."
   },
   {
     "id": "fr-b1-222",
@@ -2302,16 +3412,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Fim de Tarde Imortal",
     "grammarFocus": "Pronome Relativo: Que (Objeto)",
-    "theme": "Tema 16: Relembrando a Infância"
+    "theme": "Tema 40: Entrevista — se apresentar",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você se prepara para uma entrevista de emprego."
   },
   {
     "id": "fr-b1-223",
     "language": "fr",
     "level": "B1",
-    "tag": "VERB",
+    "tag": "DIAL",
     "uiTitle": "Um Conto Rápido",
     "grammarFocus": "Gerúndio: Ações Simultâneas (Tout en + gerúndio)",
-    "theme": "Tema 16: Relembrando a Infância"
+    "theme": "Tema 40: Entrevista — se apresentar",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você se prepara para uma entrevista de emprego."
   },
   {
     "id": "fr-b1-224",
@@ -2320,7 +3440,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Saudades Constantes",
     "grammarFocus": "Pronome Relativo: Où (Lugar/Tempo)",
-    "theme": "Tema 16: Relembrando a Infância"
+    "theme": "Tema 40: Entrevista — se apresentar",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você se prepara para uma entrevista de emprego."
   },
   {
     "id": "fr-b1-225",
@@ -2329,29 +3454,44 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Evolução do Ser",
     "grammarFocus": "Pronome Relativo: Dont (Posse)",
-    "theme": "Tema 16: Relembrando a Infância"
+    "theme": "Tema 41: Contar experiência profissional",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Detalhar projetos, resultados e aprendizados."
   },
   {
     "id": "fr-b1-226",
     "language": "fr",
     "level": "B1",
-    "tag": "GRAM",
+    "tag": "DIAL",
     "uiTitle": "Lá e Cá",
     "grammarFocus": "Par de Confusão: Qui VS Que (Relativos)",
-    "theme": "Tema 16: Relembrando a Infância",
+    "theme": "Tema 41: Contar experiência profissional",
     "topicKey": "qui-vs-que-relativos",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Detalhar projetos, resultados e aprendizados."
   },
   {
     "id": "fr-b1-227",
     "language": "fr",
     "level": "B1",
-    "tag": "GRAM",
+    "tag": "MISS",
     "uiTitle": "Visão do Hoje",
     "grammarFocus": "Par de Confusão: Lequel, Laquelle, Lesquels, Lesquelles",
-    "theme": "Tema 16: Relembrando a Infância",
+    "theme": "Tema 41: Contar experiência profissional",
     "topicKey": "lequel-laquelle-lesquels-lesquelles",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Detalhar projetos, resultados e aprendizados."
   },
   {
     "id": "fr-b1-228",
@@ -2360,25 +3500,40 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Relato Final",
     "grammarFocus": "Orações Temporais: Quand e Lorsque",
-    "theme": "Tema 16: Relembrando a Infância"
+    "theme": "Tema 41: Contar experiência profissional",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Detalhar projetos, resultados e aprendizados."
   },
   {
     "id": "fr-b1-229",
     "language": "fr",
     "level": "B1",
-    "tag": "GRAM",
+    "tag": "MISS",
     "uiTitle": "Passos da Vida",
     "grammarFocus": "Estruturas Condicionais (1): Si + Presente",
-    "theme": "Tema 16: Relembrando a Infância"
+    "theme": "Tema 41: Contar experiência profissional",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Detalhar projetos, resultados e aprendizados."
   },
   {
     "id": "fr-b1-230",
     "language": "fr",
     "level": "B1",
-    "tag": "REVIEW",
-    "uiTitle": "Checkpoint — lições 221–230",
-    "grammarFocus": "Revisão: lições 221–230",
-    "theme": "Tema 16: Relembrando a Infância"
+    "tag": "DIAL",
+    "uiTitle": "Tom de entrevista",
+    "grammarFocus": "Cultura: modestie vs mise en avant",
+    "theme": "Tema 41: Contar experiência profissional",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Detalhar projetos, resultados e aprendizados."
   },
   {
     "id": "fr-b1-231",
@@ -2387,18 +3542,28 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "O Último Verão de Criança",
     "grammarFocus": "Estruturas Condicionais (2): Si + Imperfeito",
-    "theme": "Tema 16: Relembrando a Infância"
+    "theme": "Tema 42: Redes sociais e tom",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Posts, stories e o tom certo em cada rede."
   },
   {
     "id": "fr-b1-232",
     "language": "fr",
     "level": "B1",
-    "tag": "GRAM",
+    "tag": "DIAL",
     "uiTitle": "A Caixa de Fotografias",
     "grammarFocus": "Par de Confusão: Quand VS Lorsque",
-    "theme": "Tema 16: Relembrando a Infância",
+    "theme": "Tema 42: Redes sociais e tom",
     "topicKey": "quand-vs-lorsque",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Posts, stories e o tom certo em cada rede."
   },
   {
     "id": "fr-b1-233",
@@ -2407,7 +3572,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Crescendo Aos Poucos",
     "grammarFocus": "Ordem e Posição de Pronomes Duplos",
-    "theme": "Tema 16: Relembrando a Infância"
+    "theme": "Tema 42: Redes sociais e tom",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Posts, stories e o tom certo em cada rede."
   },
   {
     "id": "fr-b1-234",
@@ -2416,25 +3586,40 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Na Fila da Boulangerie",
     "grammarFocus": "Concordância do Particípio Passado (COD e Relativos)",
-    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+    "theme": "Tema 42: Redes sociais e tom",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Posts, stories e o tom certo em cada rede."
   },
   {
     "id": "fr-b1-235",
     "language": "fr",
     "level": "B1",
-    "tag": "GRAM",
+    "tag": "DIAL",
     "uiTitle": "O Balcão Começa a Conversar",
     "grammarFocus": "Voz Passiva: Uso de Par e De",
-    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+    "theme": "Tema 42: Redes sociais e tom",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Posts, stories e o tom certo em cada rede."
   },
   {
     "id": "fr-b1-236",
     "language": "fr",
     "level": "B1",
-    "tag": "MISS",
-    "uiTitle": "O Rádio Ligado na Cozinha",
-    "grammarFocus": "Prática: Narrando eventos complexos em sequência",
-    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 241–252",
+    "grammarFocus": "Revisão: lições 241–252",
+    "theme": "Tema 42: Redes sociais e tom",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Posts, stories e o tom certo em cada rede."
   },
   {
     "id": "fr-b1-237",
@@ -2443,7 +3628,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Trocando Recados no Portão",
     "grammarFocus": "Conjunções: Mais, ou, et, donc, or, ni, car",
-    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+    "theme": "Tema 43: Expressões da internet",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Chunks nativos que aparecem em chat e memes."
   },
   {
     "id": "fr-b1-238",
@@ -2452,7 +3642,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "EXPR",
     "uiTitle": "A Panela Fervendo",
     "grammarFocus": "5 Expressões com o verbo Prendre",
-    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+    "theme": "Tema 43: Expressões da internet",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Chunks nativos que aparecem em chat e memes."
   },
   {
     "id": "fr-b1-239",
@@ -2461,16 +3656,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Entrando na Sala de Estar",
     "grammarFocus": "Verbos Impessoais: Falloir, neiger e valoir",
-    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+    "theme": "Tema 43: Expressões da internet",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Chunks nativos que aparecem em chat e memes."
   },
   {
     "id": "fr-b1-240",
     "language": "fr",
     "level": "B1",
-    "tag": "REVIEW",
-    "uiTitle": "Checkpoint — lições 231–240",
-    "grammarFocus": "Revisão: lições 231–240",
-    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+    "tag": "DIAL",
+    "uiTitle": "Missão: soar natural no chat",
+    "grammarFocus": "Produção: 4 respostas nativas",
+    "theme": "Tema 43: Expressões da internet",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Chunks nativos que aparecem em chat e memes."
   },
   {
     "id": "fr-b1-241",
@@ -2479,34 +3684,54 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Lembrando do que Ouviu",
     "grammarFocus": "Conjunções: Parce que, quand, si, comme, puisque",
-    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+    "theme": "Tema 43: Expressões da internet",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Chunks nativos que aparecem em chat e memes."
   },
   {
     "id": "fr-b1-242",
     "language": "fr",
     "level": "B1",
-    "tag": "GRAM",
+    "tag": "DIAL",
     "uiTitle": "A Mesa de Domingo",
     "grammarFocus": "Conjunções Temporais: Dès que e Aussitôt que",
-    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+    "theme": "Tema 43: Expressões da internet",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Chunks nativos que aparecem em chat e memes."
   },
   {
     "id": "fr-b1-243",
     "language": "fr",
     "level": "B1",
-    "tag": "VOC",
-    "uiTitle": "Palavras que Enganam",
-    "grammarFocus": "Falsos Amigos (Faux amis) e Erros Comuns",
-    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 253–264",
+    "grammarFocus": "Revisão: lições 253–264",
+    "theme": "Tema 44: Emoções no trabalho",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Frustração, alívio e feedback emocional no time."
   },
   {
     "id": "fr-b1-917",
     "language": "fr",
     "level": "B1",
-    "tag": "VOC",
+    "tag": "VERB",
     "uiTitle": "Palavras que Parecem Iguais",
     "grammarFocus": "Falsos amigos com o português: actuellement, demander, attendre, assister, sensible",
-    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+    "theme": "Tema 44: Emoções no trabalho",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Frustração, alívio e feedback emocional no time."
   },
   {
     "id": "fr-b1-244",
@@ -2515,9 +3740,14 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Concluindo a Fofoca",
     "grammarFocus": "Par de Confusão: Parce que VS Car",
-    "theme": "Tema 17: Fofocas e Histórias Indiretas",
+    "theme": "Tema 44: Emoções no trabalho",
     "topicKey": "parce-que-vs-car",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Frustração, alívio e feedback emocional no time."
   },
   {
     "id": "fr-b1-245",
@@ -2526,7 +3756,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Transformando Verbos em Substantivos",
     "grammarFocus": "Nominalização: Do verbo ao substantivo",
-    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+    "theme": "Tema 44: Emoções no trabalho",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Frustração, alívio e feedback emocional no time."
   },
   {
     "id": "fr-b1-246",
@@ -2535,16 +3770,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "A Escolha Certa",
     "grammarFocus": "Pronomes Demonstrativos: Celui, Celle, Ceux, Celles",
-    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+    "theme": "Tema 44: Emoções no trabalho",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Frustração, alívio e feedback emocional no time."
   },
   {
     "id": "fr-b1-247",
     "language": "fr",
     "level": "B1",
-    "tag": "GRAM",
+    "tag": "DIAL",
     "uiTitle": "Este ou Aquele",
     "grammarFocus": "Demonstrativos Compostos: Celui-ci VS Celui-là",
-    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+    "theme": "Tema 44: Emoções no trabalho",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Frustração, alívio e feedback emocional no time."
   },
   {
     "id": "fr-b1-248",
@@ -2553,29 +3798,44 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Encerrando a Manhã",
     "grammarFocus": "Par de Confusão: Puisque VS Comme",
-    "theme": "Tema 17: Fofocas e Histórias Indiretas",
+    "theme": "Tema 45: Dar feedback educado",
     "topicKey": "puisque-vs-comme",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Estruturas para criticar sem quebrar a relação."
   },
   {
     "id": "fr-b1-249",
     "language": "fr",
     "level": "B1",
-    "tag": "GRAM",
+    "tag": "MISS",
     "uiTitle": "Voltando ao Tópico",
     "grammarFocus": "Par de Confusão: Penser à VS Penser de",
-    "theme": "Tema 17: Fofocas e Histórias Indiretas",
+    "theme": "Tema 45: Dar feedback educado",
     "topicKey": "penser-a-vs-penser-de",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Estruturas para criticar sem quebrar a relação."
   },
   {
     "id": "fr-b1-250",
     "language": "fr",
     "level": "B1",
-    "tag": "REVIEW",
-    "uiTitle": "Checkpoint — lições 241–250",
-    "grammarFocus": "Revisão: lições 241–250",
-    "theme": "Tema 17: Fofocas e Histórias Indiretas"
+    "tag": "DIAL",
+    "uiTitle": "Conditionnel de suavização",
+    "grammarFocus": "Je dirais / on pourrait",
+    "theme": "Tema 45: Dar feedback educado",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Estruturas para criticar sem quebrar a relação."
   },
   {
     "id": "fr-b1-251",
@@ -2584,7 +3844,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "Jantar Reservado",
     "grammarFocus": "No restaurante: reserva, cardápio, conta e gorjeta",
-    "theme": "Tema 18: Situações, gramática e redação"
+    "theme": "Tema 45: Dar feedback educado",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Estruturas para criticar sem quebrar a relação."
   },
   {
     "id": "fr-b1-252",
@@ -2593,7 +3858,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "CULT",
     "uiTitle": "Saúde na França",
     "grammarFocus": "Sistema de saúde francês: cartão de saúde e plano complementar",
-    "theme": "Tema 18: Situações, gramática e redação"
+    "theme": "Tema 45: Dar feedback educado",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Estruturas para criticar sem quebrar a relação."
   },
   {
     "id": "fr-b1-253",
@@ -2602,7 +3872,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Enfatizando Culpados",
     "grammarFocus": "Pronomes Enfáticos: Mesmo (Même)",
-    "theme": "Tema 18: Situações, gramática e redação"
+    "theme": "Tema 45: Dar feedback educado",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Estruturas para criticar sem quebrar a relação."
   },
   {
     "id": "fr-b1-254",
@@ -2611,25 +3886,40 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Palavras Indefinidas",
     "grammarFocus": "Adjetivos Indefinidos: Chaque, certain, plusieurs, quelque",
-    "theme": "Tema 18: Situações, gramática e redação"
+    "theme": "Tema 46: Liderança leve / pedir ação",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Pedir ações claras sem soar autoritário."
   },
   {
     "id": "fr-b1-255",
     "language": "fr",
     "level": "B1",
-    "tag": "GRAM",
+    "tag": "DIAL",
     "uiTitle": "Antes ou Depois do Substantivo",
     "grammarFocus": "Adjetivos: Mudança de Sentido pela posição",
-    "theme": "Tema 18: Situações, gramática e redação"
+    "theme": "Tema 46: Liderança leve / pedir ação",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Pedir ações claras sem soar autoritário."
   },
   {
     "id": "fr-b1-256",
     "language": "fr",
     "level": "B1",
-    "tag": "EXPR",
-    "uiTitle": "O Horizonte Longínquo",
-    "grammarFocus": "5 Expressões com o verbo Mettre",
-    "theme": "Tema 18: Situações, gramática e redação"
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 265–276",
+    "grammarFocus": "Revisão: lições 265–276",
+    "theme": "Tema 46: Liderança leve / pedir ação",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Pedir ações claras sem soar autoritário."
   },
   {
     "id": "fr-b1-257",
@@ -2638,7 +3928,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "A Promessa Abstrata",
     "grammarFocus": "Redação: Descrição de um Lugar Especial",
-    "theme": "Tema 18: Situações, gramática e redação"
+    "theme": "Tema 46: Liderança leve / pedir ação",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Pedir ações claras sem soar autoritário."
   },
   {
     "id": "fr-b1-258",
@@ -2647,25 +3942,40 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "CULT",
     "uiTitle": "O E Se...",
     "grammarFocus": "Redação: Redes Sociais e Sociedade",
-    "theme": "Tema 18: Situações, gramática e redação"
+    "theme": "Tema 46: Liderança leve / pedir ação",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Pedir ações claras sem soar autoritário."
   },
   {
     "id": "fr-b1-259",
     "language": "fr",
     "level": "B1",
-    "tag": "VOC",
+    "tag": "GRAM",
     "uiTitle": "Gatilhos da Imaginação",
     "grammarFocus": "Vocabulário: Lieu, Endroit e Place",
-    "theme": "Tema 18: Situações, gramática e redação"
+    "theme": "Tema 46: Liderança leve / pedir ação",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Pedir ações claras sem soar autoritário."
   },
   {
     "id": "fr-b1-260",
     "language": "fr",
     "level": "B1",
-    "tag": "REVIEW",
-    "uiTitle": "Checkpoint — lições 251–260",
-    "grammarFocus": "Revisão: lições 251–260",
-    "theme": "Tema 18: Situações, gramática e redação"
+    "tag": "DIAL",
+    "uiTitle": "Avisos na cidade",
+    "grammarFocus": "Imperativo negativo e afirmativo",
+    "theme": "Tema 47: Imperativos e avisos",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Placas, alertas e instruções de segurança."
   },
   {
     "id": "fr-b1-261",
@@ -2674,7 +3984,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "EXPR",
     "uiTitle": "O Fato Condicional",
     "grammarFocus": "5 Expressões de Amor e Cores",
-    "theme": "Tema 18: Situações, gramática e redação"
+    "theme": "Tema 47: Imperativos e avisos",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Placas, alertas e instruções de segurança."
   },
   {
     "id": "fr-b1-262",
@@ -2683,7 +3998,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "Imaginando Impossíveis",
     "grammarFocus": "Redação: Planos para o Futuro",
-    "theme": "Tema 18: Situações, gramática e redação"
+    "theme": "Tema 47: Imperativos e avisos",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Placas, alertas e instruções de segurança."
   },
   {
     "id": "fr-b1-263",
@@ -2692,9 +4012,14 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Possibilidades Várias",
     "grammarFocus": "Vocabulário: Sortir, Partir, Quitter e Laisser",
-    "theme": "Tema 18: Situações, gramática e redação",
+    "theme": "Tema 47: Imperativos e avisos",
     "topicKey": "sortir-partir-quitter-laisser",
-    "lessonRole": "introduce"
+    "lessonRole": "introduce",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Placas, alertas e instruções de segurança."
   },
   {
     "id": "fr-b1-264",
@@ -2703,9 +4028,14 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Deixando Voar",
     "grammarFocus": "Par de Confusão: Sortir VS Partir VS Quitter VS Laisser",
-    "theme": "Tema 18: Situações, gramática e redação",
+    "theme": "Tema 47: Imperativos e avisos",
     "topicKey": "sortir-partir-quitter-laisser",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Placas, alertas e instruções de segurança."
   },
   {
     "id": "fr-b1-265",
@@ -2714,7 +4044,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "EXPR",
     "uiTitle": "Contrato com o Futuro",
     "grammarFocus": "5 Expressões de Trabalho e Dinheiro",
-    "theme": "Tema 18: Situações, gramática e redação"
+    "theme": "Tema 47: Imperativos e avisos",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Placas, alertas e instruções de segurança."
   },
   {
     "id": "fr-b1-266",
@@ -2723,7 +4058,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "As Asas Cortadas",
     "grammarFocus": "Redação: Uma Lição de Vida Importante",
-    "theme": "Tema 18: Situações, gramática e redação"
+    "theme": "Tema 48: Julgamentos e opinião",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Opinar sobre notícias e escolhas sem soar absoluto."
   },
   {
     "id": "fr-b1-267",
@@ -2732,9 +4072,14 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "O Resgate",
     "grammarFocus": "Vocabulário: Avoir mal à e Avoir du mal à",
-    "theme": "Tema 18: Situações, gramática e redação",
+    "theme": "Tema 48: Julgamentos e opinião",
     "topicKey": "avoir-mal",
-    "lessonRole": "reinforce"
+    "lessonRole": "reinforce",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Opinar sobre notícias e escolhas sem soar absoluto."
   },
   {
     "id": "fr-b1-268",
@@ -2743,7 +4088,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "EXPR",
     "uiTitle": "Tudo em Paz",
     "grammarFocus": "5 Expressões sobre Clima (Météo)",
-    "theme": "Tema 18: Situações, gramática e redação"
+    "theme": "Tema 48: Julgamentos e opinião",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Opinar sobre notícias e escolhas sem soar absoluto."
   },
   {
     "id": "fr-b1-269",
@@ -2752,16 +4102,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "Sonhar não Custa",
     "grammarFocus": "Redação: Uma Viagem Marcante",
-    "theme": "Tema 18: Situações, gramática e redação"
+    "theme": "Tema 48: Julgamentos e opinião",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Opinar sobre notícias e escolhas sem soar absoluto."
   },
   {
     "id": "fr-b1-270",
     "language": "fr",
     "level": "B1",
     "tag": "REVIEW",
-    "uiTitle": "Checkpoint — lições 261–270",
-    "grammarFocus": "Revisão: lições 261–270",
-    "theme": "Tema 18: Situações, gramática e redação"
+    "uiTitle": "Checkpoint — lições 277–288",
+    "grammarFocus": "Revisão: lições 277–288",
+    "theme": "Tema 48: Julgamentos e opinião",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Opinar sobre notícias e escolhas sem soar absoluto."
   },
   {
     "id": "fr-b1-271",
@@ -2770,16 +4130,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "Destino",
     "grammarFocus": "Redação: Desafios Pessoais",
-    "theme": "Tema 18: Situações, gramática e redação"
+    "theme": "Tema 48: Julgamentos e opinião",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Opinar sobre notícias e escolhas sem soar absoluto."
   },
   {
     "id": "fr-b1-272",
     "language": "fr",
     "level": "B1",
-    "tag": "EXPR",
+    "tag": "GRAM",
     "uiTitle": "O Eco do Destino",
     "grammarFocus": "5 Expressões com Y: Ça y est, Il y a",
-    "theme": "Tema 18: Situações, gramática e redação"
+    "theme": "Tema 49: Cinema / série — opinar",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Depois do episódio, vocês debatem sem spoilers pesados."
   },
   {
     "id": "fr-b1-273",
@@ -2788,7 +4158,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "Destino Traçado",
     "grammarFocus": "Redação: Uma Pessoa Inspiradora",
-    "theme": "Tema 18: Situações, gramática e redação"
+    "theme": "Tema 49: Cinema / série — opinar",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Depois do episódio, vocês debatem sem spoilers pesados."
   },
   {
     "id": "fr-b1-274",
@@ -2797,9 +4172,14 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Revisando o Currículo",
     "grammarFocus": "Par de Confusão: Faire mal à VS Faire du mal",
-    "theme": "Tema 19: Vida Profissional e Entrevistas",
+    "theme": "Tema 49: Cinema / série — opinar",
     "topicKey": "faire-mal-a-vs-faire-du-mal",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Depois do episódio, vocês debatem sem spoilers pesados."
   },
   {
     "id": "fr-b1-275",
@@ -2808,7 +4188,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "A Chamada de Vídeo",
     "grammarFocus": "5 Maneiras de Dizer Félicitations (B1)",
-    "theme": "Tema 19: Vida Profissional e Entrevistas"
+    "theme": "Tema 49: Cinema / série — opinar",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Depois do episódio, vocês debatem sem spoilers pesados."
   },
   {
     "id": "fr-b1-276",
@@ -2817,18 +4202,28 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "O que Foi Dito na Reunião",
     "grammarFocus": "Reportar o que disseram: dire que, on m'a dit que",
-    "theme": "Tema 19: Vida Profissional e Entrevistas"
+    "theme": "Tema 49: Cinema / série — opinar",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Depois do episódio, vocês debatem sem spoilers pesados."
   },
   {
     "id": "fr-b1-277",
     "language": "fr",
     "level": "B1",
-    "tag": "GRAM",
+    "tag": "DIAL",
     "uiTitle": "Apresentando a Trajetória",
     "grammarFocus": "Par de Confusão: Souligner VS Surligner",
-    "theme": "Tema 19: Vida Profissional e Entrevistas",
+    "theme": "Tema 49: Cinema / série — opinar",
     "topicKey": "souligner-vs-surligner",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Depois do episódio, vocês debatem sem spoilers pesados."
   },
   {
     "id": "fr-b1-278",
@@ -2837,27 +4232,42 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "As Perguntas do Recrutador",
     "grammarFocus": "5 Maneiras de Dizer Au revoir (B1)",
-    "theme": "Tema 19: Vida Profissional e Entrevistas"
+    "theme": "Tema 50: Hipóteses (e se…)",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Cenários hipotéticos sobre viagem, trabalho e vida."
   },
   {
     "id": "fr-b1-279",
     "language": "fr",
     "level": "B1",
-    "tag": "DIAL",
+    "tag": "MISS",
     "uiTitle": "O E-mail Profissional",
     "grammarFocus": "E-mail profissional: assunto, pedido e fechamento",
-    "theme": "Tema 19: Vida Profissional e Entrevistas",
+    "theme": "Tema 50: Hipóteses (e se…)",
     "topicKey": "conj-ecrire",
-    "lessonRole": "reinforce"
+    "lessonRole": "reinforce",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Cenários hipotéticos sobre viagem, trabalho e vida."
   },
   {
     "id": "fr-b1-280",
     "language": "fr",
     "level": "B1",
     "tag": "REVIEW",
-    "uiTitle": "Checkpoint — lições 271–280",
-    "grammarFocus": "Revisão: lições 271–280",
-    "theme": "Tema 19: Vida Profissional e Entrevistas"
+    "uiTitle": "Checkpoint — lições 289–300",
+    "grammarFocus": "Revisão: lições 289–300",
+    "theme": "Tema 50: Hipóteses (e se…)",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Cenários hipotéticos sobre viagem, trabalho e vida."
   },
   {
     "id": "fr-b1-281",
@@ -2866,9 +4276,14 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "Lendo o Anúncio",
     "grammarFocus": "Ler um anúncio de emprego ou uma mensagem de trabalho",
-    "theme": "Tema 19: Vida Profissional e Entrevistas",
+    "theme": "Tema 50: Hipóteses (e se…)",
     "topicKey": "conj-lire",
-    "lessonRole": "reinforce"
+    "lessonRole": "reinforce",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Cenários hipotéticos sobre viagem, trabalho e vida."
   },
   {
     "id": "fr-b1-282",
@@ -2877,9 +4292,14 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "A Pergunta Difícil",
     "grammarFocus": "Par de Confusão: Rappeler VS Se rappeler VS Se souvenir",
-    "theme": "Tema 19: Vida Profissional e Entrevistas",
+    "theme": "Tema 50: Hipóteses (e se…)",
     "topicKey": "rappeler-vs-se-rappeler-vs-se-souvenir",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Cenários hipotéticos sobre viagem, trabalho e vida."
   },
   {
     "id": "fr-b1-283",
@@ -2888,9 +4308,14 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "Respondendo ao Recrutador",
     "grammarFocus": "Responder numa entrevista: trajetória e exemplo concreto",
-    "theme": "Tema 19: Vida Profissional e Entrevistas",
+    "theme": "Tema 50: Hipóteses (e se…)",
     "topicKey": "conj-repondre",
-    "lessonRole": "reinforce"
+    "lessonRole": "reinforce",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Cenários hipotéticos sobre viagem, trabalho e vida."
   },
   {
     "id": "fr-b1-284",
@@ -2899,18 +4324,28 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "O que Eu Faço no Trabalho",
     "grammarFocus": "Falar do que você faz no trabalho",
-    "theme": "Tema 19: Vida Profissional e Entrevistas"
+    "theme": "Tema 51: Literatura curta / resumo",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Ler um conto curto e resumir sem copiar."
   },
   {
     "id": "fr-b1-285",
     "language": "fr",
     "level": "B1",
-    "tag": "DIAL",
+    "tag": "MISS",
     "uiTitle": "Marcando a Próxima Etapa",
     "grammarFocus": "Marcar um horário e aceitar uma proposta",
-    "theme": "Tema 19: Vida Profissional e Entrevistas",
+    "theme": "Tema 51: Literatura curta / resumo",
     "topicKey": "conj-prendre",
-    "lessonRole": "reinforce"
+    "lessonRole": "reinforce",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Ler um conto curto e resumir sem copiar."
   },
   {
     "id": "fr-b1-286",
@@ -2919,9 +4354,14 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Colocando a Tarefa de Pé",
     "grammarFocus": "Organizar uma tarefa: mettre en place e prazo",
-    "theme": "Tema 19: Vida Profissional e Entrevistas",
+    "theme": "Tema 51: Literatura curta / resumo",
     "topicKey": "conj-mettre",
-    "lessonRole": "reinforce"
+    "lessonRole": "reinforce",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Ler um conto curto e resumir sem copiar."
   },
   {
     "id": "fr-b1-287",
@@ -2930,7 +4370,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Aceitando a Proposta",
     "grammarFocus": "Conjugação: Construire",
-    "theme": "Tema 19: Vida Profissional e Entrevistas"
+    "theme": "Tema 51: Literatura curta / resumo",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Ler um conto curto e resumir sem copiar."
   },
   {
     "id": "fr-b1-288",
@@ -2939,25 +4384,40 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "O que Eu Quero no Cargo",
     "grammarFocus": "Dizer o que você quer no cargo",
-    "theme": "Tema 19: Vida Profissional e Entrevistas"
+    "theme": "Tema 51: Literatura curta / resumo",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Ler um conto curto e resumir sem copiar."
   },
   {
     "id": "fr-b1-289",
     "language": "fr",
     "level": "B1",
-    "tag": "DIAL",
+    "tag": "MISS",
     "uiTitle": "O que Dá para Fazer",
     "grammarFocus": "Negociar o que é possível: je peux e je ne peux pas",
-    "theme": "Tema 19: Vida Profissional e Entrevistas"
+    "theme": "Tema 51: Literatura curta / resumo",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Ler um conto curto e resumir sem copiar."
   },
   {
     "id": "fr-b1-290",
     "language": "fr",
     "level": "B1",
     "tag": "REVIEW",
-    "uiTitle": "Checkpoint — lições 281–290",
-    "grammarFocus": "Revisão: lições 281–290",
-    "theme": "Tema 19: Vida Profissional e Entrevistas"
+    "uiTitle": "Checkpoint — lições 301–312",
+    "grammarFocus": "Revisão: lições 301–312",
+    "theme": "Tema 52: Debate cultural leve",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Tradições, clichês e o que os franceses realmente fazem."
   },
   {
     "id": "fr-b1-291",
@@ -2966,7 +4426,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "A Obrigação do Trabalho",
     "grammarFocus": "Obrigação no trabalho: il faut e devoir",
-    "theme": "Tema 19: Vida Profissional e Entrevistas"
+    "theme": "Tema 52: Debate cultural leve",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Tradições, clichês e o que os franceses realmente fazem."
   },
   {
     "id": "fr-b1-292",
@@ -2975,36 +4440,56 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "O que Você Sabe Fazer",
     "grammarFocus": "Savoir numa conversa: o que você sabe fazer",
-    "theme": "Tema 20: Expressões e Redes Sociais"
+    "theme": "Tema 52: Debate cultural leve",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Tradições, clichês e o que os franceses realmente fazem."
   },
   {
     "id": "fr-b1-293",
     "language": "fr",
     "level": "B1",
-    "tag": "GRAM",
+    "tag": "MISS",
     "uiTitle": "O Post Viral",
     "grammarFocus": "Par de Confusão: Tout à coup VS Tout d'un coup",
-    "theme": "Tema 20: Expressões e Redes Sociais",
+    "theme": "Tema 52: Debate cultural leve",
     "topicKey": "tout-a-coup-vs-tout-d-un-coup",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Tradições, clichês e o que os franceses realmente fazem."
   },
   {
     "id": "fr-b1-918",
     "language": "fr",
     "level": "B1",
-    "tag": "GRAM",
+    "tag": "DIAL",
     "uiTitle": "Eu Acho que",
     "grammarFocus": "Dar opinião antes do subjuntivo: je trouve que, à mon avis, je pense que",
-    "theme": "Tema 20: Expressões e Redes Sociais"
+    "theme": "Tema 52: Debate cultural leve",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Tradições, clichês e o que os franceses realmente fazem."
   },
   {
     "id": "fr-b1-294",
     "language": "fr",
     "level": "B1",
-    "tag": "MISS",
+    "tag": "GRAM",
     "uiTitle": "A Ponte para o Subjuntivo",
     "grammarFocus": "Ponte B1 > B2: Introdução ao Subjonctif",
-    "theme": "Tema 20: Expressões e Redes Sociais"
+    "theme": "Tema 52: Debate cultural leve",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Tradições, clichês e o que os franceses realmente fazem."
   },
   {
     "id": "fr-b1-295",
@@ -3013,9 +4498,14 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "Reagindo ao Comentário",
     "grammarFocus": "Reagir a um comentário: je crois que",
-    "theme": "Tema 20: Expressões e Redes Sociais",
+    "theme": "Tema 53: Cidadania e regras do dia a dia",
     "topicKey": "conj-croire",
-    "lessonRole": "reinforce"
+    "lessonRole": "reinforce",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Reciclagem, vizinhos, regras do prédio e da cidade."
   },
   {
     "id": "fr-b1-296",
@@ -3024,27 +4514,42 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Tache ou Tâche?",
     "grammarFocus": "Par de Confusão: Une tâche VS Une tache",
-    "theme": "Tema 20: Expressões e Redes Sociais",
+    "theme": "Tema 53: Cidadania e regras do dia a dia",
     "topicKey": "une-tache-vs-une-tache",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Reciclagem, vizinhos, regras do prédio e da cidade."
   },
   {
     "id": "fr-b1-297",
     "language": "fr",
     "level": "B1",
-    "tag": "MISS",
+    "tag": "DIAL",
     "uiTitle": "A Revisão da Jornada B1",
     "grammarFocus": "Revisão Geral B1",
-    "theme": "Tema 20: Expressões e Redes Sociais"
+    "theme": "Tema 53: Cidadania e regras do dia a dia",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Reciclagem, vizinhos, regras do prédio e da cidade."
   },
   {
     "id": "fr-b1-298",
     "language": "fr",
     "level": "B1",
-    "tag": "DIAL",
+    "tag": "MISS",
     "uiTitle": "Gente e Lugar que Você Conhece",
     "grammarFocus": "Connaître numa conversa: pessoas e lugares",
-    "theme": "Tema 20: Expressões e Redes Sociais"
+    "theme": "Tema 53: Cidadania e regras do dia a dia",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Reciclagem, vizinhos, regras do prédio e da cidade."
   },
   {
     "id": "fr-b1-299",
@@ -3053,18 +4558,28 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "A Diferença é Fundamental",
     "grammarFocus": "Par de Confusão: En plus VS De plus",
-    "theme": "Tema 20: Expressões e Redes Sociais",
+    "theme": "Tema 53: Cidadania e regras do dia a dia",
     "topicKey": "en-plus-vs-de-plus",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Reciclagem, vizinhos, regras do prédio e da cidade."
   },
   {
     "id": "fr-b1-300",
     "language": "fr",
     "level": "B1",
-    "tag": "REVIEW",
-    "uiTitle": "Checkpoint — lições 291–300",
-    "grammarFocus": "Revisão: lições 291–300",
-    "theme": "Tema 20: Expressões e Redes Sociais"
+    "tag": "DIAL",
+    "uiTitle": "Cultura da coabitação",
+    "grammarFocus": "Vivre ensemble",
+    "theme": "Tema 53: Cidadania e regras do dia a dia",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Reciclagem, vizinhos, regras do prédio e da cidade."
   },
   {
     "id": "fr-b1-301",
@@ -3073,18 +4588,28 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "O Comentário Ambíguo",
     "grammarFocus": "Par de Confusão: Ailleurs VS D'ailleurs",
-    "theme": "Tema 20: Expressões e Redes Sociais",
+    "theme": "Tema 54: Contar um imprevisto longo",
     "topicKey": "ailleurs-vs-d-ailleurs",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Uma história longa com reviravoltas e desfecho."
   },
   {
     "id": "fr-b1-302",
     "language": "fr",
     "level": "B1",
-    "tag": "EXPR",
-    "uiTitle": "Reações na Rede",
-    "grammarFocus": "5 reações nativas: Carrément, Ah bon ?, C'est nickel, Tant pis, Du coup",
-    "theme": "Tema 20: Expressões e Redes Sociais"
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 313–324",
+    "grammarFocus": "Revisão: lições 313–324",
+    "theme": "Tema 54: Contar um imprevisto longo",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Uma história longa com reviravoltas e desfecho."
   },
   {
     "id": "fr-b1-303",
@@ -3093,16 +4618,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Na Minha Opinião",
     "grammarFocus": "Dar opinião: à mon avis e je trouve que",
-    "theme": "Tema 20: Expressões e Redes Sociais"
+    "theme": "Tema 54: Contar um imprevisto longo",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Uma história longa com reviravoltas e desfecho."
   },
   {
     "id": "fr-b1-304",
     "language": "fr",
     "level": "B1",
-    "tag": "GRAM",
+    "tag": "DIAL",
     "uiTitle": "Eu Acho que Não",
     "grammarFocus": "Dar opinião: je pense que e je ne pense pas que",
-    "theme": "Tema 20: Expressões e Redes Sociais"
+    "theme": "Tema 54: Contar um imprevisto longo",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Uma história longa com reviravoltas e desfecho."
   },
   {
     "id": "fr-b1-305",
@@ -3111,18 +4646,28 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "De Onde Veio a Notícia",
     "grammarFocus": "Contar de onde veio a ideia ou a notícia",
-    "theme": "Tema 20: Expressões e Redes Sociais",
+    "theme": "Tema 54: Contar um imprevisto longo",
     "topicKey": "conj-venir",
-    "lessonRole": "reinforce"
+    "lessonRole": "reinforce",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Uma história longa com reviravoltas e desfecho."
   },
   {
     "id": "fr-b1-306",
     "language": "fr",
     "level": "B1",
-    "tag": "GRAM",
+    "tag": "DIAL",
     "uiTitle": "Sair, Partir ou Deixar",
     "grammarFocus": "Usar sortir, partir, quitter e laisser numa saída",
-    "theme": "Tema 20: Expressões e Redes Sociais"
+    "theme": "Tema 54: Contar um imprevisto longo",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Uma história longa com reviravoltas e desfecho."
   },
   {
     "id": "fr-b1-307",
@@ -3131,7 +4676,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "O Plano da Semana",
     "grammarFocus": "Contar um plano com o futuro próximo",
-    "theme": "Tema 20: Expressões e Redes Sociais"
+    "theme": "Tema 55: Fechamento B1 — me explico com nuance",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você defende ideias com matizes e exemplos."
   },
   {
     "id": "fr-b1-308",
@@ -3140,7 +4690,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "O Imprevisto",
     "grammarFocus": "Contar um imprevisto no passado recente",
-    "theme": "Tema 20: Expressões e Redes Sociais"
+    "theme": "Tema 55: Fechamento B1 — me explico com nuance",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você defende ideias com matizes e exemplos."
   },
   {
     "id": "fr-b1-309",
@@ -3149,8 +4704,13 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Inscrevendo-se no Subjuntivo",
     "grammarFocus": "Subjonctif Présent: Formação e Quando Usar (Regulares)",
-    "theme": "Tema 20: Expressões e Redes Sociais",
-    "lessonRole": "introduce"
+    "theme": "Tema 55: Fechamento B1 — me explico com nuance",
+    "lessonRole": "introduce",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você defende ideias com matizes e exemplos."
   },
   {
     "id": "fr-b1-919",
@@ -3159,16 +4719,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Vou Fazer Isso",
     "grammarFocus": "Futuro próximo na vida real: o que você vai fazer",
-    "theme": "Tema 20: Expressões e Redes Sociais"
+    "theme": "Tema 55: Fechamento B1 — me explico com nuance",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você defende ideias com matizes e exemplos."
   },
   {
     "id": "fr-b2-310",
     "language": "fr",
     "level": "B2",
-    "tag": "REVIEW",
-    "uiTitle": "Checkpoint — lições 301–310",
-    "grammarFocus": "Revisão: lições 301–310",
-    "theme": "Tema 21: O Mundo das Emoções"
+    "tag": "DIAL",
+    "uiTitle": "Missão: debate com nuance",
+    "grammarFocus": "Produção: tese + concessão",
+    "theme": "Tema 55: Fechamento B1 — me explico com nuance",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você defende ideias com matizes e exemplos."
   },
   {
     "id": "fr-b2-311",
@@ -3177,7 +4747,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "O Medo Não Dito",
     "grammarFocus": "O uso do ne pleonástico (ne explétif)",
-    "theme": "Tema 21: O Mundo das Emoções"
+    "theme": "Tema 55: Fechamento B1 — me explico com nuance",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Você defende ideias com matizes e exemplos."
   },
   {
     "id": "fr-b2-312",
@@ -3186,16 +4761,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "A Surpresa no Olhar",
     "grammarFocus": "Subjonctif Présent: Verbos Irregulares (Faire, Aller, Savoir)",
-    "theme": "Tema 21: O Mundo das Emoções"
+    "theme": "Tema 56: Oratória — estruturar um ponto",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Montar um ponto oral claro: gancho, tese, prova, fecho."
   },
   {
     "id": "fr-b2-313",
     "language": "fr",
     "level": "B2",
-    "tag": "GRAM",
+    "tag": "DIAL",
     "uiTitle": "Opiniões em Conflito",
     "grammarFocus": "Indicativo VS Subjuntivo: Verbos de Opinião",
-    "theme": "Tema 21: O Mundo das Emoções"
+    "theme": "Tema 56: Oratória — estruturar um ponto",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Montar um ponto oral claro: gancho, tese, prova, fecho."
   },
   {
     "id": "fr-b2-314",
@@ -3204,35 +4789,55 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Vontades Profundas",
     "grammarFocus": "Subjonctif: Necessidade e Vontade",
-    "theme": "Tema 21: O Mundo das Emoções"
+    "theme": "Tema 56: Oratória — estruturar um ponto",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Montar um ponto oral claro: gancho, tese, prova, fecho."
   },
   {
     "id": "fr-b2-315",
     "language": "fr",
     "level": "B2",
-    "tag": "GRAM",
+    "tag": "DIAL",
     "uiTitle": "Memórias Passadas",
     "grammarFocus": "Plus-que-parfait: Formação e Quando Usar",
-    "theme": "Tema 21: O Mundo das Emoções",
-    "lessonRole": "introduce"
+    "theme": "Tema 56: Oratória — estruturar um ponto",
+    "lessonRole": "introduce",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Montar um ponto oral claro: gancho, tese, prova, fecho."
   },
   {
     "id": "fr-b2-316",
     "language": "fr",
     "level": "B2",
-    "tag": "VERB",
+    "tag": "MISS",
     "uiTitle": "Dúvidas Corrosivas",
     "grammarFocus": "Subjonctif: Dúvida e Incerteza",
-    "theme": "Tema 21: O Mundo das Emoções"
+    "theme": "Tema 56: Oratória — estruturar um ponto",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Montar um ponto oral claro: gancho, tese, prova, fecho."
   },
   {
     "id": "fr-b2-317",
     "language": "fr",
     "level": "B2",
-    "tag": "VERB",
-    "uiTitle": "Alegrias Compartilhadas",
-    "grammarFocus": "Subjonctif: Emoção e Julgamento",
-    "theme": "Tema 21: O Mundo das Emoções"
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 325–336",
+    "grammarFocus": "Revisão: lições 325–336",
+    "theme": "Tema 56: Oratória — estruturar um ponto",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Montar um ponto oral claro: gancho, tese, prova, fecho."
   },
   {
     "id": "fr-b2-318",
@@ -3241,25 +4846,40 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Aceitando Concessões",
     "grammarFocus": "Subjonctif: Orações Concessivas",
-    "theme": "Tema 21: O Mundo das Emoções"
+    "theme": "Tema 57: Expressões elevadas",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Substituir gíria por formulações mais elegantes."
   },
   {
     "id": "fr-b2-319",
     "language": "fr",
     "level": "B2",
-    "tag": "VERB",
+    "tag": "MISS",
     "uiTitle": "Propósitos Secretos",
     "grammarFocus": "Subjonctif: Finalidade e Negativa (Sans que)",
-    "theme": "Tema 21: O Mundo das Emoções"
+    "theme": "Tema 57: Expressões elevadas",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Substituir gíria por formulações mais elegantes."
   },
   {
     "id": "fr-b2-320",
     "language": "fr",
     "level": "B2",
-    "tag": "REVIEW",
-    "uiTitle": "Checkpoint — lições 311–320",
-    "grammarFocus": "Revisão: lições 311–320",
-    "theme": "Tema 21: O Mundo das Emoções"
+    "tag": "DIAL",
+    "uiTitle": "Nominalização",
+    "grammarFocus": "De verbo a substantivo abstrato",
+    "theme": "Tema 57: Expressões elevadas",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Substituir gíria por formulações mais elegantes."
   },
   {
     "id": "fr-b2-321",
@@ -3268,16 +4888,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "E Se a História Fosse Outra",
     "grammarFocus": "Hipóteses sobre o Passado (3ª Condicional)",
-    "theme": "Tema 21: O Mundo das Emoções"
+    "theme": "Tema 57: Expressões elevadas",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Substituir gíria por formulações mais elegantes."
   },
   {
     "id": "fr-b2-322",
     "language": "fr",
     "level": "B2",
-    "tag": "VERB",
+    "tag": "DIAL",
     "uiTitle": "O Futuro Já Terminou",
     "grammarFocus": "Futur Antérieur: Formação e Uso",
-    "theme": "Tema 21: O Mundo das Emoções"
+    "theme": "Tema 57: Expressões elevadas",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Substituir gíria por formulações mais elegantes."
   },
   {
     "id": "fr-b2-323",
@@ -3286,7 +4916,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Contando o que Disseram",
     "grammarFocus": "Discurso Indireto no Passado (B2)",
-    "theme": "Tema 21: O Mundo das Emoções"
+    "theme": "Tema 57: Expressões elevadas",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Substituir gíria por formulações mais elegantes."
   },
   {
     "id": "fr-b2-324",
@@ -3295,25 +4930,40 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Fazendo Outro Fazer",
     "grammarFocus": "Construções Causativas: Faire e infinitivo",
-    "theme": "Tema 21: O Mundo das Emoções"
+    "theme": "Tema 58: Francês da rua vs formal",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Mesma ideia, dois registros — e saber trocar."
   },
   {
     "id": "fr-b2-325",
     "language": "fr",
     "level": "B2",
-    "tag": "GRAM",
+    "tag": "DIAL",
     "uiTitle": "O Primeiro Dia como Chefe",
     "grammarFocus": "Causativas Reflexivas: Se fazer e Se deixar",
-    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+    "theme": "Tema 58: Francês da rua vs formal",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Mesma ideia, dois registros — e saber trocar."
   },
   {
     "id": "fr-b2-326",
     "language": "fr",
     "level": "B2",
-    "tag": "VERB",
+    "tag": "MISS",
     "uiTitle": "Delegando com Clareza",
     "grammarFocus": "O uso do Infinitivo Passado",
-    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+    "theme": "Tema 58: Francês da rua vs formal",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Mesma ideia, dois registros — e saber trocar."
   },
   {
     "id": "fr-b2-327",
@@ -3322,34 +4972,54 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Ordens Firmes",
     "grammarFocus": "Imperativo com Pronomes Duplos",
-    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+    "theme": "Tema 58: Francês da rua vs formal",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Mesma ideia, dois registros — e saber trocar."
   },
   {
     "id": "fr-b2-328",
     "language": "fr",
     "level": "B2",
-    "tag": "GRAM",
+    "tag": "DIAL",
     "uiTitle": "Estruturando a Fala",
     "grammarFocus": "Marcadores Discursivos: Adição e Estruturação",
-    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+    "theme": "Tema 58: Francês da rua vs formal",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Mesma ideia, dois registros — e saber trocar."
   },
   {
     "id": "fr-b2-329",
     "language": "fr",
     "level": "B2",
-    "tag": "GRAM",
-    "uiTitle": "Qual Documento?",
-    "grammarFocus": "Relativos Compostos: Auquel e Duquel",
-    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 337–348",
+    "grammarFocus": "Revisão: lições 337–348",
+    "theme": "Tema 58: Francês da rua vs formal",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Mesma ideia, dois registros — e saber trocar."
   },
   {
     "id": "fr-b2-330",
     "language": "fr",
     "level": "B2",
-    "tag": "REVIEW",
-    "uiTitle": "Checkpoint — lições 321–330",
-    "grammarFocus": "Revisão: lições 321–330",
-    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+    "tag": "DIAL",
+    "uiTitle": "Abrir a negociação",
+    "grammarFocus": "Fórmulas de abertura",
+    "theme": "Tema 59: Negociação / reunião difícil",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Uma reunião com interesse conflitante."
   },
   {
     "id": "fr-b2-331",
@@ -3358,20 +5028,30 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Enfatizando a Urgência",
     "grammarFocus": "Par de Confusão: Si VS Tellement VS Tant",
-    "theme": "Tema 22: Liderança, Imperativos e Julgamentos",
+    "theme": "Tema 59: Negociação / reunião difícil",
     "topicKey": "si-vs-tellement-vs-tant",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Uma reunião com interesse conflitante."
   },
   {
     "id": "fr-b2-332",
     "language": "fr",
     "level": "B2",
-    "tag": "GRAM",
+    "tag": "DIAL",
     "uiTitle": "Decidindo com Firmeza",
     "grammarFocus": "Par de Confusão: Décider de VS Se decidir à",
-    "theme": "Tema 22: Liderança, Imperativos e Julgamentos",
+    "theme": "Tema 59: Negociação / reunião difícil",
     "topicKey": "decider-de-vs-se-decidir-a",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Uma reunião com interesse conflitante."
   },
   {
     "id": "fr-b2-333",
@@ -3380,20 +5060,30 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Mudança de Rumo",
     "grammarFocus": "Par de Confusão: Déménager VS Aménager",
-    "theme": "Tema 22: Liderança, Imperativos e Julgamentos",
+    "theme": "Tema 59: Negociação / reunião difícil",
     "topicKey": "demenager-vs-amenager",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Uma reunião com interesse conflitante."
   },
   {
     "id": "fr-b2-334",
     "language": "fr",
     "level": "B2",
-    "tag": "GRAM",
+    "tag": "DIAL",
     "uiTitle": "Fatos Reais vs Aparentes",
     "grammarFocus": "Par de Confusão: En fait VS Au fait (B2)",
-    "theme": "Tema 22: Liderança, Imperativos e Julgamentos",
+    "theme": "Tema 59: Negociação / reunião difícil",
     "topicKey": "en-fait-vs-au-fait-b2",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Uma reunião com interesse conflitante."
   },
   {
     "id": "fr-b2-335",
@@ -3402,9 +5092,14 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Apontando com Precisão",
     "grammarFocus": "Par de Confusão: Y VS En (B2)",
-    "theme": "Tema 22: Liderança, Imperativos e Julgamentos",
+    "theme": "Tema 59: Negociação / reunião difícil",
     "topicKey": "y-vs-en-b2",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Uma reunião com interesse conflitante."
   },
   {
     "id": "fr-b2-336",
@@ -3413,7 +5108,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "O Relatório de Performance",
     "grammarFocus": "Voz Passiva Avançada e Passiva Pronominal",
-    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+    "theme": "Tema 60: Argumentar com concessões",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Ganhar credibilidade cedendo o que é justo."
   },
   {
     "id": "fr-b2-337",
@@ -3422,7 +5122,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "A Reunião de Crise",
     "grammarFocus": "Frases Condicionais Mistas (Condition Mixte)",
-    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+    "theme": "Tema 60: Argumentar com concessões",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Ganhar credibilidade cedendo o que é justo."
   },
   {
     "id": "fr-b2-338",
@@ -3431,25 +5136,40 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "O Discurso de Fim de Ano",
     "grammarFocus": "Redação: Carta Aberta a Colaboradores",
-    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+    "theme": "Tema 60: Argumentar com concessões",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Ganhar credibilidade cedendo o que é justo."
   },
   {
     "id": "fr-b2-339",
     "language": "fr",
     "level": "B2",
-    "tag": "GRAM",
-    "uiTitle": "Plurais que Confundem",
-    "grammarFocus": "Plurais Irregulares: Revisão Abrangente",
-    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 349–360",
+    "grammarFocus": "Revisão: lições 349–360",
+    "theme": "Tema 60: Argumentar com concessões",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Ganhar credibilidade cedendo o que é justo."
   },
   {
     "id": "fr-b2-340",
     "language": "fr",
     "level": "B2",
-    "tag": "REVIEW",
-    "uiTitle": "Checkpoint — lições 331–340",
-    "grammarFocus": "Revisão: lições 331–340",
-    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+    "tag": "DIAL",
+    "uiTitle": "Conectores de contraste",
+    "grammarFocus": "Pourtant, néanmoins, or",
+    "theme": "Tema 60: Argumentar com concessões",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Ganhar credibilidade cedendo o que é justo."
   },
   {
     "id": "fr-b2-920",
@@ -3458,7 +5178,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Por Outro Lado",
     "grammarFocus": "Conectores de oposição: cependant, en revanche, toutefois, néanmoins",
-    "theme": "Tema 22: Liderança, Imperativos e Julgamentos"
+    "theme": "Tema 60: Argumentar com concessões",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Ganhar credibilidade cedendo o que é justo."
   },
   {
     "id": "fr-b2-341",
@@ -3467,7 +5192,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "A Primeira Página",
     "grammarFocus": "Particípio Presente vs Adjetivo Verbal",
-    "theme": "Tema 23: Literatura e Situações Hipotéticas"
+    "theme": "Tema 61: Mídia e manchetes",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Ler manchetes e explicar o que está em jogo."
   },
   {
     "id": "fr-b2-342",
@@ -3476,7 +5206,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Medidas Precisas",
     "grammarFocus": "Medidas e Frações (Avançado)",
-    "theme": "Tema 23: Literatura e Situações Hipotéticas"
+    "theme": "Tema 61: Mídia e manchetes",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Ler manchetes e explicar o que está em jogo."
   },
   {
     "id": "fr-b2-343",
@@ -3485,7 +5220,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "EXPR",
     "uiTitle": "O Capítulo Misterioso",
     "grammarFocus": "5 Expressões avançadas com Y",
-    "theme": "Tema 23: Literatura e Situações Hipotéticas"
+    "theme": "Tema 61: Mídia e manchetes",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Ler manchetes e explicar o que está em jogo."
   },
   {
     "id": "fr-b2-344",
@@ -3494,7 +5234,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "A Rede Traz Ganhos?",
     "grammarFocus": "Redação: Prós e Contras das Redes Sociais",
-    "theme": "Tema 23: Literatura e Situações Hipotéticas"
+    "theme": "Tema 61: Mídia e manchetes",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Ler manchetes e explicar o que está em jogo."
   },
   {
     "id": "fr-b2-345",
@@ -3503,7 +5248,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "CULT",
     "uiTitle": "A Escola em Questão",
     "grammarFocus": "Redação: Educação Moderna e Sociedade",
-    "theme": "Tema 23: Literatura e Situações Hipotéticas"
+    "theme": "Tema 61: Mídia e manchetes",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Ler manchetes e explicar o que está em jogo."
   },
   {
     "id": "fr-b2-346",
@@ -3512,7 +5262,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "EXPR",
     "uiTitle": "No Salão de Leitura",
     "grammarFocus": "5 Expressões avançadas com En",
-    "theme": "Tema 23: Literatura e Situações Hipotéticas"
+    "theme": "Tema 61: Mídia e manchetes",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Ler manchetes e explicar o que está em jogo."
   },
   {
     "id": "fr-b2-347",
@@ -3521,7 +5276,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "A Ameaça Invisível",
     "grammarFocus": "Redação: Inteligência Artificial e Futuro",
-    "theme": "Tema 23: Literatura e Situações Hipotéticas"
+    "theme": "Tema 62: Ironia e subtexto",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Quando o sentido não está na frase literal."
   },
   {
     "id": "fr-b2-348",
@@ -3530,7 +5290,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "CULT",
     "uiTitle": "Os Limites do Justo",
     "grammarFocus": "Redação: Ética e Sociedade",
-    "theme": "Tema 23: Literatura e Situações Hipotéticas"
+    "theme": "Tema 62: Ironia e subtexto",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Quando o sentido não está na frase literal."
   },
   {
     "id": "fr-b2-349",
@@ -3539,16 +5304,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "EXPR",
     "uiTitle": "O Preço da Página",
     "grammarFocus": "5 Expressões sobre Dinheiro e Gastos",
-    "theme": "Tema 23: Literatura e Situações Hipotéticas"
+    "theme": "Tema 62: Ironia e subtexto",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Quando o sentido não está na frase literal."
   },
   {
     "id": "fr-b2-350",
     "language": "fr",
     "level": "B2",
     "tag": "REVIEW",
-    "uiTitle": "Checkpoint — lições 341–350",
-    "grammarFocus": "Revisão: lições 341–350",
-    "theme": "Tema 23: Literatura e Situações Hipotéticas"
+    "uiTitle": "Checkpoint — lições 361–372",
+    "grammarFocus": "Revisão: lições 361–372",
+    "theme": "Tema 62: Ironia e subtexto",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Quando o sentido não está na frase literal."
   },
   {
     "id": "fr-b2-351",
@@ -3557,16 +5332,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "EXPR",
     "uiTitle": "O Ofício Escrito",
     "grammarFocus": "5 Expressões sobre Trabalho e Carreira",
-    "theme": "Tema 23: Literatura e Situações Hipotéticas"
+    "theme": "Tema 62: Ironia e subtexto",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Quando o sentido não está na frase literal."
   },
   {
     "id": "fr-b2-352",
     "language": "fr",
     "level": "B2",
-    "tag": "EXPR",
+    "tag": "DIAL",
     "uiTitle": "Fábulas Contemporâneas",
     "grammarFocus": "5 Expressões sobre Animais e Natureza",
-    "theme": "Tema 23: Literatura e Situações Hipotéticas"
+    "theme": "Tema 62: Ironia e subtexto",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Quando o sentido não está na frase literal."
   },
   {
     "id": "fr-b2-353",
@@ -3575,7 +5360,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "EXPR",
     "uiTitle": "O Último Verso",
     "grammarFocus": "5 Expressões de Alta Eloquência",
-    "theme": "Tema 23: Literatura e Situações Hipotéticas"
+    "theme": "Tema 63: Relatar o que foi dito (avançado)",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Atas, rumores e citações fiéis."
   },
   {
     "id": "fr-b2-354",
@@ -3584,7 +5374,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "Escrevendo a Carta",
     "grammarFocus": "Redação: Carta de Motivação Formal",
-    "theme": "Tema 24: Debates Culturais e Cívicos"
+    "theme": "Tema 63: Relatar o que foi dito (avançado)",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Atas, rumores e citações fiéis."
   },
   {
     "id": "fr-b2-355",
@@ -3593,7 +5388,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "O Beurre e o Argent",
     "grammarFocus": "Avoir le beurre et l'argent du beurre",
-    "theme": "Tema 24: Debates Culturais e Cívicos"
+    "theme": "Tema 63: Relatar o que foi dito (avançado)",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Atas, rumores e citações fiéis."
   },
   {
     "id": "fr-b2-356",
@@ -3602,7 +5402,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "EXPR",
     "uiTitle": "Pedalando na Choucroute",
     "grammarFocus": "Pédaler dans la choucroute (Expressões Idiomáticas)",
-    "theme": "Tema 24: Debates Culturais e Cívicos"
+    "theme": "Tema 63: Relatar o que foi dito (avançado)",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Atas, rumores e citações fiéis."
   },
   {
     "id": "fr-b2-357",
@@ -3611,7 +5416,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "PRON",
     "uiTitle": "Palavras que Soam Igual",
     "grammarFocus": "Homófonos B2: Bar/barre, Celle/sel/selle",
-    "theme": "Tema 24: Debates Culturais e Cívicos"
+    "theme": "Tema 63: Relatar o que foi dito (avançado)",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Atas, rumores e citações fiéis."
   },
   {
     "id": "fr-b2-358",
@@ -3620,7 +5430,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "C'est ou Il est?",
     "grammarFocus": "C'est VS Il est (Refino B2)",
-    "theme": "Tema 24: Debates Culturais e Cívicos"
+    "theme": "Tema 63: Relatar o que foi dito (avançado)",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Atas, rumores e citações fiéis."
   },
   {
     "id": "fr-b2-359",
@@ -3629,16 +5444,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "A Ponte para o C1",
     "grammarFocus": "Ponte B2 > C1: Inversão Estilística",
-    "theme": "Tema 24: Debates Culturais e Cívicos"
+    "theme": "Tema 64: Escrever e-mail formal",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Do objeto à fórmula de polidez final."
   },
   {
     "id": "fr-b2-360",
     "language": "fr",
     "level": "B2",
     "tag": "REVIEW",
-    "uiTitle": "Checkpoint — lições 351–360",
-    "grammarFocus": "Revisão: lições 351–360",
-    "theme": "Tema 24: Debates Culturais e Cívicos"
+    "uiTitle": "Checkpoint — lições 373–384",
+    "grammarFocus": "Revisão: lições 373–384",
+    "theme": "Tema 64: Escrever e-mail formal",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Do objeto à fórmula de polidez final."
   },
   {
     "id": "fr-b2-361",
@@ -3647,7 +5472,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "PRON",
     "uiTitle": "Mais Homófonos da Polêmica",
     "grammarFocus": "Homófonos B2: Conte/compte, Maire/mer/mère",
-    "theme": "Tema 24: Debates Culturais e Cívicos"
+    "theme": "Tema 64: Escrever e-mail formal",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Do objeto à fórmula de polidez final."
   },
   {
     "id": "fr-b2-362",
@@ -3656,25 +5486,40 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "On ou L'on?",
     "grammarFocus": "On VS L'on (Variação Estilística)",
-    "theme": "Tema 24: Debates Culturais e Cívicos"
+    "theme": "Tema 64: Escrever e-mail formal",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Do objeto à fórmula de polidez final."
   },
   {
     "id": "fr-b2-363",
     "language": "fr",
     "level": "B2",
-    "tag": "MISS",
+    "tag": "DIAL",
     "uiTitle": "Revisão Geral B2",
     "grammarFocus": "Revisão Geral B2",
-    "theme": "Tema 24: Debates Culturais e Cívicos"
+    "theme": "Tema 64: Escrever e-mail formal",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Do objeto à fórmula de polidez final."
   },
   {
     "id": "fr-b2-364",
     "language": "fr",
     "level": "B2",
-    "tag": "DIAL",
+    "tag": "MISS",
     "uiTitle": "O Cansaço Elevado",
     "grammarFocus": "5 Maneiras de Dizer Je suis fatigué (Registro Soutenu)",
-    "theme": "Tema 24: Debates Culturais e Cívicos"
+    "theme": "Tema 64: Escrever e-mail formal",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Do objeto à fórmula de polidez final."
   },
   {
     "id": "fr-b2-365",
@@ -3683,16 +5528,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Os Verbos com S'en",
     "grammarFocus": "Verbos com S'en (s'en sortir, s'en vouloir)",
-    "theme": "Tema 24: Debates Culturais e Cívicos"
+    "theme": "Tema 65: Fechamento B2 — registro sob controle",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Trocar de registro conforme o interlocutor."
   },
   {
     "id": "fr-b2-366",
     "language": "fr",
     "level": "B2",
-    "tag": "GRAM",
+    "tag": "DIAL",
     "uiTitle": "Inversão com Ênfase",
     "grammarFocus": "Inversão Estilística para Ênfase e Foco",
-    "theme": "Tema 24: Debates Culturais e Cívicos"
+    "theme": "Tema 65: Fechamento B2 — registro sob controle",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Trocar de registro conforme o interlocutor."
   },
   {
     "id": "fr-b2-367",
@@ -3701,34 +5556,54 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "C'est... qui/que",
     "grammarFocus": "Orações Clivadas: C'est... qui/que",
-    "theme": "Tema 24: Debates Culturais e Cívicos"
+    "theme": "Tema 65: Fechamento B2 — registro sob controle",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Trocar de registro conforme o interlocutor."
   },
   {
     "id": "fr-b2-368",
     "language": "fr",
     "level": "B2",
-    "tag": "GRAM",
+    "tag": "DIAL",
     "uiTitle": "Ce qui, Ce que, Ce dont",
     "grammarFocus": "Orações Clivadas: Ce qui / Ce que / Ce dont",
-    "theme": "Tema 24: Debates Culturais e Cívicos"
+    "theme": "Tema 65: Fechamento B2 — registro sob controle",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Trocar de registro conforme o interlocutor."
   },
   {
     "id": "fr-c1-369",
     "language": "fr",
     "level": "C1",
-    "tag": "DIAL",
+    "tag": "PRON",
     "uiTitle": "Subindo ao Pódio",
     "grammarFocus": "Entonação vs Inversão em Fala Formal",
-    "theme": "Tema 25: Oratória e Expressões Elevadas"
+    "theme": "Tema 65: Fechamento B2 — registro sob controle",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Trocar de registro conforme o interlocutor."
   },
   {
     "id": "fr-c1-370",
     "language": "fr",
     "level": "C1",
-    "tag": "REVIEW",
-    "uiTitle": "Checkpoint — lições 361–370",
-    "grammarFocus": "Revisão: lições 361–370",
-    "theme": "Tema 25: Oratória e Expressões Elevadas"
+    "tag": "DIAL",
+    "uiTitle": "Chunks de controle",
+    "grammarFocus": "Expressões para modular o tom",
+    "theme": "Tema 65: Fechamento B2 — registro sob controle",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Trocar de registro conforme o interlocutor."
   },
   {
     "id": "fr-c1-371",
@@ -3737,16 +5612,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "O Subjuntivo do Passado",
     "grammarFocus": "O Subjonctif Passé",
-    "theme": "Tema 25: Oratória e Expressões Elevadas"
+    "theme": "Tema 66: Geopolítica em conversa",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Conversar sobre atualidades internacionais com precisão."
   },
   {
     "id": "fr-c1-372",
     "language": "fr",
     "level": "C1",
-    "tag": "VOC",
-    "uiTitle": "Estruturando o Debate",
-    "grammarFocus": "Marcadores Discursivos para Debate Oral",
-    "theme": "Tema 25: Oratória e Expressões Elevadas"
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 385–396",
+    "grammarFocus": "Revisão: lições 385–396",
+    "theme": "Tema 66: Geopolítica em conversa",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Conversar sobre atualidades internacionais com precisão."
   },
   {
     "id": "fr-c1-373",
@@ -3755,7 +5640,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "EXPR",
     "uiTitle": "Da Causa à Consequência",
     "grammarFocus": "Expressões de Causa e Consequência Complexas",
-    "theme": "Tema 25: Oratória e Expressões Elevadas"
+    "theme": "Tema 66: Geopolítica em conversa",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Conversar sobre atualidades internacionais com precisão."
   },
   {
     "id": "fr-c1-374",
@@ -3764,7 +5654,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "A Voz do Papel e da Rua",
     "grammarFocus": "Contrastes de Registro: Escrito vs Falado",
-    "theme": "Tema 25: Oratória e Expressões Elevadas"
+    "theme": "Tema 66: Geopolítica em conversa",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Conversar sobre atualidades internacionais com precisão."
   },
   {
     "id": "fr-c1-375",
@@ -3773,7 +5668,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Concessões Eloquentes",
     "grammarFocus": "Estruturas Concessivas Avançadas",
-    "theme": "Tema 25: Oratória e Expressões Elevadas"
+    "theme": "Tema 66: Geopolítica em conversa",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Conversar sobre atualidades internacionais com precisão."
   },
   {
     "id": "fr-c1-376",
@@ -3782,7 +5682,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "O Ne Explétif Avançado",
     "grammarFocus": "Subjonctif com ne explétif avançado",
-    "theme": "Tema 25: Oratória e Expressões Elevadas"
+    "theme": "Tema 66: Geopolítica em conversa",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Conversar sobre atualidades internacionais com precisão."
   },
   {
     "id": "fr-c1-377",
@@ -3791,7 +5696,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "O Francês Truncado",
     "grammarFocus": "Apócope e Truncamento no Francês Falado",
-    "theme": "Tema 25: Oratória e Expressões Elevadas"
+    "theme": "Tema 67: Filosofia no café",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Uma conversa filosófica acessível, sem jargão vazio."
   },
   {
     "id": "fr-c1-378",
@@ -3800,7 +5710,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "EXPR",
     "uiTitle": "A Mesa Metafórica",
     "grammarFocus": "5 Expressões sobre Comida e Bebida (Metafóricas)",
-    "theme": "Tema 25: Oratória e Expressões Elevadas"
+    "theme": "Tema 67: Filosofia no café",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Uma conversa filosófica acessível, sem jargão vazio."
   },
   {
     "id": "fr-c1-379",
@@ -3809,16 +5724,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Preposições de Estilo",
     "grammarFocus": "Preposições Estilísticas e Adverbiais",
-    "theme": "Tema 25: Oratória e Expressões Elevadas"
+    "theme": "Tema 67: Filosofia no café",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Uma conversa filosófica acessível, sem jargão vazio."
   },
   {
     "id": "fr-c1-380",
     "language": "fr",
     "level": "C1",
-    "tag": "REVIEW",
-    "uiTitle": "Checkpoint — lições 371–380",
-    "grammarFocus": "Revisão: lições 371–380",
-    "theme": "Tema 25: Oratória e Expressões Elevadas"
+    "tag": "DIAL",
+    "uiTitle": "Verbos de reflexão",
+    "grammarFocus": "Remettre en cause, postuler",
+    "theme": "Tema 67: Filosofia no café",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Uma conversa filosófica acessível, sem jargão vazio."
   },
   {
     "id": "fr-c1-381",
@@ -3827,7 +5752,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Formas Arcaicas",
     "grammarFocus": "Formas Verbais Arcaicas e Clássicas",
-    "theme": "Tema 25: Oratória e Expressões Elevadas"
+    "theme": "Tema 67: Filosofia no café",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Uma conversa filosófica acessível, sem jargão vazio."
   },
   {
     "id": "fr-c1-382",
@@ -3836,7 +5766,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Pronominais Recíprocos",
     "grammarFocus": "Verbos Pronominais: Usos Recíprocos e Passivos",
-    "theme": "Tema 25: Oratória e Expressões Elevadas"
+    "theme": "Tema 67: Filosofia no café",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Uma conversa filosófica acessível, sem jargão vazio."
   },
   {
     "id": "fr-c1-383",
@@ -3845,7 +5780,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Quand ou Quant?",
     "grammarFocus": "Quand VS Quant (Refinamento Final)",
-    "theme": "Tema 26: O Francês das Ruas e o Formal"
+    "theme": "Tema 68: Análise de texto curto",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Ler um trecho e extrair tese, tom e procedimentos."
   },
   {
     "id": "fr-c1-384",
@@ -3854,7 +5794,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "A Crítica de Alto Nível",
     "grammarFocus": "Marcadores de Posicionamento e Crítica de Alto Nível",
-    "theme": "Tema 26: O Francês das Ruas e o Formal"
+    "theme": "Tema 68: Análise de texto curto",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Ler um trecho e extrair tese, tom e procedimentos."
   },
   {
     "id": "fr-c1-385",
@@ -3863,16 +5808,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "CULT",
     "uiTitle": "Uma Viagem no Tempo",
     "grammarFocus": "Redação: Viagem no Tempo (Hipotético Literário)",
-    "theme": "Tema 26: O Francês das Ruas e o Formal"
+    "theme": "Tema 68: Análise de texto curto",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Ler um trecho e extrair tese, tom e procedimentos."
   },
   {
     "id": "fr-c1-386",
     "language": "fr",
     "level": "C1",
-    "tag": "MISS",
-    "uiTitle": "Revisão Geral C1",
-    "grammarFocus": "Revisão Geral C1",
-    "theme": "Tema 26: O Francês das Ruas e o Formal"
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 397–408",
+    "grammarFocus": "Revisão: lições 397–408",
+    "theme": "Tema 68: Análise de texto curto",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Ler um trecho e extrair tese, tom e procedimentos."
   },
   {
     "id": "fr-c1-387",
@@ -3881,7 +5836,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VERB",
     "uiTitle": "Formas que Só se Reconhece",
     "grammarFocus": "Reconhecimento literário: subjuntivo imperfeito, plus-que-parfait do subjuntivo, segunda forma do condicional e verbos arcaicos",
-    "theme": "Tema 26: O Francês das Ruas e o Formal"
+    "theme": "Tema 68: Análise de texto curto",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Ler um trecho e extrair tese, tom e procedimentos."
   },
   {
     "id": "fr-c1-388",
@@ -3890,7 +5850,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "Soutenu ou Courant?",
     "grammarFocus": "Registro Soutenu vs Registro Courant (Contraste)",
-    "theme": "Tema 26: O Francês das Ruas e o Formal"
+    "theme": "Tema 68: Análise de texto curto",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Ler um trecho e extrair tese, tom e procedimentos."
   },
   {
     "id": "fr-c1-389",
@@ -3899,18 +5864,28 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Même ou Si",
     "grammarFocus": "Par de Confusão: Même VS Si",
-    "theme": "Tema 26: O Francês das Ruas e o Formal",
+    "theme": "Tema 69: Debate formal",
     "topicKey": "meme-vs-si",
-    "lessonRole": "contrast"
+    "lessonRole": "contrast",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Regras de debate: tempo, réplica, síntese."
   },
   {
     "id": "fr-c1-390",
     "language": "fr",
     "level": "C1",
-    "tag": "REVIEW",
-    "uiTitle": "Checkpoint — lições 381–390",
-    "grammarFocus": "Revisão: lições 381–390",
-    "theme": "Tema 26: O Francês das Ruas e o Formal"
+    "tag": "DIAL",
+    "uiTitle": "Armas retóricas",
+    "grammarFocus": "Vocabulário de debate",
+    "theme": "Tema 69: Debate formal",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Regras de debate: tempo, réplica, síntese."
   },
   {
     "id": "fr-c1-391",
@@ -3919,7 +5894,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "Reescrita Elegante",
     "grammarFocus": "Reescrita Estrutural para Aprimoramento Estilístico",
-    "theme": "Tema 26: O Francês das Ruas e o Formal"
+    "theme": "Tema 69: Debate formal",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Regras de debate: tempo, réplica, síntese."
   },
   {
     "id": "fr-c1-392",
@@ -3928,7 +5908,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "A Reunião Formal",
     "grammarFocus": "Reunião formal: abrir, discordar e fechar",
-    "theme": "Tema 26: O Francês das Ruas e o Formal"
+    "theme": "Tema 69: Debate formal",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Regras de debate: tempo, réplica, síntese."
   },
   {
     "id": "fr-c1-393",
@@ -3937,7 +5922,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Negações Literárias",
     "grammarFocus": "Negação Literária e Formas de Elipse",
-    "theme": "Tema 26: O Francês das Ruas e o Formal"
+    "theme": "Tema 69: Debate formal",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Regras de debate: tempo, réplica, síntese."
   },
   {
     "id": "fr-c1-394",
@@ -3946,7 +5936,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "CULT",
     "uiTitle": "Textos Jornalísticos",
     "grammarFocus": "Decodificação de Textos Jornalísticos e Legais",
-    "theme": "Tema 26: O Francês das Ruas e o Formal"
+    "theme": "Tema 69: Debate formal",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Regras de debate: tempo, réplica, síntese."
   },
   {
     "id": "fr-c1-395",
@@ -3955,16 +5950,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "CULT",
     "uiTitle": "A Manchete do Dia",
     "grammarFocus": "Leitura de imprensa: manchete, fato e viés",
-    "theme": "Tema 26: O Francês das Ruas e o Formal"
+    "theme": "Tema 70: Retórica e persuasão",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Convencer com ethos, pathos e logos — em francês."
   },
   {
     "id": "fr-c1-396",
     "language": "fr",
     "level": "C1",
-    "tag": "CULT",
+    "tag": "DIAL",
     "uiTitle": "Argot e Verlan",
     "grammarFocus": "Francês Informal, Argot e Verlan (Gírias Modernas)",
-    "theme": "Tema 26: O Francês das Ruas e o Formal"
+    "theme": "Tema 70: Retórica e persuasão",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Convencer com ethos, pathos e logos — em francês."
   },
   {
     "id": "fr-c1-397",
@@ -3973,7 +5978,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "CULT",
     "uiTitle": "A Arte da Argumentação",
     "grammarFocus": "A Arte da Argumentação Superior: Conexão e Lógica",
-    "theme": "Tema 26: O Francês das Ruas e o Formal"
+    "theme": "Tema 70: Retórica e persuasão",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Convencer com ethos, pathos e logos — em francês."
   },
   {
     "id": "fr-c2-398",
@@ -3982,7 +5992,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "O Mapa Geopolítico",
     "grammarFocus": "Redução Sintática no Francês Literário",
-    "theme": "Tema 27: Geopolítica e Filosofia"
+    "theme": "Tema 70: Retórica e persuasão",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Convencer com ethos, pathos e logos — em francês."
   },
   {
     "id": "fr-c2-399",
@@ -3991,16 +6006,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "Mudando de Registro",
     "grammarFocus": "Mudança Consciente de Registro e Harmonia Estilística",
-    "theme": "Tema 27: Geopolítica e Filosofia"
+    "theme": "Tema 70: Retórica e persuasão",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Convencer com ethos, pathos e logos — em francês."
   },
   {
     "id": "fr-c2-400",
     "language": "fr",
     "level": "C2",
     "tag": "REVIEW",
-    "uiTitle": "Checkpoint — lições 391–400",
-    "grammarFocus": "Revisão: lições 391–400",
-    "theme": "Tema 27: Geopolítica e Filosofia"
+    "uiTitle": "Checkpoint — lições 409–420",
+    "grammarFocus": "Revisão: lições 409–420",
+    "theme": "Tema 70: Retórica e persuasão",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Convencer com ethos, pathos e logos — em francês."
   },
   {
     "id": "fr-c2-401",
@@ -4009,7 +6034,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "À l'instar de...",
     "grammarFocus": "Il sied de, À l'instar de e Expressões de Alta Classe",
-    "theme": "Tema 27: Geopolítica e Filosofia"
+    "theme": "Tema 71: Estilo e voz do falante",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Reconhecer e imitar estilos sem virar pastiche."
   },
   {
     "id": "fr-c2-402",
@@ -4018,7 +6048,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "CULT",
     "uiTitle": "O Debate Geopolítico",
     "grammarFocus": "Argumentação sobre Geopolítica e Cultura",
-    "theme": "Tema 27: Geopolítica e Filosofia"
+    "theme": "Tema 71: Estilo e voz do falante",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Reconhecer e imitar estilos sem virar pastiche."
   },
   {
     "id": "fr-c2-403",
@@ -4027,7 +6062,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Ativa vs Passiva Literária",
     "grammarFocus": "Estrutura de Frase: Voz Ativa vs Passiva (C1/C2)",
-    "theme": "Tema 27: Geopolítica e Filosofia"
+    "theme": "Tema 71: Estilo e voz do falante",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Reconhecer e imitar estilos sem virar pastiche."
   },
   {
     "id": "fr-c2-404",
@@ -4036,7 +6076,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Dialetos Franceses no Mundo",
     "grammarFocus": "O Francês no Mundo: Variações Regionais e Dialetos",
-    "theme": "Tema 27: Geopolítica e Filosofia"
+    "theme": "Tema 71: Estilo e voz do falante",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Reconhecer e imitar estilos sem virar pastiche."
   },
   {
     "id": "fr-c2-405",
@@ -4045,7 +6090,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "Escrita Criativa",
     "grammarFocus": "Escrita Criativa: Estilo e Fluidez Superior",
-    "theme": "Tema 27: Geopolítica e Filosofia"
+    "theme": "Tema 71: Estilo e voz do falante",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Reconhecer e imitar estilos sem virar pastiche."
   },
   {
     "id": "fr-c2-406",
@@ -4054,7 +6104,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "CULT",
     "uiTitle": "O Ensaio Literário",
     "grammarFocus": "Ensaio Literário e Persuasão C2",
-    "theme": "Tema 27: Geopolítica e Filosofia"
+    "theme": "Tema 71: Estilo e voz do falante",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Reconhecer e imitar estilos sem virar pastiche."
   },
   {
     "id": "fr-c2-407",
@@ -4063,16 +6118,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Ênfase na Frase",
     "grammarFocus": "Ênfase e deslocamento estilístico na frase",
-    "theme": "Tema 27: Geopolítica e Filosofia"
+    "theme": "Tema 72: Ambiguidade e implicatura",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Quando a frase permite duas leituras — e como escolher."
   },
   {
     "id": "fr-c2-408",
     "language": "fr",
     "level": "C2",
-    "tag": "GRAM",
-    "uiTitle": "Sistema de Relativos Avançado",
-    "grammarFocus": "Revisão de relativos e artigos",
-    "theme": "Tema 27: Geopolítica e Filosofia"
+    "tag": "REVIEW",
+    "uiTitle": "Checkpoint — lições 421–432",
+    "grammarFocus": "Revisão: lições 421–432",
+    "theme": "Tema 72: Ambiguidade e implicatura",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Quando a frase permite duas leituras — e como escolher."
   },
   {
     "id": "fr-c2-409",
@@ -4081,16 +6146,26 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "Oratória Final C2",
     "grammarFocus": "Técnicas de Oratória e Debate Final C2",
-    "theme": "Tema 27: Geopolítica e Filosofia"
+    "theme": "Tema 72: Ambiguidade e implicatura",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Quando a frase permite duas leituras — e como escolher."
   },
   {
     "id": "fr-c2-410",
     "language": "fr",
     "level": "C2",
-    "tag": "REVIEW",
-    "uiTitle": "Checkpoint — lições 401–410",
-    "grammarFocus": "Revisão: lições 401–410",
-    "theme": "Tema 28: Literatura Clássica e Análise Textual"
+    "tag": "DIAL",
+    "uiTitle": "Missão: desfazer ambiguidade",
+    "grammarFocus": "Produção: clarificação C2",
+    "theme": "Tema 72: Ambiguidade e implicatura",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Quando a frase permite duas leituras — e como escolher."
   },
   {
     "id": "fr-c2-411",
@@ -4099,7 +6174,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "A Arquitetura da Frase",
     "grammarFocus": "Período Composto: Subordinadas Encaixadas e Hiperbaton",
-    "theme": "Tema 28: Literatura Clássica e Análise Textual"
+    "theme": "Tema 72: Ambiguidade e implicatura",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Quando a frase permite duas leituras — e como escolher."
   },
   {
     "id": "fr-c2-412",
@@ -4108,7 +6188,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "VOC",
     "uiTitle": "Vocabulário Culto",
     "grammarFocus": "Campos Lexicais da Filosofia e da Ética",
-    "theme": "Tema 28: Literatura Clássica e Análise Textual"
+    "theme": "Tema 72: Ambiguidade e implicatura",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Quando a frase permite duas leituras — e como escolher."
   },
   {
     "id": "fr-c2-413",
@@ -4117,7 +6202,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "CULT",
     "uiTitle": "O Existencialismo no Café",
     "grammarFocus": "Leitura Analítica: Jean-Paul Sartre e o Ser-para-si",
-    "theme": "Tema 28: Literatura Clássica e Análise Textual"
+    "theme": "Tema 73: Crítica literária oral",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Criticar uma obra com critérios explícitos."
   },
   {
     "id": "fr-c2-414",
@@ -4126,7 +6216,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "EXPR",
     "uiTitle": "Figuras de Linguagem na Poesia",
     "grammarFocus": "5 Figuras de Linguagem em Baudelaire e Rimbaud",
-    "theme": "Tema 28: Literatura Clássica e Análise Textual"
+    "theme": "Tema 73: Crítica literária oral",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Criticar uma obra com critérios explícitos."
   },
   {
     "id": "fr-c2-415",
@@ -4135,7 +6230,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "Densidade e Elipse",
     "grammarFocus": "Omissão Poética e Densidade Semântica",
-    "theme": "Tema 28: Literatura Clássica e Análise Textual"
+    "theme": "Tema 73: Crítica literária oral",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Criticar uma obra com critérios explícitos."
   },
   {
     "id": "fr-c2-416",
@@ -4144,7 +6244,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "CULT",
     "uiTitle": "A Nouvelle Vague",
     "grammarFocus": "Leitura Analítica: Crítica Cinematográfica de François Truffaut",
-    "theme": "Tema 28: Literatura Clássica e Análise Textual"
+    "theme": "Tema 73: Crítica literária oral",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Criticar uma obra com critérios explícitos."
   },
   {
     "id": "fr-c2-417",
@@ -4153,7 +6258,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "Dissertação Literária",
     "grammarFocus": "Redação: Comentário Dissertativo (Style Bac de Français)",
-    "theme": "Tema 28: Literatura Clássica e Análise Textual"
+    "theme": "Tema 73: Crítica literária oral",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Criticar uma obra com critérios explícitos."
   },
   {
     "id": "fr-c2-418",
@@ -4162,7 +6272,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "CULT",
     "uiTitle": "Camus e o Absurdo",
     "grammarFocus": "Leitura Analítica: L'Étranger (Análise de Estilo)",
-    "theme": "Tema 28: Literatura Clássica e Análise Textual"
+    "theme": "Tema 73: Crítica literária oral",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Criticar uma obra com critérios explícitos."
   },
   {
     "id": "fr-c2-419",
@@ -4171,25 +6286,40 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "CULT",
     "uiTitle": "Comentário de uma Cena",
     "grammarFocus": "Comentário oral de uma cena literária",
-    "theme": "Tema 28: Literatura Clássica e Análise Textual"
+    "theme": "Tema 74: Mediação — explicar X para Y",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Traduzir ideias entre públicos diferentes."
   },
   {
     "id": "fr-c2-420",
     "language": "fr",
     "level": "C2",
     "tag": "REVIEW",
-    "uiTitle": "Checkpoint — lições 411–420",
-    "grammarFocus": "Revisão: lições 411–420",
-    "theme": "Tema 28: Literatura Clássica e Análise Textual"
+    "uiTitle": "Checkpoint — lições 433–444",
+    "grammarFocus": "Revisão: lições 433–444",
+    "theme": "Tema 74: Mediação — explicar X para Y",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Traduzir ideias entre públicos diferentes."
   },
   {
     "id": "fr-c2-421",
     "language": "fr",
     "level": "C2",
-    "tag": "MISS",
+    "tag": "GRAM",
     "uiTitle": "Ensaio Crítico",
     "grammarFocus": "Redação: Análise Comparativa entre Duas Obras",
-    "theme": "Tema 28: Literatura Clássica e Análise Textual"
+    "theme": "Tema 74: Mediação — explicar X para Y",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Traduzir ideias entre públicos diferentes."
   },
   {
     "id": "fr-c2-422",
@@ -4198,7 +6328,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "A Mesa de Negociação",
     "grammarFocus": "Abrindo um Debate Formal e Protocolos",
-    "theme": "Tema 29: Debate Formal e Retórica"
+    "theme": "Tema 74: Mediação — explicar X para Y",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Traduzir ideias entre públicos diferentes."
   },
   {
     "id": "fr-c2-423",
@@ -4207,7 +6342,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "EXPR",
     "uiTitle": "Expressões da Retórica",
     "grammarFocus": "Conectores de Alto Nível para Persuasão",
-    "theme": "Tema 29: Debate Formal e Retórica"
+    "theme": "Tema 74: Mediação — explicar X para Y",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Traduzir ideias entre públicos diferentes."
   },
   {
     "id": "fr-c2-424",
@@ -4216,7 +6356,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "GRAM",
     "uiTitle": "A Refutação Elegante",
     "grammarFocus": "Estruturas Concessivas Avançadas (Bien que e Quoique)",
-    "theme": "Tema 29: Debate Formal e Retórica"
+    "theme": "Tema 74: Mediação — explicar X para Y",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Traduzir ideias entre públicos diferentes."
   },
   {
     "id": "fr-c2-425",
@@ -4225,7 +6370,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "Construindo o Argumento",
     "grammarFocus": "Redação: Plano Dialético (Tese, Antítese, Síntese)",
-    "theme": "Tema 29: Debate Formal e Retórica"
+    "theme": "Tema 75: Domínio — qualquer registro, qualquer tema",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Último arco: improvisar com controle total."
   },
   {
     "id": "fr-c2-426",
@@ -4234,7 +6384,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "CULT",
     "uiTitle": "A Tradição Cartesiana",
     "grammarFocus": "Argumentação Cartesiana no Debate Francês",
-    "theme": "Tema 29: Debate Formal e Retórica"
+    "theme": "Tema 75: Domínio — qualquer registro, qualquer tema",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Último arco: improvisar com controle total."
   },
   {
     "id": "fr-c2-427",
@@ -4243,7 +6398,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "DIAL",
     "uiTitle": "Sustentando Sua Tese",
     "grammarFocus": "Transições e Sinalização Discursiva Formal",
-    "theme": "Tema 29: Debate Formal e Retórica"
+    "theme": "Tema 75: Domínio — qualquer registro, qualquer tema",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Último arco: improvisar com controle total."
   },
   {
     "id": "fr-c2-428",
@@ -4252,7 +6412,12 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "EXPR",
     "uiTitle": "Ironia e Sarcasmo",
     "grammarFocus": "Subtexto e Crítica Velada no Francês Formal",
-    "theme": "Tema 29: Debate Formal e Retórica"
+    "theme": "Tema 75: Domínio — qualquer registro, qualquer tema",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Último arco: improvisar com controle total."
   },
   {
     "id": "fr-c2-429",
@@ -4261,15 +6426,25 @@ export const FRENCH_LESSONS: LessonDefinition[] = [
     "tag": "MISS",
     "uiTitle": "A Conclusão Impecável",
     "grammarFocus": "Redação: Fechamento Persuasivo e Apelo Final",
-    "theme": "Tema 29: Debate Formal e Retórica"
+    "theme": "Tema 75: Domínio — qualquer registro, qualquer tema",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Último arco: improvisar com controle total."
   },
   {
     "id": "fr-c2-430",
     "language": "fr",
     "level": "C2",
-    "tag": "REVIEW",
-    "uiTitle": "Checkpoint — lições 421–430",
-    "grammarFocus": "Revisão: lições 421–430",
-    "theme": "Tema 29: Debate Formal e Retórica"
+    "tag": "DIAL",
+    "uiTitle": "Selo de domínio",
+    "grammarFocus": "Expressões de fechamento C2",
+    "theme": "Tema 75: Domínio — qualquer registro, qualquer tema",
+    "arcCharacters": {
+      "learner": "Lucas",
+      "local": "Camille"
+    },
+    "arcSummary": "Último arco: improvisar com controle total."
   }
 ];

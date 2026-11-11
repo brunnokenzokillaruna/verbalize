@@ -71,6 +71,11 @@ const checks: Array<{ label: string; pass: boolean }> = [];
   });
 
   checks.push({
+    label: 'FR current id fr-a1-001 is unchanged for a v4 profile',
+    pass: migrateFrontierLessonId('fr', 'fr-a1-001', 4) === 'fr-a1-001',
+  });
+
+  checks.push({
     label: 'Futuro próximo sits immediately after aller',
     pass: getNextLessonId('fr', 'fr-a1-021') === 'fr-a1-904',
   });
@@ -84,8 +89,8 @@ const checks: Array<{ label: string; pass: boolean }> = [];
 
   const reviewCount = FRENCH_LESSONS.filter((lesson) => lesson.tag === 'REVIEW').length;
   checks.push({
-    label: `French checkpoints stay at 43 (got ${reviewCount})`,
-    pass: reviewCount === 43,
+    label: `French checkpoints stay at 37 (got ${reviewCount})`,
+    pass: reviewCount === 37,
   });
 }
 
@@ -103,7 +108,7 @@ const checks: Array<{ label: string; pass: boolean }> = [];
 
   checks.push({
     label: `Curriculum version is ${CURRICULUM_VERSION}`,
-    pass: CURRICULUM_VERSION === 3,
+    pass: CURRICULUM_VERSION === 4,
   });
 
   // User finished en-a2-114 (v2 index 113), next was v2 en-a2-115 (index 114)
