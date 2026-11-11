@@ -2,11 +2,12 @@ import type { RefObject } from 'react';
 import { useRouter } from 'next/navigation';
 import { Lock } from 'lucide-react';
 import { TAG_LABELS, THEME_COLORS } from '@/components/dashboard/constants';
-import { getTagIcon } from '@/components/dashboard/dashboardTagIcons';
 import { LessonNodePopover } from '@/components/dashboard/LessonNodePopover';
-import { getLessonNodeColors, getPathOffset } from '@/components/dashboard/utils';
+import { LessonStamp } from '@/components/dashboard/LessonStamp';
+import { STAMP_CURRENT_COLOR, STAMP_STYLES } from '@/components/dashboard/lessonStampConfig';
+import { getPathOffset } from '@/components/dashboard/utils';
 import type { LessonModalState } from '@/components/dashboard/types';
-import type { LessonDefinition } from '@/types';
+import type { LessonDefinition, LessonTag } from '@/types';
 import { getTopicStage } from '@/lib/curriculum/lessonTopic';
 
 type ThemeGroup = { title: string; lessons: LessonDefinition[] };
@@ -27,6 +28,12 @@ type LessonPathProps = {
   onToggleModal: (lesson: LessonDefinition, state: Omit<LessonModalState, 'isOpen'>) => void;
   onCloseModal: () => void;
 };
+
+function stampStatus(isCompleted: boolean, isCurrent: boolean) {
+  if (isCompleted) return 'completed' as const;
+  if (isCurrent) return 'current' as const;
+  return 'locked' as const;
+}
 
 export function LessonPath({
   themes,
@@ -95,16 +102,22 @@ export function LessonPath({
                 const isCurrent = globalIdx === frontierIndex;
                 const isLocked = globalIdx > frontierIndex;
                 const isMission = lesson.tag === 'MISS';
+                const tag = (lesson.tag ?? 'GRAM') as LessonTag;
+                const stampMeta = STAMP_STYLES[tag] ?? STAMP_STYLES.GRAM;
 
                 const offset = getPathOffset(localIdx, isMobile);
-                const nodeSize = isMobile ? 64 : 72;
-                const nodeSizeActual = isMission ? 80 : nodeSize;
-                const iconSize = isMission ? 34 : 28;
-                const nodeIcon = getTagIcon(lesson.tag ?? 'GRAM', iconSize);
-                const finalNodeColors = getLessonNodeColors(isCompleted, isCurrent, isMission);
-                const tagLabel = TAG_LABELS[lesson.tag ?? ''] ?? 'Gramática';
+                const nodeSize = isMobile ? 74 : 84;
+                const nodeSizeActual = isMission || tag === 'REVIEW' ? nodeSize + 8 : nodeSize;
+                const tagLabel = TAG_LABELS[tag] ?? 'Gramática';
                 const topicStage = getTopicStage(lesson, levelLessons);
                 const isPopoverOpen = modalState.isOpen && modalState.lesson?.id === lesson.id;
+                const status = stampStatus(isCompleted, isCurrent);
+
+                const labelColor = isLocked
+                  ? 'var(--color-text-muted)'
+                  : isCurrent
+                    ? STAMP_CURRENT_COLOR
+                    : stampMeta.color;
 
                 return (
                   <div
@@ -121,32 +134,11 @@ export function LessonPath({
                       className="relative shrink-0 flex flex-col items-center mb-6 animate-fade-in"
                       style={{ transform: `translateX(${offset}px)` }}
                     >
-                      {isCurrent && !isPopoverOpen && (
-                        <div
-                          className="duo-tooltip mb-3 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest whitespace-nowrap border-2"
-                          style={{
-                            backgroundColor: 'var(--color-surface)',
-                            color: isMission ? 'var(--color-warning)' : 'var(--color-primary)',
-                            borderColor: 'var(--color-border)',
-                            boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-                            animation: 'float 2.5s ease-in-out infinite',
-                          }}
-                        >
-                          {isMission ? '⭐ Missão!' : 'Começar'}
-                          <div
-                            className="absolute left-1/2 -translate-x-1/2 -bottom-[7px] w-3 h-3 rotate-45 border-r-2 border-b-2"
-                            style={{
-                              backgroundColor: 'var(--color-surface)',
-                              borderColor: 'var(--color-border)',
-                            }}
-                          />
-                        </div>
-                      )}
-
                       <button
                         id={`lesson-node-${lesson.id}`}
                         type="button"
                         tabIndex={isLocked ? -1 : 0}
+                        aria-label={`${tagLabel}${isLocked ? ' (bloqueada)' : isCompleted ? ' (concluída)' : isCurrent ? ' — Começar' : ''}`}
                         onKeyDown={(e) => onNodeKeyDown(e, globalIdx)}
                         onClick={() =>
                           isPopoverOpen
@@ -159,29 +151,25 @@ export function LessonPath({
                                 tagLabel,
                               })
                         }
-                        className={`relative flex items-center justify-center rounded-full transition-all duration-150 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${isLocked ? 'cursor-default' : 'hover:scale-[1.03] cursor-pointer'} ${isCurrent ? 'lesson-current-dot' : ''}`}
+                        className={`relative flex items-center justify-center bg-transparent border-0 p-0 transition-all duration-150 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary ${isLocked ? 'cursor-default' : 'hover:scale-[1.04] cursor-pointer'} ${isCurrent ? 'lesson-current-stamp' : ''}`}
                         style={{
                           width: nodeSizeActual,
                           height: nodeSizeActual,
-                          ...finalNodeColors,
+                          marginBottom: isCurrent ? 10 : 0,
                         }}
                       >
-                        <div
-                          className="absolute inset-2 rounded-full pointer-events-none"
-                          style={{
-                            background: isLocked
-                              ? 'transparent'
-                              : 'linear-gradient(180deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0) 55%)',
-                          }}
+                        <LessonStamp
+                          tag={tag}
+                          status={status}
+                          size={nodeSizeActual}
+                          lessonNumber={localIdx + 1}
+                          seed={lesson.id}
                         />
-                        <div className="relative z-10 translate-y-[-2px]">{nodeIcon}</div>
                       </button>
 
                       <span
                         className="text-[10px] font-black uppercase tracking-wider mt-2 select-none transition-colors duration-200"
-                        style={{
-                          color: isLocked ? 'var(--color-text-muted)' : isCurrent ? 'var(--color-primary)' : 'var(--color-text-secondary)',
-                        }}
+                        style={{ color: labelColor }}
                       >
                         {tagLabel}
                       </span>
