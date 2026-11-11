@@ -28,12 +28,44 @@ const TENSE_HINT: Record<VerbTenseKey, { fr: string; en: string }> = {
   futurePerfect: { fr: 'futur antérieur', en: 'will have + PP' },
 };
 
+function tenseExampleSchema(language: SupportedLanguage, keys: VerbTenseKey[]): string {
+  return keys
+    .map((key) => {
+      const hint = TENSE_HINT[key][language];
+      return `    "${key}": { "target": "One short ${LANG_LABEL[language]} sentence using ${hint}", "portuguese": "Tradução em português brasileiro" }`;
+    })
+    .join(',\n');
+}
+
 export function buildFullVerbTablePrompt(
   infinitive: string,
   language: SupportedLanguage,
 ): { systemPrompt: string; prompt: string } {
   const pronouns = pronounBlock(language);
   const systemPrompt = `You are a language expert creating verb conjugation data for Brazilian Portuguese speakers learning ${LANG_LABEL[language]}. Respond with ONLY valid JSON, no markdown, no explanation.`;
+
+  const frKeys: VerbTenseKey[] = [
+    'present',
+    'past',
+    'future',
+    'imperfect',
+    'conditional',
+    'subjunctive',
+    'pluperfect',
+    'conditionalPast',
+    'nearFuture',
+    'futurePerfect',
+  ];
+  const enKeys: VerbTenseKey[] = [
+    'present',
+    'past',
+    'future',
+    'conditional',
+    'presentContinuous',
+    'pastContinuous',
+    'nearFuture',
+  ];
+  const keys = language === 'fr' ? frKeys : enKeys;
 
   const tenseLines =
     language === 'fr'
@@ -66,6 +98,9 @@ Output JSON in exactly this format:
   "conjugations": {
 ${tenseLines}
   },
+  "tenseExamples": {
+${tenseExampleSchema(language, keys)}
+  },
   "exampleSentences": [
     { "target": "Example sentence in ${LANG_LABEL[language]}", "portuguese": "Translation in Brazilian Portuguese" },
     { "target": "Another example", "portuguese": "Outra tradução" }
@@ -81,7 +116,8 @@ ${
 - past = simple past; nearFuture = going to + verb; presentContinuous / pastContinuous = progressive forms.`
 }
 - Include every tense key shown above with ALL pronouns filled.
-- Keep examples simple (A1-B1 vocabulary).
+- tenseExamples: one sentence PER tense key. The sentence MUST clearly use that tense of "${infinitive}" (not another tense). Keep A1–B1 vocabulary.
+- Keep exampleSentences simple (A1-B1 vocabulary) — general usage, any tense.
 - "translation" must be the Brazilian Portuguese infinitive (e.g., "ser/estar" for "être").`;
 
   return { systemPrompt, prompt };
@@ -108,6 +144,9 @@ Output JSON:
 {
   "conjugations": {
 ${blocks}
+  },
+  "tenseExamples": {
+${tenseExampleSchema(language, missing)}
   }
 }
 
@@ -118,6 +157,33 @@ ${
     : `- Pronouns must be exactly: I, you, he, she, it, we, they (never grouped).`
 }
 - Every listed tense key must include ALL pronouns with correct forms.
+- tenseExamples: one sentence per listed tense; must use that tense of "${infinitive}".
+- Do not invent extra tense keys.`;
+
+  return { systemPrompt, prompt };
+}
+
+/** Fill only missing per-tense example sentences (no conjugations). */
+export function buildMissingTenseExamplesPrompt(
+  infinitive: string,
+  language: SupportedLanguage,
+  missing: VerbTenseKey[],
+): { systemPrompt: string; prompt: string } {
+  const systemPrompt = `You are a language expert writing short contextual examples for Brazilian Portuguese speakers learning ${LANG_LABEL[language]}. Respond with ONLY valid JSON, no markdown.`;
+
+  const prompt = `For the ${LANG_LABEL[language]} verb "${infinitive}", write ONE short example sentence for each tense below.
+
+Output JSON:
+{
+  "tenseExamples": {
+${tenseExampleSchema(language, missing)}
+  }
+}
+
+Rules:
+- Each sentence MUST use the named tense of "${infinitive}" (not another tense).
+- A1–B1 vocabulary; one clause is enough.
+- portuguese = natural Brazilian Portuguese translation.
 - Do not invent extra tense keys.`;
 
   return { systemPrompt, prompt };
@@ -135,4 +201,25 @@ export function mergeVerbConjugations(
     next[key] = forms;
   }
   return next;
+}
+
+export type TenseExamplesPayload = Partial<
+  Record<VerbTenseKey, { target: string; portuguese: string }>
+>;
+
+export function extractTenseExamples(
+  payload: { tenseExamples?: TenseExamplesPayload; tenseGuides?: VerbDocument['tenseGuides'] } | null | undefined,
+): TenseExamplesPayload | undefined {
+  if (!payload) return undefined;
+  if (payload.tenseExamples && Object.keys(payload.tenseExamples).length > 0) {
+    return payload.tenseExamples;
+  }
+  if (!payload.tenseGuides) return undefined;
+  const fromGuides: TenseExamplesPayload = {};
+  for (const [key, guide] of Object.entries(payload.tenseGuides)) {
+    if (guide?.example?.target && guide.example.portuguese) {
+      fromGuides[key as VerbTenseKey] = guide.example;
+    }
+  }
+  return Object.keys(fromGuides).length > 0 ? fromGuides : undefined;
 }

@@ -160,6 +160,17 @@ export interface LessonLogDocument {
 
 // ─── Verbs ────────────────────────────────────────────────────────────────────
 
+/** Per-tense pedagogy card persisted on the verb cache (Verb Explorer). */
+export interface VerbTenseGuide {
+  /** Short PT-BR tip: when to use this tense. */
+  whenToUse: string;
+  /** One contextual example that uses this tense of the verb. */
+  example: {
+    target: string;
+    portuguese: string;
+  };
+}
+
 export interface VerbDocument {
   infinitive: string; // Document ID
   language: 'fr' | 'en';
@@ -187,6 +198,12 @@ export interface VerbDocument {
   };
   /** Bumped when the cached tense set is expanded (lazy upgrades). */
   tableVersion?: number;
+
+  /**
+   * One guide per available tense (whenToUse + example).
+   * Cached in Firestore so Verb Explorer never re-asks the model.
+   */
+  tenseGuides?: Partial<Record<keyof VerbDocument['conjugations'], VerbTenseGuide>>;
 
   exampleSentences: Array<{
     target: string;

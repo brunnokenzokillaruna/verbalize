@@ -3,7 +3,7 @@ import type { SupportedLanguage, VerbDocument } from '@/types';
 export type VerbTenseKey = keyof VerbDocument['conjugations'];
 
 /** Bump when the stored tense set changes — invalidates Next `'use cache'` entries. */
-export const VERB_TABLE_VERSION = 2;
+export const VERB_TABLE_VERSION = 3;
 
 /** Tenses we always try to keep on every cached verb (language-aware). */
 export const CORE_TENSES_BY_LANG: Record<SupportedLanguage, readonly VerbTenseKey[]> = {

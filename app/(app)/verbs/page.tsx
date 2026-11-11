@@ -10,7 +10,6 @@ import { LANG_META } from './data';
 import { VerbTenseList } from '@/components/verbs/VerbTenseList';
 import { VerbResultHero } from '@/components/verbs/VerbResultHero';
 import { VerbAuxiliaryHint } from '@/components/verbs/VerbAuxiliaryHint';
-import { VerbExamplesSection } from '@/components/verbs/VerbExamplesSection';
 import { VerbDrillSession } from '@/components/verbs/VerbDrillSession';
 import { VerbChallengeCard } from '@/components/verbs/VerbChallengeCard';
 import { LearnedVerbsSection, type LearnedVerb } from '@/components/verbs/LearnedVerbsSection';
@@ -67,7 +66,7 @@ export default function VerbsPage() {
   const [loading, setLoading] = useState(false);
   const [verb, setVerb] = useState<VerbDocument | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [openTenses, setOpenTenses] = useState<Set<string>>(new Set(['present']));
+  const [selectedTense, setSelectedTense] = useState('present');
   const [learnedVerbs, setLearnedVerbs] = useState<LearnedVerb[]>([]);
   const [verbsLoading, setVerbsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<VerbTab>('practice');
@@ -166,7 +165,7 @@ export default function VerbsPage() {
     } else {
       cacheVerb(result);
       setVerb(result);
-      setOpenTenses(new Set(['present']));
+      setSelectedTense('present');
     }
   }
 
@@ -174,7 +173,7 @@ export default function VerbsPage() {
     setVerb(null);
     setInput('');
     setError(null);
-    setOpenTenses(new Set(['present']));
+    setSelectedTense('present');
     setActiveTab('library');
   }
 
@@ -182,15 +181,6 @@ export default function VerbsPage() {
     setVerb(null);
     setError(null);
     setActiveTab(tab);
-  }
-
-  function toggleTense(tense: string) {
-    setOpenTenses((prev) => {
-      const next = new Set(prev);
-      if (next.has(tense)) next.delete(tense);
-      else next.add(tense);
-      return next;
-    });
   }
 
   const startDrill = useCallback(async () => {
@@ -402,21 +392,12 @@ export default function VerbsPage() {
 
             <VerbAuxiliaryHint infinitive={verb.infinitive} language={language} />
 
-            <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:items-start lg:gap-8">
-              <VerbTenseList
-                verb={verb}
-                openTenses={openTenses}
-                toggleTense={toggleTense}
-                language={language}
-              />
-
-              {verb.exampleSentences && verb.exampleSentences.length > 0 && (
-                <VerbExamplesSection
-                  examples={verb.exampleSentences}
-                  language={language}
-                />
-              )}
-            </div>
+            <VerbTenseList
+              verb={verb}
+              selectedTense={selectedTense}
+              onSelectTense={setSelectedTense}
+              language={language}
+            />
           </div>
         )}
       </main>
