@@ -1,4 +1,3 @@
-import React from 'react';
 import Image from 'next/image';
 import { AudioPlayerButton } from '@/components/lesson/AudioPlayerButton';
 import { Book } from 'lucide-react';
@@ -6,7 +5,6 @@ import { SrsBar, SRS_BAR_COLOR, SRS_LABELS, formatNextReview } from './SrsBar';
 import { VocabEnrichButton } from './VocabEnrichButton';
 import { NativePhraseBadge } from './NativePhraseBadge';
 import type { UserVocabularyDocument, SupportedLanguage } from '@/types';
-import { getVocabImage } from '@/app/actions/getVocabImage';
 import { isMissingImage, isMissingTranslation } from '@/utils/vocabHelpers';
 
 export function VocabCard({
@@ -14,7 +12,6 @@ export function VocabCard({
   language,
   urgent = false,
   animDelay = 0,
-  onImageLoaded,
   onEnrich,
   enriching = false,
 }: {
@@ -22,53 +19,17 @@ export function VocabCard({
   language: SupportedLanguage;
   urgent?: boolean;
   animDelay?: number;
-  onImageLoaded?: (word: string, imageUrl: string) => void;
   onEnrich?: (word: string) => void;
   enriching?: boolean;
 }) {
   const level = Math.min(Math.max(item.srsLevel ?? 0, 0), 5);
-  const [imageUrl, setImageUrl] = React.useState(item.imageUrl);
+  const imageUrl = item.imageUrl;
 
   const missingTranslation = isMissingTranslation(item);
-  const missingImage = !imageUrl && isMissingImage(item);
+  const missingImage = isMissingImage(item);
   const showEnrich = missingTranslation || missingImage;
   const reviewText = formatNextReview(item.nextReview as Parameters<typeof formatNextReview>[0]);
   const barColor = SRS_BAR_COLOR[level];
-
-  React.useEffect(() => {
-    setImageUrl(item.imageUrl);
-  }, [item.imageUrl]);
-
-  React.useEffect(() => {
-    let active = true;
-    const fetchImage = async () => {
-      try {
-        const result = await getVocabImage(
-          item.word,
-          item.translation || item.word,
-          language,
-          [],
-          undefined,
-          {
-            translation: !missingTranslation ? item.translation : undefined,
-            allowCached: true,
-          },
-        );
-        if (active && result?.imageUrl) {
-          setImageUrl(result.imageUrl);
-          if (result.imageUrl !== item.imageUrl) {
-            onImageLoaded?.(item.word, result.imageUrl);
-          }
-        }
-      } catch (err) {
-        console.error('Error fetching image for', item.word, err);
-      }
-    };
-    void fetchImage();
-    return () => {
-      active = false;
-    };
-  }, [item.word, item.translation, language, item.imageUrl, missingTranslation, onImageLoaded]);
 
   return (
     <div
@@ -109,7 +70,7 @@ export function VocabCard({
             </p>
           </>
         ) : (
-          <div 
+          <div
             className="flex h-full w-full flex-col items-center justify-center gap-1 p-4 relative select-none"
             style={{
               background: `linear-gradient(90deg, transparent 31px, rgba(220, 38, 38, 0.2) 31px, rgba(220, 38, 38, 0.2) 32px, transparent 32px), 
@@ -117,14 +78,22 @@ export function VocabCard({
               backgroundSize: '100% 100%, 100% 24px',
             }}
           >
-            <span className="filter drop-shadow-[0_2px_3px_rgba(0,0,0,0.1)] relative z-10 animate-float" style={{ color: 'var(--color-vocab)', animationDelay: '0.2s', animationDuration: '6s' }}>
+            <span
+              className="filter drop-shadow-[0_2px_3px_rgba(0,0,0,0.1)] relative z-10 animate-float"
+              style={{
+                color: 'var(--color-vocab)',
+                animationDelay: '0.2s',
+                animationDuration: '6s',
+              }}
+            >
               <Book size={28} />
             </span>
             <p
               className="font-display text-base font-extrabold text-center leading-tight px-1 break-words max-w-full relative z-10"
               style={{
                 color: 'var(--color-vocab)',
-                textShadow: '0.5px 0.5px 0px var(--color-surface), -0.5px -0.5px 0px rgba(0,0,0,0.15)',
+                textShadow:
+                  '0.5px 0.5px 0px var(--color-surface), -0.5px -0.5px 0px rgba(0,0,0,0.15)',
               }}
             >
               {item.word}

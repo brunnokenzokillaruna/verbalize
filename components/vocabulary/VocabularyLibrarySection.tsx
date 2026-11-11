@@ -25,7 +25,6 @@ type VocabularyLibrarySectionProps = {
   onSrsFilterChange: (filter: SrsFilter) => void;
   onLayoutChange: (mode: 'grid' | 'list') => void;
   onEnrich: (word: string) => void;
-  onImageLoaded: (word: string, imageUrl: string) => void;
 };
 
 function getFirstSeenMs(item: UserVocabularyDocument): number {
@@ -47,7 +46,6 @@ export function VocabularyLibrarySection({
   onSrsFilterChange,
   onLayoutChange,
   onEnrich,
-  onImageLoaded,
 }: VocabularyLibrarySectionProps) {
   const [selectedLetter, setSelectedLetter] = useState<string | null>(null);
 
@@ -276,7 +274,6 @@ export function VocabularyLibrarySection({
                       item={item}
                       language={language}
                       animDelay={idx * 30}
-                      onImageLoaded={onImageLoaded}
                       onEnrich={onEnrich}
                       enriching={enrichingWords.has(item.word)}
                     />

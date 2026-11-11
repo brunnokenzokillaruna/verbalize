@@ -4,8 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { CheckCircle2 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
-import { getUserVocabulary, getUserMistakes, updateVocabImage } from '@/services/firestore';
-import { wordsMatchCanonically } from '@/lib/vocabCanonical';
+import { getUserVocabulary, getUserMistakes } from '@/services/firestore';
 import type { UserVocabularyDocument, SupportedLanguage } from '@/types';
 
 import { LANG_LABEL } from '@/components/vocabulary/constants';
@@ -111,13 +110,6 @@ export default function VocabularyPage() {
     () => loadVocabulary({ silent: true }),
     [loadVocabulary],
   );
-
-  const handleImageLoaded = useCallback((word: string, imageUrl: string) => {
-    setItems((prev) => prev.map((item) => (wordsMatchCanonically(item.word, word) ? { ...item, imageUrl } : item)));
-    if (user) {
-      updateVocabImage(user.uid, word, language, imageUrl).catch(console.error);
-    }
-  }, [user, language]);
 
   const { enrichingWords, handleEnrichItem } = useVocabEnrich(user, items, language, setItems);
 
@@ -243,7 +235,6 @@ export default function VocabularyPage() {
                   onSrsFilterChange={setSrsFilter}
                   onLayoutChange={setLayoutMode}
                   onEnrich={handleEnrichItem}
-                  onImageLoaded={handleImageLoaded}
                 />
               )}
             </div>

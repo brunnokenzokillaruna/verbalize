@@ -15,7 +15,6 @@ type VocabularyDueSectionProps = {
   language: SupportedLanguage;
   enrichingWords: Set<string>;
   onEnrich: (word: string) => void;
-  onImageLoaded: (word: string, imageUrl: string) => void;
 };
 
 export function VocabularyDueSection({
@@ -24,7 +23,6 @@ export function VocabularyDueSection({
   language,
   enrichingWords,
   onEnrich,
-  onImageLoaded,
 }: VocabularyDueSectionProps) {
   const [expanded, setExpanded] = useState(false);
 
@@ -82,7 +80,6 @@ export function VocabularyDueSection({
                   language={language}
                   urgent
                   animDelay={(idx + 1) * 45}
-                  onImageLoaded={onImageLoaded}
                   onEnrich={onEnrich}
                   enriching={enrichingWords.has(item.word)}
                 />

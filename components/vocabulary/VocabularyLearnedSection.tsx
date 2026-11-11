@@ -9,7 +9,6 @@ type VocabularyLearnedSectionProps = {
   language: SupportedLanguage;
   enrichingWords: Set<string>;
   onEnrich: (word: string) => void;
-  onImageLoaded: (word: string, imageUrl: string) => void;
 };
 
 export function VocabularyLearnedSection({
@@ -18,7 +17,6 @@ export function VocabularyLearnedSection({
   language,
   enrichingWords,
   onEnrich,
-  onImageLoaded,
 }: VocabularyLearnedSectionProps) {
   if (learned.length === 0) return null;
 
@@ -39,7 +37,6 @@ export function VocabularyLearnedSection({
               item={item}
               language={language}
               animDelay={idx * 35}
-              onImageLoaded={onImageLoaded}
               onEnrich={onEnrich}
               enriching={enrichingWords.has(item.word)}
             />
