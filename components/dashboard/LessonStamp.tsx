@@ -141,7 +141,7 @@ function StampGlyph({ tag, color }: { tag: LessonTag; color: string }) {
       return (
         <g transform="translate(37 36)">
           <path d="M8 26V5" {...s} />
-          <path d="M8 5h16l-4 7 4 7H8z" fill={color} fillOpacity={0.15} {...s} />
+          <path d="M8 5h16l-4 7 4 7H8z" {...s} fill={color} fillOpacity={0.15} />
         </g>
       );
   }
