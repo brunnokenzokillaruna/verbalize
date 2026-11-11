@@ -276,11 +276,13 @@ export default function VerbsPage() {
           </div>
         ) : (
           <>
-            <VerbTabNav
-              activeTab={activeTab}
-              totalCount={learnedVerbs.length}
-              onTabChange={handleTabChange}
-            />
+            {!verb && !loading && (
+              <VerbTabNav
+                activeTab={activeTab}
+                totalCount={learnedVerbs.length}
+                onTabChange={handleTabChange}
+              />
+            )}
 
             {!verb && !loading && activeTab === 'practice' && (
               learnedVerbs.length > 0 ? (
@@ -381,7 +383,7 @@ export default function VerbsPage() {
 
         {/* ── Verb result ── */}
         {verb && !loading && (
-          <div className="flex flex-col gap-5 animate-slide-up-spring">
+          <div className="flex flex-col gap-6 animate-slide-up-spring">
             <VerbResultHero
               infinitive={verb.infinitive}
               translation={verb.translation}
@@ -391,6 +393,8 @@ export default function VerbsPage() {
             />
 
             <VerbAuxiliaryHint infinitive={verb.infinitive} language={language} />
+
+            <div className="h-px w-full bg-border" aria-hidden />
 
             <VerbTenseList
               verb={verb}
